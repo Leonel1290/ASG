@@ -11,7 +11,6 @@
     <title>Login</title>
   </head>
   <body>
-
     <div class="container">
       <div class="row justify-content-center mt-5">
         <div class="col-sm-6 col-md-4">
@@ -19,11 +18,11 @@
             <h1 class="h3">Login</h1>
           </div>
           <!-- Mostrar mensaje de error si existe -->
-          <?php if (session()->getFlashdata('error')): ?>
-            <div class="alert alert-danger" role="alert">
-              <?= session()->getFlashdata('error') ?>
-            </div>
-          <?php endif; ?>
+          <?php if (session()->get('error')): ?>
+        <div>
+            <p style="color: red;"><?= session()->get('error') ?></p>
+        </div>
+    <?php endif; ?>
 
           <form action="<?php echo base_url('/login') ?>" method="POST">
             <div class="form-group">

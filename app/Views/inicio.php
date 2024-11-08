@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
-    <!-- Required meta tags -->
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
+    <!-- Meta tags requeridos -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -13,11 +14,12 @@
       body {
         background-color: #f4f6f9;
         color: #333;
+        font-family: Arial, sans-serif;
       }
 
       .navbar {
-        margin-bottom: 20px;
-        background-color: #343a40;
+        margin-bottom: 0;
+        background-color: #001f3f; /* Azul marino */
       }
 
       .navbar-brand {
@@ -29,40 +31,72 @@
         color: #ddd;
       }
 
-      .dropdown-item:hover {
-        background-color: #007bff;
+      .hero {
+        background: linear-gradient(to right, #001f3f, #3aafa9); /* Degradado azul marino a azul verdoso */
         color: white;
+        padding: 80px 0;
+        text-align: center;
       }
 
-      .container {
-        max-width: 1200px;
-      }
-
-      h1, h2 {
-        color: #007bff;
-        font-weight: bold;
-        margin-top: 20px;
-      }
-
-      p.lead {
-        font-size: 1.2em;
+      .hero h1 {
+        font-size: 3em;
         margin-bottom: 20px;
       }
 
-      .feature-list {
-        margin: 30px 0;
+      .hero p {
+        font-size: 1.5em;
+        margin-bottom: 30px;
       }
 
-      .feature-list li {
-        margin-bottom: 10px;
+      .hero .btn-primary {
+        background-color: #f39c12; /* Naranja ámbar */
+        border-color: #f39c12;
+        padding: 10px 30px;
+        font-size: 1.2em;
       }
 
+      .hero .btn-primary:hover {
+        background-color: #e67e22; /* Un tono más oscuro para el hover */
+        border-color: #e67e22;
+      }
+
+      .feature-icons {
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .feature-icons .icon {
+        font-size: 3em;
+        color: #001f3f; /* Azul marino */
+        margin-bottom: 20px;
+      }
+
+      .feature-icons h3 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+      }
+
+      .feature-icons p {
+        font-size: 1.1em;
+        color: #555;
+      }
+
+      footer {
+        background-color: #343a40;
+        color: white;
+        padding: 20px;
+        margin-top: 40px;
+        text-align: center;
+      }
+
+      /* Estilo personalizado para el cuadro de información de la empresa */
       .company-info {
-        background-color: #007bff;
+        background-color: #001f3f; /* Azul marino */
         color: white;
         padding: 20px;
         border-radius: 8px;
         margin-top: 40px;
+        text-align: center;
       }
 
       .company-info a {
@@ -72,14 +106,6 @@
 
       .company-info a:hover {
         color: #ccc;
-      }
-
-      footer {
-        background-color: #343a40;
-        color: white;
-        padding: 20px;
-        margin-top: 40px;
-        text-align: center;
       }
 
       /* Estilo personalizado para el botón de cerrar sesión */
@@ -93,62 +119,71 @@
       }
     </style>
 
-    <title>Información del Dispositivo</title>
+    <title>ASG - Seguridad en tu Hogar</title>
   </head>
   <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
-      <a class="navbar-brand" href="#">GasSafe</a>
+      <a class="navbar-brand" href="#">ASG</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('/inicio') ?>">Inicio</a>
+            <a class="nav-link" href="#companyInfo">¿Cómo contactarnos?</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Usuario
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
-              <a class="dropdown-item" href="<?= base_url('/perfilobtener') ?>">Perfil</a>
-              <a class="dropdown-item btn-logout" href="<?= base_url('/logout') ?>">Cerrar Sesión</a> <!-- Cambiado aquí -->
-            </div>
-          </li>
+          <!-- Elimina el botón de Ingresar -->
         </ul>
       </div>
     </nav>
 
-    <!-- Información del dispositivo -->
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8">
-          <h1>Detector de Gas Inteligente</h1>
-          <p class="lead">Protege tu hogar con nuestro avanzado sistema de detección de fugas de gas. Equipado con sensores de alta precisión y un sistema de respuesta automática, este dispositivo es esencial para la seguridad de tu hogar.</p>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>Protege lo que más importa</h1>
+        <p>Tu hogar seguro con GasSafe. Detección precisa de fugas de gas en tiempo real.</p>
+        <a href="<?= base_url('/loginobtener') ?>" class="btn btn-light ml-3">Inicia Sesión</a>
+      </div>
+    </section>
 
-          <h2>Características Destacadas</h2>
-          <ul class="feature-list">
-            <li>Sensores de última tecnología para detectar múltiples gases inflamables.</li>
-            <li>Notificaciones en tiempo real en tu dispositivo móvil.</li>
-            <li>Sistema de cierre automático de válvulas para mayor seguridad.</li>
-            <li>Integración con una aplicación móvil para monitoreo y control remoto.</li>
-            <li>Fácil instalación en cualquier tipo de vivienda.</li>
-          </ul>
-
-        </div>
-        <div class="col-md-4">
-          <img src="https://www.abelson.com.ar/11196-thickbox_default/detector-de-gas-profesional-intelligent-gas.jpg" class="img-fluid" alt="Imagen del dispositivo de gas">
+    <!-- Feature Icons Section -->
+    <section id="features" class="feature-icons">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Seguridad Total</h3>
+            <p>Sistema avanzado de cierre automático de válvulas para garantizar tu seguridad.</p>
+          </div>
+          <div class="col-md-4">
+            <div class="icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Monitoreo Remoto</h3>
+            <p>Controla y monitorea las fugas desde tu dispositivo móvil con nuestra app.</p>
+          </div>
+          <div class="col-md-4">
+            <div class="icon">
+              <i class="fas fa-bell"></i>
+            </div>
+            <h3>Alertas en Tiempo Real</h3>
+            <p>Recibe notificaciones instantáneas cuando detectemos cualquier fuga de gas.</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- Información de la empresa -->
+    <!-- Información de la empresa -->
+    <div class="container mt-5" id="companyInfo">
       <div class="company-info mt-5">
         <h2>Sobre Nosotros</h2>
         <p><strong>Empresa:</strong> ASG</p>
-        <p><strong>Dirección:</strong> Calle 123, Ciudad, País</p>
-        <p><strong>Teléfono:</strong> +123 456 7890</p>
-        <p><strong>Email:</strong> contacto@gassafe.com</p>
+        <p><strong>Dirección:</strong> Río Tercero</p>
+        <p><strong>Teléfono:</strong> 3571-54412</p>
+        <p><strong>Email:</strong> againsafegas.ascii@gmail.com</p>
         <p><strong>Sitio Web:</strong> <a href="https://www.gassafe.com">www.Againsafegas.com</a></p>
       </div>
     </div>
@@ -161,5 +196,20 @@
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para scroll suave -->
+    <script>
+      $(document).ready(function(){
+        // Scroll suave al hacer clic en los enlaces de navegación
+        $('a[href^="#"]').on('click', function(e) {
+          e.preventDefault();
+
+          $('html, body').animate({
+            scrollTop: $($(this).attr('href')).offset().top
+          }, 500);
+        });
+      });
+    </script>
+
   </body>
 </html>

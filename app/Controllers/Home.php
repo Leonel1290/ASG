@@ -51,7 +51,7 @@ class Home extends Controller
                     'logged_in' => true,
                 ]);
 
-                return view('inicio'); // Redirigir a la página de inicio
+                return view('perfil'); // Redirigir a la página de inicio
             } else {
                 // Contraseña incorrecta
                 $session->setFlashdata('error', 'Contraseña incorrecta');
@@ -131,7 +131,7 @@ class Home extends Controller
             $email = \Config\Services::email();
             
             $email->setTo($user['email']);
-            $email->setFrom('valentinsalomone2001@gmail.com', 'Thewildproyect');
+            $email->setFrom('againsafegas.ascii@gmail.com', 'ASG');
             $email->setSubject('Recuperación de contraseña');
             $email->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
 
@@ -222,5 +222,8 @@ class Home extends Controller
     public function inicioresetpass()
     {
         return view('reset_password');
+    }
+    public function obtenerperfil(){
+        return view('perfilobtener');
     }
 }

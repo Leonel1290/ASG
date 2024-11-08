@@ -19,14 +19,16 @@
 
         <form action="<?= base_url('/reset-password') ?>" method="post">
             <input type="hidden" name="token" value="<?= $token ?>">
-
             <div class="mb-3">
                 <label for="password" class="form-label">Nueva Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su nueva contraseña" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Introduce tu nueva contraseña" required>
             </div>
-
             <button type="submit" class="btn btn-primary w-100">Restablecer Contraseña</button>
         </form>
+
+        <div class="text-center mt-3">
+            <a href="<?= base_url('login') ?>">Acceder</a>
+        </div>
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

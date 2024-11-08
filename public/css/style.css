@@ -1,0 +1,279 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.bodyprototipo {
+    background-image: url("fondo.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: arial;
+}
+.form-login {
+    width: 450px;
+    background-color: #24303c;
+    padding: 30px ;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+    box-shadow: 7px 13px 37px #0a0dca;
+}
+.password-container img{
+    margin-right: -500px;
+    padding-left: 15px;
+    width: 40px;
+    cursor: pointer;
+    transform: translate(840%, -215%);
+}
+.form-login h1 {
+    margin-top: 0px;
+    text-align: center;
+    height: 45px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid;
+    font-size: 30px;
+}
+.controls {
+    width: 100%;
+    border: 1px solid #017bab;
+    margin-bottom: 15px;
+    padding: 11px 10px;
+    background: #252322;
+    font-size: 14px;
+    font-weight: bold;
+}
+.buttons {
+    width: 100%;
+    height: 40px;
+    background: #1f53c5;
+    border: none;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.form-login p {
+    height: 40px;
+    text-align: center;
+    border-bottom: 1px solid;
+}
+.ccn {
+   
+    text-align: center;
+    border-bottom: 1px solid;
+
+}
+.form-login a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+.form-login a:hover {
+    text-decoration: underline;
+}
+/*register AAAAAAAAAAAAAAAAAAAAAAA */
+.form-register {
+    width: 450px;
+    background-color: #24303c;
+    padding: 30px ;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    font-family: 'calibri';
+    color: white;
+    box-shadow: 7px 13px 37px #0a0dca;
+
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.body1 {
+    background-image: url('fondo.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+.form-register h1 {
+    margin-top: 0px;
+    text-align: center;
+    height: 45px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid;
+    font-size: 30px;
+    top: 30%;
+    left: 30%;
+    transform: translate(0%, -20%);
+}
+.controls {
+    width: 100%;
+    background-color: #24303c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #1f53c5;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+}
+.form-register p {
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 40px;
+}
+.form-register a {
+    color: white;
+    text-decoration: none;
+}
+.form-register a:hover {
+    color: rgb(255, 255, 255);
+    text-decoration: underline;
+}
+.form-register .botons {
+    width: 100%;
+    background: #1f53c5;
+    border: none;
+    padding: 12px;
+    color: white;
+    margin: 16px 0;
+    font-size: 16px;
+}
+/* ACA EMPIEZA EL FORGOTPASSWORD AAAAAAAAAAA */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.bodyforgot{
+    background-image: url('fondo.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+.form-forgot {
+    width: 450px;
+    background-color: #24303c;
+    padding: 30px ;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+    box-shadow: 7px 13px 37px #0a0dca;
+}
+.form-forgot h1 {
+    margin-top: 0px;
+    text-align: center;
+    height: 45px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid;
+    font-size: 30px;
+}
+.controlsforgot {
+    width: 100%;
+    background-color: #24303c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #1f53c5;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+}
+.form-forgot a {
+    color: white;
+    text-decoration: none;
+}
+.form-forgot a:hover {
+    color: rgb(255, 255, 255);
+    text-decoration: underline;
+}
+.form-forgot .botonsforgot {
+    width: 100%;
+    background: #1f53c5;
+    border: none;
+    padding: 12px;
+    color: white;
+    margin: 16px 0;
+    font-size: 16px;
+}
+/* ACA EMPIEZA EL RESETPASSWORD AAAAAAAAAAA */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.bodyreset{
+    background-image: url('fondo.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+.form-reset {
+    width: 450px;
+    background-color: #24303c;
+    padding: 30px ;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+    box-shadow: 7px 13px 37px #0a0dca;
+}
+.form-reset h1 {
+    margin-top: 0px;
+    text-align: center;
+    height: 45px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid;
+    font-size: 30px;
+}
+.controlsreset{
+    width: 100%;
+    background-color: #24303c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #1f53c5;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
+}
+.form-reset a {
+    color: white;
+    text-decoration: none;
+}
+.form-reset a:hover {
+    color: rgb(255, 255, 255);
+    text-decoration: underline;
+}
+.form-reset .botonsreset {
+    width: 100%;
+    background: #1f53c5;
+    border: none;
+    padding: 12px;
+    color: white;
+    margin: 16px 0;
+    font-size: 16px;
+}
