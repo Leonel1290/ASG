@@ -15,7 +15,7 @@
         <!-- Muestra el nivel de gas -->
         <div class="card text-center">
             <div class="card-body">
-                <h5 class="card-title">Nivel de Gas Actual.</h5>
+                <h5 class="card-title">Nivel de Gas Actual</h5>
                 <p id="nivel_gas" class="display-4 text-primary">--</p>
             </div>
         </div>
