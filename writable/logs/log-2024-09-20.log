@@ -1,0 +1,220 @@
+INFO - 2024-09-20 00:29:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:29:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:29:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:29:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:29:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:30:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-09-20 00:30:16 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in C:\xampp\htdocs\login2\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 C:\xampp\htdocs\login2\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', '', 'formulario', 3306, '', 0)
+#1 C:\xampp\htdocs\login2\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\xampp\htdocs\login2\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\xampp\htdocs\login2\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\xampp\htdocs\login2\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\login2\system\BaseModel.php(714): CodeIgniter\Model->doFirst()
+#6 C:\xampp\htdocs\login2\app\Controllers\Home.php(96): CodeIgniter\BaseModel->first()
+#7 C:\xampp\htdocs\login2\system\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+#8 C:\xampp\htdocs\login2\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+#9 C:\xampp\htdocs\login2\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\xampp\htdocs\login2\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\xampp\htdocs\login2\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\xampp\htdocs\login2\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: NO) in C:\xampp\htdocs\login2\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\xampp\htdocs\login2\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\xampp\htdocs\login2\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\xampp\htdocs\login2\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#3 C:\xampp\htdocs\login2\system\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+#4 C:\xampp\htdocs\login2\system\BaseModel.php(714): CodeIgniter\Model->doFirst()
+#5 C:\xampp\htdocs\login2\app\Controllers\Home.php(96): CodeIgniter\BaseModel->first()
+#6 C:\xampp\htdocs\login2\system\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+#7 C:\xampp\htdocs\login2\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+#8 C:\xampp\htdocs\login2\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\login2\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\login2\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\login2\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+CRITICAL - 2024-09-20 00:30:16 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: NO)
+[Method: POST, Route: forgotpassword1]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `usuarios`
+WHERE `email` = :email:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Model.php(330): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\BaseModel.php(714): CodeIgniter\Model->doFirst()
+ 5 APPPATH\Controllers\Home.php(96): CodeIgniter\BaseModel->first()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-09-20 00:30:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:30:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 00:30:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-09-20 00:30:35 --> Email: sendWithSmtp throwed ErrorException: stream_socket_enable_crypto(): SSL operation failed with code 1. OpenSSL Error messages:
+error:1416F086:SSL routines:tls_process_server_certificate:certificate verify failed in C:\xampp\htdocs\login2\system\Email\Email.php:1922
+Stack trace:
+#0 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler(2, 'stream_socket_e...', 'C:\\xampp\\htdocs...', 1922)
+#1 C:\xampp\htdocs\login2\system\Email\Email.php(1922): stream_socket_enable_crypto(Resource id #151, true, 121)
+#2 C:\xampp\htdocs\login2\system\Email\Email.php(1809): CodeIgniter\Email\Email->SMTPConnect()
+#3 C:\xampp\htdocs\login2\system\Email\Email.php(1694): CodeIgniter\Email\Email->sendWithSmtp()
+#4 C:\xampp\htdocs\login2\system\Email\Email.php(1589): CodeIgniter\Email\Email->spoolEmail()
+#5 C:\xampp\htdocs\login2\app\Controllers\Home.php(121): CodeIgniter\Email\Email->send()
+#6 C:\xampp\htdocs\login2\system\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+#7 C:\xampp\htdocs\login2\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+#8 C:\xampp\htdocs\login2\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\login2\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\login2\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\login2\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+ERROR - 2024-09-20 00:30:35 --> Email: Unable to send email using SMTP. Your server might not be configured to send mail using this method.
+ERROR - 2024-09-20 00:30:35 --> 220 smtp.gmail.com ESMTP 41be03b00d2f7-7db4998b4f3sm9856597a12.72 - gsmtp
+
+hello: 250-smtp.gmail.com at your service, [190.122.53.177]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250 SMTPUTF8
+
+starttls: 220 2.0.0 Ready to start TLS
+
+ERROR - 2024-09-20 00:30:35 --> Error enviando correo: 220 smtp.gmail.com ESMTP 41be03b00d2f7-7db4998b4f3sm9856597a12.72 - gsmtp
+<br><pre>hello: 250-smtp.gmail.com at your service, [190.122.53.177]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250 SMTPUTF8
+</pre><pre>starttls: 220 2.0.0 Ready to start TLS
+</pre>Unable to send email using SMTP. Your server might not be configured to send mail using this method.<br><pre>Date: Fri, 20 Sep 2024 00:30:34 +0000
+To: ivosoloclash1@gmail.com
+From: &quot;Thewildproyect&quot; &lt;valentinsalomone2001@gmail.com&gt;
+Return-Path: &lt;valentinsalomone2001@gmail.com&gt;
+Subject: =?UTF-8?Q?Recuperaci=C3=B3n=20de=20contrase=C3=B1a?=
+Reply-To: &lt;valentinsalomone2001@gmail.com&gt;
+User-Agent: CodeIgniter
+X-Sender: valentinsalomone2001@gmail.com
+X-Mailer: CodeIgniter
+X-Priority: 3 (Normal)
+Message-ID: &lt;66ecc22a2098a5.74343428@gmail.com&gt;
+Mime-Version: 1.0
+
+</pre>
+ERROR - 2024-09-20 00:30:35 --> Language.invalidMessageFormat: $message: "The following SMTP error was encountered: {0}", $args: " a*‘a1ªï‚ù…Äõ#DÎ¶Iì-$aŸœÈü¹è,–A¹Ô.®	ð­p„óîÀaŽe”Å.ø¸¶;F&oé6=ªoÝBDD`jpl‡WUÖá~‘Ã8âžºÞ
+¦ò Eh5±­6wJZÁ‡‹Œ*"þ,øÇ†ÊoÇæ^lÓæÐ„„	&–l	 ´:n½S‘‰”%£è6­É@öÍÀD" (urlencoded: "%17%03%03%00a%2A%91%1E%0Da1%AA%01%EF%82%F9%85%C4%F5%23D%CE%B6I%EC-%24a%9F%9C%C8%FC%B9%E8%2C%96%0CA%B9%D4.%AE%09%F0%AD%0Dp%84%1E%F3%EE%C0a%02%1C%8Ee%94%C5.%F8%B8%B6%03%3BF%26o%E96%19%3D%AAo%DDBDD%16%60jpl%87WU%D6%E1%0B~%91%C3%9D8%E2%9E%BA%1D%DE%0A%A6%F2%17%03%03%00E%06h5%B1%AD6wJZ%C1%87%8B%8C%2A%22%FE%2C%F8%C7%01%1F%86%CA%1Bo%7F%C7%E6%5El%D3%17%E6%D0%8F%84%84%09%26%96l%09%03%A0%B4%3An%BDS%91%89%94%1F%25%A3%E86%1B%1A%AD%C9%40%F6%0E%1B%9D%CD%C0D"), MessageFormatter Error: "Invalid UTF-8 data in string argument: '': U_INVALID_CHAR_FOUND" (10)
+INFO - 2024-09-20 00:30:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:10:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:10:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:11:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:11:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:11:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:11:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:12:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-09-20 04:12:39 --> Email: sendWithSmtp throwed ErrorException: stream_socket_enable_crypto(): SSL operation failed with code 1. OpenSSL Error messages:
+error:1416F086:SSL routines:tls_process_server_certificate:certificate verify failed in C:\xampp\htdocs\login2\system\Email\Email.php:1922
+Stack trace:
+#0 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler(2, 'stream_socket_e...', 'C:\\xampp\\htdocs...', 1922)
+#1 C:\xampp\htdocs\login2\system\Email\Email.php(1922): stream_socket_enable_crypto(Resource id #151, true, 121)
+#2 C:\xampp\htdocs\login2\system\Email\Email.php(1809): CodeIgniter\Email\Email->SMTPConnect()
+#3 C:\xampp\htdocs\login2\system\Email\Email.php(1694): CodeIgniter\Email\Email->sendWithSmtp()
+#4 C:\xampp\htdocs\login2\system\Email\Email.php(1589): CodeIgniter\Email\Email->spoolEmail()
+#5 C:\xampp\htdocs\login2\app\Controllers\Home.php(121): CodeIgniter\Email\Email->send()
+#6 C:\xampp\htdocs\login2\system\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+#7 C:\xampp\htdocs\login2\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+#8 C:\xampp\htdocs\login2\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\login2\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\login2\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\login2\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+ERROR - 2024-09-20 04:12:39 --> Email: Unable to send email using SMTP. Your server might not be configured to send mail using this method.
+ERROR - 2024-09-20 04:12:39 --> 220 smtp.gmail.com ESMTP d2e1a72fcca58-71944a9cab5sm9004709b3a.5 - gsmtp
+
+hello: 250-smtp.gmail.com at your service, [190.122.53.177]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250 SMTPUTF8
+
+starttls: 220 2.0.0 Ready to start TLS
+
+ERROR - 2024-09-20 04:12:39 --> Error enviando correo: 220 smtp.gmail.com ESMTP d2e1a72fcca58-71944a9cab5sm9004709b3a.5 - gsmtp
+<br><pre>hello: 250-smtp.gmail.com at your service, [190.122.53.177]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250 SMTPUTF8
+</pre><pre>starttls: 220 2.0.0 Ready to start TLS
+</pre>Unable to send email using SMTP. Your server might not be configured to send mail using this method.<br><pre>Date: Fri, 20 Sep 2024 04:12:38 +0000
+To: angelferrer806@gmail.com
+From: &quot;Thewildproyect&quot; &lt;valentinsalomone2001@gmail.com&gt;
+Return-Path: &lt;valentinsalomone2001@gmail.com&gt;
+Subject: =?UTF-8?Q?Recuperaci=C3=B3n=20de=20contrase=C3=B1a?=
+Reply-To: &lt;valentinsalomone2001@gmail.com&gt;
+User-Agent: CodeIgniter
+X-Sender: valentinsalomone2001@gmail.com
+X-Mailer: CodeIgniter
+X-Priority: 3 (Normal)
+Message-ID: &lt;66ecf6362e6324.31399054@gmail.com&gt;
+Mime-Version: 1.0
+
+</pre>
+ERROR - 2024-09-20 04:12:40 --> Language.invalidMessageFormat: $message: "The following SMTP error was encountered: {0}", $args: " `5®C‘†J^a¾jÜ135Å–Â ·;‘D~dWÁ?Ä*¥Ç 8œŠõ°KA”ŒÖ!@ôEt¸”‘g_ÄÔ66“Ù0ÌT‡}/ân$Ž·´¹’†ê¦ÓšÌ"Ö]-³ EXfåJ4*Ó›GL-°˜o‚_ø!o	äþx‰–ÇMÈÄaäÃ_à}b»ÝÇ ‚™ß«jÈd¹ê´¦bàÉ®ªø" (urlencoded: "%17%03%03%00%605%AEC%91%1A%86J%5Ea%BEj%DC135%C5%96%C2%00%B7%3B%91D~dW%C1%3F%C4%81%2A%A5%C7%208%9C%8A%F5%B0KA%94%8C%D6%21%40%F4E%81t%B8%94%91g_%C4%D466%93%D9%9D0%CCT%14%87%7D%06%2F%E2n%24%90%05%8E%B7%7F%B4%1D%B9%9D%92%86%EA%1B%A6%D3%9A%81%CC%22%D6%5D-%B3%17%03%03%00EX%19f%E5J%184%2A%D3%11%9BGL-%B0%98o%11%82_%F8%21o%09%E4%FE%16x%89%96%03%C7M%C8%C4%0Da%E4%C3_%E0%12%7Db%BB%DD%C7%00%82%99%DF%ABj%C8d%01%06%B9%EA%0C%B4%A6b%E0%C9%08%AE%AA%F8"), MessageFormatter Error: "Invalid UTF-8 data in string argument: '': U_INVALID_CHAR_FOUND" (10)
+INFO - 2024-09-20 04:12:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:25:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:25:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:25:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-09-20 04:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-09-20 04:25:54 --> Email: sendWithSmtp throwed ErrorException: fsockopen(): SSL operation failed with code 1. OpenSSL Error messages:
+error:1416F086:SSL routines:tls_process_server_certificate:certificate verify failed in C:\xampp\htdocs\login2\system\Email\Email.php:1901
+Stack trace:
+#0 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler(2, 'fsockopen(): SS...', 'C:\\xampp\\htdocs...', 1901)
+#1 C:\xampp\htdocs\login2\system\Email\Email.php(1901): fsockopen('ssl://smtp.gmai...', 465, NULL, NULL, 10)
+#2 C:\xampp\htdocs\login2\system\Email\Email.php(1809): CodeIgniter\Email\Email->SMTPConnect()
+#3 C:\xampp\htdocs\login2\system\Email\Email.php(1694): CodeIgniter\Email\Email->sendWithSmtp()
+#4 C:\xampp\htdocs\login2\system\Email\Email.php(1589): CodeIgniter\Email\Email->spoolEmail()
+#5 C:\xampp\htdocs\login2\app\Controllers\Home.php(121): CodeIgniter\Email\Email->send()
+#6 C:\xampp\htdocs\login2\system\CodeIgniter.php(933): App\Controllers\Home->forgotPPassword()
+#7 C:\xampp\htdocs\login2\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+#8 C:\xampp\htdocs\login2\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\xampp\htdocs\login2\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\xampp\htdocs\login2\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\xampp\htdocs\login2\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+ERROR - 2024-09-20 04:25:54 --> Email: Unable to send email using SMTP. Your server might not be configured to send mail using this method.
+ERROR - 2024-09-20 04:25:54 --> 
+ERROR - 2024-09-20 04:25:54 --> Error enviando correo: Unable to send email using SMTP. Your server might not be configured to send mail using this method.<br><pre>Date: Fri, 20 Sep 2024 04:25:54 +0000
+To: ivosoloclash1@gmail.com
+From: &quot;Thewildproyect&quot; &lt;valentinsalomone2001@gmail.com&gt;
+Return-Path: &lt;valentinsalomone2001@gmail.com&gt;
+Subject: =?UTF-8?Q?Recuperaci=C3=B3n=20de=20contrase=C3=B1a?=
+Reply-To: &lt;valentinsalomone2001@gmail.com&gt;
+User-Agent: CodeIgniter
+X-Sender: valentinsalomone2001@gmail.com
+X-Mailer: CodeIgniter
+X-Priority: 3 (Normal)
+Message-ID: &lt;66ecf952240bd8.20162199@gmail.com&gt;
+Mime-Version: 1.0
+
+</pre>
+INFO - 2024-09-20 04:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
