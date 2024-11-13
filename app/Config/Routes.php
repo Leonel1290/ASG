@@ -23,8 +23,11 @@ $routes->post('/forgotpassword1', 'Home::forgotPPassword');
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword');
 
-//Perfil
 $routes->post('/login', 'Home::login');
 
-//Lecturas
-$routes->post('/api/agregar-lectura', 'LecturasController::agregarLectura');
+//Perfil
+$routes->get('/perfilobtener', 'Home::obtenerperfil');
+
+//Recibir los datos de la ESP32:
+$routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
+

@@ -1,43 +1,39 @@
 <?php
 
 namespace App\Controllers;
-
-use App\Models\LecturaModel;
+use App\Models\LecturasGasModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class LecturaController extends ResourceController
-{
-    protected $lecturaModel;
-
-    public function __construct()
-    {
-        $this->lecturaModel = new LecturaModel();
-    }
-
-    // Método para actualizar o insertar lectura de gas
-    public function actualizarLectura()
-    {
-        $usuario_id = $this->request->getPost('usuario_id');
+class LecturasController extends ResourceController {
+    public function guardar() {
+        $model = new LecturasGasModel();
         $nivel_gas = $this->request->getPost('nivel_gas');
+        $id_lectura = $this->request->getPost('id_placa');  // Obtiene el id de la lectura
 
-        if (!$usuario_id || !$nivel_gas) {
-            return $this->respond(['status' => 'error', 'message' => 'Datos insuficientes'], 400);
+        // Verifica si el id de la lectura está disponible
+        if (!$id_lectura) {
+            return $this->respond(['status' => 'error', 'message' => 'ID de lectura no proporcionado'], 400);
         }
 
-        // Actualiza o inserta el nivel de gas del usuario
-        $result = $this->lecturaModel->updateLectura($usuario_id, $nivel_gas);
+        // Verifica si ya existe una lectura con el id proporcionado
+        $lectura = $model->find($id_lectura);
 
-        if ($result) {
-            return $this->respond(['status' => 'success', 'message' => 'Lectura actualizada correctamente']);
+        if ($lectura) {
+            // Si ya existe una lectura, actualiza el nivel de gas
+            $model->update($id_lectura, ['nivel_gas' => $nivel_gas]);
+            return $this->respond(['status' => 'success', 'message' => 'Lectura actualizada']);
         } else {
-            return $this->respond(['status' => 'error', 'message' => 'Error al actualizar lectura'], 500);
+            // Si no existe una lectura con ese id, crea una nueva
+            $data = [
+                'nivel_gas' => $nivel_gas,
+                'id' => $id_lectura  // Establece el id proporcionado
+            ];
+
+            if ($model->insert($data)) {
+                return $this->respond(['status' => 'success', 'message' => 'Lectura guardada']);
+            } else {
+                return $this->respond(['status' => 'error', 'message' => 'Error al guardar la lectura'], 500);
+            }
         }
     }
-}
-public function verUltimaLectura()
-{
-    $model = new LecturaModel();  // Asumiendo que has configurado LecturaModel
-    $ultimaLectura = $model->orderBy('created_at', 'DESC')->first();  // Obtener la última lectura
-
-    return view('ver_lectura', ['lectura' => $ultimaLectura]);
 }

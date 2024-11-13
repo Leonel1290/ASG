@@ -26,44 +26,54 @@ class Home extends Controller
     }
 
     public function login()
-    {
-        $session = session();
-        $userlogin = new Userlogin();
+{
+    $session = session();
+    $userlogin = new Userlogin();
+    $lecturasGasModel = new \App\Models\LecturasGasModel();
 
-        // Captura los datos enviados desde el formulario
-        $nombre = $this->request->getPost('nombre');
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+    // Captura los datos enviados desde el formulario
+    $nombre = $this->request->getPost('nombre');
+    $email = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
 
-        // Buscar el usuario en la base de datos
-        $user = $userlogin->where('nombre', $nombre)
-                          ->where('email', $email)
-                          ->first();
+    // Buscar el usuario en la base de datos
+    $user = $userlogin->where('nombre', $nombre)
+                      ->where('email', $email)
+                      ->first();
 
-        // Verificar si el usuario existe y si la contraseña es correcta
-        if ($user) {
-            if (password_verify($password, $user['password'])) {
-                // Guardar datos en la sesión y redirigir al inicio
-                $session->set([
-                    'id'        => $user['id'],
-                    'nombre'    => $user['nombre'],
-                    'email'     => $user['email'],
-                    'logged_in' => true,
-                ]);
+    // Verificar si el usuario existe y si la contraseña es correcta
+    if ($user) {
+        if (password_verify($password, $user['password'])) {
+            // Obtener la última lectura de gas y la fecha asociada
+            $ultimaLectura = $lecturasGasModel->orderBy('id', 'DESC')->first();
+            $nivel_gas = $ultimaLectura['nivel_gas'];
+            $fecha = $ultimaLectura['created_at']; // Asumiendo que tienes una columna `created_at`
 
-                return view('perfil'); // Redirigir a la página de inicio
-            } else {
-                // Contraseña incorrecta
-                $session->setFlashdata('error', 'Contraseña incorrecta');
-                return redirect()->back();
-            }
+            // Guardar datos en la sesión y redirigir al perfil con datos adicionales
+            $session->set([
+                'id'        => $user['id'],
+                'nombre'    => $user['nombre'],
+                'email'     => $user['email'],
+                'logged_in' => true,
+            ]);
+
+            return view('perfil', [
+                'nivel_gas' => $nivel_gas,
+                'fecha'     => $fecha,
+            ]);
         } else {
-            // Usuario no encontrado
-            $session->setFlashdata('error', 'Usuario no encontrado');
+            // Contraseña incorrecta
+            $session->setFlashdata('error', 'Contraseña incorrecta');
             return redirect()->back();
         }
+    } else {
+        // Usuario no encontrado
+        $session->setFlashdata('error', 'Usuario no encontrado');
+        return redirect()->back();
     }
+}
 
+    
     public function register()
     {
         return view('register');
@@ -226,4 +236,5 @@ class Home extends Controller
     public function obtenerperfil(){
         return view('perfilobtener');
     }
+    
 }
