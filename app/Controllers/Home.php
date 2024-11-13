@@ -41,39 +41,49 @@ class Home extends Controller
                       ->where('email', $email)
                       ->first();
 
-    // Verificar si el usuario existe y si la contraseña es correcta
-    if ($user) {
-        if (password_verify($password, $user['password'])) {
-            // Obtener la última lectura de gas y la fecha asociada
-            $ultimaLectura = $lecturasGasModel->orderBy('id', 'DESC')->first();
+// Verificar si el usuario existe y si la contraseña es correcta
+if ($user) {
+    if (password_verify($password, $user['password'])) {
+        // Obtener la última lectura de gas y la fecha asociada
+        $ultimaLectura = $lecturasGasModel->orderBy('id', 'DESC')->where(['usuario_id' => $user['id']])->first();
+
+        if ($ultimaLectura) {
+            // Si hay una última lectura, obtén el nivel de gas y la fecha
             $nivel_gas = $ultimaLectura['nivel_gas'];
             $fecha = $ultimaLectura['created_at']; // Asumiendo que tienes una columna `created_at`
-
-            // Guardar datos en la sesión y redirigir al perfil con datos adicionales
-            $session->set([
-                'id'        => $user['id'],
-                'nombre'    => $user['nombre'],
-                'email'     => $user['email'],
-                'logged_in' => true,
-            ]);
-
-            return view('perfil', [
-                'nivel_gas' => $nivel_gas,
-                'fecha'     => $fecha,
-            ]);
         } else {
-            // Contraseña incorrecta
-            $session->setFlashdata('error', 'Contraseña incorrecta');
-            return redirect()->back();
+            // Si no hay registros de lecturas, asigna valores predeterminados
+            $nivel_gas = null;
+            $fecha = null;
+            $mensaje = 'No tienes registros de lecturas';
         }
+
+        // Guardar datos en la sesión y redirigir al perfil con datos adicionales
+        $session->set([
+            'id'        => $user['id'],
+            'nombre'    => $user['nombre'],
+            'email'     => $user['email'],
+            'logged_in' => true,
+        ]);
+
+        return view('perfil', [
+            'nivel_gas' => $nivel_gas,
+            'fecha'     => $fecha,
+            'mensaje'   => $mensaje ?? null
+        ]);
     } else {
-        // Usuario no encontrado
-        $session->setFlashdata('error', 'Usuario no encontrado');
+        // Contraseña incorrecta
+        $session->setFlashdata('error', 'Contraseña incorrecta');
         return redirect()->back();
     }
+} else {
+    // Usuario no encontrado
+    $session->setFlashdata('error', 'Usuario no encontrado');
+    return redirect()->back();
+
+}
 }
 
-    
     public function register()
     {
         return view('register');

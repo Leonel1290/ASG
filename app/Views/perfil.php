@@ -119,7 +119,11 @@
                         <div class="card text-center mt-4">
                             <div class="card-body">
                                 <h5 class="card-title">Nivel de Gas Actual</h5>
-                                <p id="nivelGas"><?= $nivel_gas ?> PPM</p> <!-- Mostrar el nivel de gas -->
+                                <?php if (isset($nivel_gas) && $nivel_gas !== null): ?>
+                                    <p id="nivelGas"><?= $nivel_gas ?> PPM</p>
+                                <?php else: ?>
+                                    <p id="nivelGas">No tienes registros de lecturas</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -131,32 +135,36 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
     <script>
-        const nivelGas = <?= $nivel_gas ?>; // El nivel de gas desde PHP
+        const nivelGas = <?= isset($nivel_gas) ? $nivel_gas : 'null' ?>;
 
-        // Actualizar gráfico y barra de progreso
-        const ctx = document.getElementById('gasChart').getContext('2d');
-        const gasChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['10:00', '10:05', '10:10', '10:15', '10:20'], // etiquetas de tiempo
-                datasets: [{
-                    label: 'Nivel de Gas (PPM)',
-                    data: [nivelGas, nivelGas, nivelGas, nivelGas, nivelGas], // Usar el nivel de gas recibido
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+        if (nivelGas !== null) {
+            // Actualizar gráfico y barra de progreso
+            const ctx = document.getElementById('gasChart').getContext('2d');
+            const gasChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10:00', '10:05', '10:10', '10:15', '10:20'],
+                    datasets: [{
+                        label: 'Nivel de Gas (PPM)',
+                        data: [nivelGas, nivelGas, nivelGas, nivelGas, nivelGas],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // Función para actualizar la barra de progreso
+            // Actualizar barra de progreso con el nivel de gas
+            updateProgressBar(nivelGas);
+        }
+
         function updateProgressBar(value) {
             let progressBar = document.getElementById('progressBar');
             let securityLevel = document.getElementById('securityLevel');
@@ -178,9 +186,6 @@
                 securityLevel.textContent = 'Peligro';
             }
         }
-
-        // Actualizar barra de progreso con el nivel de gas
-        updateProgressBar(nivelGas);
     </script>
 
 </body>
