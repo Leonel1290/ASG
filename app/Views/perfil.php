@@ -94,10 +94,10 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">Detalles del Dispositivo</h5>
-                        <p><strong>Nombre del Dispositivo:</strong> Detector de Gas Inteligente</p>
-                        <p><strong>Número de Serie:</strong> 123456789</p>
-                        <p><strong>Estado:</strong> Activo</p>
-                        <p><strong>Última Conexión:</strong> 02/10/2024</p>
+                        <p><strong>Nombre del Dispositivo:</strong> <?= isset($dispositivo['nombre']) ? $dispositivo['nombre'] : 'No disponible' ?></p>
+                        <p><strong>Número de Serie:</strong> <?= isset($dispositivo['numero_serie']) ? $dispositivo['numero_serie'] : 'No disponible' ?></p>
+                        <p><strong>Estado:</strong> <?= isset($dispositivo['estado']) ? $dispositivo['estado'] : 'No disponible' ?></p>
+                        <p><strong>Última Conexión:</strong> <?= isset($dispositivo['ultima_conexion']) ? $dispositivo['ultima_conexion'] : 'No disponible' ?></p>
                     </div>
                 </div>
             </div>
