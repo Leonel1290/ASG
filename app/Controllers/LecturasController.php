@@ -4,36 +4,35 @@ namespace App\Controllers;
 use App\Models\LecturasGasModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class LecturasController extends ResourceController {
-    public function guardar() {
-        $model = new LecturasGasModel();
-        $nivel_gas = $this->request->getPost('nivel_gas');
-        $id_lectura = $this->request->getPost('id_placa');  // Obtiene el id de la lectura
-
-        // Verifica si el id de la lectura está disponible
-        if (!$id_lectura) {
-            return $this->respond(['status' => 'error', 'message' => 'ID de lectura no proporcionado'], 400);
+class LecturasController extends ResourceController 
+    {
+        protected $lecturasGasModel;
+    
+        public function __construct()
+        {
+            $this->lecturasGasModel = new LecturasGasModel();
         }
-
-        // Verifica si ya existe una lectura con el id proporcionado
-        $lectura = $model->find($id_lectura);
-
-        if ($lectura) {
-            // Si ya existe una lectura, actualiza el nivel de gas
-            $model->update($id_lectura, ['nivel_gas' => $nivel_gas]);
-            return $this->respond(['status' => 'success', 'message' => 'Lectura actualizada']);
-        } else {
-            // Si no existe una lectura con ese id, crea una nueva
-            $data = [
-                'nivel_gas' => $nivel_gas,
-                'id' => $id_lectura  // Establece el id proporcionado
-            ];
-
-            if ($model->insert($data)) {
-                return $this->respond(['status' => 'success', 'message' => 'Lectura guardada']);
+    
+        public function guardar()
+        {
+            // Obtiene los datos enviados por el sensor (id de la placa y nivel de gas)
+            $id_placa = $this->request->getVar('id_placa');
+            $nivel_gas = $this->request->getVar('nivel_gas');
+    
+            // Valida los datos (puedes agregar más validaciones si es necesario)
+            if ($id_placa && $nivel_gas !== null) {
+                // Guarda la lectura de gas en la base de datos
+                $data = [
+                    'usuario_id' => 1, // Puedes ajustar esto según el usuario que envía los datos
+                    'nivel_gas' => $nivel_gas,
+                    'fecha' => date('Y-m-d H:i:s'),
+                ];
+                
+                // Guarda los datos en la base de datos
+                $this->lecturasGasModel->insert($data);
+                return $this->response->setJSON(['status' => 'success', 'message' => 'Lectura guardada correctamente']);
             } else {
-                return $this->respond(['status' => 'error', 'message' => 'Error al guardar la lectura'], 500);
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Faltan datos']);
             }
         }
     }
-}
