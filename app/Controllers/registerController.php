@@ -1,48 +1,36 @@
 <?php
-
 namespace App\Controllers;
-
-use App\Models\LecturasGasModel;
-use App\Models\DispositivosModel;
-use CodeIgniter\RESTful\ResourceController;
-
-class LecturasController extends ResourceController
+use App\Models\UserModel;
+use CodeIgniter\Controller;
+class registerController extends Controller
 {
-    public function guardar()
+    public function index()
     {
-        $lecturasModel = new LecturasGasModel();
-        $dispositivosModel = new DispositivosModel();
-
-        // Obtén los datos enviados desde la ESP32
-        $nivel_gas = $this->request->getPost('nivel_gas');
-        $numero_serie = $this->request->getPost('numero_serie');
-
-        // Validación básica
-        if (!$numero_serie || !$nivel_gas) {
-            return $this->respond(['status' => 'error', 'message' => 'Datos incompletos'], 400);
+        return view('register'); // Tu vista del formulario
+    }
+    public function store()
+    {
+        // Validación del formulario
+        $validation = \Config\Services::validation();
+        
+        $validation->setRules([
+            'nombre'  => 'required|min_length[3]',
+            'apellido' => 'required|min_length[3]',
+            'email'   => 'required|valid_email|is_unique[usuarios.email]',
+            'password' => 'required|min_length[6]'
+        ]);
+        if (!$validation->withRequest($this->request)->run()) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
-
-        // Verifica si el dispositivo está registrado
-        $dispositivo = $dispositivosModel->where('numero_serie', $numero_serie)->first();
-
-        if (!$dispositivo) {
-            return $this->respond(['status' => 'error', 'message' => 'Dispositivo no registrado'], 404);
-        }
-
-        // Inserta la lectura en la base de datos
-        $data = [
-            'usuario_id' => $dispositivo['usuario_id'], // Relaciona con el usuario
-            'nivel_gas' => $nivel_gas,
-            'fecha' => date('Y-m-d H:i:s'),
-        ];
-
-        if ($lecturasModel->insert($data)) {
-            // Actualiza la última conexión del dispositivo
-            $dispositivosModel->update($dispositivo['id'], ['ultima_conexion' => date('Y-m-d H:i:s')]);
-
-            return $this->respond(['status' => 'success', 'message' => 'Lectura guardada']);
-        } else {
-            return $this->respond(['status' => 'error', 'message' => 'Error al guardar la lectura'], 500);
-        }
+        // Procesar los datos del formulario
+        $userModel = new UserModel();
+        // Guardar el usuario
+        $userModel->save([
+            'nombre'   => $this->request->getPost('nombre'),
+            'apellido' => $this->request->getPost('apellido'),
+            'email'    => $this->request->getPost('email'),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT), // Encriptar la contraseña
+        ]);
+        return redirect()->to('/loginobtener')->with('success', 'Usuario registrado con éxito');
     }
 }
