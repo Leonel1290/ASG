@@ -1,0 +1,217 @@
+INFO - 2024-11-19 19:31:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-11-19 19:31:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-11-19 19:31:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-11-19 19:31:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-11-19 19:34:19 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:34:19', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:34:19', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:34:30 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:34:30', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:34:30', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:34:58 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:34:58', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:34:58', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:35:09 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:35:09', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:35:09', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:35:49 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:35:49', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:35:49', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-11-19 19:36:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-11-19 19:39:19 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:39:19', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:39:19', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-11-19 19:39:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-11-19 19:41:41 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:41:41', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:41:41', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:41:52 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:41:52', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:41:52', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:42:08 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:42:08', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:42:08', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:42:20 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:42:20', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:42:20', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:42:33 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:42:33', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:42:33', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:42:45 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:42:45', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:42:45', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:42:57 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:42:57', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:42:57', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-11-19 19:49:43 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:49:43', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:49:43', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-11-19 19:51:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-11-19 19:51:40 --> TypeError: CodeIgniter\Database\BaseBuilder::setBind(): Argument #1 ($key) must be of type string, int given, called in C:\xampp\htdocs\SanchezLeonel2024\login2\system\Database\BaseBuilder.php on line 1570
+[Method: POST, Route: lecturas_gas/guardar]
+in SYSTEMPATH\Database\BaseBuilder.php on line 3515.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1570): CodeIgniter\Database\BaseBuilder->setBind(0, '2024-11-19 19:51:40', true)
+ 2 SYSTEMPATH\Model.php(452): CodeIgniter\Database\BaseBuilder->set([...], '2024-11-19 19:51:40', true)
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 APPPATH\Controllers\LecturasController.php(23): CodeIgniter\Model->update('1', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\LecturasController->guardar()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\LecturasController))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
