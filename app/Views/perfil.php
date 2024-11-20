@@ -95,9 +95,9 @@
                     <div class="card-body">
                         <h5 class="card-title">Detalles del Dispositivo</h5>
                         <p><strong>Nombre del Dispositivo:</strong> Detector de Gas Inteligente</p>
-                        <p><strong>Número de Serie:</strong> 123456789</p>
+                        <p><strong>Número de Serie:</strong> 5647891</p>
                         <p><strong>Estado:</strong> Activo</p>
-                        <p><strong>Última Conexión:</strong> 02/10/2024</p>
+                        <p><strong>Última Conexión:</strong> </p>
                     </div>
                 </div>
             </div>
