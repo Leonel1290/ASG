@@ -8,7 +8,5 @@ class LecturasGasModel extends Model
     protected $table = 'lecturas_gas';
     protected $primaryKey = 'id';
     protected $allowedFields = ['usuario_id', 'nivel_gas', 'fecha'];
-
-    // Si necesitas controlar las fechas de creación y actualización automáticamente:
-    protected $useTimestamps = true;
+    protected $useTimestamps = false; // No usar timestamps automáticos
 }
