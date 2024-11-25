@@ -112,5 +112,5 @@ text-decoration: underline;
     cursor: pointer;
     width: 50px;   /* Ajusta el ancho de la imagen */
     height: 40px;  /* Ajusta la altura de la imagen */
-    transform: translate(700%, -130%);
+    transform: translate(580%, -130%);
 }
