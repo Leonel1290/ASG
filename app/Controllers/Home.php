@@ -117,7 +117,7 @@ if ($user) {
     
     
 
-    //ACA EMPIEZA THE VALIDATION
+    //ACA EMPIEZA LA VALIDACIÓN
 
 
 
