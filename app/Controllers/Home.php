@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Models\HorariosModel; 
 use App\Models\Userlogin;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
