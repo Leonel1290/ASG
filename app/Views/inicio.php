@@ -142,7 +142,7 @@
     <section class="hero">
       <div class="container">
         <h1>Protege lo que más importa</h1>
-        <p>Tu hogar seguro con GasSafe. Detección precisa de fugas de gas en tiempo real.</p>
+        <p>Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
         <a href="<?= base_url('/loginobtener') ?>" class="btn btn-light ml-3">Inicia Sesión</a>
       </div>
     </section>
