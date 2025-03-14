@@ -31,3 +31,5 @@ $routes->get('/perfilobtener', 'Home::obtenerperfil');
 //Recibir los datos de la ESP32:
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
+//$routes->get('/dispositivos', 'Home::obtenerDispositivos');
+
