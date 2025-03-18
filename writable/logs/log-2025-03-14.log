@@ -106,3 +106,5 @@ CRITICAL - 2025-03-14 13:34:49 --> ErrorException: Cannot redeclare App\Controll
 [Method: POST, Route: login]
 in APPPATH\Controllers\Home.php on line 249.
  1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2025-03-14 13:35:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-14 13:35:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

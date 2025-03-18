@@ -182,7 +182,7 @@
         <h2>Sobre Nosotros</h2>
         <p><strong>Empresa:</strong> ASG</p>
         <p><strong>Dirección:</strong> Río Tercero</p>
-        <p><strong>Teléfono:</strong> 3571-54412</p>
+        <p><strong>Teléfono:</strong> 3571-623889</p>
         <p><strong>Email:</strong> againsafegas.ascii@gmail.com</p>
         <p><strong>Sitio Web:</strong> <a href="https://www.gassafe.com">www.Againsafegas.com</a></p>
       </div>
