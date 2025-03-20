@@ -33,3 +33,5 @@ $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 //Vista para dispositivos
 $routes->get('/dispositivos', 'Home::dispositivos');
+
+$routes->get('perfil', 'Home::perfil');

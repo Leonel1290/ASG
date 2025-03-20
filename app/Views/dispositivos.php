@@ -89,8 +89,8 @@
 
     <!-- Sidebar Menu -->
     <div class="sidebar">
-        <a href="<?= base_url('dispositivos') ?>" class="d-flex align-items-center">
-            <i class="fas fa-cogs"></i> Dispositivos
+        <a href="<?= base_url('perfil') ?>" class="d-flex align-items-center">
+            <i class="fas fa-cogs"></i> Perfil
         </a>
         <a href="<?= base_url('logout') ?>" class="d-flex align-items-center"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
     </div>

@@ -251,4 +251,8 @@ if ($user) {
 {
     return view('dispositivos');
 }
+public function perfil()
+{
+    return view('perfil');
+}
 }
