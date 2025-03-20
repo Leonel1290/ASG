@@ -32,4 +32,3 @@ $routes->get('/perfilobtener', 'Home::obtenerperfil');
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 //$routes->get('/dispositivos', 'Home::obtenerDispositivos');
-
