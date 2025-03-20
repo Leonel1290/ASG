@@ -245,5 +245,10 @@ if ($user) {
     public function obtenerperfil(){
         return view('perfilobtener');
     }
-    
+
+    //función para la vista
+    public function dispositivos()
+{
+    return view('dispositivos');
+}
 }

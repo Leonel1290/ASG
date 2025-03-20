@@ -129,9 +129,9 @@
 
     <!-- Sidebar Menu -->
     <div class="sidebar">
-        <a href="#" class="d-flex align-items-center"><i class="fas fa-tachometer-alt"></i> Dispositivos</a>
-        <a href="#" class="d-flex align-items-center"><i class="fas fa-chart-line"></i> Registros de Gas</a>
-        <a href="#" class="d-flex align-items-center"><i class="fas fa-cogs"></i> Configuraciones</a>
+        <a href="<?= base_url('dispositivos') ?>" class="d-flex align-items-center">
+    <i class="fas fa-cogs"></i> Dispositivos
+</a>
         <a href="<?= base_url('logout') ?>" class="d-flex align-items-center"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
     </div>
 
