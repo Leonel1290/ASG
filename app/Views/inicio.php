@@ -122,21 +122,24 @@
     <title>ASG - Seguridad en tu Hogar</title>
   </head>
   <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-      <a class="navbar-brand" href="#">ASG</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#companyInfo">¿Cómo contactarnos?</a>
-          </li>
-          <!-- Elimina el botón de Ingresar -->
-        </ul>
-      </div>
-    </nav>
+   <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <a class="navbar-brand" href="#">ASG</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#companyInfo">¿Cómo contactarnos?</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn btn-warning text-dark px-3 ml-2" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
 
     <!-- Hero Section -->
     <section class="hero">
