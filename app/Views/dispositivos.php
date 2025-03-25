@@ -108,6 +108,23 @@
             document.querySelector('.main-content').classList.toggle('show');
         }
     </script>
+<div class="container my-5 animate">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <a href="<?= base_url('/perfil'); ?>" target="_blank" class="text-decoration-none">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Detalles del Dispositivo</h5>
+                        <p><strong>Nombre del Dispositivo:</strong> Detector de Gas Inteligente</p>
+                        <p><strong>Número de Serie:</strong> </p>
+                        <p><strong>Estado:</strong> Activo</p>
+                        <p><strong>Última Conexión:</strong> </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

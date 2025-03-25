@@ -187,8 +187,6 @@ if ($user) {
         return view('login');
     }
 
-
-
     
     public function forgotpassword()
     {
