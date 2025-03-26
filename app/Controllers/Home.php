@@ -253,4 +253,8 @@ public function perfil()
 {
     return view('perfil');
 }
+public function comprar()
+{
+    return view('comprar');
+}
 }

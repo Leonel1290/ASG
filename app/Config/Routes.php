@@ -35,3 +35,5 @@ $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 $routes->get('/dispositivos', 'Home::dispositivos');
 
 $routes->get('perfil', 'Home::perfil');
+
+$routes->get('comprar', 'Home::comprar');

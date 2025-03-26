@@ -1,0 +1,1 @@
+<img class="A_yLpA _1vGB4g advNVw rlxoLA p0KmZA ccn7hg _4WF0QQ" crossorigin="anonymous" src="https://media-public.canva.com/mYDQU/MAE3spmYDQU/1/tl.png" alt="User Login Icon." draggable="false">
