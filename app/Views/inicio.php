@@ -131,7 +131,7 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
       <li class="nav-item">
-        <a class="nav-link" href="#companyInfo">¿Cómo contactarnos?</a>
+        <center><a class="nav-link" href="#companyInfo">¿Cómo contactarnos?</a></center>
       </li>
       <li class="nav-item">
         <a class="nav-link btn btn-warning text-dark px-3 ml-2" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
