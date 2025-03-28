@@ -193,7 +193,7 @@
 
     <!-- Footer -->
     <footer>
-      <p>&copy; 2024 GasSafe Solutions. Todos los derechos reservados.</p>
+      <p>&copy; 2024 AgainSafeGas Solutions | Todos los derechos reservados.</p>
     </footer>
 
     <!-- Bootstrap JS -->
