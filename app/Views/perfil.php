@@ -8,7 +8,7 @@
     <title>Dispositivo y Lecturas de Gas</title>
     <style>
         body {
-            background-color: #1E3D59; 
+            background-color: #1E3D59;
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -120,19 +120,65 @@
                 transform: translateY(0);
             }
         }
+
+        /* Estilos responsivos */
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                left: -250px;
+                width: 200px;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .col-lg-4, .col-lg-8 {
+                width: 100%;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+        }
+
+        /* Ajustes para tablet */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .sidebar {
+                left: -250px;
+                width: 220px;
+            }
+
+            .col-lg-4, .col-lg-8 {
+                width: 100%;
+            }
+
+            .main-content {
+                margin-left: 220px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Botón para abrir el sidebar -->
+    <!-- Botón para abrir el sidebar en pantallas pequeñas -->
     <span class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></span>
 
     <!-- Sidebar Menu -->
     <div class="sidebar">
         <a href="<?= base_url('dispositivos') ?>" class="d-flex align-items-center">
-    <i class="fas fa-cogs"></i> Dispositivos
-</a>
-        <a href="<?= base_url('logout') ?>" class="d-flex align-items-center"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            <i class="fas fa-cogs"></i> Dispositivos
+        </a>
+        <a href="<?= base_url('logout') ?>" class="d-flex align-items-center">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
     </div>
 
     <!-- Main Content -->

@@ -1,0 +1,64 @@
+INFO - 2025-03-31 16:24:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:24:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:24:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-31 16:39:52 --> ErrorException: require_once(../config/database.php): Failed to open stream: No such file or directory
+[Method: GET, Route: dispositivos]
+in APPPATH\Views\dispositivos.php on line 3.
+ 1 APPPATH\Views\dispositivos.php(3): CodeIgniter\Debug\Exceptions->errorHandler(2, 'require_once(../config/database.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php', 3)
+ 2 APPPATH\Views\dispositivos.php(3): require_once()
+ 3 SYSTEMPATH\View\View.php(234): include('C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php')
+ 4 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('dispositivos', [], true)
+ 6 APPPATH\Controllers\Home.php(250): view('dispositivos')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->dispositivos()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-03-31 16:40:29 --> ErrorException: require_once(../config/database.php): Failed to open stream: No such file or directory
+[Method: GET, Route: dispositivos]
+in APPPATH\Views\dispositivos.php on line 3.
+ 1 APPPATH\Views\dispositivos.php(3): CodeIgniter\Debug\Exceptions->errorHandler(2, 'require_once(../config/database.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php', 3)
+ 2 APPPATH\Views\dispositivos.php(3): require_once()
+ 3 SYSTEMPATH\View\View.php(234): include('C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php')
+ 4 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('dispositivos', [], true)
+ 6 APPPATH\Controllers\Home.php(250): view('dispositivos')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->dispositivos()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-03-31 16:40:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-31 16:40:35 --> ErrorException: require_once(../config/database.php): Failed to open stream: No such file or directory
+[Method: GET, Route: dispositivos]
+in APPPATH\Views\dispositivos.php on line 3.
+ 1 APPPATH\Views\dispositivos.php(3): CodeIgniter\Debug\Exceptions->errorHandler(2, 'require_once(../config/database.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php', 3)
+ 2 APPPATH\Views\dispositivos.php(3): require_once()
+ 3 SYSTEMPATH\View\View.php(234): include('C:\\xampp\\htdocs\\SanchezLeonel2024\\login2\\app\\Views\\dispositivos.php')
+ 4 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('dispositivos', [], true)
+ 6 APPPATH\Controllers\Home.php(250): view('dispositivos')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->dispositivos()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-03-31 16:42:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:43:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:43:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:43:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:48:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:49:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:49:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 16:49:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:23:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:24:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:24:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:28:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:29:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:34:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-03-31 17:37:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
