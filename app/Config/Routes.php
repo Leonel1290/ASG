@@ -32,8 +32,11 @@ $routes->get('/perfilobtener', 'Home::obtenerperfil');
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 //Vista para dispositivos
-$routes->get('/dispositivos', 'Home::dispositivos');
+$routes->get('/enlace', 'EnlaceController::index');
 
 $routes->get('perfil', 'Home::perfil');
 
 $routes->get('comprar', 'Home::comprar');
+
+$routes->get('/enlace', 'EnlaceController::index');
+$routes->post('/enlace/store', 'EnlaceController::store');

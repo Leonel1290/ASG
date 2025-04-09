@@ -173,7 +173,7 @@
 
     <!-- Sidebar Menu -->
     <div class="sidebar">
-        <a href="<?= base_url('dispositivos') ?>" class="d-flex align-items-center">
+        <a href="<?= base_url('enlace') ?>" class="d-flex align-items-center">
             <i class="fas fa-cogs"></i> Dispositivos
         </a>
         <a href="<?= base_url('logout') ?>" class="d-flex align-items-center">
