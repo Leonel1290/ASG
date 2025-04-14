@@ -230,66 +230,68 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-    <script>
-        const nivelGas = <?= isset($nivel_gas) ? $nivel_gas : 'null' ?>;
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    const nivelGas = <?= isset($nivel_gas) ? $nivel_gas : 'null' ?>;
 
-        if (nivelGas !== null) {
-            // Actualizar gráfico y barra de progreso
-            const ctx = document.getElementById('gasChart').getContext('2d');
-            const gasChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['10:00', '10:05', '10:10', '10:15', '10:20'],
-                    datasets: [{
-                        label: 'Nivel de Gas (PPM)',
-                        data: [nivelGas, nivelGas, nivelGas, nivelGas, nivelGas],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+    if (nivelGas !== null) {
+        // Actualizar gráfico y barra de progreso
+        const ctx = document.getElementById('gasChart').getContext('2d');
+        const gasChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '10:05', '10:10', '10:15', '10:20'],
+                datasets: [{
+                    label: 'Nivel de Gas (PPM)',
+                    data: [nivelGas, nivelGas, nivelGas, nivelGas, nivelGas],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
-
-            // Actualizar barra de progreso con el nivel de gas
-            updateProgressBar(nivelGas);
-        }
-
-        function updateProgressBar(value) {
-            let progressBar = document.getElementById('progressBar');
-            let securityLevel = document.getElementById('securityLevel');
-
-            if (value <= 50) {
-                progressBar.style.width = '100%';
-                progressBar.classList.remove('bg-warning', 'bg-danger');
-                progressBar.classList.add('bg-success');
-                securityLevel.textContent = 'Seguro';
-            } else if (value > 50 && value <= 75) {
-                progressBar.style.width = '75%';
-                progressBar.classList.remove('bg-success', 'bg-danger');
-                progressBar.classList.add('bg-warning');
-                securityLevel.textContent = 'Precaución';
-            } else {
-                progressBar.style.width = '50%';
-                progressBar.classList.remove('bg-success', 'bg-warning');
-                progressBar.classList.add('bg-danger');
-                securityLevel.textContent = 'Peligro';
             }
-        }
+        });
 
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('show');
-            document.querySelector('.main-content').classList.toggle('show');
+        // Actualizar barra de progreso con el nivel de gas
+        updateProgressBar(nivelGas);
+    }
+
+    function updateProgressBar(value) {
+        let progressBar = document.getElementById('progressBar');
+        let securityLevel = document.getElementById('securityLevel');
+
+        progressBar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+
+        if (value >= 0 && value <= 200) {
+            progressBar.style.width = '33%';
+            progressBar.classList.add('bg-success');
+            securityLevel.textContent = 'Seguro';
+        } else if (value > 200 && value <= 300) {
+            progressBar.style.width = '66%';
+            progressBar.classList.add('bg-warning');
+            securityLevel.textContent = 'Precaución';
+        } else if (value > 300) {
+            progressBar.style.width = '100%';
+            progressBar.classList.add('bg-danger');
+            securityLevel.textContent = 'Peligro';
+        } else {
+            progressBar.style.width = '0%';
+            securityLevel.textContent = 'Sin datos';
         }
-    </script>
+    }
+
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('show');
+        document.querySelector('.main-content').classList.toggle('show');
+    }
+</script>
 
 </body>
 </html>
