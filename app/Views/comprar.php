@@ -113,7 +113,8 @@
   </style>
 </head>
 <body>
- <!-- Botón volver -->
+
+<!-- Botón volver -->
 <button class="btn btn-outline-light position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#logoutModal">
   <i class="fas fa-sign-out-alt"></i> Volver al Inicio
 </button>
@@ -134,62 +135,67 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
-  <div class="checkout-container">
-    <div class="product-card">
-      <img src="https://www.rosarioseguridad.com.ar/admin/productos/3fbd1467fa1e6f1747aa1651f7545fc0.jpg" alt="Producto">
-      <h2>Detector de Gas</h2>
-      <p>Dispositivo inteligente para monitoreo de gas en tiempo real.</p>
-      <div class="price">$100.00 USD</div>
+<div class="checkout-container">
+  <div class="product-card">
+    <img src="https://www.rosarioseguridad.com.ar/admin/productos/3fbd1467fa1e6f1747aa1651f7545fc0.jpg" alt="Producto">
+    <h2>Detector de Gas</h2>
+    <p>Dispositivo inteligente para monitoreo de gas en tiempo real.</p>
+    <div class="price">$100.00 USD</div>
 
-      <div id="paypal-button-container"></div>
-    </div>
-
-    <div class="footer">
-      &copy; 2024 AgainSafeGas Solutions | Todos los derechos reservados.
-    </div>
+    <div id="paypal-button-container"></div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal" id="modalExito">
-    <div class="modal-content">
-      <h3>✅ ¡Pago realizado con éxito!</h3>
-      <button id="cerrarModal">Aceptar</button>
-    </div>
+  <div class="footer">
+    &copy; 2024 AgainSafeGas Solutions | Todos los derechos reservados.
   </div>
+</div>
 
-  <script>
-    const modal = document.getElementById('modalExito');
-    const cerrarModal = document.getElementById('cerrarModal');
+<!-- Modal -->
+<div class="modal" id="modalExito">
+  <div class="modal-content">
+    <h3>✅ ¡Pago realizado con éxito!</h3>
+    <button id="cerrarModal">Aceptar</button>
+  </div>
+</div>
 
-    paypal.Buttons({
-      createOrder: function (data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '100.00'
-            }
-          }]
-        });
-      },
-      onApprove: function (data, actions) {
-        return actions.order.capture().then(function (details) {
-          modal.classList.add('show');
-        });
-      },
-      onCancel: function (data) {
-        alert('❌ Pago cancelado');
-      },
-      onError: function (err) {
-        alert('⚠️ Error al procesar el pago');
-        console.error(err);
-      }
-    }).render('#paypal-button-container');
+<script>
+  const modal = document.getElementById('modalExito');
+  const cerrarModal = document.getElementById('cerrarModal');
 
-    cerrarModal.addEventListener('click', () => {
-      modal.classList.remove('show');
-      // Aquí podrías redirigir al usuario si quieres
-      // window.location.href = 'tu-pagina-principal';
-    });
-  </script>
+  paypal.Buttons({
+    createOrder: function (data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: '100.00'
+          }
+        }]
+      });
+    },
+    onApprove: function (data, actions) {
+      return actions.order.capture().then(function (details) {
+        modal.classList.add('show');
+
+        // Redirige al login tras 2 segundos
+        setTimeout(() => {
+          window.location.href = '<?= base_url("login") ?>';
+        }, 2000);
+      });
+    },
+    onCancel: function (data) {
+      alert('❌ Pago cancelado');
+    },
+    onError: function (err) {
+      alert('⚠️ Error al procesar el pago');
+      console.error(err);
+    }
+  }).render('#paypal-button-container');
+
+  cerrarModal.addEventListener('click', () => {
+    modal.classList.remove('show');
+    window.location.href = '<?= base_url("login") ?>';
+  });
+</script>
+
 </body>
 </html>
