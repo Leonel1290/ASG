@@ -193,7 +193,7 @@
                             <h5 class="card-title">Detalles del Dispositivo</h5>
                             <p><strong>Nombre del Dispositivo:</strong> Detector de Gas Inteligente</p>
                             <p><strong>Número de Serie:</strong> </p>
-                            <p><strong>Estado:</strong> Activo</p>
+                            <p><strong>Estado:</strong> </p>
                             <p><strong>Última Conexión:</strong> </p>
                         </div>
                     </div>
