@@ -169,7 +169,7 @@
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
-                    <img src="https://static.vecteezy.com/system/resources/thumbnails/028/625/998/small_2x/3d-render-cylinder-gas-png.png"
+                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
                          alt="Ilustración de gas seguro"
                          class="hero-img img-fluid"
                          loading="lazy">
