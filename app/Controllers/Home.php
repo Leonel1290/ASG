@@ -17,11 +17,15 @@ class Home extends Controller
     public function inicio()
     {
         $session = session();
-        var_dump($session->get()); // Verifica el contenido de la sesión
+
+        // Log en vez de var_dump para evitar errores de headers
+        log_message('debug', json_encode($session->get()));
+
         if (!$session->get('logged_in')) {
-            return view('/login'); // Redirigir si no está logueado
+            return view('login'); // corregido: sin "/"
         }
-        return view('inicio'); // Mostrar la vista de inicio si está logueado
+
+        return view('inicio');
     }
 
     public function login()
@@ -30,164 +34,130 @@ class Home extends Controller
     $userlogin = new Userlogin();
     $lecturasGasModel = new \App\Models\LecturasGasModel();
 
-    // Captura los datos enviados desde el formulario
     $nombre = $this->request->getPost('nombre');
     $email = $this->request->getPost('email');
     $password = $this->request->getPost('password');
 
-    // Buscar el usuario en la base de datos
     $user = $userlogin->where('nombre', $nombre)
                       ->where('email', $email)
                       ->first();
 
-// Verificar si el usuario existe y si la contraseña es correcta
-if ($user) {
-    if (password_verify($password, $user['password'])) {
-        // Obtener la última lectura de gas y la fecha asociada
-        $ultimaLectura = $lecturasGasModel->orderBy('id', 'DESC')->where(['usuario_id' => $user['id']])->first();
+    if ($user) {
+        if (password_verify($password, $user['password'])) {
+            $ultimaLectura = $lecturasGasModel
+                ->orderBy('id', 'DESC')
+                ->where(['usuario_id' => $user['id']])
+                ->asArray()
+                ->first();
 
-        if ($ultimaLectura) {
-            // Si hay una última lectura, obtén el nivel de gas y la fecha
-            $nivel_gas = $ultimaLectura['nivel_gas'];
-            $fecha = $ultimaLectura['created_at']; // Asumiendo que tienes una columna `created_at`
+            $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
+            $mensaje = $ultimaLectura ? null : 'No tienes registros de lecturas';
+
+            $session->set([
+                'id'        => $user['id'],
+                'nombre'    => $user['nombre'],
+                'email'     => $user['email'],
+                'logged_in' => true,
+            ]);
+
+            return redirect()->to('/perfil');
         } else {
-            // Si no hay registros de lecturas, asigna valores predeterminados
-            $nivel_gas = null;
-            $fecha = null;
-            $mensaje = 'No tienes registros de lecturas';
+            $session->setFlashdata('error', 'Contraseña incorrecta');
+            return redirect()->back();
         }
-
-        // Guardar datos en la sesión y redirigir al perfil con datos adicionales
-        $session->set([
-            'id'        => $user['id'],
-            'nombre'    => $user['nombre'],
-            'email'     => $user['email'],
-            'logged_in' => true,
-        ]);
-
-        return view('perfil', [
-            'nivel_gas' => $nivel_gas,
-            'fecha'     => $fecha,
-            'mensaje'   => $mensaje ?? null
-        ]);
     } else {
-        // Contraseña incorrecta
-        $session->setFlashdata('error', 'Contraseña incorrecta');
+        $session->setFlashdata('error', 'Usuario no encontrado');
         return redirect()->back();
     }
-} else {
-    // Usuario no encontrado
-    $session->setFlashdata('error', 'Usuario no encontrado');
-    return redirect()->back();
+}
 
-}
-}
 
     public function register()
     {
         return view('register');
     }
+
     public function logout()
     {
-        // Destruir la sesión
         session()->destroy();
         return redirect()->to('/');
     }
+
     public function loginobtener()
     {
         return view('login');
     }
+
     public function configview()
     {
         return view('configuracion');
     }
+
     public function salirdelconfig()
     {
         return view('inicio');
     }
+
     public function volveralinicio()
     {
         return view('inicio');
     }
+
     public function volveralperfil()
     {
         return view('perfil');
     }
-    
-    
 
-    //ACA EMPIEZA LA VALIDACIÓN
-
-
+    // Recuperación de contraseña
 
     public function forgotPPassword()
     {
         $session = session();
         $userlogin = new UserModel();
-
-        // Captura el email ingresado
-        $email = $this->request->getPost('email');
-
-        // Verifica si el usuario existe
-        $user = $userlogin->where('email', $email)->first();
+        $emailInput = $this->request->getPost('email');
+        $user = $userlogin->where('email', $emailInput)->first();
 
         if ($user) {
-
-            // Verifica los valores antes de hacer la actualización
             $token = bin2hex(random_bytes(50));
             $expires = Time::now()->addHours(1);
 
-        
-            
             $updated = $userlogin->update($user['id'], [
                 'reset_token' => $token,
                 'reset_expires' => $expires->toDateTimeString(),
             ]);
 
-                  // Genera el enlace de restablecimiento de contraseña
-        $resetLink = base_url("/reset-password/$token");
+            $resetLink = base_url("/reset-password/$token");
 
             $email = \Config\Services::email();
-            
             $email->setTo($user['email']);
             $email->setFrom('againsafegas.ascii@gmail.com', 'ASG');
             $email->setSubject('Recuperación de contraseña');
             $email->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
 
-            if ($email->send()) {
-              
-            // El correo se envió correctamente
-            } else {
-            // Error en el envío
-            $data = $email->printDebugger(['headers']);
-            log_message('error', 'Error enviando correo: ' . $data);
+            if (!$email->send()) {
+                $data = $email->printDebugger(['headers']);
+                log_message('error', 'Error enviando correo: ' . $data);
             }
-            
-            
-            if ($updated) {
-                echo "Actualización exitosa";
-            } else {
-                echo "Actualización fallida";
-            }
-            
 
-            // Enviar un correo electrónico con el enlace de recuperación
-            $resetLink = base_url("/reset-password/$token");
-            // Aquí podrías enviar el correo con tu sistema de email
+            if ($updated) {
+                log_message('debug', 'Actualización de token exitosa');
+            } else {
+                log_message('error', 'Actualización de token fallida');
+            }
 
             $session->setFlashdata('success', 'Se ha enviado un enlace de recuperación a tu correo.');
             return redirect()->back();
         } else {
             $session->setFlashdata('error', 'Correo electrónico no encontrado.');
             return redirect()->back();
-        }       
+        }
     }
+
     public function loginobtenerforgot()
     {
         return view('login');
     }
 
-    
     public function forgotpassword()
     {
         return view('forgotpassword');
@@ -216,13 +186,11 @@ if ($user) {
         $token = $this->request->getPost('token');
         $password = $this->request->getPost('password');
 
-        // Busca el usuario por el token
         $user = $userlogin->where('reset_token', $token)
                           ->where('reset_expires >=', Time::now()->toDateTimeString())
                           ->first();
 
         if ($user) {
-            // Actualiza la contraseña y elimina el token
             $userlogin->update($user['id'], [
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'reset_token' => null,
@@ -236,25 +204,87 @@ if ($user) {
             return redirect()->back();
         }
     }
+    public function storeMac()
+{
+    $session = session();
+    $mac = $this->request->getPost('mac');
+
+    if (!$session->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $usuarioId = $session->get('id');
+    $enlaceModel = new \App\Models\EnlaceModel();
+
+    // Verificar si ya existe la MAC para este usuario
+    $existe = $enlaceModel
+                ->where('id_usuario', $usuarioId)
+                ->where('MAC', $mac)
+                ->first();
+
+    if ($existe) {
+        $session->setFlashdata('error', 'Esta MAC ya está enlazada.');
+    } else {
+        $enlaceModel->insert([
+            'id_usuario' => $usuarioId,
+            'MAC' => $mac
+        ]);
+        $session->setFlashdata('success', 'MAC enlazada correctamente.');
+    }
+
+    return redirect()->to('/perfil');
+}
     public function inicioresetpass()
     {
         return view('reset_password');
     }
-    public function obtenerperfil(){
+
+    public function obtenerperfil()
+    {
         return view('perfilobtener');
     }
 
-    //función para la vista
+    // Vistas varias
+
     public function dispositivos()
+    {
+        return view('dispositivos');
+    }
+
+    public function perfil()
 {
-    return view('dispositivos');
+    $session = session();
+
+    if (!$session->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $usuarioId = $session->get('id');
+
+    $enlaceModel = new \App\Models\EnlaceModel();
+    $lecturasGasModel = new \App\Models\LecturasGasModel();
+
+    // Obtener MACs del usuario
+    $macs = $enlaceModel
+                ->select('MAC')
+                ->where('id_usuario', $usuarioId)
+                ->groupBy('MAC')
+                ->findAll();
+
+    // Obtener lecturas por usuario
+    $lecturas = $lecturasGasModel->getLecturasPorUsuario($usuarioId);
+
+    // Agrega este log para ver los datos antes de pasarlos a la vista
+    log_message('debug', 'Lecturas por usuario: ' . print_r($lecturas, true));
+
+    return view('perfil', [
+        'macs' => $macs,
+        'lecturas' => $lecturas
+    ]);
 }
-public function perfil()
-{
-    return view('perfil');
-}
-public function comprar()
-{
-    return view('comprar');
-}
+
+    public function comprar()
+    {
+        return view('comprar');
+    }
 }
