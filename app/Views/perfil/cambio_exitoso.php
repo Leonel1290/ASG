@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambio Exitoso - ASG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos personalizados (puedes copiarlos de tus otras vistas) */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a202c; /* Fondo oscuro */
+            color: #cbd5e0; /* Texto claro */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center; /* Centrar contenido verticalmente */
+            justify-content: center; /* Centrar contenido horizontalmente */
+        }
+
+        .navbar {
+            background-color: #2d3748 !important;
+            position: fixed; /* Fija la navbar en la parte superior */
+            width: 100%;
+            top: 0;
+            z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #cbd5e0 !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link:hover {
+             color: #fff !important;
+        }
+
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+        .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
+        .container {
+            flex: 1; /* Permite que el contenedor ocupe el espacio restante */
+            padding: 2rem;
+            max-width: 600px;
+            margin-top: 80px; /* Espacio para la navbar fija */
+            text-align: center; /* Centrar contenido */
+        }
+
+        .card {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .success-icon {
+            color: #48bb78; /* Color verde */
+            font-size: 5rem; /* Tamaño grande del icono */
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <i class="fas fa-check-circle success-icon"></i>
+            <p class="success-message">¡Cambio de perfil exitoso!</p>
+            <a href="<?= base_url('/perfil') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Volver al Perfil</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
