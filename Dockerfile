@@ -4,6 +4,7 @@ FROM php:8.2-apache
 
 # Instala dependencias del sistema necesarias para las extensiones de PHP
 # Actualiza la lista de paquetes e instala las dependencias
+# Reemplazamos libmysqlclient-dev por libmariadb-dev-compat y libmariadb-dev
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -11,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    libmysqlclient-dev \
+    libmariadb-dev-compat \
+    libmariadb-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP necesarias para CodeIgniter 4
@@ -39,8 +41,8 @@ WORKDIR /var/www/html
 
 # Opcional: Si usas Composer para gestionar dependencias, puedes añadir estos pasos
 # Instala Composer
-# COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-# Ejecuta composer install --no-dev --optimize-autoloader
+# COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
+# Ejecuta composer install para instalar las dependencias
 # RUN composer install --no-dev --optimize-autoloader
 
 # Expone el puerto 80, que es el puerto por defecto de Apache
