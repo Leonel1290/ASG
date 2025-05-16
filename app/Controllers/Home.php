@@ -44,6 +44,12 @@ class Home extends Controller
     // Método de Login (POST /login) - Modificado para usar UserModel y verificar is_active
     public function login()
     {
+        // --- LÍNEAS DE DEBUGGING TEMPORAL ---
+        echo "DEBUG: Inicio del metodo login() en Home Controller";
+        exit();
+        // --- FIN LÍNEAS DE DEBUGGING TEMPORAL ---
+
+
         $session = session();
         // Usamos UserModel para verificar el estado activo y credenciales
         $userModel = new UserModel();
