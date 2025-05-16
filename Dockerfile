@@ -4,7 +4,7 @@ FROM php:8.2-apache
 
 # Instala dependencias del sistema necesarias para las extensiones de PHP
 # Actualiza la lista de paquetes e instala las dependencias
-# Incluimos dependencias para gd, zip, mysql/mariadb y exif
+# Incluimos dependencias para gd, zip, mysql/mariadb, exif y oniguruma (para mbstring)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev-compat \
     libmariadb-dev \
     libexif-dev \
+    libonig-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP necesarias para CodeIgniter 4
