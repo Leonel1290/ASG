@@ -1,15 +1,6 @@
 <?php
-// Esta vista espera las variables $dispositivosEnlazados y $lecturasPorMac del controlador.
-// $dispositivosEnlazados será un array de arrays, donde cada array representa un dispositivo
-// enlazado con sus detalles (MAC, nombre, ubicacion).
-// $lecturasPorMac será un array asociativo donde la clave es la MAC y el valor es un array de lecturas.
-
-// Asegurarse de que las variables existan
 $dispositivosEnlazados = $dispositivosEnlazados ?? [];
 $lecturasPorMac = $lecturasPorMac ?? [];
-
-// CodeIgniter pasa los mensajes flashdata (success, error, info) a la sesión automáticamente.
-// Se pueden acceder directamente con session('clave').
 ?>
 <!DOCTYPE html>
 <html lang="es">
