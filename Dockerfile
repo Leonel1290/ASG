@@ -25,6 +25,13 @@ RUN apt-get update && apt-get install -y \
 # Descomentamos y corregimos la instalación de la extensión intl
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl
 
+# Configura PHP para mostrar errores y registrarlos en stderr (para que Render los capture)
+RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "log_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 # Habilita el módulo rewrite de Apache (necesario para las URLs amigables de CodeIgniter)
 RUN a2enmod rewrite
 
