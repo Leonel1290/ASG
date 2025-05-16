@@ -26,17 +26,12 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl
 
 # Configura PHP para mostrar errores y registrarlos en stderr (para que Render los capture)
-# Añadimos configuración para el PHP general y para PHP-FPM
+# Configuramos solo el PHP general (para mod_php)
 RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
     && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
     && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/99-custom.ini \
     && echo "log_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
-    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/99-custom.ini \
-    # Configuración adicional para PHP-FPM pool (www.conf)
-    && echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/www.conf \
-    && echo "php_flag[display_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf \
-    && echo "php_admin_value[error_log] = /dev/stderr" >> /usr/local/etc/php-fpm.d/www.conf \
-    && echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf
+    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/99-custom.ini
 
 # Habilita el módulo rewrite de Apache (necesario para las URLs amigables de CodeIgniter)
 RUN a2enmod rewrite
@@ -45,6 +40,11 @@ RUN a2enmod rewrite
 # Asegúrate de que la estructura de directorios en tu proyecto local coincida con esto
 # La carpeta 'public' de CodeIgniter debe ser el DocumentRoot de Apache
 COPY . /var/www/html/
+
+# Agrega este paso para asegurar permisos de escritura en la carpeta writable de CodeIgniter
+# Esto es crucial para que CodeIgniter pueda escribir logs y caché
+RUN chown -R www-data:www-data /var/www/html/writable \
+    && chmod -R 775 /var/www/html/writable
 
 # Configura Apache para que el DocumentRoot apunte a la carpeta 'public' de CodeIgniter
 # Esto asegura que solo los archivos públicos sean accesibles directamente
