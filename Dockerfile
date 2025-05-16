@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
+    libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP necesarias para CodeIgniter 4
@@ -39,7 +40,7 @@ WORKDIR /var/www/html
 # Opcional: Si usas Composer para gestionar dependencias, puedes añadir estos pasos
 # Instala Composer
 # COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-# Ejecuta composer install para instalar las dependencias
+# Ejecuta composer install --no-dev --optimize-autoloader
 # RUN composer install --no-dev --optimize-autoloader
 
 # Expone el puerto 80, que es el puerto por defecto de Apache
