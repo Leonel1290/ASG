@@ -4,7 +4,7 @@ FROM php:8.2-apache
 
 # Instala dependencias del sistema necesarias para las extensiones de PHP
 # Actualiza la lista de paquetes e instala las dependencias
-# Incluimos dependencias para gd, zip, mysql/mariadb, exif y oniguruma (para mbstring)
+# Incluimos dependencias para gd, zip, mysql/mariadb, exif, oniguruma (para mbstring) y icu (para intl)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -16,14 +16,14 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev \
     libexif-dev \
     libonig-dev \
+    libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP necesarias para CodeIgniter 4
 # Modifica esta lista según las necesidades específicas de tu aplicación
 # Ahora incluimos las extensiones que requieren las dependencias instaladas arriba
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip
-# Instala la extensión intl si la necesitas (común para localización)
-# RUN docker-php-ext_install intl
+# Descomentamos y corregimos la instalación de la extensión intl
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl
 
 # Habilita el módulo rewrite de Apache (necesario para las URLs amigables de CodeIgniter)
 RUN a2enmod rewrite
