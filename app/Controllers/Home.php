@@ -44,12 +44,6 @@ class Home extends Controller
     // Método de Login (POST /login) - Modificado para usar UserModel y verificar is_active
     public function login()
     {
-        // --- LÍNEAS DE DEBUGGING TEMPORAL ---
-        echo "DEBUG: Inicio del metodo login() en Home Controller";
-        exit();
-        // --- FIN LÍNEAS DE DEBUGGING TEMPORAL ---
-
-
         $session = session();
         // Usamos UserModel para verificar el estado activo y credenciales
         $userModel = new UserModel();
@@ -63,6 +57,12 @@ class Home extends Controller
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
         // $nombre = $this->request->getPost('nombre'); // Descomentar si buscas por nombre también
+
+        // --- LÍNEAS DE DEBUGGING TEMPORAL ---
+        // Ahora depuramos después de obtener los datos del formulario
+        echo "DEBUG: Datos del formulario obtenidos. Email: " . $email;
+        exit();
+        // --- FIN LÍNEAS DE DEBUGGING TEMPORAL ---
 
 
         // Buscar usuario por email (asumiendo que el email es único para login)
@@ -234,10 +234,6 @@ class Home extends Controller
 
         $token = $this->request->getPost('token');
         $password = $this->request->getPost('password');
-
-        $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
 
         if ($user) {
              // --- VERIFICACIÓN: Solo permitir reset si la cuenta está activa ---
