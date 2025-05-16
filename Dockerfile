@@ -2,9 +2,21 @@
 # Puedes elegir una versión específica de PHP si lo necesitas, por ejemplo php:8.1-apache
 FROM php:8.2-apache
 
+# Instala dependencias del sistema necesarias para las extensiones de PHP
+# Actualiza la lista de paquetes e instala las dependencias
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 # Instala extensiones de PHP necesarias para CodeIgniter 4
 # Modifica esta lista según las necesidades específicas de tu aplicación
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv
+# Ahora incluimos las extensiones que requieren las dependencias instaladas arriba
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip
 # Instala la extensión intl si la necesitas (común para localización)
 # RUN docker-php-ext_install intl
 
