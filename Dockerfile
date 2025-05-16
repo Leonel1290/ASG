@@ -1,5 +1,6 @@
 # Usa una imagen base oficial de PHP con Apache
-# Elegimos una versión reciente y estable de PHP (puedes ajustarla)
+# Puedes intentar cambiar la versión de PHP aquí si la construcción falla
+# Por ejemplo: FROM php:8.1-apache o FROM php:8.3-apache
 FROM php:8.2-apache
 
 # Establece el directorio de trabajo dentro del contenedor
@@ -7,6 +8,7 @@ WORKDIR /var/www/html
 
 # Instala dependencias del sistema y extensiones de PHP comunes para CodeIgniter
 # Las extensiones son necesarias para funcionalidades como base de datos, email, etc.
+# Si la construcción falla aquí, puede ser un problema temporal con los repositorios de paquetes
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
@@ -26,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install mysqli pdo pdo_mysql zip mbstring exif pcntl bcmath ctype fileinfo json tokenizer xml intl
 
 # Instala Composer
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
 
 # Copia todos los archivos de tu aplicación al directorio de trabajo
 COPY . .
@@ -46,7 +48,7 @@ RUN a2enmod rewrite \
     && sed -i '/<Directory \/var\/www\/>/a AllowOverride All' /etc/apache2/sites-available/000-default.conf \
     && sed -i 's/<Directory \/var\/www\/html>/<Directory \/var\/www\/html\/public>/' /etc/apache2/sites-available/000-default.conf \
     && sed -i '/<Directory \/var\/www\/html\/public>/i <Directory \/var\/www\/html>' /etc/apache2/sites-available/000-default.conf \
-    && sed -i '/<\/Directory>/a <\/Directory>' /etc/apache2/sites-available/000-default.conf # Esto agrega el cierre del directorio /var/www/html
+    && sed -i '/<\/Directory>/a <\/Directory>' /etc/apache2/sites-available/000-default.conf
 
 # Asegura que el directorio 'writable' tenga los permisos correctos para Apache
 # El usuario 'www-data' es el usuario por defecto de Apache en esta imagen
