@@ -13,6 +13,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Dispositivo - ASG</title>
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -219,9 +220,6 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Gráficos</a>
                         </li>
                     </ul>
 

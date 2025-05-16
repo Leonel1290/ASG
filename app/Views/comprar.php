@@ -136,7 +136,7 @@
         <img src="imagenes/detector.png" alt="Detector de Gas">
         <h2>Detector de Gas</h2>
         <p>Dispositivo inteligente para monitoreo de gas en tiempo real.</p>
-        <div class="price">$100.00 USD</div>
+        <div class="price">$99.99 USD</div>
 
         <div id="paypal-button-container"></div>
     </div>
@@ -215,7 +215,7 @@
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        value: '100.00' // Replace with dynamic price if needed
+                        value: '99.99' // Replace with dynamic price if needed
                     }
                 }]
             });

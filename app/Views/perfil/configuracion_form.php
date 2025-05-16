@@ -210,9 +210,6 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Gráficos</a>
-                        </li>
                     </ul>
 
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">

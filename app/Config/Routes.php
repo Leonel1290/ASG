@@ -14,7 +14,7 @@ $routes->get('/register', 'registerController::index');
 
 // Ruta para procesar el formulario de registro
 // POST /registerController/store (Coincide con la action del formulario en register.php)
-$routes->post('/registerController/store', 'registerController::store');
+$routes->post('/register/store', 'registerController::store'); 
 
 // Ruta para mostrar la página que le dice al usuario que revise su email
 $routes->get('/register/check-email', 'registerController::checkEmail');
@@ -111,28 +111,3 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Otras rutas (mantengo las que tenías)
 $routes->get('/comprar', 'Home::comprar');
-// Esta ruta parece duplicada con '/enlace/store'. Decide cuál usar.
-// $routes->post('/enlazar-mac', 'EnlaceController::store'); // Posible duplicado
-// Esta ruta parece para ver lecturas por MAC, verifica si existe en Home.php o LecturasController.php
-// Asegúrate de que Home::verLecturas o el controlador correspondiente exista.
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Posible duplicado/alternativa a /detalles/(:any)
-// Esta ruta parece para actualizar un dispositivo, verifica si existe en un controlador.
-// Asegúrate de que DispositivoController::actualizarDispositivo exista.
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Posible duplicado/alternativa a /perfil/dispositivo/actualizar
-
-
-// Rutas que parecen vistas directas o redundantes en Home (considera limpiarlas)
-// $routes->get('/logout', 'Home::logout'); // Duplicada con la POST
-// $routes->get('/register', 'Home::register'); // Duplicada con registerController::index
-// $routes->get('/inicioobtener', 'Home::inicioobtener');
-// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot');
-// $routes->get('/inicioresetpass', 'Home::inicioresetpass');
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil');
-// $routes->get('/dispositivos', 'Home::dispositivos');
-// $routes->get('/perfil', 'Home::perfil'); // Duplicada con PerfilController::index
-// $routes->get('/comprar', 'Home::comprar'); // Duplicada
-
-
-// Nota: Tienes varias rutas duplicadas o que apuntan a métodos que no vimos en los controladores adjuntos (ej. Home::verLecturas, DispositivoController::actualizarDispositivo).
-// Revisa tu código para asegurarte de que todas las rutas apuntan a controladores y métodos existentes y correctos.
-// También, considera limpiar las rutas duplicadas para evitar confusiones.

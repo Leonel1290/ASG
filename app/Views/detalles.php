@@ -1,8 +1,4 @@
 <?php
-// Esta vista espera las variables $mac, $lecturas, $labels, $data, $message (opcional),
-// y las nuevas variables $nombreDispositivo y $ubicacionDispositivo del controlador.
-
-// Asegurarse de que las variables existan y tengan valores por defecto si son nulas
 $mac = $mac ?? 'Desconocida';
 $nombreDispositivo = $nombreDispositivo ?? $mac; // Usar la MAC como nombre por defecto si no se pasa nombre
 $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
@@ -17,7 +13,8 @@ $message = $message ?? null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Dispositivo: <?= esc($nombreDispositivo) ?></title>
+    <title>Detalle del Dispositivo</title>
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

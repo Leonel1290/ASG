@@ -7,82 +7,26 @@
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <title>Registro</title>
     <style>
-        /* Añade o ajusta tus estilos CSS aquí */
+        /* Estilos para mensajes de éxito y error (se mantienen aquí) */
         .success-message {
-            color: green;
+            color: green; /* O el color de tu tema para éxito */
             font-weight: bold;
             margin-bottom: 15px;
+            text-align: center; /* Centrar mensajes */
         }
         .error-messages ul {
             list-style: none;
             padding: 0;
             margin: 0 0 15px 0;
-            color: red;
+            color: red; /* O el color de tu tema para error */
+            text-align: left; /* Alinear lista de errores a la izquierda si hay varios */
         }
         .error-messages li {
             margin-bottom: 5px;
+            text-align: center; /* Centrar cada mensaje de error */
         }
-         .form-register {
-            width: 400px; /* Ajusta el ancho si es necesario */
-            background: #24303c;
-            padding: 30px;
-            margin: auto;
-            margin-top: 100px;
-            border-radius: 4px;
-            font-family: 'calibri';
-            color: white;
-            box-shadow: 7px 13px 37px #000;
-        }
-
-        .form-register h1 {
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .controls {
-            width: 100%;
-            background: #24303c;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 16px;
-            border: 1px solid #1f53c5;
-            font-family: 'calibri';
-            font-size: 18px;
-            color: white;
-        }
-
-        .form-register p {
-            height: 40px;
-            text-align: center;
-            font-size: 18px;
-            line-height: 40px;
-        }
-
-        .form-register a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .form-register a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-
-        .botons {
-            width: 100%;
-            background: #1f53c5;
-            border: none;
-            padding: 12px;
-            color: white;
-            margin: 16px 0;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .botons:hover {
-            background: #143c8a;
-        }
+        /* Nota: Otros estilos como .form-register, .controls, .botons, etc.,
+                 se espera que provengan de tu archivo register.css */
     </style>
 </head>
 <body class="body">
@@ -94,13 +38,12 @@
         <?php endif; ?>
 
         <?php if (session()->getFlashdata('error')): ?>
-            <div class="error-messages">
-                <ul>
-                    <li><?= esc(session()->getFlashdata('error')) ?></li>
-                </ul>
-            </div>
-        <?php endif; ?>
-
+             <div class="error-messages">
+                 <ul>
+                     <li><?= esc(session()->getFlashdata('error')) ?></li>
+                 </ul>
+             </div>
+         <?php endif; ?>
 
         <?php if (session()->getFlashdata('errors')): ?>
             <div class="error-messages">
@@ -114,6 +57,7 @@
 
         <form action="<?= base_url('register/store') ?>" method="post">
             <?= csrf_field() ?>
+
             <input class="controls" type="text" name="nombre" id="nombre" placeholder="Ingrese su Nombre" value="<?= old('nombre') ?>" required>
 
             <input class="controls" type="text" name="apellido" id="apellido" placeholder="Ingrese su Apellido" value="<?= old('apellido') ?>" required>

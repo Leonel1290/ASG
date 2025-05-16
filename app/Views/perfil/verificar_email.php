@@ -8,10 +8,11 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificar Email - ASG</title>
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Estilos personalizados (puedes copiarlos de tus otras vistas) */
+        /* Estilos personalizados */
         html, body {
             margin: 0;
             padding: 0;
@@ -26,27 +27,34 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
             min-height: 100vh;
         }
 
+        /* --- ESTILOS PARA AGRANDAR EL NAVBAR --- */
         .navbar {
-            background-color: #2d3748 !important;
+            background-color: #2d3748 !important; /* Color de fondo oscuro */
         }
 
         .navbar-brand {
-            color: #fff !important;
+            color: #fff !important; /* Color del texto de la marca */
             font-weight: bold;
+            font-size: 1.4rem; /* Agrandar letra de la marca */
         }
 
         .navbar-nav .nav-link {
-            color: #cbd5e0 !important;
+            color: #cbd5e0 !important; /* Color de los enlaces de navegación */
+            font-size: 1.1rem; /* Agrandar letra de los enlaces */
+            padding-top: .75rem; /* Aumentar relleno vertical */
+            padding-bottom: .75rem; /* Aumentar relleno vertical */
         }
 
         .navbar-nav .nav-link.active {
-            color: #4299e1 !important;
+            color: #4299e1 !important; /* Color del enlace activo (azul) */
             font-weight: bold;
         }
 
         .navbar-nav .nav-link:hover {
-             color: #fff !important;
+             color: #fff !important; /* Color al pasar el ratón */
         }
+        /* --- FIN ESTILOS NAVBAR --- */
+
 
         .btn-outline-secondary {
             color: #cbd5e0;
@@ -61,7 +69,7 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
         .container {
             flex: 1;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 600px; /* Mantenemos el ancho máximo para el contenido principal */
             margin-top: 2rem;
         }
 
@@ -113,13 +121,14 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
          .btn-primary {
             background-color: #4299e1; /* Botón principal */
             border-color: #4299e1;
+            color: white; /* Asegurar texto blanco */
             transition: background-color 0.3s ease;
-        }
+         }
 
-        .btn-primary:hover {
+         .btn-primary:hover {
             background-color: #2b6cb0;
             border-color: #2b6cb0;
-        }
+         }
 
         .mt-3 { margin-top: 1rem; }
         .mb-4 { margin-bottom: 1.5rem; }
@@ -145,13 +154,14 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
                              <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Gráficos</a>
-                        </li>
+                             <a class="nav-link" href="#">Gráficos</a>
+                         </li>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
-                         <?= csrf_field() ?> <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
-                        </button>
+                         <?= csrf_field() ?>
+                         <button type="submit" class="btn btn-outline-secondary btn-sm">
+                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                         </button>
                     </form>
                 </div>
             </div>
@@ -166,11 +176,11 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
             <div class="card-body">
 
                  <?php if (session('success')): ?>
-                    <div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
-                <?php endif; ?>
-                <?php if (session('error')): ?>
-                    <div class="alert alert-danger mt-3"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
-                <?php endif; ?>
+                     <div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
+                 <?php endif; ?>
+                 <?php if (session('error')): ?>
+                     <div class="alert alert-danger mt-3"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
+                 <?php endif; ?>
 
                 <p class="card-text mb-4">
                     Para acceder a la configuración de tu perfil, necesitamos verificar que tienes acceso a tu email actual.
