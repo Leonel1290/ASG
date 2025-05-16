@@ -26,11 +26,17 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl
 
 # Configura PHP para mostrar errores y registrarlos en stderr (para que Render los capture)
-RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "log_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+# Añadimos configuración para el PHP general y para PHP-FPM
+RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
+    && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
+    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/99-custom.ini \
+    && echo "log_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
+    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/99-custom.ini \
+    # Configuración adicional para PHP-FPM pool (www.conf)
+    && echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/www.conf \
+    && echo "php_flag[display_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf \
+    && echo "php_admin_value[error_log] = /dev/stderr" >> /usr/local/etc/php-fpm.d/www.conf \
+    && echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf
 
 # Habilita el módulo rewrite de Apache (necesario para las URLs amigables de CodeIgniter)
 RUN a2enmod rewrite
