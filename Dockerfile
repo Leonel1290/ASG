@@ -28,7 +28,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install mysqli pdo pdo_mysql zip mbstring exif pcntl bcmath ctype fileinfo json tokenizer xml intl
 
 # Instala Composer
-COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
+# CORRECCIÓN: Usamos la imagen composer:2 y copiamos desde /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 # Copia todos los archivos de tu aplicación al directorio de trabajo
 COPY . .
