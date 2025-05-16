@@ -17,7 +17,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Estilos personalizados (puedes copiarlos de tus otras vistas) */
+        /* Estilos personalizados */
         html, body {
             margin: 0;
             padding: 0;
@@ -34,7 +34,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             min-height: 100vh; /* Ocupar al menos el 100% de la altura de la ventana */
         }
 
-        /* Estilos para la barra de navegación */
+        /* --- ESTILOS PARA AGRANDAR EL NAVBAR --- */
         .navbar {
             background-color: #2d3748 !important; /* Color de fondo oscuro similar al de las tarjetas */
         }
@@ -42,10 +42,14 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         .navbar-brand {
             color: #fff !important; /* Color del texto de la marca */
             font-weight: bold;
+            font-size: 1.4rem; /* Agrandar letra de la marca */
         }
 
         .navbar-nav .nav-link {
             color: #cbd5e0 !important; /* Color de los enlaces de navegación */
+            font-size: 1.1rem; /* Agrandar letra de los enlaces */
+            padding-top: .75rem; /* Aumentar relleno vertical */
+            padding-bottom: .75rem; /* Aumentar relleno vertical */
         }
 
         .navbar-nav .nav-link.active {
@@ -56,6 +60,8 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         .navbar-nav .nav-link:hover {
              color: #fff !important; /* Color al pasar el ratón */
         }
+        /* --- FIN ESTILOS NAVBAR --- */
+
 
         /* Estilos para el botón de Cerrar Sesión */
         .btn-outline-secondary {
@@ -116,6 +122,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         .btn-primary {
             background-color: #4299e1; /* Botón principal (azul) */
             border-color: #4299e1;
+            color: white; /* Asegurar texto blanco */
             transition: background-color 0.3s ease;
         }
 
@@ -125,14 +132,15 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         }
 
          .btn-secondary {
-            background-color: #6b7280;
-            border-color: #6b7280;
-            transition: background-color 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: #4b5563;
-            border-color: #4b5563;
-        }
+             background-color: #6b7280;
+             border-color: #6b7280;
+             color: white; /* Asegurar texto blanco */
+             transition: background-color 0.3s ease;
+         }
+         .btn-secondary:hover {
+             background-color: #4b5563;
+             border-color: #4b5563;
+         }
 
 
         /* Estilos para mensajes de alerta */
@@ -177,6 +185,14 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             box-sizing: border-box; /* Incluir padding y borde en el ancho total */
         }
 
+         /* Estilo para input deshabilitado */
+         .form-control:disabled {
+             background-color: #5a6678; /* Fondo ligeramente distinto para deshabilitados */
+             color: #a0aec0; /* Texto más claro */
+             opacity: 1; /* Asegurar que no se vea transparente */
+         }
+
+
         .form-control::placeholder {
             color: #a0aec0; /* Color de placeholder */
         }
@@ -188,6 +204,10 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             font-size: 0.875em; /* Tamaño de fuente más pequeño */
             margin-top: 0.25rem;
         }
+         /* Estilo del input cuando hay error de validación */
+         .form-control.is-invalid {
+             border-color: #e53e3e;
+         }
 
 
         /* Utilidades de espaciado (ya definidas por Bootstrap, pero se incluyen por consistencia) */
@@ -224,7 +244,8 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                     </ul>
 
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
-                        <?= csrf_field() ?> <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
                         </button>
                     </form>
@@ -260,12 +281,13 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
 
 
                 <form method="post" action="<?= base_url('/perfil/dispositivo/actualizar') ?>">
-                    <?= csrf_field() ?> <input type="hidden" name="mac" value="<?= esc($dispositivo['MAC'] ?? '') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="mac" value="<?= esc($dispositivo['MAC'] ?? '') ?>">
 
                     <div class="form-group">
                         <label for="mac_display"><i class="fas fa-fingerprint me-2"></i> MAC del Dispositivo:</label>
                         <input type="text" class="form-control" id="mac_display" value="<?= esc($dispositivo['MAC'] ?? 'Desconocida') ?>" disabled>
-                        <?php if (isset($errors['mac'])): ?>
+                         <?php if (isset($errors['mac'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['mac']) ?>
                             </div>
@@ -287,12 +309,12 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                     <div class="form-group">
                         <label for="ubicacion"><i class="fas fa-map-marker-alt me-2"></i> Ubicación:</label>
                          <input type="text" class="form-control <?= isset($errors['ubicacion']) ? 'is-invalid' : '' ?>" id="ubicacion" name="ubicacion"
-                            value="<?= esc(set_value('ubicacion', $dispositivo['ubicacion'] ?? '')) ?>">
-                        <?php if (isset($errors['ubicacion'])): ?>
-                            <div class="invalid-feedback">
-                                <?= esc($errors['ubicacion']) ?>
-                            </div>
-                        <?php endif; ?>
+                             value="<?= esc(set_value('ubicacion', $dispositivo['ubicacion'] ?? '')) ?>">
+                         <?php if (isset($errors['ubicacion'])): ?>
+                             <div class="invalid-feedback">
+                                 <?= esc($errors['ubicacion']) ?>
+                             </div>
+                         <?php endif; ?>
                     </div>
 
                     <button type="submit" class="btn btn-primary mt-2 me-2"><i class="fas fa-save me-2"></i> Guardar Cambios</button>
