@@ -45,6 +45,13 @@ class Home extends Controller
     public function login()
     {
         $session = session();
+
+        // --- LÍNEAS DE DEBUGGING TEMPORAL ---
+        // Ahora depuramos después de obtener la sesión, justo antes de instanciar UserModel
+        echo "DEBUG: Sesion obtenida. Intentando instanciar UserModel.";
+        exit();
+        // --- FIN LÍNEAS DE DEBUGGING TEMPORAL ---
+
         // Usamos UserModel para verificar el estado activo y credenciales
         $userModel = new UserModel();
         // Instancia LecturasGasModel si lo necesitas aquí (tu código original lo hacía)
@@ -57,12 +64,6 @@ class Home extends Controller
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
         // $nombre = $this->request->getPost('nombre'); // Descomentar si buscas por nombre también
-
-        // --- LÍNEAS DE DEBUGGING TEMPORAL ---
-        // Ahora depuramos después de obtener los datos del formulario
-        echo "DEBUG: Datos del formulario obtenidos. Email: " . $email;
-        exit();
-        // --- FIN LÍNEAS DE DEBUGGING TEMPORAL ---
 
 
         // Buscar usuario por email (asumiendo que el email es único para login)
@@ -235,6 +236,10 @@ class Home extends Controller
         $token = $this->request->getPost('token');
         $password = $this->request->getPost('password');
 
+        $user = $userModel->where('reset_token', $token)
+                          ->where('reset_expires >=', Time::now()->toDateTimeString())
+                          ->first();
+
         if ($user) {
              // --- VERIFICACIÓN: Solo permitir reset si la cuenta está activa ---
             if (!$user['is_active']) {
@@ -292,7 +297,7 @@ class Home extends Controller
         return redirect()->to('/perfil'); // Redirigir al perfil
     }
 
-    // Rutas que parecen vistas directas o redundantes en Home (considera limpiarlas)
+    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
     public function inicioresetpass() { return view('reset_password'); } // Duplicada con showResetPasswordForm
     public function obtenerperfil() { return view('perfilobtener'); } // Vista no proporcionada
 
