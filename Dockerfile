@@ -59,11 +59,17 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 # Establece el directorio de trabajo
 WORKDIR /var/www/html
 
-# Opcional: Si usas Composer para gestionar dependencias, puedes añadir estos pasos
-# Es ALTAMENTE RECOMENDABLE usar Composer para instalar las dependencias definidas en composer.json
-# Instala Composer
-COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
-# Ejecuta composer install para instalar las dependencias
+# --- INSTALACIÓN DE COMPOSER (CORRECCIÓN) ---
+# Descarga el instalador de Composer
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    # Ejecuta el instalador para instalar Composer globalmente
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    # Verifica que Composer esté instalado y elimina el instalador
+    && composer --version \
+    && rm composer-setup.php
+# --- FIN INSTALACIÓN DE COMPOSER ---
+
+# Ejecuta composer install para instalar las dependencias del proyecto
 # --no-dev: no instala dependencias de desarrollo (más ligero para producción)
 # --optimize-autoloader: optimiza el autoloader para un mejor rendimiento
 RUN composer install --no-dev --optimize-autoloader
