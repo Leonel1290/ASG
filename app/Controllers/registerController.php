@@ -99,8 +99,11 @@ class registerController extends Controller
             // --- Enviar el correo electrónico de verificación ---
             $emailService = \Config\Services::email();
 
+            // Configura el remitente. Es mejor configurar esto en app/Config/Email.php o .env
+            // Si no está configurado globalmente, descomenta y ajusta las siguientes líneas:
+            // $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
+
             $emailService->setTo($email);
-            $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO EN app/Config/Email.php
             $emailService->setSubject('Verifica tu cuenta de ASG');
 
             // Crear el enlace de verificación
@@ -113,13 +116,13 @@ class registerController extends Controller
             // Intentar enviar el correo
             if ($emailService->send()) {
                 // Éxito al enviar el correo
-                log_message('debug', 'Correo de verificación enviado a: ' . $email);
-                // Redirigir a una página que le diga al usuario que revise su email
+                log_message('debug', 'Correo de verificación de registro enviado a: ' . $email);
+                // Redirigir a una página que le dice al usuario que revise su email
                 return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un correo de verificación a tu email. Por favor, revisa tu bandeja de entrada para activar tu cuenta.');
             } else {
                 // Error al enviar el correo
                 // Puedes loguear el error para depuración
-                log_message('error', 'Error al enviar correo de verificación a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
+                log_message('error', 'Error al enviar correo de verificación de registro a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
                 // Opcional: Eliminar el usuario recién creado si el email no se pudo enviar
                 // $this->userModel->delete($userId);
                 return redirect()->back()->withInput()->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
@@ -136,7 +139,7 @@ class registerController extends Controller
     public function checkEmail()
     {
         // Esta vista simplemente informa al usuario sobre el email enviado
-        return view('register/verification_message'); // <-- NUEVA VISTA
+        return view('register/verification_message'); // <-- Vista para mensaje de verificación
     }
 
 
