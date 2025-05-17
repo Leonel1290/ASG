@@ -24,9 +24,12 @@ RUN apt-get update && apt-get install -y \
 # Modifica esta lista según las necesidades específicas de tu aplicación
 # Ahora incluimos las extensiones que requieren las dependencias instaladas arriba
 # Descomentamos y corregimos la instalación de la extensión intl
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl \
+# --- CORRECCIÓN: Añadimos 'mysqli' a la lista de extensiones a instalar ---
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl mysqli \
     # Añade aquí cualquier otra extensión de PHP si tu proyecto la necesita
     && docker-php-ext-enable pdo_mysql # Asegura que la extensión pdo_mysql esté habilitada explícitamente
+    # No es necesario habilitar mysqli explícitamente con docker-php-ext-enable, install ya lo hace.
+# --- FIN CORRECCIÓN ---
 
 # Configura PHP para mostrar errores y registrarlos en stderr (para que Render los capture)
 # Para producción, deberías cambiar 'display_errors' a 'Off' en tu .env.
@@ -59,7 +62,7 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 # Establece el directorio de trabajo
 WORKDIR /var/www/html
 
-# --- INSTALACIÓN DE COMPOSER (CORRECCIÓN) ---
+# --- INSTALACIÓN DE COMPOSER ---
 # Descarga el instalador de Composer
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
     # Ejecuta el instalador para instalar Composer globalmente
