@@ -1,9 +1,5 @@
 <?php
 
-// Temporalmente, para forzar la visualización de errores en Render
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 /*
  *---------------------------------------------------------------
  * CHECK PHP VERSION
