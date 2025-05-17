@@ -113,6 +113,12 @@ $routes->post('/enlace/store', 'EnlaceController::store');
 // GET /detalles/LA_MAC_DEL_DISPOSITIVO
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
+// --- RUTAS DE VISTA DIRECTA ---
+
+// Ruta para la vista de "comprar"
+// Descomentamos esta ruta para que la vista sea accesible
+$routes->get('/comprar', 'Home::comprar');
+
 
 // --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
 // Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
@@ -122,9 +128,14 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 // $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
 // $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
 // $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
-// $routes->get('/comprar', 'Home::comprar'); // Duplicada
 
 // NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
 // que parecen duplicados con PerfilController::index y EnlaceController::store.
 // Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
 // para estas funcionalidades y eliminar los métodos duplicados en Home.php.
+
+// --- RUTAS NO ENCONTRADAS EN CONTROLADORES ADJUNTOS (COMENTADAS) ---
+// Estas rutas estaban en tu Routes.php original pero no vimos métodos correspondientes
+// en los controladores que proporcionaste.
+// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
+// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
