@@ -15,8 +15,7 @@
         "ext-mbstring": "*",
         "laminas/laminas-escaper": "^2.13",
         "psr/log": "^3.0",
-        "ext-mysqli": "*"  // Añadido explícitamente ya que usas MySQLi
-        // Añade aquí cualquier otra dependencia de Composer que tu proyecto necesite
+        "ext-mysqli": "*"
     },
     "require-dev": {
         "codeigniter/coding-standard": "^1.7",
