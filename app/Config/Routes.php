@@ -13,10 +13,10 @@ $routes->get('/', 'Home::index');
 $routes->get('/register', 'registerController::index');
 
 // Ruta para procesar el formulario de registro
-// POST /registerController/store (Coincide con la action del formulario en register.php)
-$routes->post('/register/store', 'registerController::store'); 
+// POST /register/store (Coincide con la action del formulario en register.php)
+$routes->post('/register/store', 'registerController::store');
 
-// Ruta para mostrar la página que le dice al usuario que revise su email
+// Ruta para mostrar la página que le dice al usuario que revise su email después del registro
 $routes->get('/register/check-email', 'registerController::checkEmail');
 
 // Ruta para verificar el token recibido por email para REGISTRO
@@ -28,15 +28,15 @@ $routes->post('/login', 'Home::login');
 // Ruta para mostrar el formulario de login (si usas loginobtener para esto)
 $routes->get('/loginobtener', 'Home::loginobtener');
 
-// Ruta para cerrar sesión
+// Ruta para cerrar sesión (usando POST para mayor seguridad)
 $routes->post('/logout', 'Home::logout');
 
 
 // RECUPERACION DE CONTRASEÑA
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword');
+$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Asumo que esta es la ruta que procesa el formulario de forgot password
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword');
+$routes->post('/reset-password', 'Home::resetPassword'); // Asumo que esta es la ruta que procesa el formulario de reset password
 
 // --- FIN RUTAS DE REGISTRO Y LOGIN ---
 
@@ -76,38 +76,55 @@ $routes->group('perfil', function($routes) {
     // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
 
 
-    // --- NUEVAS RUTAS PARA GESTIÓN DE DISPOSITIVOS ---
+    // --- RUTAS PARA GESTIÓN DE DISPOSITIVOS ---
 
     // Ruta para mostrar el formulario de edición de un dispositivo
     // GET /perfil/dispositivo/editar/MAC_DEL_DISPOSITIVO
     // (:segment) captura la MAC de la URL
-    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1'); // NUEVA RUTA
+    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
 
     // Ruta para procesar el formulario de edición de un dispositivo
     // POST /perfil/dispositivo/actualizar
-    $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice'); // NUEVA RUTA
+    $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
 
     // Ruta para eliminar dispositivos seleccionados (desenlazar del usuario)
     // POST /perfil/eliminar-dispositivos
-    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos'); // Ya existía
+    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
 
-    // --- FIN NUEVAS RUTAS GESTIÓN DE DISPOSITIVOS ---
+    // --- FIN RUTAS GESTIÓN DE DISPOSITIVOS ---
 
 });
 
 
 // Recibir los datos de la ESP32:
+// POST /lecturas_gas/guardar
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 // Vista para enlazar dispositivos (formulario para ingresar MAC)
+// GET /enlace
 $routes->get('/enlace', 'EnlaceController::index');
 // Acción para enlazar MACs (procesa el formulario de /enlace)
+// POST /enlace/store
 $routes->post('/enlace/store', 'EnlaceController::store');
 
 // Detalles del dispositivo (mostrar lecturas, etc.)
 // Asumo que esta ruta usa la MAC para identificar el dispositivo
+// GET /detalles/LA_MAC_DEL_DISPOSITIVO
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
-// Otras rutas (mantengo las que tenías)
-$routes->get('/comprar', 'Home::comprar');
+
+// --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
+// Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
+// Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
+// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
+// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
+// $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
+// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
+// $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
+// $routes->get('/comprar', 'Home::comprar'); // Duplicada
+
+// NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
+// que parecen duplicados con PerfilController::index y EnlaceController::store.
+// Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
+// para estas funcionalidades y eliminar los métodos duplicados en Home.php.
