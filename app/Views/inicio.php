@@ -191,7 +191,7 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt=""
+                         alt="Ilustración de fuga de gas"
                          class="hero-img img-fluid"
                          loading="lazy">
                 </div>
