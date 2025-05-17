@@ -26,10 +26,10 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => '',
-        'database'     => 'tesinaleo.12',
+        'hostname'     => 'beqt3q0gyevl7xonxald-mysql.services.clever-cloud.com',
+        'username'     => 'ujlzjpclm80hxedm',
+        'password'     => '2OJyrxmcM62meKPHo7mu',
+        'database'     => 'beqt3q0gyevl7xonxald',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
