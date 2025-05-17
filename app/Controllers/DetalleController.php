@@ -4,9 +4,10 @@ namespace App\Controllers;
 
 use App\Models\LecturasGasModel;
 use App\Models\DispositivoModel; // Importar el modelo de dispositivo
-use CodeIgniter\RESTful\ResourceController; // Si extiendes de ResourceController, mantenlo. Si no, usa CodeIgniter\Controller.
+use CodeIgniter\Controller; // Asegúrate de extender de Controller o BaseController
+// use CodeIgniter\RESTful\ResourceController; // Si extiendes de ResourceController, mantenlo. Si no, usa CodeIgniter\Controller.
 
-// Si extiendes de BaseController, cambia 'extends ResourceController' a 'extends BaseController'
+// Si extiendes de BaseController, cambia 'extends Controller' a 'extends BaseController'
 // Si no, usa 'extends Controller'
 class DetalleController extends BaseController // Asumo que extiendes de BaseController
 {
@@ -20,61 +21,66 @@ class DetalleController extends BaseController // Asumo que extiendes de BaseCon
 
         $this->lecturaModel = new LecturasGasModel();
         $this->dispositivoModel = new DispositivoModel(); // Instancia el modelo de dispositivo
+
+        // Cargar helpers necesarios si no están en BaseController
+        helper(['url']);
     }
 
+    // Método para mostrar los detalles de un dispositivo (GET /detalles/(:any))
     public function detalles($mac)
     {
-        // Recuperar las lecturas de gas para la MAC proporcionada
+        // Recuperar las lecturas de gas para la MAC proporcionada usando el método del modelo
         $lecturas = $this->lecturaModel->getLecturasPorMac($mac);
 
-        // --- NUEVO: Obtener los detalles del dispositivo (incluyendo nombre y ubicacion) ---
+        // Obtener los detalles del dispositivo (incluyendo nombre y ubicacion)
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
-        $nombreDispositivo = $dispositivo['nombre'] ?? $mac; // Usar nombre si existe, si no, la MAC
+        // Usar el nombre del dispositivo si existe, si no, usar la MAC
+        $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
+        // Usar la ubicación del dispositivo si existe, si no, 'Desconocida'
         $ubicacionDispositivo = $dispositivo['ubicacion'] ?? 'Desconocida';
-        // --- FIN NUEVO ---
 
 
         // Verificar si hay lecturas disponibles para esa MAC
         if (empty($lecturas)) {
-            // Si no hay lecturas, retornar una vista con un mensaje
+            // Si no hay lecturas, retornar la vista 'detalles' con un mensaje
             return view('detalles', [
                 'mac' => $mac,
                 'nombreDispositivo' => $nombreDispositivo, // Pasar el nombre del dispositivo
                 'ubicacionDispositivo' => $ubicacionDispositivo, // Pasar la ubicación
-                'lecturas' => [],
-                'labels' => [],
-                'data' => [],
-                'message' => 'No se encontraron lecturas para este dispositivo.'
+                'lecturas' => [], // Pasar array vacío de lecturas
+                'labels' => [], // Pasar array vacío de labels para el gráfico
+                'data' => [], // Pasar array vacío de data para el gráfico
+                'message' => 'No se encontraron lecturas para este dispositivo.' // Mensaje para la vista
             ]);
         }
 
-        // Si hay lecturas, ordenar las lecturas por fecha
+        // Si hay lecturas, ordenar las lecturas por fecha (ascendente para el gráfico)
         usort($lecturas, function ($a, $b) {
             return strtotime($a['fecha']) - strtotime($b['fecha']);
         });
 
-        // Preparar los datos para el gráfico
+        // Preparar los datos para el gráfico (labels y data)
         $labels = [];
         $data = [];
         foreach ($lecturas as $lectura) {
-            $labels[] = $lectura['fecha'];
-            $data[] = $lectura['nivel_gas'];
+            $labels[] = $lectura['fecha']; // Eje X: Fechas
+            $data[] = $lectura['nivel_gas']; // Eje Y: Nivel de gas
         }
 
-        // Retornar la vista con los datos de las lecturas y el gráfico
+        // Retornar la vista 'detalles' con los datos de las lecturas, el dispositivo y el gráfico
         return view('detalles', [
             'mac' => $mac,
             'nombreDispositivo' => $nombreDispositivo, // Pasar el nombre del dispositivo
             'ubicacionDispositivo' => $ubicacionDispositivo, // Pasar la ubicación
-            'lecturas' => $lecturas,
-            'labels' => $labels,
-            'data' => $data,
+            'lecturas' => $lecturas, // Pasar todas las lecturas
+            'labels' => $labels, // Pasar labels para el gráfico
+            'data' => $data, // Pasar data para el gráfico
             'message' => null // No hay mensaje de error si hay lecturas
         ]);
     }
 
-    // Puedes tener otros métodos en este controlador si los usas.
-    // public function detalle($mac) // Si tienes este método, revisa si es redundante con detalles()
+    // Si tienes un método 'detalle' adicional, revisa si es redundante con 'detalles()'
+    // public function detalle($mac)
     // {
     //     $lecturaModel = new \App\Models\LecturasGasModel();
     //     $lecturas = $lecturaModel->getLecturasPorMac($mac);
