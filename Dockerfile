@@ -17,16 +17,20 @@ RUN apt-get update && apt-get install -y \
     libexif-dev \
     libonig-dev \
     libicu-dev \
+    # Añade aquí cualquier otra dependencia del sistema si tu proyecto la necesita
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP necesarias para CodeIgniter 4
 # Modifica esta lista según las necesidades específicas de tu aplicación
 # Ahora incluimos las extensiones que requieren las dependencias instaladas arriba
 # Descomentamos y corregimos la instalación de la extensión intl
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif gd iconv zip intl \
+    # Añade aquí cualquier otra extensión de PHP si tu proyecto la necesita
+    && docker-php-ext-enable pdo_mysql # Asegura que la extensión pdo_mysql esté habilitada explícitamente
 
 # Configura PHP para mostrar errores y registrarlos en stderr (para que Render los capture)
-# Configuramos solo el PHP general (para mod_php)
+# Para producción, deberías cambiar 'display_errors' a 'Off' en tu .env.
+# La configuración en 99-custom.ini es para el entorno del contenedor.
 RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
     && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/99-custom.ini \
     && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/99-custom.ini \
@@ -42,7 +46,8 @@ RUN a2enmod rewrite
 COPY . /var/www/html/
 
 # Agrega este paso para asegurar permisos de escritura en la carpeta writable de CodeIgniter
-# Esto es crucial para que CodeIgniter pueda escribir logs y caché
+# Esto es crucial para que CodeIgniter pueda escribir logs y caché de sesión
+# www-data es el usuario bajo el que corre Apache/PHP en esta imagen base
 RUN chown -R www-data:www-data /var/www/html/writable \
     && chmod -R 775 /var/www/html/writable
 
@@ -55,10 +60,13 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 WORKDIR /var/www/html
 
 # Opcional: Si usas Composer para gestionar dependencias, puedes añadir estos pasos
+# Es ALTAMENTE RECOMENDABLE usar Composer para instalar las dependencias definidas en composer.json
 # Instala Composer
-# COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
+COPY --from=composer:latest /usr/local/bin/composer /usr/local/bin/composer
 # Ejecuta composer install para instalar las dependencias
-# RUN composer install --no-dev --optimize-autoloader
+# --no-dev: no instala dependencias de desarrollo (más ligero para producción)
+# --optimize-autoloader: optimiza el autoloader para un mejor rendimiento
+RUN composer install --no-dev --optimize-autoloader
 
 # Expone el puerto 80, que es el puerto por defecto de Apache
 EXPOSE 80
