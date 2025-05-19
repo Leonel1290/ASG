@@ -7,9 +7,10 @@ $labels = $labels ?? [];
 $data = $data ?? [];
 $message = $message ?? null;
 
-// Obtener el último nivel de gas para mostrarlo en la tarjeta simple,
-// tal como se hacía en el primer código (usando el primer elemento si está ordenado descendente)
-$nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? esc($lecturas[0]['nivel_gas']) . ' PPM' : 'Sin datos';
+// Obtener el último nivel de gas para mostrarlo en la tarjeta simple
+// Se asume que el arreglo $lecturas está ordenado de forma ascendente (el más antiguo primero)
+$ultimoIndice = count($lecturas) - 1;
+$nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas']) ? esc($lecturas[$ultimoIndice]['nivel_gas']) . ' PPM' : 'Sin datos';
 
 ?>
 <!DOCTYPE html>
@@ -329,14 +330,14 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ?
             </div>
 
             <div class="mt-4">
-                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad (JS): <span id="securityLevel">Sin datos</span></p>
+                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad (PPM): <span id="securityLevel">Sin datos</span></p>
                 <div class="progress">
                     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
 
             <div class="current-gas-level-card mt-4">
-                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Última Lectura (JS)</h5>
+                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Última Lectura (PPM)</h5>
                 <p class="current-gas-level" id="nivelGas">Cargando...</p>
             </div>
         </div>
