@@ -6,16 +6,15 @@ use CodeIgniter\Controller;
 use App\Models\EnlaceModel;
 use App\Models\LecturasGasModel;
 use App\Models\UserModel;
-use App\Models\DispositivoModel; // Importar el modelo de dispositivo
+use App\Models\DispositivoModel;
 use CodeIgniter\I18n\Time;
 
-// Asumo que extiendes de tu BaseController. Si no, cambia 'extends BaseController' a 'extends Controller'.
 class PerfilController extends BaseController
 {
     protected $userModel;
     protected $enlaceModel;
     protected $lecturasGasModel;
-    protected $dispositivoModel; // Propiedad para el modelo de dispositivo
+    protected $dispositivoModel;
 
 
     public function __construct()
@@ -26,7 +25,7 @@ class PerfilController extends BaseController
         $this->userModel = new UserModel();
         $this->enlaceModel = new EnlaceModel();
         $this->lecturasGasModel = new LecturasGasModel();
-        $this->dispositivoModel = new DispositivoModel(); // Instancia el modelo de dispositivo
+        $this->dispositivoModel = new DispositivoModel();
 
 
         // --- CARGAR HELPERS ---
@@ -35,38 +34,41 @@ class PerfilController extends BaseController
     }
 
     // Método para mostrar la página principal del perfil (GET /perfil)
-    // Modificado para obtener detalles completos del dispositivo
     public function index()
     {
         $session = session();
         $usuarioId = $session->get('id');
 
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'PerfilController::index() - Estado de la sesión al inicio: ' . json_encode($session->get()));
+        log_message('debug', 'PerfilController::index() - Usuario ID de la sesión: ' . ($usuarioId ?? 'null'));
+        // --- FIN LOGGING ---
+
+        // Redirigir si el usuario no está logueado
         if (!$usuarioId) {
+            log_message('debug', 'PerfilController::index() - Usuario ID no encontrado en sesión, redirigiendo a login.');
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
         }
 
-        // Obtener las direcciones MAC enlazadas al usuario desde la tabla 'enlace'
+        // Obtener las direcciones MAC enlazadas al usuario actual desde la tabla 'enlace'
         $enlaces = $this->enlaceModel
                         ->select('MAC')
                         ->where('id_usuario', $usuarioId)
-                        ->findAll(); // Obtiene un array de arrays, ej: [['MAC' => '...'], ['MAC' => '...']]
+                        ->findAll();
 
-        $macs = array_column($enlaces, 'MAC'); // Extraer solo los valores de MAC en un array simple
+        $macs = array_column($enlaces, 'MAC');
 
         $dispositivosEnlazados = [];
         if (!empty($macs)) {
-            // Obtener los detalles completos de los dispositivos (nombre y ubicacion)
-            // usando las MACs obtenidas.
-            // Usamos whereIn para buscar múltiples MACs.
             $dispositivosEnlazados = $this->dispositivoModel
                                         ->whereIn('MAC', $macs)
-                                        ->findAll(); // Obtiene un array de arrays con detalles del dispositivo
+                                        ->findAll();
         }
 
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
         $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
-        // Procesar las lecturas para agruparlas por MAC (esto ya lo tenías)
+        // Procesar las lecturas para agruparlas por MAC
         $lecturasPorMac = [];
         if (!empty($allLecturas)) {
              foreach ($allLecturas as $lectura) {
@@ -80,22 +82,23 @@ class PerfilController extends BaseController
             }
         }
 
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'PerfilController::index() - Dispositivos enlazados obtenidos: ' . json_encode($dispositivosEnlazados));
+        log_message('debug', 'PerfilController::index() - Lecturas por MAC procesadas: ' . json_encode($lecturasPorMac));
+        // --- FIN LOGGING ---
+
+
         // Pasar los datos a la vista.
-        // Ahora pasamos los detalles completos de los dispositivos enlazados.
         return view('perfil', [
-            'dispositivosEnlazados' => $dispositivosEnlazados, // Pasar los detalles de los dispositivos
-            'lecturasPorMac' => $lecturasPorMac // Pasar las lecturas procesadas
+            'dispositivosEnlazados' => $dispositivosEnlazados,
+            'lecturasPorMac' => $lecturasPorMac
         ]);
     }
 
 
     // --- MÉTODOS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN ---
 
-    // ... (Mantén los métodos configuracion, enviarVerificacion, verificarEmailToken, configForm, actualizar) ...
-    // Asegúrate de que estén en este archivo PerfilController.php
-
-    // Método para mostrar la página de inicio de verificación (GET /perfil/configuracion)
-     public function configuracion()
+    public function configuracion()
     {
         $session = session();
         $loggedInUserId = $session->get('id');
@@ -116,7 +119,6 @@ class PerfilController extends BaseController
         return view('perfil/verificar_email', $data);
     }
 
-    // Método para enviar el correo de verificación (POST /perfil/enviar-verificacion)
     public function enviarVerificacion()
     {
         $session = session();
@@ -143,22 +145,24 @@ class PerfilController extends BaseController
         ]);
 
         $emailService = \Config\Services::email();
+        // Configura el remitente en app/Config/Email.php o .env
+        // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
+
         $emailService->setTo($email);
-        $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
         $emailService->setSubject('Verificación de Email para Configuración de Perfil');
         $verificationLink = base_url("perfil/verificar-email/{$token}");
         $message = "Hola {$user['nombre']},\n\nHaz solicitado verificar tu email para acceder a la configuración de tu perfil.\n\nPor favor, haz clic en el siguiente enlace para verificar tu email:\n{$verificationLink}\n\nEste enlace expirará en 15 minutos.\n\nSi no solicitaste esta verificación, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
         $emailService->setMessage($message);
 
         if ($emailService->send()) {
+            log_message('debug', 'Correo de verificación de configuración enviado a: ' . $email);
             return redirect()->to('/perfil/configuracion')->with('success', 'Se ha enviado un correo de verificación a tu email actual. Por favor, revisa tu bandeja de entrada.');
         } else {
-            log_message('error', 'Error al enviar correo de verificación: ' . $emailService->printDebugger(['headers', 'subject', 'body']));
+            log_message('error', 'Error al enviar correo de verificación de configuración a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
             return redirect()->to('/perfil/configuracion')->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
         }
     }
 
-    // Método para verificar el token recibido por email (GET /perfil/verificar-email/(:segment))
     public function verificarEmailToken($token = null)
     {
         if ($token === null) {
@@ -184,13 +188,12 @@ class PerfilController extends BaseController
         return redirect()->to('/perfil/config_form')->with('success', 'Email verificado exitosamente. Ahora puedes actualizar tu perfil.');
     }
 
-    // Método para mostrar el formulario de configuración REAL (GET /perfil/config_form)
     public function configForm()
     {
         $session = session();
         $loggedInUserId = $session->get('id');
 
-        if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
              if ($loggedInUserId) {
                  return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de acceder a la configuración.');
              } else {
@@ -213,8 +216,6 @@ class PerfilController extends BaseController
         return view('perfil/configuracion_form', $data);
     }
 
-
-    // Método para procesar la actualización del perfil (POST /perfil/actualizar)
     public function actualizar()
     {
         $session = session();
@@ -278,7 +279,6 @@ class PerfilController extends BaseController
         }
     }
 
-    // Método para mostrar la página de éxito después de actualizar el perfil
     public function cambioExitoso()
     {
         $session = session();
@@ -291,10 +291,8 @@ class PerfilController extends BaseController
     // --- FIN MÉTODOS FLUJO VERIFICACIÓN Y CONFIGURACIÓN ---
 
 
-    // --- NUEVOS MÉTODOS PARA GESTIÓN DE DISPOSITIVOS ---
+    // --- MÉTODOS PARA GESTIÓN DE DISPOSITIVOS ---
 
-    // Método para mostrar el formulario de edición de un dispositivo
-    // GET /perfil/dispositivo/editar/(:segment)
     public function editDevice($mac = null)
     {
         $session = session();
@@ -308,7 +306,6 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'MAC del dispositivo no especificada.');
         }
 
-        // Verificar si la MAC está enlazada al usuario actual
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
                         ->where('MAC', $mac)
@@ -318,22 +315,17 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo.');
         }
 
-        // Obtener los detalles del dispositivo
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
 
         if (!$dispositivo) {
-            // Esto no debería pasar si el enlace existe, pero es una buena práctica verificar
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
-        // Cargar la vista del formulario de edición y pasar los datos del dispositivo
         return view('perfil/edit_device', [
-            'dispositivo' => $dispositivo // Pasar todos los datos del dispositivo
+            'dispositivo' => $dispositivo
         ]);
     }
 
-    // Método para procesar el formulario de edición de un dispositivo
-    // POST /perfil/dispositivo/actualizar
     public function updateDevice()
     {
         $session = session();
@@ -343,15 +335,13 @@ class PerfilController extends BaseController
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
-        // Obtener los datos del formulario
-        $mac = $this->request->getPost('mac'); // Necesitamos la MAC para identificar el dispositivo
+        $mac = $this->request->getPost('mac');
         $nombre = $this->request->getPost('nombre');
         $ubicacion = $this->request->getPost('ubicacion');
 
-        // Validar los datos recibidos
         $rules = [
             'mac' => [
-                'rules' => 'required|exact_length[17]', // Validación básica de formato MAC (XX:XX:XX:XX:XX:XX)
+                'rules' => 'required|exact_length[17]',
                 'errors' => [
                     'required' => 'La MAC es obligatoria.',
                     'exact_length' => 'El formato de la MAC es incorrecto.'
@@ -365,7 +355,7 @@ class PerfilController extends BaseController
                 ]
             ],
             'ubicacion' => [
-                'rules' => 'max_length[255]', // Ubicación puede ser opcional
+                'rules' => 'max_length[255]',
                 'errors' => [
                     'max_length' => 'La Ubicación no puede exceder los 255 caracteres.'
                 ]
@@ -373,12 +363,9 @@ class PerfilController extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
-            // Redirigimos a la ruta de edición, pasando la MAC como segmento de URL
             return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('errors', $this->validator->getErrors())->with('error', 'Error de validación. Por favor, revisa los datos.');
         }
 
-        // Verificar si la MAC está enlazada al usuario actual antes de actualizar
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
                         ->where('MAC', $mac)
@@ -388,56 +375,35 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo.');
         }
 
-        // Preparar los datos para la actualización
         $updateData = [
             'nombre' => $nombre,
             'ubicacion' => $ubicacion,
-            // 'updated_at' se actualizará automáticamente si useTimestamps es true en el modelo.
         ];
 
-        // Usar el modelo de dispositivo para realizar la actualización por MAC
         $updated = $this->dispositivoModel->updateDispositivoByMac($mac, $updateData);
 
         if ($updated) {
-            // Redirigir de vuelta a la página principal del perfil con un mensaje de éxito
             return redirect()->to('/perfil')->with('success', "¡Dispositivo '{$nombre}' actualizado exitosamente!");
         } else {
-             // Si el update() devuelve false, hubo un problema
-             // Redirigir de vuelta al formulario de edición con un mensaje de error genérico
              return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('error', 'Hubo un error al intentar actualizar el dispositivo.');
         }
     }
 
-
-    // Método para eliminar dispositivos (mantén tu código existente)
-     public function eliminarDispositivos()
+    public function eliminarDispositivos()
     {
-        $usuarioId = session()->get('id');
-        // Asumo que el formulario de eliminación envía un array de MACs
+        $session = session();
+        $usuarioId = $session->get('id');
+
+        if (!$usuarioId) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
+        }
+
         $macs_a_eliminar = $this->request->getPost('macs');
 
         if (!empty($macs_a_eliminar) && is_array($macs_a_eliminar)) {
-            // Eliminar los enlaces del usuario a estas MACs
             $this->enlaceModel->where('id_usuario', $usuarioId)
                               ->whereIn('MAC', $macs_a_eliminar)
                               ->delete();
-
-            // NOTA: Esto SOLO elimina el ENLACE. Los dispositivos en la tabla 'dispositivos'
-            // y sus lecturas en 'lecturas_gas' (si tienen FK con CASCADE DELETE)
-            // podrían eliminarse automáticamente si tienes configuradas las restricciones
-            // FOREIGN KEY con ON DELETE CASCADE en tu base de datos.
-            // Según tu script SQL, la tabla 'enlace' tiene FK a 'dispositivos' con ON DELETE CASCADE.
-            // La tabla 'lecturas_gas' tiene FK a 'dispositivos' con ON DELETE CASCADE.
-            // Esto significa que al eliminar una MAC de la tabla 'dispositivos',
-            // sus entradas en 'enlace' y 'lecturas_gas' asociadas a esa MAC también se eliminarán.
-            // Sin embargo, tu lógica actual elimina el enlace primero.
-            // Si quieres eliminar el DISPOSITIVO COMPLETO (y no solo el enlace del usuario),
-            // deberías eliminar de la tabla 'dispositivos' usando $this->dispositivoModel->whereIn('MAC', $macs_a_eliminar)->delete();
-            // PERO ten cuidado, esto eliminará el dispositivo para TODOS los usuarios enlazados.
-            // Si solo quieres desenlazar, la lógica actual de eliminar de 'enlace' es correcta.
-            // Si quieres eliminar el dispositivo si NINGÚN usuario está enlazado a él después de desenlazar,
-            // necesitarías lógica adicional.
-            // Por ahora, mantendremos la lógica de solo eliminar el enlace, que es lo que hace tu código actual.
 
             return redirect()->to('/perfil')->with('success', 'Dispositivos desenlazados correctamente.');
         } else {

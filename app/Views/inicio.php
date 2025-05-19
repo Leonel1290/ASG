@@ -19,12 +19,16 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            overflow: hidden;
+            /* overflow: hidden; */ /* Comentamos overflow: hidden en el body para evitar problemas de scroll */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
             background-color: rgba(13, 31, 35, 0.8);
+            position: fixed; /* Mantenemos la posición fija */
+            top: 0; /* La fija en la parte superior */
+            width: 100%; /* Asegura que ocupe todo el ancho */
+            z-index: 1000; /* Asegura que esté por encima del contenido */
         }
 
         .navbar-brand, .nav-link {
@@ -51,6 +55,11 @@
         .hero {
             padding: 6rem 0;
             position: relative;
+            /* --- CORRECCIÓN: Añadir padding-top para compensar la altura del navbar fijo --- */
+            /* Ajusta este valor (ej. 70px) para que sea ligeramente mayor que la altura de tu navbar */
+            /* Puedes necesitar ajustar el valor si la altura del navbar cambia en diferentes tamaños de pantalla */
+            padding-top: 80px; /* Añadimos un padding superior para que el contenido no quede detrás del navbar */
+            /* --- FIN CORRECCIÓN --- */
         }
 
         .hero h1 {
@@ -77,6 +86,11 @@
             50% { transform: translateY(-15px); }
         }
 
+        .features {
+             padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
+             padding-bottom: 3rem;
+        }
+
         .features i {
             font-size: 3rem;
             color: #698180;
@@ -98,6 +112,7 @@
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
+            margin-top: auto; /* Empuja el footer hacia abajo si el contenido es corto */
         }
 
         a {
@@ -119,16 +134,22 @@
             opacity: 1;
             transition: opacity 1s ease-out 1.5s; /* Desaparece después de 1.5s */
         }
-        @keyframes pulse-fade {
+        /* @keyframes pulse-fade {
             0% { transform: scale(0.8); opacity: 0.8; }
             50% { transform: scale(1.2); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
-        }
+        } */ /* Comentado porque no se usa */
 
         .explosion-animation-overlay.fade-out {
             opacity: 0;
-            pointer-events: none;
+            pointer-events: none; /* Permite interactuar con los elementos debajo una vez que desaparece */
         }
+
+        /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
+         main {
+             flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
+         }
+
     </style>
 </head>
 <body>
@@ -170,7 +191,7 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de gas seguro"
+                         alt="Ilustración de fuga de gas"
                          class="hero-img img-fluid"
                          loading="lazy">
                 </div>
@@ -225,17 +246,21 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function(){
+        // Smooth scroll para enlaces internos
         $('a[href^="#"]').on('click', function(e) {
             e.preventDefault();
             const target = $($(this).attr('href'));
             if(target.length) {
-                $('html, body').animate({ scrollTop: target.offset().top - 70 }, 500);
+                // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
+                const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
+                $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
             }
         });
 
+        // Ocultar overlay de animación al cargar la página
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
-            $('body').css('overflow', 'auto');
+            // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
         });
     });
 </script>

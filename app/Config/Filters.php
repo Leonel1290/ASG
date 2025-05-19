@@ -35,6 +35,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        // Alias para tu filtro de sesión de administrador
         'SessionAdmin'  => \App\Filters\SessionAdmin::class,
     ];
 
@@ -53,13 +54,13 @@ class Filters extends BaseFilters
      */
     public array $required = [
         'before' => [
-            'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
+            // 'forcehttps', // Force Global Secure Requests (consider habilitar en producción si usas HTTPS)
+            // 'pagecache',  // Web Page Caching (considerar para rendimiento)
         ],
         'after' => [
-            'pagecache',   // Web Page Caching
-            'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar
+            // 'pagecache',   // Web Page Caching
+            // 'performance', // Performance Metrics
+            'toolbar',     // Debug Toolbar (deshabilitar en producción)
         ],
     ];
 
@@ -71,13 +72,13 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            // 'honeypot',
-            // 'csrf',
-            // 'invalidchars',
+            // 'honeypot', // Protección básica contra spam en formularios
+            // 'csrf', // Protección CSRF (recomendado para formularios POST)
+            // 'invalidchars', // Filtra caracteres potencialmente dañinos en la entrada
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders',
+            // 'secureheaders', // Añade cabeceras de seguridad (recomendado para producción)
         ],
     ];
 
@@ -106,10 +107,16 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
+        // Aplica el filtro SessionAdmin a la ruta /inicio
+        // Asegúrate de que la lógica de este filtro redirija si el usuario no cumple los requisitos
         "SessionAdmin" => [
             "before" => [
                 "/inicio"
+                // Añade aquí otras rutas que solo los administradores deberían acceder
+                // Por ejemplo: '/admin/*', '/dashboard', etc.
             ]
         ]
+        // Ejemplo de filtro de autenticación general (si tuvieras uno)
+        // 'auth' => ['before' => ['/perfil/*', '/enlace', '/enlace/store', '/lecturas_gas/guardar', '/detalles/*']],
     ];
 }
