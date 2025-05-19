@@ -7,6 +7,10 @@ $labels = $labels ?? [];
 $data = $data ?? [];
 $message = $message ?? null;
 
+// Obtener el último nivel de gas para mostrarlo en la tarjeta simple,
+// tal como se hacía en el primer código (usando el primer elemento si está ordenado descendente)
+$nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? esc($lecturas[0]['nivel_gas']) . ' PPM' : 'Sin datos';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -119,6 +123,7 @@ $message = $message ?? null;
             cursor: pointer;
         }
 
+        /* Clases de Bootstrap para colores de fondo de badges/spans */
         .bg-success {
             background-color: #48bb78 !important;
             color: #2d3748; /* Asegura que el texto sea legible sobre el fondo */
@@ -147,7 +152,7 @@ $message = $message ?? null;
 
         .card:hover {
              /* Sombra neón y ancha - Puedes ajustar los colores y el desenfoque */
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
         }
 
         .card-body {
@@ -161,6 +166,37 @@ $message = $message ?? null;
             color: #667eea;
             margin-bottom: 1rem;
         }
+
+         /* Estilos específicos para la tarjeta de Nivel de Gas Actual (del primer código) */
+         .current-gas-level-card-simple {
+            background-color: #2d3748; /* Usar el color de la tarjeta general */
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            transition: box-shadow 0.3s ease;
+            padding: 1.5rem; /* Igual que card-body */
+            text-align: center; /* Centrar contenido */
+         }
+
+         .current-gas-level-card-simple:hover {
+              box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+         }
+
+         .current-gas-level-card-simple .card-title {
+             font-size: 1.75rem; /* Igual que card-title general */
+             font-weight: bold;
+             color: #667eea;
+             margin-bottom: 1rem;
+         }
+
+         .current-gas-level-card-simple .current-gas-level-value {
+             font-size: 2rem;
+             font-weight: bold;
+             color: #f6e05e; /* Color amarillo/oro */
+         }
+
 
         .progress {
             height: 1rem;
@@ -215,6 +251,12 @@ $message = $message ?? null;
             .card-title {
                 font-size: 1.5rem;
             }
+             .current-gas-level-card-simple .card-title {
+                 font-size: 1.5rem;
+             }
+             .current-gas-level-card-simple .current-gas-level-value {
+                 font-size: 1.75rem;
+             }
         }
     </style>
 </head>
@@ -229,6 +271,12 @@ $message = $message ?? null;
     <p class="device-details-line">
         MAC: <?= esc($mac) ?> | Ubicación: <?= esc($ubicacionDispositivo) ?>
     </p>
+
+    <div class="current-gas-level-card-simple">
+        <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
+        <p class="current-gas-level-value"><?= $nivelGasActualDisplay ?></p>
+    </div>
+
     <h2 class="section-title"><i class="fas fa-list-alt me-2"></i> Registros de Lecturas de Gas</h2>
     <div class="table-responsive">
         <table class="table table-striped mt-3">
@@ -241,33 +289,31 @@ $message = $message ?? null;
             </thead>
             <tbody>
                 <?php if (empty($lecturas)): ?>
-                    <tr><td colspan="3" class="text-center">No hay lecturas disponibles para este dispositivo.</td></tr>
+                    <tr><td colspan="3" class="text-center">No hay lecturas registradas.</td></tr>
                 <?php else: ?>
-                    <?php foreach ($lecturas as $lectura):
-                        $rowClass = '';
-                        $estado = '';
-                        // Asegúrate de que 'nivel_gas' existe y es numérico
-                        $nivel_gas = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1; // Usar -1 o similar para indicar dato inválido si no existe
-
-                        if ($nivel_gas >= 500) {
-                            $rowClass = 'table-danger'; // Usar clases de tabla de Bootstrap
-                            $estado = 'Peligro';
-                        } elseif ($nivel_gas >= 200) {
-                            $rowClass = 'table-warning'; // Usar clases de tabla de Bootstrap
-                            $estado = 'Precaución';
-                        } elseif ($nivel_gas >= 0) { // Considerar 0 o más como seguro si no supera los umbrales
-                            $rowClass = 'table-success'; // Usar clases de tabla de Bootstrap
-                            $estado = 'Seguro';
-                        } else {
-                            // Caso de dato inválido o faltante
-                            $rowClass = 'table-secondary'; // O alguna otra clase para indicar estado desconocido/error
-                            $estado = 'Desconocido';
-                        }
-                    ?>
-                        <tr class="<?= $rowClass ?>">
+                    <?php foreach ($lecturas as $lectura): ?>
+                        <tr>
                             <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
                             <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
-                            <td class="text-center"><?= $estado ?></td>
+                            <td class="text-center">
+                                <?php
+                                    $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
+                                    $estado = 'Desconocido';
+                                    $class = '';
+
+                                    if ($nivel >= 500) {
+                                        $estado = 'Peligro';
+                                        $class = 'bg-danger';
+                                    } elseif ($nivel >= 200) {
+                                        $estado = 'Precaución';
+                                        $class = 'bg-warning';
+                                    } elseif ($nivel >= 0) {
+                                        $estado = 'Seguro'; // O 'Normal' como en el código 1
+                                        $class = 'bg-success';
+                                    }
+                                ?>
+                                <span class="badge <?= $class ?>"><?= $estado ?></span>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -283,14 +329,14 @@ $message = $message ?? null;
             </div>
 
             <div class="mt-4">
-                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad: <span id="securityLevel">Sin datos</span></p>
+                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad (JS): <span id="securityLevel">Sin datos</span></p>
                 <div class="progress">
                     <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
 
             <div class="current-gas-level-card mt-4">
-                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Nivel de Gas Actual</h5>
+                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Última Lectura (JS)</h5>
                 <p class="current-gas-level" id="nivelGas">Cargando...</p>
             </div>
         </div>
@@ -305,8 +351,14 @@ $message = $message ?? null;
     const labels = <?= json_encode(isset($labels) ? $labels : []) ?>; // Mantener orden original para JS/Chart.js
     const data = <?= json_encode(isset($data) ? $data : []) ?>; // Mantener orden original para JS/Chart.js
 
-
-    const ultimoValor = lecturas.length > 0 && lecturas[lecturas.length - 1] && typeof lecturas[lecturas.length - 1]['nivel_gas'] !== 'undefined'
+    // Encontrar el último valor válido de nivel_gas en el array lecturas,
+    // asumiendo que el array "lecturas" para el JS y el gráfico
+    // está ordenado de más antiguo a más reciente, y el último elemento es el más reciente.
+    // Si tu array $lecturas en PHP (usado para la tabla) está ordenado de MÁS RECIENTE a MÁS ANTIGUO,
+    // y quieres que el JS use el dato más reciente, entonces deberías acceder al primer elemento:
+    // const ultimoValor = lecturas.length > 0 && typeof lecturas[0]['nivel_gas'] !== 'undefined' ? (parseFloat(lecturas[0]['nivel_gas']) || 0) : null;
+    // Mantengo la lógica original del JS del segundo código, que usa el último elemento del array.
+    const ultimoValor = lecturas.length > 0 && typeof lecturas[lecturas.length - 1]['nivel_gas'] !== 'undefined'
         ? (parseFloat(lecturas[lecturas.length - 1]['nivel_gas']) || 0) // Asegurar que sea número, default 0 si falla parse
         : null; // Usar null si no hay lecturas o el campo no existe
 
@@ -330,32 +382,41 @@ $message = $message ?? null;
         let width = 0;
         let levelText = 'Sin datos';
         let barClass = '';
-         let textColorClass = ''; // Para cambiar color del texto de seguridad si quieres
+        // let textColorClass = ''; // Para cambiar color del texto de seguridad si quieres
 
         // Ajusta estos umbrales según la lógica de tu aplicación
-        if (value >= 0 && value < 200) {
-            width = Math.min(100, (value / 200) * 33); // Escala dentro del primer tercio
-            levelText = 'Seguro';
-            barClass = 'bg-success';
-             textColorClass = 'text-success'; // O una clase personalizada
-        } else if (value >= 200 && value < 500) {
-            width = Math.min(100, 33 + ((value - 200) / 300) * 33); // Escala en el segundo tercio
-            width = Math.min(100, width); // Asegurarse de no pasar del 100%
-            levelText = 'Precaución';
-            barClass = 'bg-warning';
-             textColorClass = 'text-warning'; // O una clase personalizada
-        } else if (value >= 500) {
-            width = Math.min(100, 66 + ((value - 500) / 500) * 34); // Escala en el último tercio (ejemplo, ajusta el divisor si tienes un valor máximo esperado)
-            width = Math.min(100, width); // Asegurarse de no pasar del 100%
-            levelText = 'Peligro';
-            barClass = 'bg-danger';
-             textColorClass = 'text-danger'; // O una clase personalizada
-        } else { // Valor negativo o no numérico inesperado manejado antes, pero como fallback
+        // Asegúrate de que el valor no sea negativo si vino un dato inesperado
+        const safeValue = Math.max(0, value); // Usar 0 si el valor es negativo
+
+        if (safeValue >= 0 && safeValue < 200) {
+             // Escala: 0-199 PPM -> 0-33% de la barra
+             width = Math.min(100, (safeValue / 200) * 33);
+             levelText = 'Seguro';
+             barClass = 'bg-success';
+             // textColorClass = 'text-success';
+         } else if (safeValue >= 200 && safeValue < 500) {
+             // Escala: 200-499 PPM -> 33%-66% de la barra (rango de 300 PPM)
+             width = Math.min(100, 33 + ((safeValue - 200) / 300) * 33);
+             width = Math.min(100, width); // Asegurarse de no pasar del 100%
+             levelText = 'Precaución';
+             barClass = 'bg-warning';
+             // textColorClass = 'text-warning';
+         } else if (safeValue >= 500) {
+             // Escala: 500+ PPM -> 66%-100% de la barra
+             // Aquí puedes ajustar el divisor (500) si tienes un valor máximo razonable
+             // Por ejemplo, si el máximo esperado es 1000 PPM: ((safeValue - 500) / 500) * 34
+             // Si no hay máximo definido, la barra simplemente llegará al 100% para cualquier valor >= 500
+             width = Math.min(100, 66 + ((safeValue - 500) / 500) * 34); // Ejemplo con divisor 500
+             width = Math.min(100, width); // Asegurarse de no pasar del 100%
+             levelText = 'Peligro';
+             barClass = 'bg-danger';
+             // textColorClass = 'text-danger';
+         } else { // Caso de valor inválido o no numérico manejado por el Math.max(0, value)
              width = 0;
              levelText = 'Inválido';
              barClass = '';
-             textColorClass = 'text-muted';
-        }
+             // textColorClass = 'text-muted';
+         }
 
 
         progressBar.style.width = `${width}%`;
@@ -374,11 +435,8 @@ $message = $message ?? null;
         const gasChart = new Chart(ctx, {
             type: 'line',
             data: {
-                // Si los labels están en orden descendente (reciente a antiguo)
-                // labels: labels.slice().reverse(), // Clona y revierte para Chart.js si es necesario
-                // data: data.slice().reverse(),   // Clona y revierte para Chart.js si es necesario
-                labels: labels, // Asumiendo que labels ya está en el orden correcto (antiguo a reciente)
-                data: data, // Asumiendo que data ya está en el orden correcto
+                // Si los arrays labels y data están ordenados de más antiguo a más reciente, úsalos directamente:
+                labels: labels,
                 datasets: [{
                     label: 'Nivel de Gas (PPM)',
                     data: data,
@@ -388,6 +446,18 @@ $message = $message ?? null;
                     fill: true,
                     tension: 0.3
                 }]
+                // Si tus arrays labels y data están ordenados de MÁS RECIENTE a MÁS ANTIGUO (como podría sugerir la tabla),
+                // deberías revertirlos para el gráfico:
+                // labels: labels.slice().reverse(), // Clona y revierte
+                // datasets: [{
+                //     label: 'Nivel de Gas (PPM)',
+                //     data: data.slice().reverse(), // Clona y revierte
+                //     borderColor: 'rgba(54, 162, 235, 1)',
+                //     backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                //     borderWidth: 2,
+                //     fill: true,
+                //     tension: 0.3
+                // }]
             },
             options: {
                 responsive: true,
@@ -426,13 +496,13 @@ $message = $message ?? null;
                         },
                         ticks: {
                             color: '#cbd5e0', // Color para las etiquetas del eje
-                            display: false // Ocultar las etiquetas del eje X si hay muchas
+                             display: false // Ocultar las etiquetas del eje X si hay muchas
                         },
                          // Si labels está en orden descendente (reciente a antiguo) para Chart.js, descomenta:
                          // reverse: true,
                         grid: {
                             display: false, // Ocultar las líneas de la cuadrícula del eje X
-                            color: '#4a5568' // Color opcional para la cuadrícula si la muestras
+                             color: '#4a5568' // Color opcional para la cuadrícula si la muestras
                         }
                     },
                     y: {
@@ -446,8 +516,8 @@ $message = $message ?? null;
                             color: '#cbd5e0' // Color para las etiquetas del eje
                         },
                          grid: {
-                            color: '#4a5568' // Color opcional para la cuadrícula si la muestras
-                        }
+                             color: '#4a5568' // Color opcional para la cuadrícula si la muestras
+                         }
                     }
                 }
             }
@@ -467,8 +537,8 @@ $message = $message ?? null;
     }
 
     // console.log('Lecturas:', lecturas); // Descomenta para depurar
-    // console.log('Labels:', labels);   // Descomenta para depurar
-    // console.log('Data:', data);     // Descomenta para depurar
+    // console.log('Labels:', labels);   // Descomenta para depurar
+    // console.log('Data:', data);     // Descomenta para depurar
 </script>
 
 </body>
