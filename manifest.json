@@ -2,7 +2,7 @@
   "name": "ASG - Again Safe Gas",
   "short_name": "ASG",
   "description": "Aplicación de gestión de dispositivos y perfil para ASG.",
-  "start_url": "/inicio",
+  "start_url": "/index",
   "display": "standalone",
   "background_color": "#1a202c",
   "theme_color": "#2d3748",
