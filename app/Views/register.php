@@ -28,16 +28,25 @@
         /* Nota: Otros estilos como .form-register, .controls, .botons, etc.,
                  se espera que provengan de tu archivo register.css */
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
 </head>
 <body class="body">
     <section class="form-register">
         <h1>Formulario Registro</h1>
 
         <?php if (session()->getFlashdata('success')): ?>
-            <p class="success-message"><?= session()->getFlashdata('success') ?></p>
+            <div class="success-message">
+                <?= esc(session()->getFlashdata('success')) ?>
+            </div>
         <?php endif; ?>
 
-        <?php if (session()->getFlashdata('error')): ?>
+         <?php if (session()->getFlashdata('error')): ?>
              <div class="error-messages">
                  <ul>
                      <li><?= esc(session()->getFlashdata('error')) ?></li>
@@ -72,5 +81,19 @@
         </form>
         <p><a href="<?= base_url('loginobtener') ?>">¿Ya tengo Cuenta?</a></p>
     </section>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
