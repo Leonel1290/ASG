@@ -24,124 +24,240 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos generales y navbar */
+        /* Añadimos un reset general para asegurar que no haya márgenes/paddings por defecto */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background-color: #1a202c; /* Dark mode background */
-            color: #cbd5e0; /* Light text */
+            background-color: #1a202c;
+            color: #cbd5e0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; /* Aseguramos que el margen sea 0 */
+            padding: 0; /* Aseguramos que el padding sea 0 */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        .navbar {
-            background-color: #2d3748 !important; /* Darker header */
-        }
-
-        .navbar-brand {
-            color: #fff !important;
-            font-weight: bold;
-        }
-
-        .navbar-brand:hover {
-            color: #ccc !important;
-        }
-
-        .nav-link {
-            color: #cbd5e0 !important;
-        }
-
-        .nav-link:hover {
-            color: #fff !important;
+            /* Eliminamos padding-top ya que la navbar no es fija por defecto (si la haces fija, descomenta y ajusta) */
+            /* padding-top: 56px; */
         }
 
         .container {
-            flex: 1; /* Allow container to grow */
-            padding-top: 20px; /* Space for fixed navbar */
-            padding-bottom: 20px;
+            flex: 1;
+            padding: 2rem;
         }
 
-        .card {
-            background-color: #2d3748; /* Card background */
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* Estilo para el botón Volver */
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Añadir transición para hover */
+        }
+         .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
+
+        .page-title {
+            color: #f7fafc;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem; /* Reducido el margen inferior */
+            text-align: center;
+        }
+
+        /* Estilo para la línea de detalles (MAC y Ubicación) */
+        .device-details-line {
+            text-align: center;
+            color: #a0aec0; /* Color de texto secundario */
+            font-size: 1rem;
+            margin-bottom: 1.5rem; /* Espacio debajo de los detalles */
+        }
+
+
+        .section-title {
+            color: #edf2f7;
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a5568;
+            padding-bottom: 0.5rem;
+        }
+
+        .table-responsive {
             margin-bottom: 1.5rem;
         }
 
-        .card-header {
-            background-color: #4a5568; /* Card header background */
-            border-bottom: none;
-            color: #fff;
+        .table {
+            width: 100%;
+            color: #e2e8f0;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+            border-radius: 0.5rem;
+            overflow: hidden; /* Asegura que las esquinas redondeadas se vean */
+            background-color: #2d3748;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .table th {
+            background-color: #4a5568;
+            color: #f7fafc;
             font-weight: bold;
-            padding: 1rem 1.5rem;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #374151;
+        }
+
+        .table tbody tr:hover {
+            background-color: #4a5568;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Clases de Bootstrap para colores de fondo de badges/spans */
+        .bg-success {
+            background-color: #48bb78 !important;
+            color: #2d3748; /* Asegura que el texto sea legible sobre el fondo */
+        }
+
+        .bg-warning {
+            background-color: #f6e05e !important;
+             color: #2d3748; /* Asegura que el texto sea legible sobre el fondo */
+        }
+
+        .bg-danger {
+            background-color: #e53e3e !important;
+            color: #edf2f7;
+        }
+
+
+        .card {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            transition: box-shadow 0.3s ease; /* Animación para la sombra */
+        }
+
+        .card:hover {
+             /* Sombra neón y ancha - Puedes ajustar los colores y el desenfoque */
+             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
         }
 
         .card-body {
             padding: 1.5rem;
+            text-align: center;
         }
 
-        .alert {
-            margin-top: 1rem;
-        }
-
-        .alert-info {
-            background-color: #bee3f8;
-            color: #2c5282;
-            border-color: #90cdf4;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 40vh; /* Responsive height */
-            width: 100%;
-        }
-
-        .status-circle {
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-ok { background-color: #4CAF50; } /* Green */
-        .status-danger { background-color: #f56565; } /* Red */
-        .status-unknown { background-color: #ecc94b; } /* Yellow */
-
-        .level-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 120px; /* Fixed height for consistent display */
-            font-size: 2.2rem;
+        .card-title {
+            font-size: 1.75rem;
             font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+         /* Estilos específicos para la tarjeta de Nivel de Gas Actual (del primer código) */
+         .current-gas-level-card-simple {
+            background-color: #2d3748; /* Usar el color de la tarjeta general */
             color: #fff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            border: none;
             border-radius: 0.5rem;
-            background-color: #374151; /* Default background */
-            transition: background-color 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            transition: box-shadow 0.3s ease;
+            padding: 1.5rem; /* Igual que card-body */
+            text-align: center; /* Centrar contenido */
+         }
+
+         .current-gas-level-card-simple:hover {
+              box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+         }
+
+         .current-gas-level-card-simple .card-title {
+             font-size: 1.75rem; /* Igual que card-title general */
+             font-weight: bold;
+             color: #667eea;
+             margin-bottom: 1rem;
+         }
+
+         .current-gas-level-card-simple .current-gas-level-value {
+             font-size: 2rem;
+             font-weight: bold;
+             color: #f6e05e; /* Color amarillo/oro */
+         }
+
+
+        .progress {
+            height: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background-color: #4a5568;
         }
 
-        .level-card.status-ok {
-            background-color: #4CAF50; /* Green */
-        }
-        .level-card.status-danger {
-            background-color: #e53e3e; /* Red */
-        }
-        .level-card.status-unknown {
-            background-color: #d69e2e; /* Yellow */
+        .progress-bar {
+            background-color: #48bb78; /* Color por defecto, se cambia con JS */
+            transition: width 0.5s ease; /* Animación más suave */
+            color: #fff;
+            text-align: center;
+            line-height: 1rem; /* Centrar texto verticalmente si lo hubiera */
         }
 
-        /* Adjustments for smaller screens */
+        .security-level-text {
+            font-weight: bold;
+            margin-top: 0.5rem;
+            color: #f7fafc;
+        }
+
+        .current-gas-level-card {
+            background-color: #4a5568;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .current-gas-level-title {
+            font-size: 1.25rem;
+            color: #edf2f7;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-gas-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea; /* Color por defecto, se puede cambiar con JS si quieres */
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .navbar-nav {
-                text-align: center;
+            .page-title {
+                font-size: 1.75rem;
             }
-            .nav-link {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
+
+            .section-title {
+                font-size: 1.25rem;
             }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+             .current-gas-level-card-simple .card-title {
+                 font-size: 1.5rem;
+             }
+             .current-gas-level-card-simple .current-gas-level-value {
+                 font-size: 1.75rem;
+             }
         }
     </style>
 
@@ -154,144 +270,227 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 </head>
 <body>
 
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="<?= base_url('/perfil'); ?>">ASG</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil'); ?>">Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion'); ?>">Configuración</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/logout'); ?>">Cerrar Sesión</a>
-                        </li>
-                    </ul>
+<div class="container my-5">
+    <a href="<?= base_url('/perfil') ?>" class="btn btn-outline-secondary mb-4">
+        <i class="fas fa-arrow-left me-2"></i> Volver al Perfil
+    </a>
+
+    <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Detalle del Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
+    <p class="device-details-line">
+        MAC: <?= esc($mac) ?> | Ubicación: <?= esc($ubicacionDispositivo) ?>
+    </p>
+
+    <div class="current-gas-level-card-simple">
+        <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
+        <p class="current-gas-level-value"><?= $nivelGasActualDisplay ?></p>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-list-alt me-2"></i> Registros de Lecturas de Gas</h2>
+    <div class="table-responsive">
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-calendar-alt me-2"></i> Fecha</th>
+                    <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
+                    <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($lecturas)): ?>
+                    <tr><td colspan="3" class="text-center">No hay lecturas registradas.</td></tr>
+                <?php else: ?>
+                    <?php foreach ($lecturas as $lectura): ?>
+                        <tr>
+                            <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
+                            <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
+                            <td class="text-center">
+                                <?php
+                                    $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
+                                    $estado = 'Desconocido';
+                                    $class = '';
+
+                                    if ($nivel >= 500) {
+                                        $estado = 'Peligro';
+                                        $class = 'bg-danger';
+                                    } elseif ($nivel >= 200) {
+                                        $estado = 'Precaución';
+                                        $class = 'bg-warning';
+                                    } elseif ($nivel >= 0) {
+                                        $estado = 'Seguro'; // O 'Normal' como en el código 1
+                                        $class = 'bg-success';
+                                    }
+                                ?>
+                                <span class="badge <?= $class ?>"><?= $estado ?></span>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card mt-5">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-chart-line me-2"></i> Gráfico de Niveles de Gas</h5>
+            <div class="chart-container" style="max-width: 700px; margin: 0 auto;">
+                 <canvas id="gasChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="mt-4">
+                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad (PPM): <span id="securityLevel">Sin datos</span></p>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <div class="container my-4">
-        <?php if ($message): ?>
-            <div class="alert alert-info text-center" role="alert">
-                <?= esc($message) ?>
+            <div class="current-gas-level-card mt-4">
+                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Última Lectura (PPM)</h5>
+                <p class="current-gas-level" id="nivelGas">Cargando...</p>
             </div>
-        <?php endif; ?>
-
-        <h2 class="text-center mb-4">Detalles del Dispositivo: <?= esc($nombreDispositivo) ?></h2>
-
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-info-circle me-2"></i> Información General
-                    </div>
-                    <div class="card-body">
-                        <p><strong>MAC:</strong> <?= esc($mac) ?></p>
-                        <p><strong>Ubicación:</strong> <?= esc($ubicacionDispositivo) ?></p>
-                        <p><strong>Última Lectura:</strong>
-                            <?php if (!empty($lecturas)):
-                                $ultimaLectura = end($lecturas);
-                                echo esc($ultimaLectura['fecha_lectura']) . ' ' . esc($ultimaLectura['hora_lectura']);
-                            else: ?>
-                                Sin datos
-                            <?php endif; ?>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-gas-pump me-2"></i> Nivel de Gas Actual
-                    </div>
-                    <div class="card-body text-center">
-                        <?php
-                        $statusClass = 'status-unknown';
-                        if (!empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas'])) {
-                            $nivelGas = (float)$lecturas[$ultimoIndice]['nivel_gas'];
-                            if ($nivelGas <= 500) {
-                                $statusClass = 'status-ok';
-                            } else {
-                                $statusClass = 'status-danger';
-                            }
-                        }
-                        ?>
-                        <div class="level-card <?= $statusClass ?>">
-                            <?= $nivelGasActualDisplay ?>
-                        </div>
-                        <?php if ($statusClass == 'status-ok'): ?>
-                            <p class="text-success mt-2">Nivel de gas seguro.</p>
-                        <?php elseif ($statusClass == 'status-danger'): ?>
-                            <p class="text-danger mt-2">¡Nivel de gas peligroso! Se recomienda ventilar y revisar.</p>
-                        <?php else: ?>
-                            <p class="text-muted mt-2">Estado desconocido o sin datos.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-chart-line me-2"></i> Historial de Nivel de Gas (Últimas lecturas)
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="gasLevelChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-4">
-            <a href="<?= base_url('/perfil') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Volver a Mis Dispositivos</a>
         </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const labels = <?= json_encode($labels); ?>;
-    const data = <?= json_encode($data); ?>;
-    const lecturas = <?= json_encode($lecturas); ?>; // Puedes usar esto para depuración o lógica adicional
+</div>
 
+<script>
+    // Asegúrate de que $lecturas, $labels y $data se pasen correctamente desde PHP
+    // Usar ?? [] para manejar caso null/undefined si no hay datos
+    const lecturas = <?= json_encode($lecturas ?? []) ?>;
+    const labels = <?= json_encode(isset($labels) ? $labels : []) ?>; // Mantener orden original para JS/Chart.js
+    const data = <?= json_encode(isset($data) ? $data : []) ?>; // Mantener orden original para JS/Chart.js
+
+    // Encontrar el último valor válido de nivel_gas en el array lecturas,
+    // asumiendo que el array "lecturas" para el JS y el gráfico
+    // está ordenado de más antiguo a más reciente, y el último elemento es el más reciente.
+    // Si tu array $lecturas en PHP (usado para la tabla) está ordenado de MÁS RECIENTE a MÁS ANTIGUO,
+    // y quieres que el JS use el dato más reciente, entonces deberías acceder al primer elemento:
+    // const ultimoValor = lecturas.length > 0 && typeof lecturas[0]['nivel_gas'] !== 'undefined' ? (parseFloat(lecturas[0]['nivel_gas']) || 0) : null;
+    // Mantengo la lógica original del JS del segundo código, que usa el último elemento del array.
+    const ultimoValor = lecturas.length > 0 && typeof lecturas[lecturas.length - 1]['nivel_gas'] !== 'undefined'
+        ? (parseFloat(lecturas[lecturas.length - 1]['nivel_gas']) || 0) // Asegurar que sea número, default 0 si falla parse
+        : null; // Usar null si no hay lecturas o el campo no existe
+
+
+    if (ultimoValor !== null) {
+        document.getElementById('nivelGas').textContent = `${ultimoValor} PPM`;
+        updateProgressBar(ultimoValor);
+    } else {
+        document.getElementById('nivelGas').textContent = 'Sin datos';
+        document.getElementById('securityLevel').textContent = 'Sin datos';
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = '0%';
+        progressBar.className = 'progress-bar';
+        progressBar.setAttribute('aria-valuenow', 0);
+    }
+
+
+    function updateProgressBar(value) {
+        const progressBar = document.getElementById('progressBar');
+        const securityLevelSpan = document.getElementById('securityLevel'); // Referencia al span
+        let width = 0;
+        let levelText = 'Sin datos';
+        let barClass = '';
+        // let textColorClass = ''; // Para cambiar color del texto de seguridad si quieres
+
+        // Ajusta estos umbrales según la lógica de tu aplicación
+        // Asegúrate de que el valor no sea negativo si vino un dato inesperado
+        const safeValue = Math.max(0, value); // Usar 0 si el valor es negativo
+
+        if (safeValue >= 0 && safeValue < 200) {
+             // Escala: 0-199 PPM -> 0-33% de la barra
+             width = Math.min(100, (safeValue / 200) * 33);
+             levelText = 'Seguro';
+             barClass = 'bg-success';
+             // textColorClass = 'text-success';
+         } else if (safeValue >= 200 && safeValue < 500) {
+             // Escala: 200-499 PPM -> 33%-66% de la barra (rango de 300 PPM)
+             width = Math.min(100, 33 + ((safeValue - 200) / 300) * 33);
+             width = Math.min(100, width); // Asegurarse de no pasar del 100%
+             levelText = 'Precaución';
+             barClass = 'bg-warning';
+             // textColorClass = 'text-warning';
+         } else if (safeValue >= 500) {
+             // Escala: 500+ PPM -> 66%-100% de la barra
+             // Aquí puedes ajustar el divisor (500) si tienes un valor máximo razonable
+             // Por ejemplo, si el máximo esperado es 1000 PPM: ((safeValue - 500) / 500) * 34
+             // Si no hay máximo definido, la barra simplemente llegará al 100% para cualquier valor >= 500
+             width = Math.min(100, 66 + ((safeValue - 500) / 500) * 34); // Ejemplo con divisor 500
+             width = Math.min(100, width); // Asegurarse de no pasar del 100%
+             levelText = 'Peligro';
+             barClass = 'bg-danger';
+             // textColorClass = 'text-danger';
+         } else { // Caso de valor inválido o no numérico manejado por el Math.max(0, value)
+             width = 0;
+             levelText = 'Inválido';
+             barClass = '';
+             // textColorClass = 'text-muted';
+         }
+
+
+        progressBar.style.width = `${width}%`;
+        progressBar.className = `progress-bar ${barClass}`; // Aplicar clase de color
+        progressBar.setAttribute('aria-valuenow', width);
+        securityLevelSpan.textContent = levelText;
+        // Opcional: cambiar el color del texto del nivel de seguridad
+        // securityLevelSpan.className = ''; // Limpiar clases anteriores
+        // securityLevelSpan.classList.add(textColorClass); // Añadir clase de color
+    }
+
+
+    // Solo intentar crear el gráfico si hay datos de labels y data
     if (labels.length > 0 && data.length > 0) {
-        const ctx = document.getElementById('gasLevelChart').getContext('2d');
-        const gasLevelChart = new Chart(ctx, {
+        const ctx = document.getElementById('gasChart').getContext('2d');
+        const gasChart = new Chart(ctx, {
             type: 'line',
             data: {
+                // Si los arrays labels y data están ordenados de más antiguo a más reciente, úsalos directamente:
                 labels: labels,
                 datasets: [{
                     label: 'Nivel de Gas (PPM)',
                     data: data,
-                    borderColor: '#4CAF50', // Color de línea verde
-                    backgroundColor: 'rgba(76, 175, 80, 0.2)', // Fondo de área suave
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.3, // Curva suave de la línea
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#4CAF50',
-                    pointHoverBackgroundColor: '#4CAF50',
-                    pointHoverBorderColor: '#fff'
+                    tension: 0.3
                 }]
+                // Si tus arrays labels y data están ordenados de MÁS RECIENTE a MÁS ANTIGUO (como podría sugerir la tabla),
+                // deberías revertirlos para el gráfico:
+                // labels: labels.slice().reverse(), // Clona y revierte
+                // datasets: [{
+                //     label: 'Nivel de Gas (PPM)',
+                //     data: data.slice().reverse(), // Clona y revierte
+                //     borderColor: 'rgba(54, 162, 235, 1)',
+                //     backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                //     borderWidth: 2,
+                //     fill: true,
+                //     tension: 0.3
+                // }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, // Permite controlar el tamaño con el div contenedor
                 plugins: {
                     legend: {
+                        position: 'top',
                         labels: {
-                            color: '#cbd5e0' // Color para la leyenda
+                            color: '#f7fafc' // Color para el texto de la leyenda
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + context.raw + ' PPM';
+                                const label = context.dataset.label || '';
+                                if (context.parsed.y !== null) {
+                                    return `${label}: ${context.parsed.y} PPM`;
+                                }
+                                return label;
+                            },
+                            title: function(context) {
+                                if (context && context[0] && context[0].label) {
+                                    return `Fecha: ${context[0].label}`;
+                                }
+                                return null;
                             }
                         }
                     }
@@ -300,15 +499,19 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
                     x: {
                         title: {
                             display: true,
-                            text: 'Fecha y Hora',
+                            text: 'Fecha',
                             color: '#e2e8f0' // Color para el título del eje
                         },
                         ticks: {
-                            color: '#cbd5e0' // Color para las etiquetas del eje
+                            color: '#cbd5e0', // Color para las etiquetas del eje
+                             display: false // Ocultar las etiquetas del eje X si hay muchas
                         },
+                         // Si labels está en orden descendente (reciente a antiguo) para Chart.js, descomenta:
+                         // reverse: true,
                         grid: {
+                            display: false, // Ocultar las líneas de la cuadrícula del eje X
                              color: '#4a5568' // Color opcional para la cuadrícula si la muestras
-                         }
+                        }
                     },
                     y: {
                         title: {
