@@ -7,6 +7,8 @@
 
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
+    <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -19,33 +21,32 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            /* overflow: hidden; */ /* Comentamos overflow: hidden en el body para evitar problemas de scroll */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
             background-color: rgba(13, 31, 35, 0.8);
-            position: fixed; /* Mantenemos la posición fija */
-            top: 0; /* La fija en la parte superior */
-            width: 100%; /* Ocupa todo el ancho */
-            z-index: 1000; /* Asegura que esté por encima de otros elementos */
-            transition: background-color 0.3s ease; /* Transición suave para el color de fondo */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
         }
 
         .navbar-brand img {
-            height: 40px; /* Tamaño del logo */
+            height: 40px;
             margin-right: 10px;
         }
 
         .navbar-nav .nav-link {
-            color: #AFB3B7; /* Color de texto para los enlaces */
+            color: #AFB3B7;
             font-weight: 600;
             margin-left: 15px;
             transition: color 0.3s ease;
         }
 
         .navbar-nav .nav-link:hover {
-            color: #ffffff; /* Color al pasar el ratón */
+            color: #ffffff;
         }
 
         .hero-section {
@@ -53,15 +54,15 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            height: 100vh; /* Ocupa toda la altura de la ventana */
-            background-image: url('<?= base_url('/imagenes/detector.jpg'); ?>'); /* Imagen de fondo */
+            height: 100vh;
+            background-image: url('<?= base_url('/imagenes/detector.jpg'); ?>');
             background-size: cover;
             background-position: center;
             position: relative;
-            color: #e2e8f0; /* Texto claro para contraste */
-            margin-top: 0; /* Eliminar el margen superior */
-            padding-top: 56px; /* Ajuste para la navbar fija */
-            box-sizing: border-box; /* Incluye padding en el height */
+            color: #e2e8f0;
+            margin-top: 0;
+            padding-top: 56px;
+            box-sizing: border-box;
         }
 
         .hero-overlay {
@@ -70,19 +71,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Oscurece la imagen de fondo */
+            background-color: rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px; /* Padding interno */
+            padding: 20px;
         }
 
         .hero-title {
-            font-size: 3.5rem; /* Tamaño de fuente grande */
+            font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 20px;
-            color: #ffffff; /* Blanco puro para el título */
+            color: #ffffff;
         }
 
         .hero-subtitle {
@@ -92,7 +93,7 @@
         }
 
         .btn-primary {
-            background-color: #3498db; /* Azul vibrante */
+            background-color: #3498db;
             border-color: #3498db;
             padding: 12px 30px;
             font-size: 1.1rem;
@@ -102,7 +103,7 @@
         }
 
         .btn-primary:hover {
-            background-color: #2874a6; /* Azul más oscuro al pasar el ratón */
+            background-color: #2874a6;
             border-color: #2874a6;
         }
 
@@ -115,7 +116,7 @@
         }
 
         .bg-light-dark {
-            background-color: #1a202c; /* Fondo para secciones */
+            background-color: #1a202c;
         }
 
         .feature-icon {
@@ -125,11 +126,11 @@
         }
 
         .card {
-            background-color: #2d3748; /* Color de tarjeta */
+            background-color: #2d3748;
             border: none;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: #e2e8f0; /* Texto claro */
+            color: #e2e8f0;
             padding: 20px;
         }
 
@@ -139,7 +140,7 @@
         }
 
         .cta-section {
-            background: linear-gradient(90deg, #3498db, #2c3e50); /* Degradado de colores */
+            background: linear-gradient(90deg, #3498db, #2c3e50);
             color: #ffffff;
             padding: 80px 0;
             text-align: center;
@@ -169,7 +170,7 @@
         }
 
         .contact-section address {
-            font-style: normal; /* Quitar cursiva de address */
+            font-style: normal;
         }
 
         .footer {
@@ -340,6 +341,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // Asegúrate de que base_url('service-worker.js') apunte a la ruta correcta en Render
                 navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito:', registration.scope);
