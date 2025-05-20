@@ -3,7 +3,7 @@
 // que contiene los detalles del dispositivo a editar (MAC, nombre, ubicacion).
 $dispositivo = $dispositivo ?? ['MAC' => '', 'nombre' => '', 'ubicacion' => ''];
 
-// CodeIgniter pasa los errores de validación en la variable $errors si la validación falla con with('errors', ...)
+// CodeIgniter pasa los errores de validación en la variable $errors si la validación falla con with('errors', ...)'
 // Si la validación es exitosa, $errors será null o un array vacío.
 $errors = session('errors') ?? []; // Obtener errores de validación de la sesión flashdata
 ?>
@@ -27,228 +27,151 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             background-color: #1a202c; /* Fondo oscuro principal */
             color: #cbd5e0; /* Texto claro */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Ocupar al menos el 100% de la altura de la ventana */
+            min-height: 100vh;
         }
 
         /* --- ESTILOS PARA AGRANDAR EL NAVBAR --- */
         .navbar {
-            background-color: #2d3748 !important; /* Color de fondo oscuro similar al de las tarjetas */
+            background-color: #2d3748 !important; /* Color de fondo oscuro */
+            padding-top: 1rem; /* Más espacio arriba */
+            padding-bottom: 1rem; /* Más espacio abajo */
         }
 
         .navbar-brand {
-            color: #fff !important; /* Color del texto de la marca */
-            font-weight: bold;
-            font-size: 1.4rem; /* Agrandar letra de la marca */
-        }
-
-        .navbar-nav .nav-link {
-            color: #cbd5e0 !important; /* Color de los enlaces de navegación */
-            font-size: 1.1rem; /* Agrandar letra de los enlaces */
-            padding-top: .75rem; /* Aumentar relleno vertical */
-            padding-bottom: .75rem; /* Aumentar relleno vertical */
-        }
-
-        .navbar-nav .nav-link.active {
-            color: #4299e1 !important; /* Color del enlace activo (azul) */
+            color: #fff !important; /* Color blanco para la marca */
+            font-size: 1.5rem; /* Tamaño más grande */
             font-weight: bold;
         }
 
-        .navbar-nav .nav-link:hover {
-             color: #fff !important; /* Color al pasar el ratón */
+        .navbar-brand:hover {
+            color: #ccc !important; /* Ligeramente más claro al pasar el ratón */
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+
+        .nav-link {
+            color: #cbd5e0 !important; /* Color claro para los enlaces */
+            font-size: 1.1rem;
+            padding-left: 1rem !important; /* Espacio entre enlaces en pantallas grandes */
+            padding-right: 1rem !important;
+        }
+
+        .nav-link:hover {
+            color: #fff !important; /* Color blanco al pasar el ratón */
         }
         /* --- FIN ESTILOS NAVBAR --- */
 
-
-        /* Estilos para el botón de Cerrar Sesión */
-        .btn-outline-secondary {
-            color: #cbd5e0;
-            border-color: #cbd5e0;
-        }
-         .btn-outline-secondary:hover {
-            color: #1a202c;
-            background-color: #cbd5e0;
-            border-color: #cbd5e0;
-        }
-
-        /* Contenedor principal del contenido */
         .container {
-            flex: 1; /* Permite que el contenedor ocupe el espacio restante */
+            flex: 1; /* Permite que el contenedor crezca y ocupe el espacio disponible */
             padding: 2rem;
-            max-width: 600px; /* Limitar el ancho del formulario para mejor legibilidad */
-            margin-top: 2rem; /* Espacio superior */
-            margin-bottom: 2rem; /* Espacio inferior */
+            max-width: 800px; /* Ancho máximo para el formulario */
+            margin-top: 20px; /* Espacio superior para compensar navbar */
         }
 
-        /* Estilos para las tarjetas */
         .card {
-            background-color: #2d3748; /* Fondo de tarjeta oscuro */
-            color: #fff;
+            background-color: #2d3748; /* Fondo oscuro de la tarjeta */
+            color: #fff; /* Texto blanco en la tarjeta */
             border: none;
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
-            background-color: #4a5568; /* Color de encabezado de tarjeta */
-            color: #edf2f7;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #2d3748;
-            border-radius: 0.5rem 0.5rem 0 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
+            background-color: #4a5568; /* Un poco más claro para el encabezado */
+            border-bottom: none;
+            color: #fff;
             font-weight: bold;
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-title i {
-            margin-right: 0.5rem;
+            padding: 1rem 1.5rem;
         }
 
         .card-body {
             padding: 1.5rem;
         }
 
-        /* Estilos para el botón principal (Guardar Cambios) */
-        .btn-primary {
-            background-color: #4299e1; /* Botón principal (azul) */
-            border-color: #4299e1;
-            color: white; /* Asegurar texto blanco */
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #2b6cb0;
-            border-color: #2b6cb0;
-        }
-
-         .btn-secondary {
-             background-color: #6b7280;
-             border-color: #6b7280;
-             color: white; /* Asegurar texto blanco */
-             transition: background-color 0.3s ease;
-         }
-         .btn-secondary:hover {
-             background-color: #4b5563;
-             border-color: #4b5563;
-         }
-
-
-        /* Estilos para mensajes de alerta */
-        .alert {
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: 0.375rem;
-        }
-
-        .alert-success {
-            background-color: #c6f6d5; /* Alerta verde */
-            color: #1a202c;
-            border-color: #a7f3d0;
-        }
-
-        .alert-danger {
-            background-color: #fed7d7; /* Alerta roja */
-            color: #1a202c;
-            border-color: #fbcbcb;
-        }
-
-        /* Estilos para grupos de formulario (label + input) */
         .form-group {
             margin-bottom: 1.5rem;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #e2e8f0; /* Color de label */
+            color: #a0aec0; /* Color de etiqueta */
             font-weight: bold;
+            display: block; /* Asegura que la etiqueta esté en su propia línea */
+            margin-bottom: 0.5rem;
         }
 
-        /* Estilos para campos de input */
         .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #4a5568; /* Fondo de input */
-            border: 1px solid #718096;
-            border-radius: 0.375rem;
-            color: #edf2f7; /* Color de texto de input */
-            box-sizing: border-box; /* Incluir padding y borde en el ancho total */
+            background-color: #4a5568;
+            color: #fff;
+            border: 1px solid #6b7280;
+            border-radius: 0.25rem;
+            padding: 0.75rem 1rem;
         }
 
-         /* Estilo para input deshabilitado */
-         .form-control:disabled {
-             background-color: #5a6678; /* Fondo ligeramente distinto para deshabilitados */
-             color: #a0aec0; /* Texto más claro */
-             opacity: 1; /* Asegurar que no se vea transparente */
-         }
-
-
-        .form-control::placeholder {
-            color: #a0aec0; /* Color de placeholder */
+        .form-control:focus {
+            background-color: #4a5568;
+            color: #fff;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
         }
 
-        /* Estilos para mensajes de error de validación bajo los inputs */
         .invalid-feedback {
-            display: block; /* Mostrar el mensaje de error */
-            color: #e53e3e; /* Color rojo */
-            font-size: 0.875em; /* Tamaño de fuente más pequeño */
-            margin-top: 0.25rem;
-        }
-         /* Estilo del input cuando hay error de validación */
-         .form-control.is-invalid {
-             border-color: #e53e3e;
-         }
-
-
-        /* Utilidades de espaciado (ya definidas por Bootstrap, pero se incluyen por consistencia) */
-        .mt-2 { margin-top: 0.5rem; }
-        .mt-3 { margin-top: 1rem; }
-        .mb-4 { margin-bottom: 1.5rem; }
-
-        /* Estilos para iconos dentro de labels */
-        label i {
-            margin-right: 0.5rem;
+            color: #fc8181; /* Color rojo para errores de validación */
         }
 
+        .btn-primary {
+            background-color: #4CAF50; /* Green */
+            border-color: #4CAF50;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
 </head>
 <body>
 
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
-
+                <a class="navbar-brand" href="<?= base_url('/perfil'); ?>">ASG</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
+                            <a class="nav-link" href="<?= base_url('/perfil'); ?>">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                            <a class="nav-link" href="<?= base_url('/perfil/configuracion'); ?>">Configuración</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil/logout'); ?>">Cerrar Sesión</a>
                         </li>
                     </ul>
-
-                    <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
-                        </button>
-                    </form>
                 </div>
             </div>
         </nav>
@@ -257,10 +180,9 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
     <div class="container my-5">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title"><i class="fas fa-edit me-2"></i> Editar Dispositivo</h5>
+                <h5 class="card-title"><i class="fas fa-microchip me-2"></i> Editar Dispositivo</h5>
             </div>
             <div class="card-body">
-
                 <?php if (session('success')): ?>
                     <div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
                 <?php endif; ?>
@@ -268,32 +190,13 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                     <div class="alert alert-danger mt-3"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
                 <?php endif; ?>
 
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-danger mt-3">
-                        <i class="fas fa-exclamation-triangle me-2"></i> Por favor, corrige los siguientes errores:
-                        <ul>
-                            <?php foreach ($errors as $error): ?>
-                                <li><?= esc($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-
-
-                <form method="post" action="<?= base_url('/perfil/dispositivo/actualizar') ?>">
+                <form action="<?= base_url('/dispositivos/actualizar/' . esc($dispositivo['MAC'])) ?>" method="post">
                     <?= csrf_field() ?>
-                    <input type="hidden" name="mac" value="<?= esc($dispositivo['MAC'] ?? '') ?>">
-
                     <div class="form-group">
-                        <label for="mac_display"><i class="fas fa-fingerprint me-2"></i> MAC del Dispositivo:</label>
-                        <input type="text" class="form-control" id="mac_display" value="<?= esc($dispositivo['MAC'] ?? 'Desconocida') ?>" disabled>
-                         <?php if (isset($errors['mac'])): ?>
-                            <div class="invalid-feedback">
-                                <?= esc($errors['mac']) ?>
-                            </div>
-                        <?php endif; ?>
+                        <label for="MAC"><i class="fas fa-barcode me-2"></i> MAC del Dispositivo:</label>
+                        <input type="text" class="form-control" id="MAC" name="MAC"
+                            value="<?= esc($dispositivo['MAC'] ?? '') ?>" readonly>
                     </div>
-
 
                     <div class="form-group">
                         <label for="nombre"><i class="fas fa-tag me-2"></i> Nombre del Dispositivo:</label>
@@ -325,7 +228,21 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 
 </body>
 </html>
