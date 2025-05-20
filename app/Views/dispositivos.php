@@ -69,7 +69,7 @@
         <form id="deviceForm">
             <div class="mb-3">
                 <label for="macAddress" class="form-label">Dirección MAC</label>
-                <input type="text" class="form-control" id="macAddress" required
+                <input type="text" class="form-control" id="macAddress" required 
                        placeholder="AA:BB:CC:DD:EE:FF" pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$">
                 <div class="form-text">Formato: AA:BB:CC:DD:EE:FF o AA-BB-CC-DD-EE-FF</div>
             </div>
@@ -79,7 +79,6 @@
         <div id="responseMessage" class="mt-3 alert" style="display: none;"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.getElementById("deviceForm").addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -94,22 +93,15 @@
 
             // Verificar si la MAC existe en la base de datos
             try {
-                // Modifica esta URL si tu API de dispositivos no está directamente bajo la raíz
-                const response = await fetch(`<?= base_url('/api/dispositivos') ?>?mac_address=${macAddress}`);
+                const response = await fetch(`/api/dispositivos?mac_address=${macAddress}`);
 
                 if (response.ok) {
-                    const data = await response.json();
-                    if (data.exists) { // Asume que tu API devuelve { exists: true } si encuentra la MAC
-                        window.location.href = `<?= base_url('/dispositivo/') ?>${macAddress}`;
-                    } else {
-                        showMessage("MAC no encontrada. Asegúrate de que el ESP32 haya enviado su dirección.", "danger");
-                    }
+                    window.location.href = `/dispositivo/${macAddress}`;
                 } else {
-                    showMessage("Error al verificar la MAC con el servidor.", "danger");
+                    showMessage("MAC no encontrada. Asegúrate de que el ESP32 haya enviado su dirección.", "danger");
                 }
             } catch (error) {
                 showMessage("Error de conexión con el servidor", "danger");
-                console.error("Fetch error:", error);
             }
         });
 
