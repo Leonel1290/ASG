@@ -24,136 +24,174 @@
         .checkout-container {
             flex: 1; /* Allow container to grow */
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            padding: 2rem;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        .checkout-card {
-            background-color: #2d3748; /* Card background */
-            color: #e2e8f0; /* Card text color */
+        .card {
+            background-color: #2d3748; /* Slightly lighter dark for cards */
             border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            max-width: 500px; /* Max width for the card */
-            width: 100%; /* Make card responsive */
-            text-align: center; /* Center text inside card */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
         }
 
-        .checkout-card h2 {
-            color: #4299e1; /* Heading color */
-            margin-bottom: 1.5rem;
+        h2 {
+            color: #4CAF50; /* Green for headings */
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
-        .checkout-card p {
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
+        .product-details {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #4a5568; /* Subtle separator */
+            padding-bottom: 20px;
+        }
+
+        .product-details p {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .product-details strong {
+            color: #fff;
+        }
+
+        .total-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+            text-align: right;
+            margin-bottom: 30px;
         }
 
         #paypal-button-container {
-            margin-top: 1.5rem;
+            margin-top: 20px;
         }
 
-        /* Estilos para mensajes de error */
-        .error-message {
-            color: #f56565; /* Red color for errors */
-            margin-top: 1rem;
+        /* Message styling */
+        .message {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
             font-weight: bold;
+            text-align: center;
         }
 
-        /* Estilos para el modal de éxito */
+        .message.success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .message.error {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        /* Modal styling */
         .modal-content {
-            background-color: #2d3748; /* Fondo del modal */
-            color: #e2e8f0; /* Color del texto del modal */
+            background-color: #2d3748;
+            color: #fff;
         }
 
         .modal-header {
-            border-bottom-color: #4a5568; /* Color del borde del header del modal */
+            border-bottom-color: #4a5568;
         }
 
         .modal-footer {
-            border-top-color: #4a5568; /* Color del borde del footer del modal */
+            border-top-color: #4a5568;
         }
 
-        .modal-title {
-            color: #48bb78; /* Color verde para el título del modal */
+        .btn-success {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
         }
 
-        .btn-secondary {
-            background-color: #6b7280;
-            border-color: #6b7280;
-            transition: background-color 0.3s ease;
+        .btn-success:hover {
+            background-color: #45a049;
+            border-color: #45a049;
         }
-        .btn-secondary:hover {
-            background-color: #4b5563;
-            border-color: #4b5563;
-        }
-
-
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
 </head>
 <body>
-
     <div class="checkout-container">
-        <div class="checkout-card">
+        <div class="card">
             <h2>Confirmar Compra</h2>
-            <p>Estás a punto de adquirir un dispositivo AgainSafeGas. Por favor, procede con el pago a través de PayPal.</p>
+
+            <div class="product-details">
+                <p><strong>Producto:</strong> Sensor de Gas Detector ESP32</p>
+                <p><strong>Descripción:</strong> Un dispositivo inteligente para la detección de fugas de gas en tu hogar.</p>
+                <p><strong>Cantidad:</strong> 1</p>
+            </div>
+
+            <div class="total-price">
+                Total: $100.00 USD
+            </div>
 
             <div id="paypal-button-container"></div>
-
-            <div id="error-message" class="error-message"></div>
+            <div id="responseMessage" class="message" style="display: none;"></div>
         </div>
     </div>
 
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="successModalLabel">¡Pago Confirmado!</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Tu pago ha sido procesado exitosamente. ¡Gracias por tu compra!
+                <div class="modal-body text-center">
+                    <i class="fas fa-check-circle text-success" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>Tu compra ha sido realizada con éxito. Ahora puedes añadir el dispositivo a tu perfil.</p>
                 </div>
-                <div class="modal-footer">
-                    <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
-                    </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a href="<?= base_url('/perfil') ?>" class="btn btn-success">Ir a Mi Perfil</a>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function showMessage(message, type) {
+        const msgElement = document.getElementById("responseMessage");
+        msgElement.innerText = message;
+        msgElement.className = `message ${type}`;
+        msgElement.style.display = "block";
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // Inicializar el modal de éxito
-    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
-        keyboard: false // Evitar cerrar con la tecla Esc
-    });
-
-    // Función para mostrar mensajes de error
-    function showErrorMessage(message) {
-        const errorMessageDiv = document.getElementById('error-message');
-        if (errorMessageDiv) {
-            errorMessageDiv.innerText = message;
-        }
+        setTimeout(() => {
+            msgElement.style.display = "none";
+        }, 5000);
     }
 
-    // Configurar los botones de PayPal
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+        backdrop: 'static', // Prevent closing by clicking outside
+        keyboard: false // Prevent closing with keyboard
+    });
+
     paypal.Buttons({
         createOrder: function (data, actions) {
-            // Set up the transaction
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        value: '100.00' // Replace with dynamic price if needed
+                        value: '100.00' // Monto del producto
                     }
                 }]
             });
         },
         onApprove: function (data, actions) {
-            // Capture the funds from the transaction
+            // This function captures the funds from the transaction.
             return actions.order.capture().then(function (details) {
                 // Show the success modal
                 successModal.show();
@@ -176,15 +214,29 @@
         onCancel: function (data) {
             // Handle cancelation
             console.log('Payment cancelled', data);
-            showErrorMessage('❌ El pago fue cancelado.');
+            showMessage('❌ El pago fue cancelado.', 'error');
         },
         onError: function (err) {
             // Handle errors
             console.error('An error occurred during the transaction', err);
-            showErrorMessage('⚠️ Error al procesar el pago. Por favor, intente de nuevo.');
+            showMessage('⚠️ Error al procesar el pago. Por favor, intente de nuevo.', 'error');
         }
     }).render('#paypal-button-container'); // Render the PayPal button into the container
 </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 
 </body>
 </html>
