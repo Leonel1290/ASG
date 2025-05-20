@@ -248,29 +248,7 @@
     <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function(){
-        // Smooth scroll para enlaces internos
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            const target = $($(this).attr('href'));
-            if(target.length) {
-                // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
-                const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
-                $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
-            }
-        });
-
-        // Ocultar overlay de animación al cargar la página
-        $(window).on('load', function() {
-            $('#explosionOverlay').addClass('fade-out');
-            // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
-        });
-    });
-</script>
 
     <script>
         if ('serviceWorker' in navigator) {
