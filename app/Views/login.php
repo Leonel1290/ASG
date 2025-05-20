@@ -22,6 +22,7 @@
           <div class="text-center mb-4">
             <h1 class="h3">Login</h1>
           </div>
+          <!-- Mostrar mensaje de error si existe -->
           <?php if (session()->get('error')): ?>
         <div>
             <p style="color: red;"><?= session()->get('error') ?></p>
@@ -30,13 +31,19 @@
 
           <form action="<?php echo base_url('/login') ?>" method="POST">
             <div class="form-group">
-              <label for="email">Correo Electrónico</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo" required>
+              <label for="nombre">Nombre</label>
+              <input type="text" name="nombre" id="nombre" class="form-control" required>
             </div>
-            <div class="form-group password-container">
-              <label for="password">Contraseña</label>
-              <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su contraseña" required>
-              <img src="https://icon-library.com/images/eye-icon-png/eye-icon-png-1035969-200.png" id="eyeicon">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" name="email" id="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <div class="ver">
+              <img src="https://static.thenounproject.com/png/1035969-200.png" id="eyeicon">
             </div>
             <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
           </form>
@@ -47,6 +54,8 @@
         </div>
       </div>
     </div>
+    <!-- Optional JavaScript; choose one of the two! -->
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     
@@ -55,13 +64,14 @@
      eyeicon.onclick = function(){
         if(password.type == "password"){
             password.type = "text";
-            eyeicon.src = "https://cdn-icons-png.flaticon.com/512/9675/9675660.png";
-        }else{
+            eyeicon.src= "https://icons.veryicon.com/png/o/miscellaneous/myfont/eye-open-4.png";
+        }
+        else{
             password.type = "password";
-            eyeicon.src = "https://icon-library.com/images/eye-icon-png/eye-icon-png-1035969-200.png";
+            eyeicon.src= "https://static.thenounproject.com/png/1035969-200.png";
         }
      }
-    </script>
+     </script>
 
     <script>
         if ('serviceWorker' in navigator) {
