@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="<?= base_url('css/register.css') ?>">
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <title>Registro</title>
-    <style>
+     <style>
         /* Estilos para mensajes de éxito y error (se mantienen aquí) */
         .success-message {
             color: green; /* O el color de tu tema para éxito */
@@ -41,12 +41,10 @@
         <h1>Formulario Registro</h1>
 
         <?php if (session()->getFlashdata('success')): ?>
-            <div class="success-message">
-                <?= esc(session()->getFlashdata('success')) ?>
-            </div>
+            <p class="success-message"><?= session()->getFlashdata('success') ?></p>
         <?php endif; ?>
 
-         <?php if (session()->getFlashdata('error')): ?>
+        <?php if (session()->getFlashdata('error')): ?>
              <div class="error-messages">
                  <ul>
                      <li><?= esc(session()->getFlashdata('error')) ?></li>
