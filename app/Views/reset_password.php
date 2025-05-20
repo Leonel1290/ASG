@@ -36,7 +36,7 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="<?= base_url('loginobtener') ?>">Volver al inicio de sesión</a>
+            <a href="<?= base_url('login') ?>">Acceder</a>
         </div>
     </section>
 
