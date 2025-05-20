@@ -38,24 +38,23 @@ $errors = session('errors') ?? [];
         }
 
         .card {
-            background-color: #2d3748; /* Fondo oscuro de la tarjeta */
-            color: #fff; /* Texto blanco en la tarjeta */
+            background-color: #2d3748;
+            color: #fff;
             border: none;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
             padding: 2rem;
         }
 
         .email-icon {
-            color: #48bb78; /* Color verde para el icono */
+            color: #4299e1; /* Color azul */
             font-size: 5rem; /* Tamaño grande del icono */
             margin-bottom: 1rem;
         }
 
         .message-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .btn-secondary {
@@ -69,10 +68,9 @@ $errors = session('errors') ?? [];
         }
 
         .alert {
-            margin-top: 1rem;
-            padding: 0.75rem 1.25rem;
-            border: 1px solid transparent;
-            border-radius: 0.25rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
         }
 
         .alert-success {
@@ -119,7 +117,7 @@ $errors = session('errors') ?? [];
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
