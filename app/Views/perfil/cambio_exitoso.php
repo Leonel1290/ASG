@@ -33,24 +33,35 @@
         }
 
         .navbar-brand {
-            color: #fff !important; /* Color blanco para la marca */
+            color: #fff !important;
             font-weight: bold;
         }
 
-        .navbar-brand:hover {
-            color: #ccc !important; /* Ligeramente más claro al pasar el ratón */
+        .navbar-nav .nav-link {
+            color: #cbd5e0 !important;
         }
 
-        .nav-link {
-            color: #cbd5e0 !important; /* Color claro para los enlaces */
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important;
+            font-weight: bold;
         }
 
-        .nav-link:hover {
-            color: #fff !important; /* Color blanco al pasar el ratón */
+        .navbar-nav .nav-link:hover {
+             color: #fff !important;
+        }
+
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+        .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
         }
 
         .container {
-            flex: 1; /* Permite que el contenedor crezca y ocupe el espacio disponible */
+            flex: 1; /* Permite que el contenedor ocupe el espacio restante */
             padding: 2rem;
             max-width: 600px;
             margin-top: 80px; /* Espacio para la navbar fija */
@@ -101,9 +112,8 @@
     <div class="container">
         <div class="card">
             <i class="fas fa-check-circle success-icon"></i>
-            <p class="success-message">¡Cambio exitoso!</p>
-            <p>Tu información ha sido actualizada correctamente.</p>
-            <a href="<?= base_url('/perfil/configuracion') ?>" class="btn btn-secondary mt-3">Volver a Configuración</a>
+            <p class="success-message">¡Cambio de perfil exitoso!</p>
+            <a href="<?= base_url('/perfil') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Volver al Perfil</a>
         </div>
     </div>
 
