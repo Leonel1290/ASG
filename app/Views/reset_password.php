@@ -6,12 +6,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link rel="stylesheet" href="<?= base_url('css/reset.css') ?>">
+    <title>Restablecer Contraseña</title>
+
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ASG">
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-    <title>Restablecer Contraseña</title>
+
 </head>
 <body class="d-flex align-items-center justify-content-center vh-100 bg-light">
 
@@ -34,11 +36,12 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="<?= base_url('login') ?>">Acceder</a>
+            <a href="<?= base_url('loginobtener') ?>">Volver al inicio de sesión</a>
         </div>
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -52,5 +55,6 @@
             });
         }
     </script>
+
 </body>
 </html>
