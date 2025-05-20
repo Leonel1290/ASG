@@ -33,74 +33,77 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
         }
 
         .navbar-brand {
-            color: #fff !important; /* Color blanco para la marca */
-            font-size: 1.5rem; /* Tamaño más grande */
+            color: #fff !important; /* Color del texto de la marca */
+            font-weight: bold;
+            font-size: 1.4rem; /* Agrandar letra de la marca */
+        }
+
+        .navbar-nav .nav-link {
+            color: #cbd5e0 !important; /* Color de los enlaces de navegación */
+            font-size: 1.1rem; /* Agrandar letra de los enlaces */
+            padding-top: .75rem; /* Aumentar relleno vertical */
+            padding-bottom: .75rem; /* Aumentar relleno vertical */
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important; /* Color del enlace activo (azul) */
             font-weight: bold;
         }
 
-        .navbar-brand:hover {
-            color: #ccc !important; /* Ligeramente más claro al pasar el ratón */
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-        }
-
-        .nav-link {
-            color: #cbd5e0 !important; /* Color claro para los enlaces */
-            font-size: 1.1rem;
-            padding-left: 1rem !important; /* Espacio entre enlaces en pantallas grandes */
-            padding-right: 1rem !important;
-        }
-
-        .nav-link:hover {
-            color: #fff !important; /* Color blanco al pasar el ratón */
+        .navbar-nav .nav-link:hover {
+             color: #fff !important; /* Color al pasar el ratón */
         }
         /* --- FIN ESTILOS NAVBAR --- */
 
+
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+        .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
         .container {
-            flex: 1; /* Permite que el contenedor crezca y ocupe el espacio disponible */
+            flex: 1;
             padding: 2rem;
-            max-width: 700px;
-            margin-top: 20px; /* Espacio superior para compensar navbar */
+            max-width: 600px; /* Mantenemos el ancho máximo para el contenido principal */
+            margin-top: 2rem;
         }
 
         .card {
-            background-color: #2d3748; /* Fondo oscuro de la tarjeta */
-            color: #fff; /* Texto blanco en la tarjeta */
+            background-color: #2d3748;
+            color: #fff;
             border: none;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centrar contenido de la tarjeta */
         }
 
         .card-header {
-            background-color: #4a5568; /* Un poco más claro para el encabezado */
-            border-bottom: none;
-            color: #fff;
-            font-weight: bold;
+            background-color: #4a5568;
+            color: #edf2f7;
             padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2d3748;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0;
         }
 
         .card-body {
             padding: 1.5rem;
         }
 
-        .btn-primary {
-            background-color: #4CAF50; /* Green */
-            border-color: #4CAF50;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #45a049;
-            border-color: #45a049;
-        }
-
         .alert {
-            margin-top: 1rem;
-            padding: 0.75rem 1.25rem;
-            border: 1px solid transparent;
-            border-radius: 0.25rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
         }
 
         .alert-success {
@@ -114,6 +117,23 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
             color: #1a202c;
             border-color: #fbcbcb;
         }
+
+         .btn-primary {
+            background-color: #4299e1; /* Botón principal */
+            border-color: #4299e1;
+            color: white; /* Asegurar texto blanco */
+            transition: background-color 0.3s ease;
+         }
+
+         .btn-primary:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+         }
+
+        .mt-3 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        .me-2 { margin-right: 0.5rem; }
+
     </style>
 
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
@@ -128,22 +148,25 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="<?= base_url('/perfil'); ?>">ASG</a>
+                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil'); ?>">Perfil</a>
+                            <a class="nav-link" href="<?= base_url('/perfil') ?>">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion'); ?>">Configuración</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/logout'); ?>">Cerrar Sesión</a>
+                             <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
                         </li>
                     </ul>
+                    <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
+                         <?= csrf_field() ?>
+                         <button type="submit" class="btn btn-outline-secondary btn-sm">
+                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                         </button>
+                    </form>
                 </div>
             </div>
         </nav>
@@ -179,7 +202,7 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
