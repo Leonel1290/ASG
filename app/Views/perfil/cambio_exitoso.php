@@ -33,35 +33,24 @@
         }
 
         .navbar-brand {
-            color: #fff !important;
+            color: #fff !important; /* Color blanco para la marca */
             font-weight: bold;
         }
 
-        .navbar-nav .nav-link {
-            color: #cbd5e0 !important;
+        .navbar-brand:hover {
+            color: #ccc !important; /* Ligeramente más claro al pasar el ratón */
         }
 
-        .navbar-nav .nav-link.active {
-            color: #4299e1 !important;
-            font-weight: bold;
+        .nav-link {
+            color: #cbd5e0 !important; /* Color claro para los enlaces */
         }
 
-        .navbar-nav .nav-link:hover {
-             color: #fff !important;
-        }
-
-        .btn-outline-secondary {
-            color: #cbd5e0;
-            border-color: #cbd5e0;
-        }
-        .btn-outline-secondary:hover {
-            color: #1a202c;
-            background-color: #cbd5e0;
-            border-color: #cbd5e0;
+        .nav-link:hover {
+            color: #fff !important; /* Color blanco al pasar el ratón */
         }
 
         .container {
-            flex: 1; /* Permite que el contenedor ocupe el espacio restante */
+            flex: 1; /* Permite que el contenedor crezca y ocupe el espacio disponible */
             padding: 2rem;
             max-width: 600px;
             margin-top: 80px; /* Espacio para la navbar fija */
@@ -99,18 +88,40 @@
             border-color: #4b5563;
         }
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
 </head>
 <body>
 
     <div class="container">
         <div class="card">
             <i class="fas fa-check-circle success-icon"></i>
-            <p class="success-message">¡Cambio de perfil exitoso!</p>
-            <a href="<?= base_url('/perfil') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Volver al Perfil</a>
+            <p class="success-message">¡Cambio exitoso!</p>
+            <p>Tu información ha sido actualizada correctamente.</p>
+            <a href="<?= base_url('/perfil/configuracion') ?>" class="btn btn-secondary mt-3">Volver a Configuración</a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 
 </body>
 </html>
