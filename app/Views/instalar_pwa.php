@@ -55,6 +55,11 @@
         const installButton = document.getElementById('installButton');
         const notSupportedMessage = document.getElementById('notSupportedMessage');
 
+        // --- NUEVO: Log de las URLs generadas por base_url() ---
+        console.log('URL del Manifest:', '<?= base_url('manifest.json'); ?>');
+        console.log('URL del Service Worker:', '<?= base_url('service-worker.js'); ?>');
+        // --- FIN NUEVO ---
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
