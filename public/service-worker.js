@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asg-pwa-cache-v4'; // <--- ¡AUMENTA LA VERSIÓN DEL CACHE! (ej. v4)
+const CACHE_NAME = 'asg-pwa-cache-v6'; // <--- ¡AUMENTA LA VERSIÓN DEL CACHE! (ej. v6)
 const urlsToCache = [
   '/', // La raíz de tu aplicación
   '/inicio',
