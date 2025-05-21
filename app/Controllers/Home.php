@@ -332,6 +332,11 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         // --- FIN LOGGING ---
         return view('comprar');
     }
+    // En app/Controllers/Home.php
+public function instalarPWA()
+{
+    return view('instalar_pwa');
+}
 
     // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
     // public function verLecturas($mac) { ... }
