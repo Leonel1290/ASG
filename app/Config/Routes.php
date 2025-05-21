@@ -120,6 +120,10 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 $routes->get('/comprar', 'Home::comprar');
 
 
+// En app/Config/Routes.php
+$routes->get('/instalar-pwa', 'Home::instalarPWA');
+
+
 // --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
 // Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
 // Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
