@@ -89,6 +89,15 @@
             background-color: #4b5563;
             border-color: #4b5563;
         }
+        /* New style for the image */
+        .checkout-card img {
+            max-width: 150px; /* Adjust as needed */
+            height: auto;
+            margin-bottom: 1rem; /* Space below the image */
+            display: block; /* Make it a block element to center with margin auto */
+            margin-left: auto;
+            margin-right: auto;
+        }
 
 
     </style>
@@ -104,6 +113,7 @@
     <div class="checkout-container">
         <div class="checkout-card">
             <h2>Confirmar Compra</h2>
+            <img src="<?= base_url('/imagenes/Logo.png'); ?>" alt="AgainSafeGas Logo">
             <p>Estás a punto de adquirir un dispositivo AgainSafeGas. Por favor, procede con el pago a través de PayPal.</p>
 
             <div id="paypal-button-container"></div>
