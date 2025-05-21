@@ -66,10 +66,9 @@
             display: inline-block; /* Para que el pseudo-elemento se ajuste al ancho del texto */
             color: #fff; /* Color base del texto (las letras blancas fijas) */
             line-height: 1.2; /* Ajusta si el efecto se ve cortado */
-            /* IMPORTANTE: El texto original no tendrá overflow: hidden; aquí, el efecto se creará con el pseudo-elemento */
         }
 
-        /* --- ESTILOS PARA EL EFECTO DE LLAMAS AZULES A TRAVÉS DEL TEXTO --- */
+        /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
         .hero h1::before {
             content: attr(data-text); /* Toma el texto del atributo data-text */
             position: absolute;
@@ -78,38 +77,37 @@
             width: 100%;
             height: 100%;
             color: transparent; /* Hace el texto del pseudo-elemento transparente */
-            background-image: url('<?= base_url('/imagenes/borde-de-llama-de-fuego-azul-ardiente-3d.jpg'); ?>'); /* Tu imagen de llama */
-            background-size: 100% 200%; /* Cubre el área y permite movimiento vertical. Ajusta el 200% si las llamas son muy "altas" o "bajas" */
+
+            /* --- AQUÍ CAMBIA LA IMAGEN Y POSIBLEMENTE EL TAMAÑO --- */
+            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
+            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
             background-repeat: no-repeat;
             background-position: center bottom; /* Inicia la imagen desde abajo */
             -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
             background-clip: text;
-            filter: blur(0.5px); /* Un ligero desenfoque para suavizar el efecto de llama */
+            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
             opacity: 0; /* Empieza invisible */
-            animation: blueFlameTextEffect 4s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento */
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
         }
 
-        @keyframes blueFlameTextEffect {
+        @keyframes greenSmokeTextEffect {
             0% {
-                background-position: center bottom; /* La llama empieza desde abajo del texto */
+                background-position: center bottom; /* El humo empieza desde abajo del texto */
                 opacity: 0; /* Empieza invisible */
             }
-            25% {
-                opacity: 1; /* Se vuelve visible rápidamente */
+            20% {
+                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
             }
-            50% {
-                background-position: center center; /* La llama sube y está en el centro */
-                opacity: 1; /* Permanece visible */
-            }
-            75% {
-                opacity: 0.5; /* Empieza a desvanecerse */
+            60% {
+                background-position: center top; /* El humo sube y se va por arriba del texto */
+                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
             }
             100% {
-                background-position: center top; /* La llama se va por arriba del texto */
+                background-position: center top; /* Asegura que termina en la parte superior */
                 opacity: 0; /* Desaparece completamente */
             }
         }
-        /* --- FIN ESTILOS PARA EL EFECTO DE LLAMAS AZULES A TRAVÉS DEL TEXTO --- */
+        /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
 
 
         .hero-line {
