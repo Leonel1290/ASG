@@ -120,33 +120,6 @@
         a {
             text-decoration: none;
         }
-
-        /* Estilos para la animación de explosión/humo */
-        .explosion-animation-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0D1F23; /* Fondo oscuro */
-            z-index: 1001; /* Asegura que esté por encima de todo */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            transition: opacity 1s ease-out 1.5s; /* Desaparece después de 1.5s */
-        }
-        /* @keyframes pulse-fade {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        } */ /* Comentado porque no se usa */
-
-        .explosion-animation-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none; /* Permite interactuar con los elementos debajo una vez que desaparece */
-        }
-
         /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
          main {
              flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
