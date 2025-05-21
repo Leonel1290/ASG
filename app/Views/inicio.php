@@ -15,7 +15,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-     <style>
+    <style>
         body {
             background: linear-gradient(135deg, #0D1F23, #132E35);
             font-family: 'Poppins', sans-serif;
@@ -89,8 +89,8 @@
         }
 
         .features {
-             padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
-             padding-bottom: 3rem;
+            padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
+            padding-bottom: 3rem;
         }
 
         .features i {
@@ -121,10 +121,20 @@
             text-decoration: none;
         }
         /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
-         main {
-             flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
-         }
+        main {
+            flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
+        }
 
+        /* --- Estilos para las líneas del menú hamburguesa --- */
+        .navbar-toggler-icon {
+            /* Cambia el color de fondo para las tres líneas */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Opcional: Cambiar el color del borde del botón del toggler al hacer foco */
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5); /* Usando el color #698180 con transparencia */
+        }
     </style>
 </head>
 <body>
@@ -166,9 +176,9 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de fuga de gas"
-                         class="hero-img img-fluid"
-                         loading="lazy">
+                            alt="Ilustración de fuga de gas"
+                            class="hero-img img-fluid"
+                            loading="lazy">
                 </div>
             </div>
         </div>
