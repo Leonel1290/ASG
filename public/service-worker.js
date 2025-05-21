@@ -2,6 +2,7 @@ const CACHE_NAME = 'asg-pwa-cache-v2'; // <--- INCREMENTA LA VERSIÓN DEL CACHE
 const urlsToCache = [
   '/', // La raíz de tu aplicación
   '/inicio', // <--- AÑADIDA LA PÁGINA DE INICIO
+  '/login',
   '/loginobtener', // Página de login
   '/perfil', // Ruta común para el perfil, si es relevante
   '/perfil/configuracion', // Página de configuración

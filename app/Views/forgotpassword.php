@@ -41,7 +41,7 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="<?= base_url('login') ?>">Acceder</a>
+            <a href="<?= base_url('/loginobtener') ?>">Acceder</a>
         </div>
     </section>
 
