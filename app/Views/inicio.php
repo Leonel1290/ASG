@@ -21,16 +21,16 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            /* overflow: hidden; */ /* Comentamos overflow: hidden en el body para evitar problemas de scroll */
+            /* overflow: hidden; */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
             background-color: rgba(13, 31, 35, 0.8);
-            position: fixed; /* Mantenemos la posición fija */
-            top: 0; /* La fija en la parte superior */
-            width: 100%; /* Asegura que ocupe todo el ancho */
-            z-index: 1000; /* Asegura que esté por encima del contenido */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .navbar-brand, .nav-link {
@@ -57,27 +57,24 @@
         .hero {
             padding: 6rem 0;
             position: relative;
-            /* --- CORRECCIÓN: Añadir padding-top para compensar la altura del navbar fijo --- */
-            /* Ajusta este valor (ej. 70px) para que sea ligeramente mayor que la altura de tu navbar */
-            /* Puedes necesitar ajustar el valor si la altura del navbar cambia en diferentes tamaños de pantalla */
-            padding-top: 80px; /* Añadimos un padding superior para que el contenido no quede detrás del navbar */
-            /* --- FIN CORRECCIÓN --- */
+            padding-top: 80px;
         }
 
         .hero h1 {
             font-size: 3rem;
-            color: #fff;
+            color: #fff; /* Color inicial antes de la animación */
             font-weight: 700;
+            /* Asegúrate de que el contenedor de las letras animadas tenga suficiente espacio */
         }
 
-        /* --- NUEVO CSS para la animación de color y el movimiento --- */
-        .animated-text {
-            display: inline-block; /* Para que cada span se posicione correctamente */
-            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate; /* Animación de color y movimiento */
-            white-space: nowrap; /* Evita que las palabras se dividan en líneas */
+        /* --- ESTILOS PARA LA ANIMACIÓN DEL TEXTO --- */
+        #animatedTitle span {
+            display: inline-block; /* Permite que cada letra sea un bloque animable */
+            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate;
+            /* Las animaciones se aplicarán individualmente a cada span */
+            /* El delay se agregará con JavaScript */
         }
 
-        /* Definimos los colores para la animación */
         @keyframes colorChange {
             0% { color: #fff; } /* Blanco */
             25% { color: #698180; } /* Tu color secundario */
@@ -86,19 +83,13 @@
             100% { color: #fff; } /* Vuelve a blanco */
         }
 
-        /* Animación para un ligero movimiento hacia arriba y abajo */
         @keyframes moveText {
             0% { transform: translateY(0); }
             50% { transform: translateY(-5px); } /* Un ligero movimiento hacia arriba */
             100% { transform: translateY(0); }
         }
+        /* --- FIN ESTILOS PARA LA ANIMACIÓN DEL TEXTO --- */
 
-        /* Aplicar la animación a cada letra */
-        .animated-text span {
-            display: inline-block;
-            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate; /* Las animaciones se aplican a cada letra */
-        }
-        /* --- FIN NUEVO CSS --- */
 
         .hero-line {
             width: 80px;
@@ -119,7 +110,7 @@
         }
 
         .features {
-            padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
+            padding-top: 3rem;
             padding-bottom: 3rem;
         }
 
@@ -144,26 +135,23 @@
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
-            margin-top: auto; /* Empuja el footer hacia abajo si el contenido es corto */
+            margin-top: auto;
         }
 
         a {
             text-decoration: none;
         }
-        /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
+
         main {
-            flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
+            flex-grow: 1;
         }
 
-        /* --- Estilos para las líneas del menú hamburguesa --- */
         .navbar-toggler-icon {
-            /* Cambia el color de fondo para las tres líneas */
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
-        /* Opcional: Cambiar el color del borde del botón del toggler al hacer foco */
         .navbar-toggler:focus {
-            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5); /* Usando el color #698180 con transparencia */
+            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5);
         }
     </style>
 </head>
@@ -266,8 +254,7 @@
             e.preventDefault();
             const target = $($(this).attr('href'));
             if(target.length) {
-                // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
-                const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
+                const offset = $('.navbar').outerHeight() + 10;
                 $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
             }
         });
@@ -275,37 +262,36 @@
         // Ocultar overlay de animación al cargar la página
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
-            // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
         });
 
-        // --- NUEVO SCRIPT para dividir el texto y aplicar animación ---
-        const text = $('#animatedTitle').text();
-        $('#animatedTitle').empty(); // Vacía el contenido original
+        // --- ESTE ES EL SCRIPT CLAVE PARA LA ANIMACIÓN DEL TEXTO ---
+        const titleElement = $('#animatedTitle');
+        const text = titleElement.text();
+        titleElement.empty(); // Vacía el contenido original del h1
 
-        // Divide cada letra y la envuelve en un <span>
+        // Divide cada letra del texto y la envuelve en un <span>, aplicando un delay individual
         for (let i = 0; i < text.length; i++) {
             const span = $('<span>').text(text[i]);
-            // Ajusta el delay de la animación para cada letra
-            span.css('animation-delay', (i * 0.1) + 's'); // Cada letra se anima con un retraso de 0.1s
-            $('#animatedTitle').append(span);
+            // Ajusta el 'animation-delay' para crear un efecto de "ola"
+            span.css('animation-delay', (i * 0.1) + 's'); // Cada letra se anima con un retraso de 0.1 segundos
+            titleElement.append(span);
         }
-        // --- FIN NUEVO SCRIPT ---
+        // --- FIN DEL SCRIPT CLAVE ---
     });
 </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Asegúrate de que base_url('service-worker.js') apunte a la ruta correcta en Render
-                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado con éxito:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Fallo el registro de ServiceWorker:', error);
-                    });
-            });
-        }
-    </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                .then(registration => {
+                    console.log('ServiceWorker registrado con éxito:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Fallo el registro de ServiceWorker:', error);
+                });
+        });
+    }
+</script>
 
 </body>
 </html>
