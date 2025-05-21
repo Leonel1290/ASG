@@ -196,7 +196,7 @@
                         <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com">Descargar Dispositivo</a>
+                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com">Descargar App</a>
                     </li>
                     </ul>
             </div>
