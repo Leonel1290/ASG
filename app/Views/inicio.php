@@ -214,7 +214,7 @@
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
-                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
+                    <img src="https://img.freepik.com/fotos-premium/primer-plano-humo-azul-sobre-fondo-abstracto_23-2148092431.jpg?w=900"
                                 alt="Ilustración de fuga de gas"
                                 class="hero-img img-fluid"
                                 loading="lazy">
