@@ -63,13 +63,13 @@
             font-size: 3rem;
             font-weight: 700;
             position: relative; /* Necesario para posicionar el pseudo-elemento */
-            display: inline-block; /* Para que el fondo del pseudo-elemento se ajuste al texto */
-            color: #fff; /* Color base del texto (las letras en sí) */
-            overflow: hidden; /* Oculta el desbordamiento del pseudo-elemento de "fuego" */
-            line-height: 1.2; /* Ajusta si el efecto de fuego se ve cortado */
+            display: inline-block; /* Para que el pseudo-elemento se ajuste al ancho del texto */
+            color: #fff; /* Color base del texto (las letras blancas fijas) */
+            line-height: 1.2; /* Ajusta si el efecto se ve cortado */
+            /* IMPORTANTE: El texto original no tendrá overflow: hidden; aquí, el efecto se creará con el pseudo-elemento */
         }
 
-        /* --- ESTILOS PARA EL EFECTO DE FUEGO AZUL --- */
+        /* --- ESTILOS PARA EL EFECTO DE LLAMAS AZULES A TRAVÉS DEL TEXTO --- */
         .hero h1::before {
             content: attr(data-text); /* Toma el texto del atributo data-text */
             position: absolute;
@@ -77,63 +77,39 @@
             left: 0;
             width: 100%;
             height: 100%;
-            color: transparent; /* El texto del pseudo-elemento en sí es transparente */
-            background: linear-gradient(to top, #00BFFF 0%, #00FFFF 50%, rgba(0,255,255,0) 100%); /* Gradiente de azul para el fuego */
-            -webkit-background-clip: text; /* Recorta el fondo al texto */
+            color: transparent; /* Hace el texto del pseudo-elemento transparente */
+            background-image: url('<?= base_url('/imagenes/borde-de-llama-de-fuego-azul-ardiente-3d.jpg'); ?>'); /* Tu imagen de llama */
+            background-size: 100% 200%; /* Cubre el área y permite movimiento vertical. Ajusta el 200% si las llamas son muy "altas" o "bajas" */
+            background-repeat: no-repeat;
+            background-position: center bottom; /* Inicia la imagen desde abajo */
+            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
             background-clip: text;
-            filter: blur(2px); /* Añade un ligero desenfoque para el efecto de resplandor */
-            /* Animación: Mueve el brillo hacia arriba y lo desvanece */
-            animation: blueFireEffect 3s infinite alternate ease-in-out;
-            /* La animación de brillo se aplica a través del text-shadow */
-            text-shadow: 0 0 5px rgba(0,255,255,0.7), /* Resplandor interior */
-                         0 0 10px rgba(0,255,255,0.5),
-                         0 0 15px rgba(0,255,255,0.3);
-            transform: translateY(100%); /* Empieza completamente debajo del texto */
+            filter: blur(0.5px); /* Un ligero desenfoque para suavizar el efecto de llama */
+            opacity: 0; /* Empieza invisible */
+            animation: blueFlameTextEffect 4s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento */
         }
 
-        @keyframes blueFireEffect {
+        @keyframes blueFlameTextEffect {
             0% {
-                transform: translateY(100%); /* Empieza completamente debajo */
-                opacity: 0; /* Totalmente transparente al inicio */
+                background-position: center bottom; /* La llama empieza desde abajo del texto */
+                opacity: 0; /* Empieza invisible */
             }
-            30% {
-                transform: translateY(0%); /* Sube y cubre el texto */
-                opacity: 1; /* Totalmente visible */
+            25% {
+                opacity: 1; /* Se vuelve visible rápidamente */
             }
-            70% {
-                transform: translateY(-50%); /* Sigue subiendo ligeramente para desvanecerse */
-                opacity: 0.8; /* Empieza a desvanecerse */
+            50% {
+                background-position: center center; /* La llama sube y está en el centro */
+                opacity: 1; /* Permanece visible */
+            }
+            75% {
+                opacity: 0.5; /* Empieza a desvanecerse */
             }
             100% {
-                transform: translateY(-100%); /* Desaparece por completo por arriba */
-                opacity: 0; /* Totalmente transparente al final */
+                background-position: center top; /* La llama se va por arriba del texto */
+                opacity: 0; /* Desaparece completamente */
             }
         }
-
-        /* Animación para un sutil parpadeo o pulsación del "fuego" */
-        .hero h1::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            background: linear-gradient(to top, #00BFFF 0%, #00FFFF 100%); /* Otro gradiente para el pulso */
-            filter: blur(1px); /* Menos desenfoque para la capa superior */
-            opacity: 0; /* Empieza oculto */
-            animation: blueFirePulse 2s infinite alternate ease-in-out;
-            z-index: -1; /* Asegura que esté debajo del ::before si es necesario, o úsalo para una segunda capa de brillo */
-        }
-
-        @keyframes blueFirePulse {
-            0% { opacity: 0; transform: translateY(0); }
-            50% { opacity: 0.5; transform: translateY(-2px); } /* Sutil pulso y movimiento */
-            100% { opacity: 0; transform: translateY(0); }
-        }
-        /* --- FIN ESTILOS PARA EL EFECTO DE FUEGO AZUL --- */
+        /* --- FIN ESTILOS PARA EL EFECTO DE LLAMAS AZULES A TRAVÉS DEL TEXTO --- */
 
 
         .hero-line {
