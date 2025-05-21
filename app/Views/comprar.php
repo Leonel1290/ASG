@@ -113,7 +113,7 @@
     <div class="checkout-container">
         <div class="checkout-card">
             <h2>Confirmar Compra</h2>
-            <img src="<?= base_url('/imagenes/Logo.png'); ?>" alt="AgainSafeGas Logo">
+            <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="AgainSafeGas Logo">
             <p>Estás a punto de adquirir un dispositivo AgainSafeGas. Por favor, procede con el pago a través de PayPal.</p>
 
             <div id="paypal-button-container"></div>
