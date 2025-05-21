@@ -195,7 +195,10 @@
                     <li class="nav-item ms-2">
                         <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                     </li>
-                </ul>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com">Descargar Dispositivo</a>
+                    </li>
+                    </ul>
             </div>
         </div>
     </nav>
@@ -204,7 +207,7 @@
 <main>
     <section class="hero" id="inicio">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row align-items-centers">
                 <div class="col-md-6 text-start">
                     <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
@@ -213,9 +216,9 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                                alt="Ilustración de fuga de gas"
-                                class="hero-img img-fluid"
-                                loading="lazy">
+                                 alt="Ilustración de fuga de gas"
+                                 class="hero-img img-fluid"
+                                 loading="lazy">
                 </div>
             </div>
         </div>
