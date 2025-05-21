@@ -21,180 +21,124 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
+            /* overflow: hidden; */ /* Comentamos overflow: hidden en el body para evitar problemas de scroll */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
             background-color: rgba(13, 31, 35, 0.8);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            transition: background-color 0.3s ease;
+            position: fixed; /* Mantenemos la posición fija */
+            top: 0; /* La fija en la parte superior */
+            width: 100%; /* Asegura que ocupe todo el ancho */
+            z-index: 1000; /* Asegura que esté por encima del contenido */
         }
 
-        .navbar-brand img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .navbar-nav .nav-link {
+        .navbar-brand, .nav-link {
             color: #AFB3B7;
-            font-weight: 600;
-            margin-left: 15px;
-            transition: color 0.3s ease;
         }
 
-        .navbar-nav .nav-link:hover {
-            color: #ffffff;
+        .navbar-brand:hover, .nav-link:hover {
+            color: #698180;
         }
 
-        .hero-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100vh;
-            background-image: url('<?= base_url('/imagenes/detector.jpg'); ?>');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            color: #e2e8f0;
-            margin-top: 0;
-            padding-top: 56px;
-            box-sizing: border-box;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
-
-        .hero-subtitle {
-            font-size: 1.5rem;
-            max-width: 800px;
-            margin-bottom: 30px;
-        }
-
-        .btn-primary {
-            background-color: #3498db;
-            border-color: #3498db;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #2874a6;
-            border-color: #2874a6;
-        }
-
-        .section-padding {
-            padding: 60px 0;
-        }
-
-        .text-dark-blue {
-            color: #1a202c;
-        }
-
-        .bg-light-dark {
-            background-color: #1a202c;
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-
-        .card {
-            background-color: #2d3748;
+        .btn-custom {
+            background-color: #698180;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: #e2e8f0;
-            padding: 20px;
-        }
-
-        .card-title {
-            color: #ffffff;
+            color: #fff;
             font-weight: 600;
+            border-radius: 30px;
+            padding: 0.6rem 1.6rem;
         }
 
-        .cta-section {
-            background: linear-gradient(90deg, #3498db, #2c3e50);
-            color: #ffffff;
-            padding: 80px 0;
-            text-align: center;
+        .btn-custom:hover {
+            background-color: #2D4A53;
         }
 
-        .cta-title {
-            font-size: 2.5rem;
+        .hero {
+            padding: 6rem 0;
+            position: relative;
+            /* --- CORRECCIÓN: Añadir padding-top para compensar la altura del navbar fijo --- */
+            /* Ajusta este valor (ej. 70px) para que sea ligeramente mayor que la altura de tu navbar */
+            /* Puedes necesitar ajustar el valor si la altura del navbar cambia en diferentes tamaños de pantalla */
+            padding-top: 80px; /* Añadimos un padding superior para que el contenido no quede detrás del navbar */
+            /* --- FIN CORRECCIÓN --- */
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #fff;
             font-weight: 700;
-            margin-bottom: 20px;
         }
 
-        .contact-section {
-            background-color: #1a202c;
-            color: #AFB3B7;
-            padding: 60px 0;
+        .hero-line {
+            width: 80px;
+            height: 4px;
+            background-color: #698180;
+            margin: 1rem 0 1.5rem;
         }
 
-        .contact-section h2 {
-            color: #ffffff;
-            margin-bottom: 30px;
-            text-align: center;
+        .hero-img {
+            max-width: 100%;
+            height: auto;
+            animation: float 6s ease-in-out infinite;
         }
 
-        .contact-section p, .contact-section address {
-            font-size: 1.1rem;
-            line-height: 1.8;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
-        .contact-section address {
-            font-style: normal;
+        .features {
+             padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
+             padding-bottom: 3rem;
         }
 
-        .footer {
+        .features i {
+            font-size: 3rem;
+            color: #698180;
+        }
+
+        .features h3 {
+            color: #fff;
+        }
+
+        .company-info {
+            background-color: #2D4A53;
+            border-radius: 10px;
+            padding: 2rem;
+            color: #fff;
+        }
+
+        footer {
             background-color: #0D1F23;
-            color: #AFB3B7;
-            padding: 20px 0;
             text-align: center;
+            padding: 1rem;
             font-size: 0.9rem;
+            margin-top: auto; /* Empuja el footer hacia abajo si el contenido es corto */
         }
 
-        /* Medias Queries para responsividad */
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1.2rem;
-            }
-
-            .cta-title {
-                font-size: 2rem;
-            }
+        a {
+            text-decoration: none;
         }
+
+        /* Estilos para la animación de explosión/humo */
+       
+        /* @keyframes pulse-fade {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        } */ /* Comentado porque no se usa */
+
+        .explosion-animation-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none; /* Permite interactuar con los elementos debajo una vez que desaparece */
+        }
+
+        /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
+         main {
+             flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
+         }
+
     </style>
 </head>
 <body>
