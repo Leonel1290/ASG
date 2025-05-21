@@ -1,14 +1,15 @@
+// manifest.json
 {
   "name": "ASG - Again Safe Gas",
   "short_name": "ASG",
   "description": "Aplicación de gestión de dispositivos y perfil para ASG.",
-  "start_url": "/inicio", // La URL que deseas que la PWA cargue primero
+  "start_url": "/loginobtener", // <-- CAMBIO AQUÍ
   "display": "standalone",
   "background_color": "#1a202c",
   "theme_color": "#2d3748",
   "icons": [
     {
-      "src": "/imagenes/Logo.png", // La ruta relativa a tu dominio en Render
+      "src": "/imagenes/Logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
