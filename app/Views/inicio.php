@@ -155,146 +155,117 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="<?= base_url(); ?>">
-                <img src="<?= base_url('/imagenes/Logo.png'); ?>" alt="Logo ASG">
-                ASG
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+<div id="explosionOverlay" class="explosion-animation-overlay">
+    <div class="explosion-image-container"></div>
+</div>
+
+<header>
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">ASG</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="#hero">Inicio</a>
+                        <a class="nav-link" href="#company">Contacto</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Características</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contacto</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('/loginobtener'); ?>">Iniciar Sesión</a>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+</header>
 
-    <main>
-        <section id="hero" class="hero-section">
-            <div class="hero-overlay">
-                <h1 class="hero-title">AgainSafeGas: Tu Hogar, Más Seguro que Nunca</h1>
-                <p class="hero-subtitle">Monitorea y protege a tu familia de fugas de gas con nuestra tecnología avanzada.</p>
-                <a href="<?= base_url('/register'); ?>" class="btn btn-primary">Registrarse Ahora</a>
-            </div>
-        </section>
-
-        <section id="features" class="section-padding bg-light-dark">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="cta-title">Características Clave</h2>
-                    <p class="hero-subtitle">Descubre cómo AgainSafeGas protege tu hogar.</p>
+<main>
+    <section class="hero" id="inicio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-start">
+                    <h1>Protege lo que más importa</h1>
+                    <div class="hero-line"></div>
+                    <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
+                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
-                <div class="row text-center">
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <i class="fas fa-bell feature-icon"></i>
-                            <h5 class="card-title">Alertas en Tiempo Real</h5>
-                            <p class="card-text">Recibe notificaciones instantáneas en tu dispositivo móvil ante cualquier detección de gas anómala.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <i class="fas fa-chart-line feature-icon"></i>
-                            <h5 class="card-title">Monitoreo Constante</h5>
-                            <p class="card-text">Visualiza el nivel de gas en tu hogar las 24 horas del día, los 7 días de la semana, desde cualquier lugar.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <i class="fas fa-mobile-alt feature-icon"></i>
-                            <h5 class="card-title">Acceso Remoto y Sencillo</h5>
-                            <p class="card-text">Gestiona tus dispositivos y configura alertas fácilmente desde nuestra intuitiva aplicación.</p>
-                        </div>
-                    </div>
+                <div class="col-md-6 text-center mt-4 mt-md-0">
+                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
+                         alt="Ilustración de fuga de gas"
+                         class="hero-img img-fluid"
+                         loading="lazy">
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="cta" class="cta-section">
-            <div class="container">
-                <h2 class="cta-title">¿Listo para un Hogar Más Seguro?</h2>
-                <p class="hero-subtitle">Únete a la comunidad de AgainSafeGas y protege lo que más importa.</p>
-                <a href="<?= base_url('/register'); ?>" class="btn btn-primary">Comenzar Ahora</a>
-            </div>
-        </section>
-
-        <section id="about" class="section-padding bg-light-dark">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="cta-title">Sobre Nosotros</h2>
-                    <p class="hero-subtitle">Nuestra misión es tu tranquilidad.</p>
+    <section class="features py-5 text-center">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <i class="fas fa-shield-alt mb-3"></i>
+                    <h3>Seguridad Total</h3>
+                    <p>Sistema de cierre automático de válvulas para una protección eficaz.</p>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <p>En AgainSafeGas, estamos comprometidos con la seguridad de tu hogar. Desarrollamos soluciones de monitoreo de gas innovadoras y accesibles, utilizando tecnología de punta para brindarte tranquilidad.</p>
-                        <p>Nuestra visión es un mundo donde las familias estén protegidas de los peligros invisibles del gas, a través de sistemas de detección confiables y alertas rápidas.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <p>Creemos en la importancia de la prevención y la información. Por eso, nuestra plataforma no solo te alerta, sino que también te permite visualizar datos y tomar el control de la seguridad de tu entorno.</p>
-                        <p>Forma parte de nuestra comunidad y experimenta la diferencia que hace la seguridad inteligente en tu vida diaria.</p>
-                    </div>
+                <div class="col-md-4">
+                    <i class="fas fa-mobile-alt mb-3"></i>
+                    <h3>Monitoreo Remoto</h3>
+                    <p>Control desde tu celular a través de nuestra app segura.</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-bell mb-3"></i>
+                    <h3>Alertas en Tiempo Real</h3>
+                    <p>Notificaciones inmediatas ante cualquier fuga detectada.</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="contact" class="contact-section">
-            <div class="container">
-                <h2>Contáctanos</h2>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <p>Si tienes alguna pregunta, sugerencia o necesitas soporte, no dudes en contactarnos. Estamos aquí para ayudarte.</p>
-                        <p>Puedes enviarnos un mensaje directamente, o contactarnos a través de nuestras redes sociales (si las tienes).</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <address>
-                            <p><i class="fas fa-map-marker-alt me-2"></i> Dirección: [Tu Dirección Física si aplica]</p>
-                            <p><i class="fas fa-phone me-2"></i> Teléfono: [Tu Número de Teléfono si aplica]</p>
-                            <p><i class="fas fa-envelope me-2"></i> Email: <a href="mailto:againsafegas.ascii@gmail.com" class="text-light">againsafegas.ascii@gmail.com</a></p>
-                            <p><i class="fas fa-globe me-2"></i> Sitio Web: <a href="https://www.gassafe.com" target="_blank" class="text-light">www.AgainSafeGas.com</a></p>
-                        </address>
-                    </div>
-                </div>
+    <section class="py-5" id="company">
+        <div class="container">
+            <div class="company-info mx-auto text-center">
+                <h2 class="mb-3">Sobre Nosotros</h2>
+                <address>
+                    <p><strong>Empresa:</strong> AgainSafeGas</p>
+                    <p><strong>Dirección:</strong> Río Tercero</p>
+                    <p><strong>Teléfono:</strong> <a href="tel:+543571623889" class="text-light">3571-623889</a></p>
+                    <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com" class="text-light">againsafegas.ascii@gmail.com</a></p>
+                    <p><strong>Sitio Web:</strong> <a href="https://www.gassafe.com" target="_blank" class="text-light">www.AgainSafeGas.com</a></p>
+                </address>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+</main>
 
-    <footer>
-        <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
-    </footer>
+<footer>
+    <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            // Smooth scroll para enlaces internos
-            $('a[href^="#"]').on('click', function(e) {
-                e.preventDefault();
-                const target = $($(this).attr('href'));
-                if(target.length) {
-                    // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
-                    const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
-                    $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
-                }
-            });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // Smooth scroll para enlaces internos
+        $('a[href^="#"]').on('click', function(e) {
+            e.preventDefault();
+            const target = $($(this).attr('href'));
+            if(target.length) {
+                // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
+                const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
+                $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
+            }
         });
-    </script>
+
+        // Ocultar overlay de animación al cargar la página
+        $(window).on('load', function() {
+            $('#explosionOverlay').addClass('fade-out');
+            // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
+        });
+    });
+</script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
