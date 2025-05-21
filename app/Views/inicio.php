@@ -21,7 +21,6 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            /* overflow: hidden; */
         }
 
         .navbar {
@@ -65,11 +64,12 @@
             font-weight: 700;
             position: relative; /* Necesario para posicionar el pseudo-elemento */
             display: inline-block; /* Para que el fondo del pseudo-elemento se ajuste al texto */
-            color: #fff; /* Color base del texto */
-            overflow: hidden; /* Oculta el desbordamiento del pseudo-elemento */
+            color: #fff; /* Color base del texto (las letras en sí) */
+            overflow: hidden; /* Oculta el desbordamiento del pseudo-elemento de "fuego" */
+            line-height: 1.2; /* Ajusta si el efecto de fuego se ve cortado */
         }
 
-        /* --- ESTILOS PARA LA ANIMACIÓN DEL EFECTO DE BARRIDO AZUL --- */
+        /* --- ESTILOS PARA EL EFECTO DE FUEGO AZUL --- */
         .hero h1::before {
             content: attr(data-text); /* Toma el texto del atributo data-text */
             position: absolute;
@@ -77,24 +77,63 @@
             left: 0;
             width: 100%;
             height: 100%;
-            color: #00BFFF; /* Color azul que aparecerá */
-            /* Usamos clip-path para el efecto de barrido desde abajo */
-            clip-path: inset(100% 0 0 0); /* Empieza oculto en la parte inferior */
-            animation: blueWipe 3s infinite alternate ease-in-out; /* Animación de 3s, infinita, alterna */
+            color: transparent; /* El texto del pseudo-elemento en sí es transparente */
+            background: linear-gradient(to top, #00BFFF 0%, #00FFFF 50%, rgba(0,255,255,0) 100%); /* Gradiente de azul para el fuego */
+            -webkit-background-clip: text; /* Recorta el fondo al texto */
+            background-clip: text;
+            filter: blur(2px); /* Añade un ligero desenfoque para el efecto de resplandor */
+            /* Animación: Mueve el brillo hacia arriba y lo desvanece */
+            animation: blueFireEffect 3s infinite alternate ease-in-out;
+            /* La animación de brillo se aplica a través del text-shadow */
+            text-shadow: 0 0 5px rgba(0,255,255,0.7), /* Resplandor interior */
+                         0 0 10px rgba(0,255,255,0.5),
+                         0 0 15px rgba(0,255,255,0.3);
+            transform: translateY(100%); /* Empieza completamente debajo del texto */
         }
 
-        @keyframes blueWipe {
+        @keyframes blueFireEffect {
             0% {
-                clip-path: inset(100% 0 0 0); /* Oculto en la parte inferior */
+                transform: translateY(100%); /* Empieza completamente debajo */
+                opacity: 0; /* Totalmente transparente al inicio */
             }
-            50% {
-                clip-path: inset(0% 0 0 0); /* Cubre todo el texto */
+            30% {
+                transform: translateY(0%); /* Sube y cubre el texto */
+                opacity: 1; /* Totalmente visible */
+            }
+            70% {
+                transform: translateY(-50%); /* Sigue subiendo ligeramente para desvanecerse */
+                opacity: 0.8; /* Empieza a desvanecerse */
             }
             100% {
-                clip-path: inset(0% 0 100% 0); /* Se desvanece hacia arriba */
+                transform: translateY(-100%); /* Desaparece por completo por arriba */
+                opacity: 0; /* Totalmente transparente al final */
             }
         }
-        /* --- FIN ESTILOS PARA LA ANIMACIÓN DEL EFECTO DE BARRIDO AZUL --- */
+
+        /* Animación para un sutil parpadeo o pulsación del "fuego" */
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background: linear-gradient(to top, #00BFFF 0%, #00FFFF 100%); /* Otro gradiente para el pulso */
+            filter: blur(1px); /* Menos desenfoque para la capa superior */
+            opacity: 0; /* Empieza oculto */
+            animation: blueFirePulse 2s infinite alternate ease-in-out;
+            z-index: -1; /* Asegura que esté debajo del ::before si es necesario, o úsalo para una segunda capa de brillo */
+        }
+
+        @keyframes blueFirePulse {
+            0% { opacity: 0; transform: translateY(0); }
+            50% { opacity: 0.5; transform: translateY(-2px); } /* Sutil pulso y movimiento */
+            100% { opacity: 0; transform: translateY(0); }
+        }
+        /* --- FIN ESTILOS PARA EL EFECTO DE FUEGO AZUL --- */
 
 
         .hero-line {
