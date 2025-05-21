@@ -70,6 +70,36 @@
             font-weight: 700;
         }
 
+        /* --- NUEVO CSS para la animación de color y el movimiento --- */
+        .animated-text {
+            display: inline-block; /* Para que cada span se posicione correctamente */
+            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate; /* Animación de color y movimiento */
+            white-space: nowrap; /* Evita que las palabras se dividan en líneas */
+        }
+
+        /* Definimos los colores para la animación */
+        @keyframes colorChange {
+            0% { color: #fff; } /* Blanco */
+            25% { color: #698180; } /* Tu color secundario */
+            50% { color: #AFB3B7; } /* Tu color de texto principal */
+            75% { color: #2D4A53; } /* Otro color de tu paleta */
+            100% { color: #fff; } /* Vuelve a blanco */
+        }
+
+        /* Animación para un ligero movimiento hacia arriba y abajo */
+        @keyframes moveText {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); } /* Un ligero movimiento hacia arriba */
+            100% { transform: translateY(0); }
+        }
+
+        /* Aplicar la animación a cada letra */
+        .animated-text span {
+            display: inline-block;
+            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate; /* Las animaciones se aplican a cada letra */
+        }
+        /* --- FIN NUEVO CSS --- */
+
         .hero-line {
             width: 80px;
             height: 4px;
@@ -169,16 +199,16 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 text-start">
-                    <h1>Protege lo que más importa</h1>
+                    <h1 id="animatedTitle">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                            alt="Ilustración de fuga de gas"
-                            class="hero-img img-fluid"
-                            loading="lazy">
+                                alt="Ilustración de fuga de gas"
+                                class="hero-img img-fluid"
+                                loading="lazy">
                 </div>
             </div>
         </div>
@@ -247,6 +277,19 @@
             $('#explosionOverlay').addClass('fade-out');
             // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
         });
+
+        // --- NUEVO SCRIPT para dividir el texto y aplicar animación ---
+        const text = $('#animatedTitle').text();
+        $('#animatedTitle').empty(); // Vacía el contenido original
+
+        // Divide cada letra y la envuelve en un <span>
+        for (let i = 0; i < text.length; i++) {
+            const span = $('<span>').text(text[i]);
+            // Ajusta el delay de la animación para cada letra
+            span.css('animation-delay', (i * 0.1) + 's'); // Cada letra se anima con un retraso de 0.1s
+            $('#animatedTitle').append(span);
+        }
+        // --- FIN NUEVO SCRIPT ---
     });
 </script>
     <script>
