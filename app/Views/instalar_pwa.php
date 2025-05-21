@@ -55,77 +55,47 @@
         const installButton = document.getElementById('installButton');
         const notSupportedMessage = document.getElementById('notSupportedMessage');
 
-        // 1. Escuchar el evento 'beforeinstallprompt'
-        // Este evento se dispara cuando el navegador está listo para mostrar el prompt de instalación.
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevenir que el prompt se muestre automáticamente
             e.preventDefault();
-            // Almacenar el evento para poder dispararlo más tarde
             deferredPrompt = e;
-            // Mostrar el botón de instalación al usuario
             installButton.classList.remove('hidden');
             console.log('Evento beforeinstallprompt disparado. Botón de instalación visible.');
         });
 
-        // 2. Manejar el clic en el botón de instalación
         installButton.addEventListener('click', async () => {
-            // Ocultar el botón después de que el usuario haga clic
             installButton.classList.add('hidden');
-
-            // Mostrar el prompt de instalación guardado
             if (deferredPrompt) {
                 console.log('Llamando a deferredPrompt.prompt()...');
                 deferredPrompt.prompt();
-                // Esperar la respuesta del usuario al prompt
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log(`El usuario eligió: ${outcome}`);
-                // Resetear deferredPrompt, ya que solo se puede usar una vez
                 deferredPrompt = null;
-
-                // Si el usuario aceptó la instalación, puedes redirigirlo o mostrar un mensaje
                 if (outcome === 'accepted') {
                     console.log('El usuario aceptó la instalación de la PWA.');
-                    // Opcional: Puedes redirigir al usuario a la página de inicio o a su perfil
-                    // después de la instalación. Esto es para la *navegación actual* en el navegador.
-                    // La PWA instalada se abrirá según el start_url del manifest.
-                    // window.location.href = '<?= base_url('/') ?>'; // Redirigir a la página de inicio
                 } else {
                     console.log('El usuario rechazó la instalación de la PWA.');
-                    // Opcional: Mostrar un mensaje al usuario de que puede instalarla más tarde
-                    // notSupportedMessage.classList.remove('hidden'); // Podrías reutilizar este mensaje o crear uno nuevo
                 }
             } else {
                 console.log('deferredPrompt no está disponible. Posiblemente ya se instaló o no es compatible.');
-                // Si el botón se hizo visible pero deferredPrompt es nulo (ej. ya se usó),
-                // o si el navegador no lo soporta, mostrar el mensaje de no soportado.
                 notSupportedMessage.classList.remove('hidden');
             }
         });
 
-        // 3. Manejar el evento 'appinstalled'
-        // Este evento se dispara si la PWA se instala correctamente (ya sea por el prompt o manualmente)
         window.addEventListener('appinstalled', () => {
             console.log('ASG PWA instalada exitosamente!');
-            // Opcional: Ocultar el botón de instalación si la app ya está instalada
             installButton.classList.add('hidden');
-            notSupportedMessage.classList.add('hidden'); // Ocultar también el mensaje de no soportado
-            // Puedes mostrar un mensaje de éxito o redirigir aquí si lo deseas
-            // alert('¡ASG se ha instalado en tu pantalla de inicio!');
+            notSupportedMessage.classList.add('hidden');
         });
 
-        // 4. Fallback si 'beforeinstallprompt' nunca se dispara (navegador no compatible o ya instalada)
-        // Un pequeño retraso para asegurar que 'beforeinstallprompt' tenga tiempo de dispararse.
         setTimeout(() => {
-            // Si deferredPrompt nunca se asignó Y el botón de instalación sigue oculto
-            // (lo que significa que beforeinstallprompt no se disparó),
-            // entonces el navegador no lo soporta o la PWA ya está instalada.
             if (!deferredPrompt && installButton.classList.contains('hidden')) {
                 notSupportedMessage.classList.remove('hidden');
                 console.log('No se detectó soporte para beforeinstallprompt o la PWA ya está instalada.');
             }
-        }, 1000); // Espera 1 segundo
+        }, 1000);
 
-        // --- NUEVO: Registro del Service Worker para la PWA ---
+        // --- REGISTRO DEL SERVICE WORKER PARA LA PWA ---
+        // Asegúrate de que esta URL sea correcta para tu despliegue de PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
@@ -137,7 +107,7 @@
                     });
             });
         }
-        // --- FIN NUEVO ---
+        // --- FIN REGISTRO ---
     </script>
 
 </body>
