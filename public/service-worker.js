@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asg-pwa-cache-v2'; // <--- INCREMENTA LA VERSIÓN DEL CACHE
+const CACHE_NAME = 'asg-pwa-cache-v3'; // <--- INCREMENTA LA VERSIÓN DEL CACHE (¡Importante para que los cambios se apliquen!)
 const urlsToCache = [
   '/', // La raíz de tu aplicación
   '/inicio', // <--- AÑADIDA LA PÁGINA DE INICIO
@@ -6,6 +6,8 @@ const urlsToCache = [
   '/loginobtener', // Página de login
   '/perfil', // Ruta común para el perfil, si es relevante
   '/perfil/configuracion', // Página de configuración
+  '/instalar-pwa', // <-- NUEVO: Añadir la página de instalación de PWA
+  '/manifest.json', // <-- NUEVO: Añadir el propio manifest.json
   // Otros endpoints importantes que quieras que funcionen offline
   // Por ejemplo, si tienes una ruta para ver dispositivos: '/perfil/dispositivos'
   // Si tienes una página de error o offline específica: '/offline.html'
@@ -13,6 +15,7 @@ const urlsToCache = [
   // Archivos CSS de CDN
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+  'https://cdn.tailwindcss.com', // <-- Asegúrate de que Tailwind CDN esté en la caché
 
   // Imágenes en public/css/
   '/css/90514.jpg',
@@ -20,7 +23,7 @@ const urlsToCache = [
   '/css/usuario.png',
 
   // Archivos JavaScript de CDN
-  'https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', // Corregido: 5.3.0 para que coincida con CSS
 
   // Imágenes en public/imagenes/
   '/imagenes/Logo.png',
