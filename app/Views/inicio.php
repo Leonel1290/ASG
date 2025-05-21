@@ -62,33 +62,39 @@
 
         .hero h1 {
             font-size: 3rem;
-            color: #fff; /* Color inicial antes de la animación */
             font-weight: 700;
-            /* Asegúrate de que el contenedor de las letras animadas tenga suficiente espacio */
+            position: relative; /* Necesario para posicionar el pseudo-elemento */
+            display: inline-block; /* Para que el fondo del pseudo-elemento se ajuste al texto */
+            color: #fff; /* Color base del texto */
+            overflow: hidden; /* Oculta el desbordamiento del pseudo-elemento */
         }
 
-        /* --- ESTILOS PARA LA ANIMACIÓN DEL TEXTO --- */
-        #animatedTitle span {
-            display: inline-block; /* Permite que cada letra sea un bloque animable */
-            animation: colorChange 4s infinite alternate, moveText 2s infinite alternate;
-            /* Las animaciones se aplicarán individualmente a cada span */
-            /* El delay se agregará con JavaScript */
+        /* --- ESTILOS PARA LA ANIMACIÓN DEL EFECTO DE BARRIDO AZUL --- */
+        .hero h1::before {
+            content: attr(data-text); /* Toma el texto del atributo data-text */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #00BFFF; /* Color azul que aparecerá */
+            /* Usamos clip-path para el efecto de barrido desde abajo */
+            clip-path: inset(100% 0 0 0); /* Empieza oculto en la parte inferior */
+            animation: blueWipe 3s infinite alternate ease-in-out; /* Animación de 3s, infinita, alterna */
         }
 
-        @keyframes colorChange {
-            0% { color: #fff; } /* Blanco */
-            25% { color: #698180; } /* Tu color secundario */
-            50% { color: #AFB3B7; } /* Tu color de texto principal */
-            75% { color: #2D4A53; } /* Otro color de tu paleta */
-            100% { color: #fff; } /* Vuelve a blanco */
+        @keyframes blueWipe {
+            0% {
+                clip-path: inset(100% 0 0 0); /* Oculto en la parte inferior */
+            }
+            50% {
+                clip-path: inset(0% 0 0 0); /* Cubre todo el texto */
+            }
+            100% {
+                clip-path: inset(0% 0 100% 0); /* Se desvanece hacia arriba */
+            }
         }
-
-        @keyframes moveText {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-5px); } /* Un ligero movimiento hacia arriba */
-            100% { transform: translateY(0); }
-        }
-        /* --- FIN ESTILOS PARA LA ANIMACIÓN DEL TEXTO --- */
+        /* --- FIN ESTILOS PARA LA ANIMACIÓN DEL EFECTO DE BARRIDO AZUL --- */
 
 
         .hero-line {
@@ -187,7 +193,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 text-start">
-                    <h1 id="animatedTitle">Protege  lo  que  más  importa</h1>
+                    <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
@@ -263,20 +269,6 @@
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
         });
-
-        // --- ESTE ES EL SCRIPT CLAVE PARA LA ANIMACIÓN DEL TEXTO ---
-        const titleElement = $('#animatedTitle');
-        const text = titleElement.text();
-        titleElement.empty(); // Vacía el contenido original del h1
-
-        // Divide cada letra del texto y la envuelve en un <span>, aplicando un delay individual
-        for (let i = 0; i < text.length; i++) {
-            const span = $('<span>').text(text[i]);
-            // Ajusta el 'animation-delay' para crear un efecto de "ola"
-            span.css('animation-delay', (i * 0.1) + 's'); // Cada letra se anima con un retraso de 0.1 segundos
-            titleElement.append(span);
-        }
-        // --- FIN DEL SCRIPT CLAVE ---
     });
 </script>
 <script>
