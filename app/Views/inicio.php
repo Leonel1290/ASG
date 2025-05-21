@@ -15,7 +15,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
+     <style>
         body {
             background: linear-gradient(135deg, #0D1F23, #132E35);
             font-family: 'Poppins', sans-serif;
@@ -122,7 +122,20 @@
         }
 
         /* Estilos para la animación de explosión/humo */
-       
+        .explosion-animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0D1F23; /* Fondo oscuro */
+            z-index: 1001; /* Asegura que esté por encima de todo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 1s ease-out 1.5s; /* Desaparece después de 1.5s */
+        }
         /* @keyframes pulse-fade {
             0% { transform: scale(0.8); opacity: 0.8; }
             50% { transform: scale(1.2); opacity: 1; }
