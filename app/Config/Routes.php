@@ -124,22 +124,13 @@ $routes->get('/comprar', 'Home::comprar');
 $routes->get('/instalar-pwa', 'Home::instalarPWA');
 
 
-// --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
-// Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
-// Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
-// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
-// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
-// $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
-// $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
+// En app/Config/Routes.php
 
-// NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
-// que parecen duplicados con PerfilController::index y EnlaceController::store.
-// Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
-// para estas funcionalidades y eliminar los métodos duplicados en Home.php.
+$routes->group('/', function($routes) {
+    // ... tus rutas existentes ...
 
-// --- RUTAS NO ENCONTRADAS EN CONTROLADORES ADJUNTOS (COMENTADAS) ---
-// Estas rutas estaban en tu Routes.php original pero no vimos métodos correspondientes
-// en los controladores que proporcionaste.
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
+    // Nueva ruta para el control de la válvula (POST request)
+    $routes->post('api/valve_control', 'ValveController::controlValve');
+
+    // ... otras rutas que no estén dentro de un grupo con prefijo
+});
