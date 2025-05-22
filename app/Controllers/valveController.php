@@ -5,7 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 
-class ValveController extends ResourceController
+class valveController extends ResourceController
 {
     use ResponseTrait;
 
