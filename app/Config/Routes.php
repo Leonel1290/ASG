@@ -63,25 +63,25 @@ $routes->get('/perfil', 'PerfilController::index', ['filter' => 'auth']); // Asu
 
 
 // --- RUTAS PARA VISTAS GENÉRICAS (Ej. si PerfilController no maneja todo) ---
-// $routes->get('/home', 'Home::home'); // Si Home::home es la página principal después del login
-// $routes->get('/dispositivos', 'DispositivoController::index'); // Si hay una vista para listar dispositivos
+ $routes->get('/home', 'Home::home'); // Si Home::home es la página principal después del login
+ $routes->get('/dispositivos', 'DispositivoController::index'); // Si hay una vista para listar dispositivos
 
 
 // --- RUTAS NO ENCONTRADAS EN CONTROLADORES ADJUNTOS (COMENTADAS) ---
 // Estas rutas estaban en tu Routes.php original pero no vimos métodos correspondientes
 // en los controladores que proporcionaste.
 
-// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
-// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
-// $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
-// $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
+ $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
+ $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
+ $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
+ $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
+ $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
 
 // NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
 // que parecen duplicados con PerfilController::index y EnlaceController::store.
 // Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
 // para estas funcionalidades y eliminar los métodos duplicados en Home.php.
 
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
+ $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
+ $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
 
