@@ -13,148 +13,254 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-bg: #0D1F23;
+            --secondary-bg: #132E35;
+            --accent-color: #698180; /* Verde-gris azulado */
+            --light-text: #AFB3B7;
+            --white-text: #fff;
+            --dark-blue: #2D4A53;
+            --button-hover: #4A6C77; /* Un tono más oscuro del accent-color para el hover */
+            --gradient-start: #0A1C20;
+            --gradient-end: #0F252D;
+        }
+
         body {
-            background: linear-gradient(135deg, #0D1F23, #132E35);
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             font-family: 'Poppins', sans-serif;
-            color: #AFB3B7;
+            color: var(--light-text);
             margin: 0;
+            min-height: 100vh; /* Asegura que el gradiente cubra toda la altura */
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden; /* Evita scroll horizontal */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
-            background-color: rgba(13, 31, 35, 0.8);
+            background-color: rgba(13, 31, 35, 0.85); /* Un poco más opaco */
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
+            border-bottom: 1px solid rgba(105, 129, 128, 0.1); /* Sutil borde inferior */
+            transition: background-color 0.3s ease;
         }
 
         .navbar-brand, .nav-link {
-            color: #AFB3B7;
+            color: var(--light-text);
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .navbar-brand:hover, .nav-link:hover {
-            color: #698180;
+            color: var(--accent-color);
+        }
+
+        .navbar-brand img {
+            height: 40px; /* Ajusta el tamaño del logo si se añade */
+            margin-right: 8px;
         }
 
         .btn-custom {
-            background-color: #698180;
+            background-color: var(--accent-color);
             border: none;
-            color: #fff;
+            color: var(--white-text);
             font-weight: 600;
             border-radius: 30px;
-            padding: 0.6rem 1.6rem;
+            padding: 0.7rem 1.8rem; /* Ligeramente más grande */
+            transition: all 0.3s ease; /* Transición para todos los cambios */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
         .btn-custom:hover {
-            background-color: #2D4A53;
+            background-color: var(--button-hover); /* Tono de hover */
+            transform: translateY(-2px); /* Pequeño levantamiento */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            color: var(--white-text); /* Asegura que el color del texto no cambie */
         }
 
+        .btn-custom:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hero Section */
         .hero {
-            padding: 6rem 0;
+            padding: 8rem 0 6rem; /* Más padding superior para compensar el navbar fijo */
             position: relative;
-            padding-top: 80px;
+            text-align: left; /* Asegura que el texto esté a la izquierda por defecto */
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem; /* Título más grande */
             font-weight: 700;
-            position: relative; /* Necesario para posicionar el pseudo-elemento */
-            display: inline-block; /* Para que el pseudo-elemento se ajuste al ancho del texto */
-            color: #fff; /* Color base del texto (las letras blancas fijas) */
-            line-height: 1.2; /* Ajusta si el efecto se ve cortado */
+            position: relative;
+            display: inline-block;
+            color: var(--white-text);
+            line-height: 1.2;
+            margin-bottom: 1rem;
         }
 
         /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
         .hero h1::before {
-            content: attr(data-text); /* Toma el texto del atributo data-text */
+            content: attr(data-text);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            color: transparent; /* Hace el texto del pseudo-elemento transparente */
+            color: transparent;
 
-            /* --- AQUÍ CAMBIA LA IMAGEN Y POSIBLEMENTE EL TAMAÑO --- */
-            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
-            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
+            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>');
+            background-size: 100% 250%;
             background-repeat: no-repeat;
-            background-position: center bottom; /* Inicia la imagen desde abajo */
-            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
+            background-position: center bottom;
+            -webkit-background-clip: text;
             background-clip: text;
-            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
-            opacity: 0; /* Empieza invisible */
-            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
+            filter: blur(1.5px);
+            opacity: 0;
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out;
         }
 
         @keyframes greenSmokeTextEffect {
             0% {
-                background-position: center bottom; /* El humo empieza desde abajo del texto */
-                opacity: 0; /* Empieza invisible */
+                background-position: center bottom;
+                opacity: 0;
             }
             20% {
-                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
+                opacity: 0.8;
             }
             60% {
-                background-position: center top; /* El humo sube y se va por arriba del texto */
-                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
+                background-position: center top;
+                opacity: 0.6;
             }
             100% {
-                background-position: center top; /* Asegura que termina en la parte superior */
-                opacity: 0; /* Desaparece completamente */
+                background-position: center top;
+                opacity: 0;
             }
         }
         /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
 
-
         .hero-line {
-            width: 80px;
-            height: 4px;
-            background-color: #698180;
-            margin: 1rem 0 1.5rem;
+            width: 100px; /* Línea más larga */
+            height: 5px; /* Más gruesa */
+            background-color: var(--accent-color);
+            margin: 1.5rem 0 2rem; /* Más espacio */
+            border-radius: 2px;
+        }
+
+        .hero p.lead {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            margin-bottom: 2rem;
         }
 
         .hero-img {
-            max-width: 100%;
+            max-width: 90%; /* Ligeramente más pequeña */
             height: auto;
             animation: float 6s ease-in-out infinite;
+            display: block; /* Para centrar con margin auto */
+            margin: 0 auto;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-18px); } /* Mayor flotación */
         }
 
+        /* Features Section */
         .features {
-            padding-top: 3rem;
-            padding-bottom: 3rem;
+            padding: 5rem 0; /* Más padding */
+            background-color: rgba(19, 46, 53, 0.4); /* Fondo sutil para la sección */
+            border-radius: 15px; /* Bordes redondeados para la sección */
+            margin: 3rem 0;
+        }
+
+        .features .col-md-4 {
+            padding: 2rem; /* Más padding dentro de cada columna */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 10px;
+            background-color: rgba(45, 74, 83, 0.2); /* Fondo sutil para las tarjetas de features */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .features .col-md-4:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-color: rgba(45, 74, 83, 0.4);
         }
 
         .features i {
-            font-size: 3rem;
-            color: #698180;
+            font-size: 4rem; /* Iconos más grandes */
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(105, 129, 128, 0.5); /* Sutil sombra en el icono */
         }
 
         .features h3 {
-            color: #fff;
+            color: var(--white-text);
+            font-weight: 600;
+            margin-bottom: 1rem;
         }
 
+        .features p {
+            color: var(--light-text);
+        }
+
+        /* Company Info Section */
         .company-info {
-            background-color: #2D4A53;
-            border-radius: 10px;
-            padding: 2rem;
-            color: #fff;
+            background-color: var(--dark-blue);
+            border-radius: 15px; /* Más redondeado */
+            padding: 3rem; /* Más padding */
+            color: var(--white-text);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
+            max-width: 700px; /* Ancho máximo para la tarjeta */
+        }
+
+        .company-info h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--white-text);
+            margin-bottom: 2rem;
+        }
+
+        .company-info p {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .company-info p strong {
+            color: var(--accent-color);
+        }
+
+        .company-info a {
+            color: var(--light-text) !important; /* Asegura que el color sea claro */
+            transition: color 0.3s ease;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            text-decoration-color: rgba(105, 129, 128, 0.5);
+        }
+
+        .company-info a:hover {
+            color: var(--white-text) !important;
+            text-decoration-color: var(--white-text);
         }
 
         footer {
-            background-color: #0D1F23;
+            background-color: var(--primary-bg);
             text-align: center;
-            padding: 1rem;
-            font-size: 0.9rem;
+            padding: 1.5rem; /* Más padding en el footer */
+            font-size: 0.95rem;
             margin-top: auto;
+            color: var(--light-text);
+            border-top: 1px solid rgba(105, 129, 128, 0.1);
         }
 
         a {
@@ -172,6 +278,46 @@
         .navbar-toggler:focus {
             box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5);
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 6rem;
+                text-align: center; /* Centrar texto y elementos en móviles */
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .hero-line {
+                margin: 1rem auto 1.5rem; /* Centrar línea en móviles */
+            }
+            .hero p.lead {
+                font-size: 1rem;
+            }
+            .hero-img {
+                max-width: 80%; /* Ajustar tamaño de imagen */
+            }
+            .features .col-md-4 {
+                margin-bottom: 2rem; /* Espacio entre tarjetas en móviles */
+            }
+            .company-info {
+                padding: 2rem;
+            }
+            .company-info h2 {
+                font-size: 2rem;
+            }
+            .navbar-nav {
+                margin-top: 1rem; /* Espacio superior para el menú desplegado */
+            }
+            .navbar-nav .nav-item {
+                margin-left: 0 !important;
+                margin-bottom: 10px;
+            }
+            .navbar-nav .btn-custom {
+                width: 100%; /* Botones de menú anchos */
+            }
+        }
     </style>
 </head>
 <body>
@@ -184,7 +330,7 @@
     <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="#">ASG</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -198,7 +344,10 @@
                     <li class="nav-item ms-2">
                         <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
                     </li>
-                    </ul>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-custom" href="<?= base_url('/loginobtener') ?>">Inicia Sesión</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -207,18 +356,16 @@
 <main>
     <section class="hero" id="inicio">
         <div class="container">
-            <div class="row align-items-centers">
-                <div class="col-md-6 text-start">
+            <div class="row align-items-center"> <div class="col-md-6 text-start">
                     <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
-                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                                 alt="Ilustración de fuga de gas"
-                                 class="hero-img img-fluid"
-                                 loading="lazy">
+                         alt="Ilustración de fuga de gas"
+                         class="hero-img img-fluid"
+                         loading="lazy">
                 </div>
             </div>
         </div>
@@ -302,3 +449,4 @@
 </script>
 
 </body>
+</html>
