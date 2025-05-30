@@ -133,4 +133,5 @@ $routes->group('/', function($routes) {
     $routes->post('api/valve_control', 'ValveController::controlValve');
 
     // ... otras rutas que no estén dentro de un grupo con prefijo
+    $routes->post('api/valve_control', 'Api::valve_control');
 });
