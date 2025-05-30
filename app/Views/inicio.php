@@ -17,250 +17,289 @@
 
     <style>
         :root {
-            --primary-bg: #0D1F23;
-            --secondary-bg: #132E35;
-            --accent-color: #698180; /* Verde-gris azulado */
-            --light-text: #AFB3B7;
-            --white-text: #fff;
-            --dark-blue: #2D4A53;
-            --button-hover: #4A6C77; /* Un tono más oscuro del accent-color para el hover */
-            --gradient-start: #0A1C20;
-            --gradient-end: #0F252D;
+            /* Colores Base */
+            --bg-color: #0B0C10; /* Casi negro, fondo principal */
+            --panel-color: #1F2833; /* Gris oscuro azulado, para elementos como navbar, cards */
+            --text-color: #C5C6C7; /* Gris claro, para texto general */
+            --white-text: #fff; /* Blanco puro para texto de alto contraste */
+
+            /* Colores Neón/Acento */
+            --accent-color: #66FCF1; /* Turquesa neón vibrante */
+            --highlight-color: #45A29E; /* Verde azulado más suave, para hover de acento */
+
+            /* Sombras Neón */
+            --shadow-color-light: rgba(102, 252, 241, 0.2); /* Sombra turquesa neón suave */
+            --shadow-color-medium: rgba(102, 252, 241, 0.4); /* Sombra turquesa neón media */
+            --shadow-color-strong: rgba(102, 252, 241, 0.6); /* Sombra turquesa neón fuerte */
+
+            /* Transiciones */
+            --transition-speed: 0.3s;
+            --transition-ease: ease-in-out;
         }
 
         body {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Poppins', sans-serif;
-            color: var(--light-text);
             margin: 0;
-            min-height: 100vh; /* Asegura que el gradiente cubra toda la altura */
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Evita scroll horizontal */
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at top left, rgba(69, 162, 158, 0.1) 0%, transparent 30%),
+                              radial-gradient(circle at bottom right, rgba(102, 252, 241, 0.08) 0%, transparent 40%);
         }
 
+        /* Navbar */
         .navbar {
-            backdrop-filter: blur(10px);
-            background-color: rgba(13, 31, 35, 0.85); /* Un poco más opaco */
+            backdrop-filter: blur(8px); /* Ligeramente menos blur */
+            background-color: rgba(31, 40, 51, 0.95); /* Más opaco para un fondo sólido */
+            border-bottom: 1px solid var(--accent-color);
+            box-shadow: 0 4px 15px var(--shadow-color-light); /* Sombra más pronunciada y neón */
+            transition: background-color var(--transition-speed) var(--transition-ease), box-shadow var(--transition-speed) var(--transition-ease);
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
-            border-bottom: 1px solid rgba(105, 129, 128, 0.1); /* Sutil borde inferior */
-            transition: background-color 0.3s ease;
         }
 
         .navbar-brand, .nav-link {
-            color: var(--light-text);
+            color: var(--text-color);
             font-weight: 600;
-            transition: color 0.3s ease;
+            transition: color var(--transition-speed) var(--transition-ease);
         }
 
         .navbar-brand:hover, .nav-link:hover {
             color: var(--accent-color);
+            text-shadow: 0 0 8px var(--shadow-color-medium); /* Sombra al pasar el ratón */
         }
 
-        .navbar-brand img {
-            height: 40px; /* Ajusta el tamaño del logo si se añade */
-            margin-right: 8px;
-        }
-
+        /* Botones Globales */
         .btn-custom {
             background-color: var(--accent-color);
-            border: none;
-            color: var(--white-text);
+            border: 2px solid var(--accent-color); /* Borde que coincide con el color */
+            color: var(--bg-color); /* Texto oscuro sobre el color de acento */
             font-weight: 600;
-            border-radius: 30px;
-            padding: 0.7rem 1.8rem; /* Ligeramente más grande */
-            transition: all 0.3s ease; /* Transición para todos los cambios */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px; /* Bordes ligeramente menos redondeados */
+            padding: 0.75rem 1.8rem;
+            transition: all var(--transition-speed) var(--transition-ease);
+            box-shadow: 0 4px 12px var(--shadow-color-light); /* Sombra suave por defecto */
             position: relative;
-            overflow: hidden;
+            overflow: hidden; /* Para efectos internos del botón si se añaden */
             z-index: 1;
         }
 
         .btn-custom:hover {
-            background-color: var(--button-hover); /* Tono de hover */
-            transform: translateY(-2px); /* Pequeño levantamiento */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            color: var(--white-text); /* Asegura que el color del texto no cambie */
+            background-color: var(--highlight-color); /* Tono de hover */
+            border-color: var(--highlight-color);
+            transform: translateY(-3px); /* Mayor levantamiento */
+            box-shadow: 0 6px 20px var(--shadow-color-medium); /* Sombra más fuerte al hover */
+            color: var(--bg-color); /* Asegura que el color del texto no cambie */
         }
 
         .btn-custom:active {
             transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px var(--shadow-color-light);
         }
 
         /* Hero Section */
         .hero {
-            padding: 8rem 0 6rem; /* Más padding superior para compensar el navbar fijo */
+            padding: 8rem 0 6rem;
             position: relative;
-            text-align: left; /* Asegura que el texto esté a la izquierda por defecto */
+            text-align: left;
         }
 
         .hero h1 {
-            font-size: 3.5rem; /* Título más grande */
+            font-size: 3.8rem; /* Título aún más grande */
             font-weight: 700;
             position: relative;
             display: inline-block;
-            color: var(--white-text);
+            color: var(--white-text); /* Color base del texto (letras blancas fijas) */
             line-height: 1.2;
             margin-bottom: 1rem;
+            /* Animación de brillo sutil para el texto base */
+            animation: textPulse 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes textPulse {
+            0% { text-shadow: 0 0 5px rgba(255,255,255,0.1); }
+            100% { text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         }
 
         /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
         .hero h1::before {
-            content: attr(data-text);
+            content: attr(data-text); /* Toma el texto del atributo data-text */
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            color: transparent;
+            color: transparent; /* Hace el texto del pseudo-elemento transparente */
 
-            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>');
-            background-size: 100% 250%;
+            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
+            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
             background-repeat: no-repeat;
-            background-position: center bottom;
-            -webkit-background-clip: text;
+            background-position: center bottom; /* Inicia la imagen desde abajo */
+            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
             background-clip: text;
-            filter: blur(1.5px);
-            opacity: 0;
-            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out;
+            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
+            opacity: 0; /* Empieza invisible */
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
         }
 
         @keyframes greenSmokeTextEffect {
             0% {
-                background-position: center bottom;
-                opacity: 0;
+                background-position: center bottom; /* El humo empieza desde abajo del texto */
+                opacity: 0; /* Empieza invisible */
+                filter: blur(1.5px);
             }
             20% {
-                opacity: 0.8;
+                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
+                filter: blur(1.5px);
             }
             60% {
-                background-position: center top;
-                opacity: 0.6;
+                background-position: center top; /* El humo sube y se va por arriba del texto */
+                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
+                filter: blur(2.5px); /* Se desenfoca un poco más al subir */
             }
             100% {
-                background-position: center top;
-                opacity: 0;
+                background-position: center top; /* Asegura que termina en la parte superior */
+                opacity: 0; /* Desaparece completamente */
+                filter: blur(3px); /* Se desenfoca aún más al desaparecer */
             }
         }
         /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
 
         .hero-line {
-            width: 100px; /* Línea más larga */
-            height: 5px; /* Más gruesa */
+            width: 120px; /* Línea más larga */
+            height: 4px; /* Más gruesa */
             background-color: var(--accent-color);
-            margin: 1.5rem 0 2rem; /* Más espacio */
+            margin: 1.5rem 0 2rem;
             border-radius: 2px;
+            box-shadow: 0 0 10px var(--shadow-color-medium); /* Sombra neón en la línea */
         }
 
         .hero p.lead {
-            font-size: 1.25rem;
-            color: var(--light-text);
-            margin-bottom: 2rem;
+            font-size: 1.35rem; /* Más grande */
+            color: var(--text-color);
+            margin-bottom: 2.5rem;
         }
 
         .hero-img {
-            max-width: 90%; /* Ligeramente más pequeña */
+            max-width: 95%; /* Ligeramente más grande */
             height: auto;
             animation: float 6s ease-in-out infinite;
-            display: block; /* Para centrar con margin auto */
+            display: block;
             margin: 0 auto;
+            filter: drop-shadow(0 0 15px var(--shadow-color-medium)); /* Sombra neón en la imagen */
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-18px); } /* Mayor flotación */
+            50% { transform: translateY(-20px); } /* Mayor flotación */
         }
 
         /* Features Section */
         .features {
-            padding: 5rem 0; /* Más padding */
-            background-color: rgba(19, 46, 53, 0.4); /* Fondo sutil para la sección */
-            border-radius: 15px; /* Bordes redondeados para la sección */
-            margin: 3rem 0;
+            padding: 5rem 0;
+            background-color: var(--panel-color); /* Fondo sólido para la sección */
+            border-radius: 15px;
+            margin: 4rem 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Sombra más fuerte para la sección */
         }
 
         .features .col-md-4 {
-            padding: 2rem; /* Más padding dentro de cada columna */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 2.5rem; /* Más padding */
+            transition: transform var(--transition-speed) var(--transition-ease), box-shadow var(--transition-speed) var(--transition-ease), background-color var(--transition-speed) var(--transition-ease);
             border-radius: 10px;
-            background-color: rgba(45, 74, 83, 0.2); /* Fondo sutil para las tarjetas de features */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: rgba(45, 74, 83, 0.3); /* Fondo sutil para las tarjetas de features */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(102, 252, 241, 0.1); /* Borde sutil */
         }
 
         .features .col-md-4:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            background-color: rgba(45, 74, 83, 0.4);
+            transform: translateY(-8px); /* Mayor levantamiento */
+            box-shadow: 0 12px 30px var(--shadow-color-medium); /* Sombra más fuerte al hover */
+            background-color: rgba(45, 74, 83, 0.6); /* Más opaco al hover */
         }
 
         .features i {
-            font-size: 4rem; /* Iconos más grandes */
+            font-size: 4.5rem; /* Iconos más grandes */
             color: var(--accent-color);
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 10px rgba(105, 129, 128, 0.5); /* Sutil sombra en el icono */
+            margin-bottom: 1.8rem;
+            text-shadow: 0 0 15px var(--shadow-color-medium); /* Sombra neón en el icono */
+            animation: iconPulse 2s infinite alternate ease-in-out; /* Animación de brillo para iconos */
+        }
+
+        @keyframes iconPulse {
+            0% { text-shadow: 0 0 5px var(--shadow-color-light); }
+            100% { text-shadow: 0 0 20px var(--shadow-color-strong); }
         }
 
         .features h3 {
             color: var(--white-text);
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 0 5px rgba(255,255,255,0.1);
         }
 
         .features p {
-            color: var(--light-text);
+            color: var(--text-color);
         }
 
         /* Company Info Section */
         .company-info {
-            background-color: var(--dark-blue);
-            border-radius: 15px; /* Más redondeado */
-            padding: 3rem; /* Más padding */
+            background-color: var(--panel-color);
+            border-radius: 15px;
+            padding: 3.5rem; /* Más padding */
             color: var(--white-text);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
-            max-width: 700px; /* Ancho máximo para la tarjeta */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Sombra más pronunciada y oscura */
+            max-width: 800px;
+            margin-bottom: 4rem; /* Espacio antes del footer */
+            border: 1px solid rgba(102, 252, 241, 0.2); /* Borde sutil */
         }
 
         .company-info h2 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 700;
-            color: var(--white-text);
-            margin-bottom: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 2.2rem;
+            text-shadow: 0 0 10px var(--shadow-color-medium);
         }
 
         .company-info p {
             font-size: 1.1rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
         }
 
         .company-info p strong {
             color: var(--accent-color);
         }
 
-        .company-info a {
-            color: var(--light-text) !important; /* Asegura que el color sea claro */
-            transition: color 0.3s ease;
+        .company-info address a {
+            color: var(--text-color) !important;
+            transition: color var(--transition-speed) var(--transition-ease), text-shadow var(--transition-speed) var(--transition-ease);
             text-decoration: underline;
-            text-underline-offset: 4px;
-            text-decoration-color: rgba(105, 129, 128, 0.5);
+            text-underline-offset: 6px;
+            text-decoration-color: rgba(102, 252, 241, 0.3);
         }
 
-        .company-info a:hover {
-            color: var(--white-text) !important;
-            text-decoration-color: var(--white-text);
+        .company-info address a:hover {
+            color: var(--accent-color) !important;
+            text-shadow: 0 0 8px var(--shadow-color-medium);
+            text-decoration-color: var(--accent-color);
         }
 
+        /* Footer */
         footer {
-            background-color: var(--primary-bg);
-            text-align: center;
-            padding: 1.5rem; /* Más padding en el footer */
-            font-size: 0.95rem;
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--accent-color);
+            padding: 2rem;
+            font-size: 1rem;
             margin-top: auto;
-            color: var(--light-text);
-            border-top: 1px solid rgba(105, 129, 128, 0.1);
+            color: var(--text-color);
+            box-shadow: 0 -4px 15px var(--shadow-color-light);
         }
 
         a {
@@ -272,34 +311,47 @@
         }
 
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28197, 198, 199, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
         .navbar-toggler:focus {
-            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5);
+            box-shadow: 0 0 0 .25rem var(--shadow-color-medium);
         }
 
         /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            .hero p.lead {
+                font-size: 1.15rem;
+            }
+            .features .col-md-4 {
+                margin-bottom: 2rem;
+                padding: 2rem;
+            }
+            .features i {
+                font-size: 3.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .hero {
                 padding-top: 6rem;
-                text-align: center; /* Centrar texto y elementos en móviles */
+                text-align: center;
             }
             .hero h1 {
                 font-size: 2.5rem;
                 margin-bottom: 1.5rem;
             }
             .hero-line {
-                margin: 1rem auto 1.5rem; /* Centrar línea en móviles */
+                margin: 1rem auto 1.5rem;
             }
             .hero p.lead {
                 font-size: 1rem;
             }
             .hero-img {
-                max-width: 80%; /* Ajustar tamaño de imagen */
-            }
-            .features .col-md-4 {
-                margin-bottom: 2rem; /* Espacio entre tarjetas en móviles */
+                max-width: 80%;
             }
             .company-info {
                 padding: 2rem;
@@ -308,14 +360,32 @@
                 font-size: 2rem;
             }
             .navbar-nav {
-                margin-top: 1rem; /* Espacio superior para el menú desplegado */
+                margin-top: 1rem;
             }
             .navbar-nav .nav-item {
                 margin-left: 0 !important;
                 margin-bottom: 10px;
             }
             .navbar-nav .btn-custom {
-                width: 100%; /* Botones de menú anchos */
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p.lead {
+                font-size: 0.9rem;
+            }
+            .features i {
+                font-size: 3rem;
+            }
+            .company-info h2 {
+                font-size: 1.8rem;
+            }
+            .company-info p {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -356,7 +426,8 @@
 <main>
     <section class="hero" id="inicio">
         <div class="container">
-            <div class="row align-items-center"> <div class="col-md-6 text-start">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-start">
                     <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
@@ -429,6 +500,9 @@
         });
 
         // Ocultar overlay de animación al cargar la página
+        // Asegúrate de que el overlay exista en tu HTML y tenga las clases CSS para funcionar.
+        // No proporcionaste las clases `explosion-animation-overlay` y `explosion-image-container`
+        // ni la clase `fade-out` en el CSS, así que esto solo funcionará si las defines.
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
         });
