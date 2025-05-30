@@ -52,10 +52,10 @@
 
         /* Navbar */
         .navbar {
-            backdrop-filter: blur(8px); /* Ligeramente menos blur */
-            background-color: rgba(31, 40, 51, 0.95); /* Más opaco para un fondo sólido */
+            backdrop-filter: blur(8px);
+            background-color: rgba(31, 40, 51, 0.95);
             border-bottom: 1px solid var(--accent-color);
-            box-shadow: 0 4px 15px var(--shadow-color-light); /* Sombra más pronunciada y neón */
+            box-shadow: 0 4px 15px var(--shadow-color-light);
             transition: background-color var(--transition-speed) var(--transition-ease), box-shadow var(--transition-speed) var(--transition-ease);
             position: fixed;
             top: 0;
@@ -71,30 +71,30 @@
 
         .navbar-brand:hover, .nav-link:hover {
             color: var(--accent-color);
-            text-shadow: 0 0 8px var(--shadow-color-medium); /* Sombra al pasar el ratón */
+            text-shadow: 0 0 8px var(--shadow-color-medium);
         }
 
         /* Botones Globales */
         .btn-custom {
             background-color: var(--accent-color);
-            border: 2px solid var(--accent-color); /* Borde que coincide con el color */
-            color: var(--bg-color); /* Texto oscuro sobre el color de acento */
+            border: 2px solid var(--accent-color);
+            color: var(--bg-color);
             font-weight: 600;
-            border-radius: 5px; /* Bordes ligeramente menos redondeados */
+            border-radius: 5px;
             padding: 0.75rem 1.8rem;
             transition: all var(--transition-speed) var(--transition-ease);
-            box-shadow: 0 4px 12px var(--shadow-color-light); /* Sombra suave por defecto */
+            box-shadow: 0 4px 12px var(--shadow-color-light);
             position: relative;
-            overflow: hidden; /* Para efectos internos del botón si se añaden */
+            overflow: hidden;
             z-index: 1;
         }
 
         .btn-custom:hover {
-            background-color: var(--highlight-color); /* Tono de hover */
+            background-color: var(--highlight-color);
             border-color: var(--highlight-color);
-            transform: translateY(-3px); /* Mayor levantamiento */
-            box-shadow: 0 6px 20px var(--shadow-color-medium); /* Sombra más fuerte al hover */
-            color: var(--bg-color); /* Asegura que el color del texto no cambie */
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--shadow-color-medium);
+            color: var(--bg-color);
         }
 
         .btn-custom:active {
@@ -110,125 +110,128 @@
         }
 
         .hero h1 {
-            font-size: 3.8rem; /* Título aún más grande */
+            font-size: 3.8rem;
             font-weight: 700;
             position: relative;
             display: inline-block;
-            color: var(--white-text); /* Color base del texto (letras blancas fijas) */
+            color: var(--white-text);
             line-height: 1.2;
             margin-bottom: 1rem;
-            /* Animación de brillo sutil para el texto base */
-            animation: textPulse 3s infinite alternate ease-in-out;
+            /* Sombra neón y animación para el texto principal */
+            text-shadow: 0 0 10px var(--shadow-color-strong), 0 0 20px var(--shadow-color-strong), 0 0 30px var(--shadow-color-medium);
+            animation: neonPulse 3s infinite alternate ease-in-out;
         }
 
-        @keyframes textPulse {
-            0% { text-shadow: 0 0 5px rgba(255,255,255,0.1); }
-            100% { text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        @keyframes neonPulse {
+            0% { text-shadow: 0 0 10px var(--shadow-color-strong), 0 0 20px var(--shadow-color-strong); }
+            100% { text-shadow: 0 0 20px var(--shadow-color-strong), 0 0 30px var(--shadow-color-medium), 0 0 40px var(--shadow-color-light); }
         }
 
-        /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
+        /* --- ESTILOS PARA EL EFECTO DE HUMO SIN IMAGEN DE FONDO --- */
         .hero h1::before {
-            content: attr(data-text); /* Toma el texto del atributo data-text */
+            content: attr(data-text);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            color: transparent; /* Hace el texto del pseudo-elemento transparente */
-
-            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
-            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
+            color: transparent;
+            /* Eliminamos la imagen de fondo. Si quieres un "color" que suba como humo,
+               puedes usar un background-color degradado aquí.
+               Por ahora, lo he eliminado para que el texto principal tenga la sombra neón */
+            background-image: linear-gradient(to top, rgba(102, 252, 241, 0.4), rgba(102, 252, 241, 0)); /* Un gradiente para un efecto sutil de "sombra que sube" */
+            background-size: 100% 250%;
             background-repeat: no-repeat;
-            background-position: center bottom; /* Inicia la imagen desde abajo */
-            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
+            background-position: center bottom;
+            -webkit-background-clip: text;
             background-clip: text;
-            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
-            opacity: 0; /* Empieza invisible */
-            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
+            filter: blur(1.5px);
+            opacity: 0;
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out;
         }
 
         @keyframes greenSmokeTextEffect {
             0% {
-                background-position: center bottom; /* El humo empieza desde abajo del texto */
-                opacity: 0; /* Empieza invisible */
-                filter: blur(1.5px);
+                background-position: center bottom;
+                opacity: 0;
+                filter: blur(0.5px);
             }
             20% {
-                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
+                opacity: 0.7; /* Menos opaco que antes para que no compita con la sombra del texto */
                 filter: blur(1.5px);
             }
             60% {
-                background-position: center top; /* El humo sube y se va por arriba del texto */
-                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
-                filter: blur(2.5px); /* Se desenfoca un poco más al subir */
+                background-position: center top;
+                opacity: 0.5;
+                filter: blur(2.5px);
             }
             100% {
-                background-position: center top; /* Asegura que termina en la parte superior */
-                opacity: 0; /* Desaparece completamente */
-                filter: blur(3px); /* Se desenfoca aún más al desaparecer */
+                background-position: center top;
+                opacity: 0;
+                filter: blur(3px);
             }
         }
-        /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
+        /* --- FIN ESTILOS PARA EL EFECTO DE HUMO SIN IMAGEN DE FONDO --- */
 
         .hero-line {
-            width: 120px; /* Línea más larga */
-            height: 4px; /* Más gruesa */
+            width: 120px;
+            height: 4px;
             background-color: var(--accent-color);
             margin: 1.5rem 0 2rem;
             border-radius: 2px;
-            box-shadow: 0 0 10px var(--shadow-color-medium); /* Sombra neón en la línea */
+            box-shadow: 0 0 10px var(--shadow-color-medium);
         }
 
         .hero p.lead {
-            font-size: 1.35rem; /* Más grande */
+            font-size: 1.35rem;
             color: var(--text-color);
             margin-bottom: 2.5rem;
         }
 
         .hero-img {
-            max-width: 95%; /* Ligeramente más grande */
+            max-width: 95%;
             height: auto;
             animation: float 6s ease-in-out infinite;
             display: block;
             margin: 0 auto;
-            filter: drop-shadow(0 0 15px var(--shadow-color-medium)); /* Sombra neón en la imagen */
+            filter: drop-shadow(0 0 15px var(--shadow-color-medium));
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); } /* Mayor flotación */
+            50% { transform: translateY(-20px); }
         }
 
         /* Features Section */
         .features {
             padding: 5rem 0;
-            background-color: var(--panel-color); /* Fondo sólido para la sección */
+            background-color: var(--panel-color);
             border-radius: 15px;
             margin: 4rem 0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Sombra más fuerte para la sección */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
 
         .features .col-md-4 {
-            padding: 2.5rem; /* Más padding */
+            padding: 2.5rem;
             transition: transform var(--transition-speed) var(--transition-ease), box-shadow var(--transition-speed) var(--transition-ease), background-color var(--transition-speed) var(--transition-ease);
             border-radius: 10px;
-            background-color: rgba(45, 74, 83, 0.3); /* Fondo sutil para las tarjetas de features */
+            background-color: rgba(45, 74, 83, 0.3);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(102, 252, 241, 0.1); /* Borde sutil */
+            border: 1px solid rgba(102, 252, 241, 0.1);
         }
 
         .features .col-md-4:hover {
-            transform: translateY(-8px); /* Mayor levantamiento */
-            box-shadow: 0 12px 30px var(--shadow-color-medium); /* Sombra más fuerte al hover */
-            background-color: rgba(45, 74, 83, 0.6); /* Más opaco al hover */
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px var(--shadow-color-medium);
+            background-color: rgba(45, 74, 83, 0.6);
         }
 
         .features i {
-            font-size: 4.5rem; /* Iconos más grandes */
+            font-size: 4.5rem;
             color: var(--accent-color);
             margin-bottom: 1.8rem;
-            text-shadow: 0 0 15px var(--shadow-color-medium); /* Sombra neón en el icono */
-            animation: iconPulse 2s infinite alternate ease-in-out; /* Animación de brillo para iconos */
+            text-shadow: 0 0 15px var(--shadow-color-medium);
+            animation: iconPulse 2s infinite alternate ease-in-out;
         }
 
         @keyframes iconPulse {
@@ -251,12 +254,12 @@
         .company-info {
             background-color: var(--panel-color);
             border-radius: 15px;
-            padding: 3.5rem; /* Más padding */
+            padding: 3.5rem;
             color: var(--white-text);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Sombra más pronunciada y oscura */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             max-width: 800px;
-            margin-bottom: 4rem; /* Espacio antes del footer */
-            border: 1px solid rgba(102, 252, 241, 0.2); /* Borde sutil */
+            margin-bottom: 4rem;
+            border: 1px solid rgba(102, 252, 241, 0.2);
         }
 
         .company-info h2 {
@@ -387,6 +390,15 @@
             .company-info p {
                 font-size: 0.95rem;
             }
+            .hero-buttons { /* Ajuste para los botones en el hero section en pantallas pequeñas */
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            .hero-buttons .btn-custom {
+                width: 80%; /* Hacer los botones un poco más anchos */
+            }
         }
     </style>
 </head>
@@ -412,10 +424,10 @@
                         <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
+                        <a class="btn btn-custom" href="<?= base_url('/loginobtener') ?>">Inicia Sesión</a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-custom" href="<?= base_url('/loginobtener') ?>">Inicia Sesión</a>
+                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
                     </li>
                 </ul>
             </div>
@@ -431,6 +443,10 @@
                     <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
+                    <div class="hero-buttons">
+                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom mt-3 me-2">Comprar Dispositivo</a>
+                        <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
+                    </div>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
@@ -500,9 +516,6 @@
         });
 
         // Ocultar overlay de animación al cargar la página
-        // Asegúrate de que el overlay exista en tu HTML y tenga las clases CSS para funcionar.
-        // No proporcionaste las clases `explosion-animation-overlay` y `explosion-image-container`
-        // ni la clase `fade-out` en el CSS, así que esto solo funcionará si las defines.
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
         });
