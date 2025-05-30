@@ -238,12 +238,12 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
         // Aquí deberías hacer una llamada AJAX a tu backend (Controlador)
         // Por ejemplo, usando fetch API
         fetch('<?= base_url('/api/valve_control') ?>', { // Ajusta esta URL a tu endpoint API
-            method: 'POST',
+            method: 'POST', //
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest' // Para identificar peticiones AJAX
             },
-            body: JSON.stringify({ mac: mac, command: command })
+            body: JSON.stringify({ mac: mac, command: command }) //
         })
         .then(response => {
             if (!response.ok) {
