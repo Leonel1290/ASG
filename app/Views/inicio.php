@@ -14,7 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Stalinist+One&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Colores Base */
@@ -31,6 +36,8 @@
             --shadow-color-light: rgba(102, 252, 241, 0.2); /* Sombra turquesa neón suave */
             --shadow-color-medium: rgba(102, 252, 241, 0.4); /* Sombra turquesa neón media */
             --shadow-color-strong: rgba(102, 252, 241, 0.6); /* Sombra turquesa neón fuerte */
+            --shadow-color-glitch: rgba(102, 252, 241, 0.8); /* Más intensa para el efecto glitch */
+
 
             /* Transiciones */
             --transition-speed: 0.3s;
@@ -40,7 +47,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif; /* Poppins como fuente principal para el cuerpo */
             margin: 0;
             min-height: 100vh;
             display: flex;
@@ -63,13 +70,29 @@
             z-index: 1000;
         }
 
-        .navbar-brand, .nav-link {
+        .navbar-brand {
+            /* Fuente Stalinist One para el logo "ASG" */
+            font-family: "Stalinist One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 2rem; /* Ajusta el tamaño para que se vea bien */
+            color: var(--accent-color); /* Color neón para el logo */
+            text-shadow: 0 0 10px var(--shadow-color-medium); /* Sombra neón inicial */
+            transition: color var(--transition-speed) var(--transition-ease), text-shadow var(--transition-speed) var(--transition-ease);
+        }
+
+        .navbar-brand:hover {
+            color: var(--highlight-color);
+            text-shadow: 0 0 15px var(--shadow-color-strong); /* Sombra más fuerte al pasar el ratón */
+        }
+
+        .nav-link {
             color: var(--text-color);
             font-weight: 600;
             transition: color var(--transition-speed) var(--transition-ease);
         }
 
-        .navbar-brand:hover, .nav-link:hover {
+        .nav-link:hover {
             color: var(--accent-color);
             text-shadow: 0 0 8px var(--shadow-color-medium);
         }
@@ -110,21 +133,26 @@
         }
 
         .hero h1 {
+            /* Fuente Rubik Glitch para el h1 */
+            font-family: "Rubik Glitch", system-ui, cursive; /* Agregamos cursive como respaldo */
+            font-weight: 400; /* Según la definición de Rubik Glitch */
+            font-style: normal; /* Según la definición de Rubik Glitch */
+            
             font-size: 3.8rem;
-            font-weight: 700;
             position: relative;
             display: inline-block;
             color: var(--white-text);
             line-height: 1.2;
             margin-bottom: 1rem;
-            /* Sombra neón y animación para el texto principal */
-            text-shadow: 0 0 10px var(--shadow-color-strong), 0 0 20px var(--shadow-color-strong), 0 0 30px var(--shadow-color-medium);
+            
+            /* Sombra neón y animación para el texto principal (más intensa con Rubik Glitch) */
+            text-shadow: 0 0 10px var(--shadow-color-glitch), 0 0 20px var(--shadow-color-glitch), 0 0 30px var(--shadow-color-medium);
             animation: neonPulse 3s infinite alternate ease-in-out;
         }
 
         @keyframes neonPulse {
-            0% { text-shadow: 0 0 10px var(--shadow-color-strong), 0 0 20px var(--shadow-color-strong); }
-            100% { text-shadow: 0 0 20px var(--shadow-color-strong), 0 0 30px var(--shadow-color-medium), 0 0 40px var(--shadow-color-light); }
+            0% { text-shadow: 0 0 10px var(--shadow-color-glitch), 0 0 20px var(--shadow-color-glitch); }
+            100% { text-shadow: 0 0 20px var(--shadow-color-glitch), 0 0 30px var(--shadow-color-medium), 0 0 40px var(--shadow-color-light); }
         }
 
         /* --- ESTILOS PARA EL EFECTO DE HUMO SIN IMAGEN DE FONDO --- */
@@ -136,10 +164,8 @@
             width: 100%;
             height: 100%;
             color: transparent;
-            /* Eliminamos la imagen de fondo. Si quieres un "color" que suba como humo,
-               puedes usar un background-color degradado aquí.
-               Por ahora, lo he eliminado para que el texto principal tenga la sombra neón */
-            background-image: linear-gradient(to top, rgba(102, 252, 241, 0.4), rgba(102, 252, 241, 0)); /* Un gradiente para un efecto sutil de "sombra que sube" */
+            /* Usamos un gradiente sutil para el efecto de "humo" en las letras, sin imagen */
+            background-image: linear-gradient(to top, rgba(102, 252, 241, 0.4), rgba(102, 252, 241, 0));
             background-size: 100% 250%;
             background-repeat: no-repeat;
             background-position: center bottom;
@@ -157,7 +183,7 @@
                 filter: blur(0.5px);
             }
             20% {
-                opacity: 0.7; /* Menos opaco que antes para que no compita con la sombra del texto */
+                opacity: 0.7;
                 filter: blur(1.5px);
             }
             60% {
@@ -200,6 +226,14 @@
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
+        }
+
+        /* Contenedor de botones en el hero */
+        .hero-buttons {
+            display: flex;
+            gap: 1rem; /* Espacio entre los botones */
+            margin-top: 2rem;
+            flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
         }
 
         /* Features Section */
@@ -339,6 +373,9 @@
         }
 
         @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.75rem; /* Ajuste para navbar-brand en pantallas pequeñas */
+            }
             .hero {
                 padding-top: 6rem;
                 text-align: center;
@@ -372,9 +409,21 @@
             .navbar-nav .btn-custom {
                 width: 100%;
             }
+            .hero-buttons {
+                justify-content: center; /* Centra los botones en el hero */
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .hero-buttons .btn-custom {
+                width: 80%; /* Hacer los botones un poco más anchos */
+                margin: 0 auto; /* Centrar botones individuales */
+            }
         }
 
         @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1.5rem; /* Ajuste para navbar-brand en pantallas extra pequeñas */
+            }
             .hero h1 {
                 font-size: 2rem;
             }
@@ -389,15 +438,6 @@
             }
             .company-info p {
                 font-size: 0.95rem;
-            }
-            .hero-buttons { /* Ajuste para los botones en el hero section en pantallas pequeñas */
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                align-items: center;
-            }
-            .hero-buttons .btn-custom {
-                width: 80%; /* Hacer los botones un poco más anchos */
             }
         }
     </style>
@@ -444,8 +484,8 @@
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <div class="hero-buttons">
-                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom mt-3 me-2">Comprar Dispositivo</a>
-                        <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
+                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom">Comprar Dispositivo</a>
+                        <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom">Inicia Sesión</a>
                     </div>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
