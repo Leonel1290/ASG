@@ -6,32 +6,32 @@ use CodeIgniter\Model;
 
 class DispositivoModel extends Model
 {
-    protected $table      = 'dispositivos'; // Tabla 'dispositivos'
-    protected $primaryKey = 'id';         // Llave primaria 'id'
-    protected $useAutoIncrement = true; // Asumo que el ID es auto-incremental
-    protected $returnType       = 'array'; // Usaremos 'array'
-    protected $useSoftDeletes   = false; // No usas soft deletes
-
+    protected $table          = 'dispositivos'; // Tabla 'dispositivos'
+    protected $primaryKey     = 'id';           // Llave primaria 'id'
+    protected $useAutoIncrement = true;       // Asumo que el ID es auto-incremental
+    protected $returnType     = 'array';      // Usaremos 'array'
+    protected $useSoftDeletes = false;        // No usas soft deletes
 
     // Campos permitidos para insertar o actualizar.
-    // Asegúrate de incluir 'MAC', 'nombre', y 'ubicacion'.
-    // Si tu tabla tiene 'usuario_id', 'numero_serie', 'estado', 'ultima_conexion', inclúyelos si los gestionas aquí.
+    // **Importante: he añadido 'estado_valvula' aquí.**
+    // También he incluido 'usuario_id', 'numero_serie', 'estado', 'ultima_conexion'
+    // asumiendo que podrían existir en tu tabla aunque no estén explícitamente en el DUMP inicial,
+    // pero son comunes en tablas de dispositivos. Si no existen, elimínalos.
     protected $allowedFields = [
         'MAC',
         'nombre',
         'ubicacion',
-        // Si existen y se gestionan:
-        // 'usuario_id',
-        // 'numero_serie',
-        // 'estado',
-        // 'ultima_conexion',
-        // 'created_at' y 'updated_at' se manejan automáticamente si useTimestamps es true
+        'estado_valvula', // <-- ¡Este es el campo nuevo y crucial!
+        'usuario_id',     // Añadir si existe en tu tabla 'dispositivos'
+        'numero_serie',   // Añadir si existe en tu tabla 'dispositivos'
+        'estado',         // Añadir si existe en tu tabla 'dispositivos' (estado general del dispositivo)
+        'ultima_conexion',// Añadir si existe en tu tabla 'dispositivos'
     ];
 
     // Habilitamos el uso de timestamps si quieres manejar la fecha de creación o actualización de registros
     // Tu tabla `dispositivos` en el script SQL tiene `created_at` y `updated_at`.
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime'; // O 'int' si guardas timestamps como enteros
+    protected $dateFormat    = 'datetime'; // El DUMP muestra 'timestamp', por lo que 'datetime' es apropiado
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at'; // Solo si useSoftDeletes es true
@@ -47,43 +47,58 @@ class DispositivoModel extends Model
     // protected $beforeInsert   = ['formatMac']; // Ejemplo de callback
     // protected $beforeUpdate   = ['formatMac']; // Ejemplo de callback
 
-    // Método para obtener dispositivo por su id
+    /**
+     * Obtiene un dispositivo por su ID.
+     * @param int $id El ID del dispositivo.
+     * @return array|object|null Los datos del dispositivo o null si no se encuentra.
+     */
     public function getDispositivoById($id)
     {
         return $this->find($id);
     }
 
-    // Método para obtener dispositivo por su MAC
+    /**
+     * Obtiene un dispositivo por su dirección MAC.
+     * @param string $mac La dirección MAC del dispositivo.
+     * @return array|object|null Los datos del dispositivo o null si no se encuentra.
+     */
     public function getDispositivoByMac($mac)
     {
         return $this->where('MAC', $mac)->first();
     }
 
-    // Método para actualizar dispositivo por su MAC
+    /**
+     * Actualiza un dispositivo por su dirección MAC.
+     * @param string $mac La dirección MAC del dispositivo a actualizar.
+     * @param array $data Los datos a actualizar (ej. ['estado_valvula' => 1]).
+     * @return bool True si la actualización fue exitosa, false en caso contrario.
+     */
     public function updateDispositivoByMac($mac, $data)
     {
         // Usa where() para encontrar el registro por MAC y luego update()
-        return $this->where('MAC', $mac)->set($data)->update();
+        // CodeIgniter 4 permite esto directamente:
+        return $this->where('MAC', $mac)->update(null, $data);
+        // O alternativamente, como lo tenías y también funciona:
+        // return $this->where('MAC', $mac)->set($data)->update();
     }
-
-    // Método para actualizar un dispositivo por su ID (ya existe en el modelo base find/update)
-    // public function updateDispositivo($id, $data)
-    // {
-    //     return $this->update($id, $data);
-    // }
 
     // Ejemplo de callback para formatear MAC si fuera necesario
     // protected function formatMac(array $data)
     // {
     //     if (isset($data['data']['MAC'])) {
-    //         // Ejemplo: convertir a mayúsculas y formato con guiones
+    //         // Ejemplo: convertir a mayúsculas y formato con guiones (AA:BB:CC:DD:EE:FF)
     //         $mac = strtoupper(str_replace([':', '-'], '', $data['data']['MAC']));
     //         $data['data']['MAC'] = implode(':', str_split($mac, 2));
     //     }
     //     return $data;
     // }
 
-    // NOTA: Tienes otro modelo llamado DispositivosModel.php que parece apuntar a la misma tabla 'dispositivos'.
-    // Es recomendable usar UN SOLO modelo (DispositivoModel) para interactuar con la tabla de dispositivos
-    // y eliminar el modelo DispositivosModel.php para evitar confusión y redundancia.
+    // NOTA IMPORTANTE:
+    // Mencionaste en tu código original que "Tienes otro modelo llamado DispositivosModel.php
+    // que parece apuntar a la misma tabla 'dispositivos'".
+    // Es CRÍTICO que solo tengas UN modelo que interactúe con una tabla específica.
+    // Si realmente tienes dos modelos diferentes (DispositivoModel y DispositivosModel)
+    // apuntando a la tabla 'dispositivos', DEBES eliminar uno de ellos para evitar conflictos
+    // y comportamientos inesperados en tu aplicación.
+    // Te recomiendo encarecidamente quedarte con este `DispositivoModel` y eliminar el otro.
 }
