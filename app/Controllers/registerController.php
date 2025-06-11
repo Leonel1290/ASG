@@ -35,15 +35,15 @@ class registerController extends Controller
                 'rules' => 'required|min_length[1]|max_length[50]',
                 'errors' => [
                     'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El campo nombre debe tener al menos 1 carácter.', 
+                    'min_length' => 'El campo nombre debe tener al menos 1 carácter.',
                     'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|min_length[1]|max_length[50]', 
+                'rules' => 'required|min_length[1]|max_length[50]',
                 'errors' => [
                     'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El campo apellido debe tener al menos 1 carácter.', 
+                    'min_length' => 'El campo apellido debe tener al menos 1 carácter.',
                     'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
                 ]
             ],
@@ -63,14 +63,8 @@ class registerController extends Controller
                     'min_length' => 'La contraseña debe tener al menos 8 caracteres.',
                     'regex_match' => 'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.'
                 ]
-            ],
-            'password_confirm' => [ // Nuevo campo para confirmar la contraseña
-                'rules' => 'required|matches[password]',
-                'errors' => [
-                    'required' => 'Por favor, confirma tu contraseña.',
-                    'matches' => 'Las contraseñas no coinciden.'
-                ]
             ]
+            // Se ha eliminado la validación para 'password_confirm'
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
