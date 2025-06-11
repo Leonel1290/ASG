@@ -57,21 +57,18 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[8]|regex_match[/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+}{"\'?/>.<,])(?=.*[^\da-zA-Z]).{8,}/]',
+                'rules' => 'required|min_length[6]',
                 'errors' => [
                     'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 8 caracteres.',
-                    'regex_match' => 'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.'
+                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
                 ]
             ]
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
-            log_message('debug', 'Registro: Validación fallida. Errores: ' . json_encode($validation->getErrors()));
+            // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
-
-        log_message('debug', 'Registro: Validación exitosa. Procesando datos...');
 
         // Procesar los datos del formulario si la validación es exitosa
         $nombre = $this->request->getPost('nombre');
@@ -94,22 +91,17 @@ class registerController extends Controller
             'reset_expires' => $expires->toDateTimeString(), // Guardar expiración
         ];
 
-        log_message('debug', 'Registro: Intentando insertar usuario con datos: ' . json_encode($userData));
-
         // Guardar el usuario en la base de datos
         // Usamos insert() en lugar de save() para obtener el ID del nuevo registro
         $userId = $this->userModel->insert($userData);
 
         if ($userId) {
-            log_message('debug', 'Registro: Usuario insertado con ID: ' . $userId);
-
             // --- Enviar el correo electrónico de verificación ---
             $emailService = \Config\Services::email();
 
-            // Configura el remitente. ES CRÍTICO QUE ESTO ESTÉ BIEN CONFIGURADO.
-            // Idealmente, esto se configura en app/Config/Email.php o en tu archivo .env
-            // Si NO está configurado globalmente, DESCOMENTA Y AJUSTA LA SIGUIENTE LÍNEA:
-            // $emailService->setFrom('tu_correo_de_envio@ejemplo.com', 'ASG App'); // <-- ¡CONFIGURA ESTO CON UN EMAIL REAL!
+            // Configura el remitente. Es mejor configurar esto en app/Config/Email.php o .env
+            // Si no está configurado globalmente, descomenta y ajusta las siguientes líneas:
+            // $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
 
             $emailService->setTo($email);
             $emailService->setSubject('Verifica tu cuenta de ASG');
@@ -120,8 +112,6 @@ class registerController extends Controller
             $message = "Hola {$nombre},\n\nGracias por registrarte en ASG.\n\nPor favor, haz clic en el siguiente enlace para verificar tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nSi no te registraste en ASG, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
 
             $emailService->setMessage($message);
-
-            log_message('debug', 'Registro: Intentando enviar correo a: ' . $email . ' con enlace: ' . $verificationLink);
 
             // Intentar enviar el correo
             if ($emailService->send()) {
@@ -134,15 +124,13 @@ class registerController extends Controller
                 // Puedes loguear el error para depuración
                 log_message('error', 'Error al enviar correo de verificación de registro a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
                 // Opcional: Eliminar el usuario recién creado si el email no se pudo enviar
-                // $this->userModel->delete($userId); // Descomenta solo si realmente quieres borrar el usuario
+                // $this->userModel->delete($userId);
                 return redirect()->back()->withInput()->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
             }
             // --- Fin Enviar el correo electrónico ---
 
         } else {
             // Error al guardar el usuario en la base de datos
-            // El método errors() del modelo te dará detalles del fallo en la DB.
-            log_message('error', 'Registro: Error al guardar el usuario en la base de datos. Errores del modelo: ' . json_encode($this->userModel->errors()));
             return redirect()->back()->withInput()->with('error', 'Hubo un error al registrar el usuario. Por favor, inténtalo de nuevo.');
         }
     }
