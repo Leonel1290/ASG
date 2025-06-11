@@ -32,18 +32,18 @@ class registerController extends Controller
 
         $validation->setRules([
             'nombre'  => [
-                'rules' => 'required|min_length[3]|max_length[50]',
+                'rules' => 'required|min_length[1]|max_length[50]',
                 'errors' => [
                     'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El campo nombre debe tener al menos 3 caracteres.',
+                    'min_length' => 'El campo nombre debe tener al menos 1 carácter.', 
                     'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|min_length[3]|max_length[50]',
+                'rules' => 'required|min_length[1]|max_length[50]', 
                 'errors' => [
                     'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El campo apellido debe tener al menos 3 caracteres.',
+                    'min_length' => 'El campo apellido debe tener al menos 1 carácter.', 
                     'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
                 ]
             ],
