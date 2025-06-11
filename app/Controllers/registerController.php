@@ -57,10 +57,18 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[6]',
+                'rules' => 'required|min_length[8]|regex_match[/^(?=.*[A-Z]).*$/]|regex_match[/^(?=.*[a-z]).*$/]|regex_match[/^(?=.*\d).*$/]|regex_match[/^(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).*$/]',
                 'errors' => [
                     'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
+                    'min_length' => 'La contraseña debe tener al menos 8 caracteres.',
+                    'regex_match' => 'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.'
+                ]
+            ],
+            'password_confirm' => [ // Nuevo campo para confirmar la contraseña
+                'rules' => 'required|matches[password]',
+                'errors' => [
+                    'required' => 'Por favor, confirma tu contraseña.',
+                    'matches' => 'Las contraseñas no coinciden.'
                 ]
             ]
         ]);
