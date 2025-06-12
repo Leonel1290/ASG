@@ -25,9 +25,8 @@ class Home extends BaseController
      */
     public function __construct()
     {
-        // Llama al constructor de la clase padre (BaseController)
-        // para asegurar que las configuraciones básicas (como la sesión) se inicialicen.
-        parent::__construct();
+        // NO se llama a parent::__construct() aquí cuando se extiende de BaseController.
+        // La inicialización del padre se maneja a través de initController().
 
         // Instanciar todos los modelos que se utilizarán en este controlador
         $this->userModel = new UserModel();
