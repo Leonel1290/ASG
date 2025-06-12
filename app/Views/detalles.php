@@ -5,7 +5,6 @@ $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
 $message = $message ?? null;
 
 // Obtener el último nivel de gas para mostrarlo en la tarjeta simple
-// Usar null coalescing para $lecturas en caso de ser null
 $ultimoIndice = count($lecturas ?? []) - 1; 
 $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas']) ? esc($lecturas[$ultimoIndice]['nivel_gas']) . ' PPM' : 'Sin datos';
 
@@ -225,8 +224,8 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 </div>
 
 <script>
-    // Define la URL base de tu aplicación de CodeIgniter en Render, obtenida de App.php
-    const API_BASE_URL = 'https://pwa-1s1m.onrender.com'; 
+    // Define la URL base de tu aplicación de CodeIgniter en Render, incluyendo 'index.php'
+    const API_BASE_URL = 'https://pwa-1s1m.onrender.com/index.php'; 
 
     // Función para enviar comandos a la válvula
     function sendValveCommand(mac, command) {
@@ -247,7 +246,6 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
         })
         .then(response => {
             if (!response.ok) {
-                // Si la respuesta no es OK (ej. 400, 500), intentar leer el error
                 return response.json().then(err => Promise.reject(err));
             }
             return response.json();
@@ -268,10 +266,9 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             valveMessageDiv.textContent = 'Ocurrió un error de conexión o en el servidor.';
             valveMessageDiv.classList.remove('d-none');
             valveMessageDiv.classList.add('alert-danger');
-            // Intentar mostrar un mensaje de error más específico si el error es un objeto
             if (error.message) {
                 valveMessageDiv.textContent = error.message;
-            } else if (error.error) { // Si el error es un objeto con una propiedad 'error'
+            } else if (error.error) {
                 valveMessageDiv.textContent = error.error;
             }
         });
