@@ -224,8 +224,8 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 </div>
 
 <script>
-    // Define la URL base de tu aplicación de CodeIgniter en Render, incluyendo 'index.php'
-    const API_BASE_URL = 'https://pwa-1s1m.onrender.com/index.php'; 
+    // Define la URL base de tu aplicación de CodeIgniter en Render, ahora sin 'index.php'
+    const API_BASE_URL = 'https://pwa-1s1m.onrender.com'; 
 
     // Función para enviar comandos a la válvula
     function sendValveCommand(mac, command) {

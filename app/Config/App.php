@@ -16,8 +16,8 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'https://pwa-1s1m.onrender.com';
-    
+    public string $baseURL = 'https://pwa-1s1m.onrender.com/'; // Mantén tu URL de Render con la barra final
+
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
      * If you want to accept multiple Hostnames, set this.
@@ -25,7 +25,7 @@ class App extends BaseConfig
      * E.g.,
      * When your site URL ($baseURL) is 'http://example.com/', and your site
      * also accepts 'http://media.example.com/' and 'http://accounts.example.com/':
-     *     ['media.example.com', 'accounts.example.com']
+     * ['media.example.com', 'accounts.example.com']
      *
      * @var list<string>
      */
@@ -36,11 +36,10 @@ class App extends BaseConfig
      * Index File
      * --------------------------------------------------------------------------
      *
-     * Typically, this will be your `index.php` file, unless you've renamed it to
-     * something else. If you have configured your web server to remove this file
-     * from your site URIs, set this variable to an empty string.
+     * **¡CAMBIO AQUÍ!** Establece esto a una cadena vacía para que CodeIgniter
+     * espere URLs sin 'index.php'. El servidor de Render se encargará de la reescritura.
      */
-    public string $indexPage = 'index.php';
+    public string $indexPage = ''; 
 
     /**
      * --------------------------------------------------------------------------
@@ -51,9 +50,9 @@ class App extends BaseConfig
      * URI string. The default setting of 'REQUEST_URI' works for most servers.
      * If your links do not seem to work, try one of the other delicious flavors:
      *
-     *  'REQUEST_URI': Uses $_SERVER['REQUEST_URI']
+     * 'REQUEST_URI': Uses $_SERVER['REQUEST_URI']
      * 'QUERY_STRING': Uses $_SERVER['QUERY_STRING']
-     *    'PATH_INFO': Uses $_SERVER['PATH_INFO']
+     * 'PATH_INFO': Uses $_SERVER['PATH_INFO']
      *
      * WARNING: If you set this to 'PATH_INFO', URIs will always be URL-decoded!
      */
@@ -131,7 +130,7 @@ class App extends BaseConfig
      * dates with the date helper, and can be retrieved through app_timezone()
      *
      * @see https://www.php.net/manual/en/timezones.php for list of timezones
-     *      supported by PHP.
+     * supported by PHP.
      */
     public string $appTimezone = 'UTC';
 
@@ -173,10 +172,10 @@ class App extends BaseConfig
      * the HTTP header for the client IP address.
      *
      * Here are some examples:
-     *     [
-     *         '10.0.1.200'     => 'X-Forwarded-For',
-     *         '192.168.5.0/24' => 'X-Real-IP',
-     *     ]
+     * [
+     * '10.0.1.200'    => 'X-Forwarded-For',
+     * '192.168.5.0/24' => 'X-Real-IP',
+     * ]
      *
      * @var array<string, string>
      */
