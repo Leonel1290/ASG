@@ -5,15 +5,16 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
+// Ruta principal que carga la vista de inicio
 $routes->get('/', 'Home::index');
 
-// --- RUTAS DE REGISTRO Y LOGIN (AJUSTADAS PARA VERIFICACIÓN) ---
+// --- RUTAS DE REGISTRO Y LOGIN ---
 
 // Ruta para mostrar el formulario de registro
 $routes->get('/register', 'registerController::index');
 
 // Ruta para procesar el formulario de registro
-// POST /register/store (Coincide con la action del formulario en register.php)
 $routes->post('/register/store', 'registerController::store');
 
 // Ruta para mostrar la página que le dice al usuario que revise su email después del registro
@@ -25,117 +26,99 @@ $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEma
 // Ruta para procesar el formulario de login
 $routes->post('/login', 'Home::login');
 
-// Ruta para mostrar el formulario de login (si usas loginobtener para esto)
+// Ruta para mostrar el formulario de login
 $routes->get('/loginobtener', 'Home::loginobtener');
 
 // Ruta para cerrar sesión (usando POST para mayor seguridad)
 $routes->post('/logout', 'Home::logout');
 
-
-// RECUPERACION DE CONTRASEÑA
+// --- RUTAS DE RECUPERACIÓN DE CONTRASEÑA ---
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Asumo que esta es la ruta que procesa el formulario de forgot password
+$routes->post('/forgotpassword1', 'Home::forgotPPassword');
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword'); // Asumo que esta es la ruta que procesa el formulario de reset password
-
-// --- FIN RUTAS DE REGISTRO Y LOGIN ---
+$routes->post('/reset-password', 'Home::resetPassword');
 
 
-// Perfil (Agrupamos rutas relacionadas con PerfilController)
-$routes->group('perfil', function($routes) {
-    // Ruta para la página principal del perfil
-    // GET /perfil
-    $routes->get('/', 'PerfilController::index');
+// --- RUTAS DE HOME PARA USUARIOS LOGUEADOS ---
 
-    // --- RUTAS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
+// ¡¡¡ ESTA ES LA RUTA QUE FALTABA Y CAUSABA EL ERROR !!!
+$routes->get('/inicio', 'Home::inicio'); // <--- ¡ASEGÚRATE QUE ESTA LÍNEA ESTÉ PRESENTE!
 
-    // Ruta para mostrar la página INICIAL de configuración (pide verificar email)
-    // GET /perfil/configuracion
+// Ruta para mostrar el perfil del usuario logueado
+// NOTA: Esta ruta ya está agrupada en el bloque /perfil, pero si necesitas acceso directo, la mantienes aquí.
+// Si ya accedes a ella con /perfil, puedes eliminar esta línea para evitar duplicidad.
+// $routes->get('/perfil', 'Home::perfil');
+
+
+// Ruta para mostrar la vista de compra de dispositivos
+$routes->get('/comprar', 'Home::comprar');
+
+// Ruta para registrar una compra de dispositivo (para ser llamada por webhooks o lógica interna)
+// Requiere MAC y opcionalmente un ID de transacción
+$routes->post('/registrar-compra-automatica', 'Home::registrarCompraAutomatica');
+
+
+// --- RUTAS AGRUPADAS (RECOMENDADO PARA ORGANIZACIÓN) ---
+
+// Perfil (Agrupamos rutas relacionadas con el perfil del usuario)
+$routes->group('/perfil', function ($routes) {
+    // Ruta principal del perfil (GET /perfil)
+    $routes->get('/', 'PerfilController::index'); // Esta es la ruta preferida para /perfil
+
+    // Ruta para mostrar el formulario de configuración del perfil (GET /perfil/configuracion)
     $routes->get('configuracion', 'PerfilController::configuracion');
 
-    // Ruta para procesar el envío del correo de verificación para CONFIGURACIÓN
-    // POST /perfil/enviar-verificacion
-    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
+    // Ruta para procesar la actualización de la configuración del perfil (POST /perfil/actualizar-configuracion)
+    $routes->post('actualizar-configuracion', 'PerfilController::actualizarConfiguracion');
 
-    // Ruta para verificar el token recibido por email para CONFIGURACIÓN
-    // GET /perfil/verificar-email/EL_TOKEN_GENERADO
-    $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
+    // Ruta para mostrar el formulario de verificación de email antes de editar datos sensibles (GET /perfil/verificar-email)
+    $routes->get('verificar-email', 'PerfilController::verificarEmail');
 
-    // Ruta para mostrar el formulario de configuración REAL (accesible después de verificar email)
-    // GET /perfil/config_form
-    $routes->get('config_form', 'PerfilController::configForm');
+    // Ruta para enviar el correo de verificación de email (POST /perfil/enviar-verificacion)
+    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacionEmail');
 
-    // Ruta para procesar la actualización del perfil (nombre/email)
-    // POST /perfil/actualizar
-    $routes->post('actualizar', 'PerfilController::actualizar');
+    // Ruta para validar el código de verificación del email (POST /perfil/validar-codigo-verificacion)
+    $routes->post('validar-codigo-verificacion', 'PerfilController::validarCodigoVerificacion');
 
-    // Ruta para la página de éxito después de actualizar el perfil
-    // GET /perfil/cambio-exitoso
-    $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
-
-    // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
-
-
-    // --- RUTAS PARA GESTIÓN DE DISPOSITIVOS ---
-
-    // Ruta para mostrar el formulario de edición de un dispositivo
-    // GET /perfil/dispositivo/editar/MAC_DEL_DISPOSITIVO
-    // (:segment) captura la MAC de la URL
-    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
-
-    // Ruta para procesar el formulario de edición de un dispositivo
+    // Rutas para editar y actualizar un dispositivo específico del usuario
+    // GET /perfil/dispositivo/editar/(:any)
+    $routes->get('dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
     // POST /perfil/dispositivo/actualizar
-    $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
+    $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo');
 
-    // Ruta para eliminar dispositivos seleccionados (desenlazar del usuario)
-    // POST /perfil/eliminar-dispositivos
+    // Ruta para eliminar (desenlazar) dispositivos del perfil del usuario (POST /perfil/eliminar-dispositivos)
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
-
-
-    // --- FIN RUTAS GESTIÓN DE DISPOSITIVOS ---
-
 });
 
 
-// Recibir los datos de la ESP32:
-// POST /lecturas_gas/guardar
+// Rutas de Enlace de MAC a Usuario
+$routes->get('/enlace', 'EnlaceController::index');
+$routes->post('/enlace/store', 'EnlaceController::store');
+
+// Rutas para la API de Dispositivos (ESP32)
+$routes->post('/dispositivos/registrar', 'DispositivoController::registrarDispositivo');
+
+// Rutas para la API de Lecturas de Gas (ESP32)
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
-// Vista para enlazar dispositivos (formulario para ingresar MAC)
-// GET /enlace
-$routes->get('/enlace', 'EnlaceController::index');
-// Acción para enlazar MACs (procesa el formulario de /enlace)
-// POST /enlace/store
-$routes->post('/enlace/store', 'EnlaceController::store');
 
 // Detalles del dispositivo (mostrar lecturas, etc.)
 // Asumo que esta ruta usa la MAC para identificar el dispositivo
-// GET /detalles/LA_MAC_DEL_DISPOSITIVO
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
-// --- RUTAS DE VISTA DIRECTA ---
 
-// Ruta para la vista de "comprar"
-// Descomentamos esta ruta para que la vista sea accesible
-$routes->get('/comprar', 'Home::comprar');
+// --- RUTAS NO UTILIZADAS O DUPLICADAS (COMENTADAS) ---
+// Las siguientes rutas están comentadas porque parecen ser redundantes o no corresponden
+// con los métodos de controlador que hemos estado utilizando. Es buena práctica mantener
+// un Routes.php limpio y sin duplicidades.
 
-
-// --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
-// Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
-// Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
-// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
+// $routes->post('/enlazar-mac', 'EnlaceController::store'); // Duplicada con /enlace/store
+// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no se encuentra en Home.php
+// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Duplicada con /perfil/dispositivo/actualizar si se usa PerfilController
+// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con /loginobtener
 // $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
 // $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
-// $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
-
-// NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
-// que parecen duplicados con PerfilController::index y EnlaceController::store.
-// Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
-// para estas funcionalidades y eliminar los métodos duplicados en Home.php.
-
-// --- RUTAS NO ENCONTRADAS EN CONTROLADORES ADJUNTOS (COMENTADAS) ---
-// Estas rutas estaban en tu Routes.php original pero no vimos métodos correspondientes
-// en los controladores que proporcionaste.
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
+// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Duplicada con /perfil
+// $routes->get('/dispositivos', 'Home::dispositivos'); // Si es para listar, debería ir en DispositivoController
+// $routes->get('/home', 'Home::home'); // Si usas Home::inicio, esta puede ser redundante.
+// $routes->get('/dispositivos', 'DispositivoController::index'); // Si tienes un método index en DispositivoController para listar
