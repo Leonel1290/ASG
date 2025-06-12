@@ -2,56 +2,77 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
-use App\Models\DispositivoModel; // Asegúrate de que este namespace y nombre de modelo sean correctos
+use CodeIgniter\API\ResponseTrait;
+use App\Controllers\BaseController;
+use App\Models\DispositivoModel;
+use Config\Services;
 
-class ValveController extends Controller
+class ValveController extends BaseController
 {
-    /**
-     * Maneja el comando de abrir o cerrar la válvula para un dispositivo específico.
-     * Recibe la MAC del dispositivo y el comando ('open' o 'close') vía JSON POST.
-     */
+    use ResponseTrait;
+
     public function controlValve()
     {
-        // Obtener los datos del cuerpo de la solicitud JSON
+        // Validar entrada
         $input = $this->request->getJSON();
-
-        $mac = $input->mac ?? null;
-        $command = $input->command ?? null;
-
-        // Validar que la MAC y el comando estén presentes
-        if (!$mac || !$command) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'MAC y comando son requeridos.'
-            ])->setStatusCode(400); // Código de estado HTTP 400 Bad Request
+        if (!$input || !isset($input->mac) {
+            return $this->failValidationError('Se requiere MAC del dispositivo');
         }
 
-        // Instanciar el modelo del dispositivo
-        // Asegúrate de que tu DispositivoModel exista y tenga la columna 'estado_valvula'
-        $dispositivoModel = new DispositivoModel();
+        $mac = $input->mac;
+        $command = $input->command ?? null;
+        
+        if (!in_array($command, ['open', 'close'])) {
+            return $this->failValidationError('Comando inválido (use open/close)');
+        }
 
-        // Determinar el valor numérico para 'estado_valvula'
-        // 1 para 'open' (abrir), 0 para 'close' (cerrar)
-        $estadoValvula = ($command === 'open') ? 1 : 0;
+        // Obtener dispositivo
+        $model = new DispositivoModel();
+        $device = $model->where('MAC', $mac)->first();
+        
+        if (!$device) {
+            return $this->failNotFound('Dispositivo no encontrado');
+        }
 
-        // Actualizar el estado de la válvula en la base de datos
-        // El método 'update' con 'where' solo actualiza los registros que coinciden.
-        // Devuelve el número de filas afectadas.
-        $updated = $dispositivoModel->where('MAC', $mac)->set(['estado_valvula' => $estadoValvula])->update();
+        // Actualizar estado en DB
+        $newState = ($command === 'open') ? 1 : 0;
+        $model->update($device['id'], ['estado_valvula' => $newState]);
 
-        if ($updated) {
-            // Si la actualización fue exitosa
-            return $this->response->setJSON([
+        // Si no tiene IP, retornar solo éxito en DB
+        if (empty($device['ip_local'])) {
+            return $this->respond([
                 'status' => 'success',
-                'message' => 'Válvula ' . (($command === 'open') ? 'abierta' : 'cerrada') . ' correctamente para el dispositivo ' . $mac . '.'
+                'message' => 'Estado actualizado en DB (sin IP local)',
+                'device_state' => $newState
             ]);
-        } else {
-            // Si no se pudo actualizar (ej. MAC no encontrada o no hubo cambios)
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No se pudo actualizar el estado de la válvula. Es posible que el dispositivo con MAC "' . $mac . '" no exista o que el estado ya sea el solicitado.'
-            ])->setStatusCode(500); // Código de estado HTTP 500 Internal Server Error
+        }
+
+        // Enviar comando al dispositivo
+        $client = Services::curlrequest();
+        try {
+            $response = $client->post("http://{$device['ip_local']}/valve", [
+                'json' => ['command' => $command],
+                'timeout' => 3,
+                'connect_timeout' => 3
+            ]);
+            
+            $deviceResponse = json_decode($response->getBody(), true);
+            
+            return $this->respond([
+                'status' => 'success',
+                'message' => 'Comando ejecutado en dispositivo',
+                'device_response' => $deviceResponse,
+                'device_state' => $newState
+            ]);
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Error control válvula: ' . $e->getMessage());
+            
+            return $this->respond([
+                'status' => 'partial_success',
+                'message' => 'Estado actualizado pero error en dispositivo: ' . $e->getMessage(),
+                'device_state' => $newState
+            ], 207); // Código 207 Multi-Status
         }
     }
 }
