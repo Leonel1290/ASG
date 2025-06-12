@@ -81,24 +81,4 @@ class DispositivoModel extends Model
         // O alternativamente, como lo tenías y también funciona:
         // return $this->where('MAC', $mac)->set($data)->update();
     }
-
-    // Ejemplo de callback para formatear MAC si fuera necesario
-    // protected function formatMac(array $data)
-    // {
-    //     if (isset($data['data']['MAC'])) {
-    //         // Ejemplo: convertir a mayúsculas y formato con guiones (AA:BB:CC:DD:EE:FF)
-    //         $mac = strtoupper(str_replace([':', '-'], '', $data['data']['MAC']));
-    //         $data['data']['MAC'] = implode(':', str_split($mac, 2));
-    //     }
-    //     return $data;
-    // }
-
-    // NOTA IMPORTANTE:
-    // Mencionaste en tu código original que "Tienes otro modelo llamado DispositivosModel.php
-    // que parece apuntar a la misma tabla 'dispositivos'".
-    // Es CRÍTICO que solo tengas UN modelo que interactúe con una tabla específica.
-    // Si realmente tienes dos modelos diferentes (DispositivoModel y DispositivosModel)
-    // apuntando a la tabla 'dispositivos', DEBES eliminar uno de ellos para evitar conflictos
-    // y comportamientos inesperados en tu aplicación.
-    // Te recomiendo encarecidamente quedarte con este `DispositivoModel` y eliminar el otro.
 }
