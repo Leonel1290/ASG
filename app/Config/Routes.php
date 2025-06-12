@@ -23,38 +23,30 @@ $routes->get('/register/check-email', 'registerController::checkEmail');
 // Ruta para verificar el token recibido por email para REGISTRO
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
-// Ruta para procesar el formulario de login
-$routes->post('/login', 'Home::login');
-
-// Ruta para mostrar el formulario de login
-$routes->get('/loginobtener', 'Home::loginobtener');
+// Ruta para mostrar y procesar el formulario de login (AHORA GESTIONA AMBOS MÉTODOS GET y POST)
+$routes->match(['get', 'post'], '/login', 'Home::login');
 
 // Ruta para cerrar sesión (usando POST para mayor seguridad)
 $routes->post('/logout', 'Home::logout');
+
 
 // --- RUTAS DE RECUPERACIÓN DE CONTRASEÑA ---
 $routes->get('/forgotpassword', 'Home::forgotpassword');
 $routes->post('/forgotpassword1', 'Home::forgotPPassword');
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword');
+$routes->get('/cambio_exitoso', function() { return view('cambio_exitoso'); }); // Ruta para la vista de cambio de contraseña exitoso
 
 
 // --- RUTAS DE HOME PARA USUARIOS LOGUEADOS ---
 
-// ¡¡¡ ESTA ES LA RUTA QUE FALTABA Y CAUSABA EL ERROR !!!
-$routes->get('/inicio', 'Home::inicio'); // <--- ¡ASEGÚRATE QUE ESTA LÍNEA ESTÉ PRESENTE!
-
-// Ruta para mostrar el perfil del usuario logueado
-// NOTA: Esta ruta ya está agrupada en el bloque /perfil, pero si necesitas acceso directo, la mantienes aquí.
-// Si ya accedes a ella con /perfil, puedes eliminar esta línea para evitar duplicidad.
-// $routes->get('/perfil', 'Home::perfil');
-
+// Ruta para mostrar la vista de inicio para usuarios logueados
+$routes->get('/inicio', 'Home::inicio');
 
 // Ruta para mostrar la vista de compra de dispositivos
 $routes->get('/comprar', 'Home::comprar');
 
-// Ruta para registrar una compra de dispositivo (para ser llamada por webhooks o lógica interna)
-// Requiere MAC y opcionalmente un ID de transacción
+// Ruta para registrar una compra de dispositivo (usada internamente por PayPalController)
 $routes->post('/registrar-compra-automatica', 'Home::registrarCompraAutomatica');
 
 
@@ -63,7 +55,7 @@ $routes->post('/registrar-compra-automatica', 'Home::registrarCompraAutomatica')
 // Perfil (Agrupamos rutas relacionadas con el perfil del usuario)
 $routes->group('/perfil', function ($routes) {
     // Ruta principal del perfil (GET /perfil)
-    $routes->get('/', 'PerfilController::index'); // Esta es la ruta preferida para /perfil
+    $routes->get('/', 'PerfilController::index');
 
     // Ruta para mostrar el formulario de configuración del perfil (GET /perfil/configuracion)
     $routes->get('configuracion', 'PerfilController::configuracion');
@@ -81,9 +73,7 @@ $routes->group('/perfil', function ($routes) {
     $routes->post('validar-codigo-verificacion', 'PerfilController::validarCodigoVerificacion');
 
     // Rutas para editar y actualizar un dispositivo específico del usuario
-    // GET /perfil/dispositivo/editar/(:any)
     $routes->get('dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
-    // POST /perfil/dispositivo/actualizar
     $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo');
 
     // Ruta para eliminar (desenlazar) dispositivos del perfil del usuario (POST /perfil/eliminar-dispositivos)
@@ -103,22 +93,19 @@ $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 
 // Detalles del dispositivo (mostrar lecturas, etc.)
-// Asumo que esta ruta usa la MAC para identificar el dispositivo
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 
-// --- RUTAS NO UTILIZADAS O DUPLICADAS (COMENTADAS) ---
-// Las siguientes rutas están comentadas porque parecen ser redundantes o no corresponden
-// con los métodos de controlador que hemos estado utilizando. Es buena práctica mantener
-// un Routes.php limpio y sin duplicidades.
+// --- NUEVAS RUTAS PARA INTEGRACIÓN DE PAYPAL ---
+// Agrupamos las rutas de PayPal bajo '/paypal'
+$routes->group('paypal', function ($routes) {
+    // Endpoint para que el SDK de PayPal cree una orden en tu servidor
+    $routes->post('create-order', 'PayPalController::createOrder');
 
-// $routes->post('/enlazar-mac', 'EnlaceController::store'); // Duplicada con /enlace/store
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no se encuentra en Home.php
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Duplicada con /perfil/dispositivo/actualizar si se usa PerfilController
-// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con /loginobtener
-// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
-// $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Duplicada con /perfil
-// $routes->get('/dispositivos', 'Home::dispositivos'); // Si es para listar, debería ir en DispositivoController
-// $routes->get('/home', 'Home::home'); // Si usas Home::inicio, esta puede ser redundante.
-// $routes->get('/dispositivos', 'DispositivoController::index'); // Si tienes un método index en DispositivoController para listar
+    // Endpoint para que el SDK de PayPal capture la orden en tu servidor
+    $routes->post('capture-order', 'PayPalController::captureOrder');
+
+    // Vistas de redirección post-PayPal
+    $routes->get('success', 'PayPalController::success');
+    $routes->get('cancel', 'PayPalController::cancel');
+});
