@@ -2,14 +2,11 @@
 $mac = $mac ?? 'Desconocida';
 $nombreDispositivo = $nombreDispositivo ?? $mac; // Usar la MAC como nombre por defecto si no se pasa nombre
 $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
-// Las variables $lecturas, $labels y $data ya no se usarán directamente para mostrar en la vista,
-// pero se mantendrán en el controlador para que el sistema no falle si aún se pasan.
 $message = $message ?? null;
 
-// Obtener el último nivel de gas para mostrarlo en la tarjeta simple (se mantiene esta tarjeta)
-// Se asume que el arreglo $lecturas está ordenado de forma ascendente (el más antiguo primero)
-// Aunque no se mostrará la tabla ni el gráfico, se mantiene esta lógica para la tarjeta simple
-$ultimoIndice = count($lecturas ?? []) - 1; // Usar null coalescing para $lecturas en caso de ser null
+// Obtener el último nivel de gas para mostrarlo en la tarjeta simple
+// Usar null coalescing para $lecturas en caso de ser null
+$ultimoIndice = count($lecturas ?? []) - 1; 
 $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas']) ? esc($lecturas[$ultimoIndice]['nivel_gas']) . ' PPM' : 'Sin datos';
 
 ?>
@@ -51,7 +48,7 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             border-color: #cbd5e0;
             transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-         .btn-outline-secondary:hover {
+        .btn-outline-secondary:hover {
             color: #1a202c;
             background-color: #cbd5e0;
             border-color: #cbd5e0;
@@ -84,7 +81,7 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
         }
 
         .card:hover {
-             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
         }
 
         .card-body {
@@ -99,8 +96,8 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             margin-bottom: 1rem;
         }
 
-         /* Estilos específicos para la tarjeta de Nivel de Gas Actual */
-         .current-gas-level-card-simple {
+        /* Estilos específicos para la tarjeta de Nivel de Gas Actual */
+        .current-gas-level-card-simple {
             background-color: #2d3748;
             color: #fff;
             border: none;
@@ -110,24 +107,24 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             transition: box-shadow 0.3s ease;
             padding: 1.5rem;
             text-align: center;
-         }
+        }
 
-         .current-gas-level-card-simple:hover {
-              box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
-         }
+        .current-gas-level-card-simple:hover {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+        }
 
-         .current-gas-level-card-simple .card-title {
-             font-size: 1.75rem;
-             font-weight: bold;
-             color: #667eea;
-             margin-bottom: 1rem;
-         }
+        .current-gas-level-card-simple .card-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
 
-         .current-gas-level-card-simple .current-gas-level-value {
-             font-size: 2rem;
-             font-weight: bold;
-             color: #f6e05e;
-         }
+        .current-gas-level-card-simple .current-gas-level-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f6e05e;
+        }
 
         /* Estilos para los nuevos botones */
         .valve-buttons {
@@ -173,20 +170,20 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             .card-title {
                 font-size: 1.5rem;
             }
-             .current-gas-level-card-simple .card-title {
-                 font-size: 1.5rem;
-             }
-             .current-gas-level-card-simple .current-gas-level-value {
-                 font-size: 1.75rem;
-             }
-             .valve-buttons {
+            .current-gas-level-card-simple .card-title {
+                font-size: 1.5rem;
+            }
+            .current-gas-level-card-simple .current-gas-level-value {
+                font-size: 1.75rem;
+            }
+            .valve-buttons {
                 flex-direction: column; /* Apila los botones en pantallas pequeñas */
                 align-items: center;
-             }
-             .btn-valve {
+            }
+            .btn-valve {
                 width: 80%; /* Ocupa más ancho en móvil */
                 max-width: 300px; /* Asegura que no sea demasiado ancho */
-             }
+            }
         }
     </style>
 
@@ -225,25 +222,28 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 
     <div id="valveMessage" class="alert alert-info mt-4 text-center d-none" role="alert"></div>
 
-
 </div>
 
 <script>
+    // Define la URL base de tu aplicación de CodeIgniter en Render, obtenida de App.php
+    const API_BASE_URL = 'https://pwa-1s1m.onrender.com'; 
+
     // Función para enviar comandos a la válvula
     function sendValveCommand(mac, command) {
         const valveMessageDiv = document.getElementById('valveMessage');
         valveMessageDiv.classList.add('d-none'); // Ocultar mensaje anterior
         valveMessageDiv.classList.remove('alert-success', 'alert-danger'); // Limpiar clases de estilo
 
-        // Aquí deberías hacer una llamada AJAX a tu backend (Controlador)
-        // Por ejemplo, usando fetch API
-        fetch('<?= base_url('/api/valve_control') ?>', { // Ajusta esta URL a tu endpoint API
-            method: 'POST', //
+        // Construye la URL completa del endpoint API
+        const apiUrl = `${API_BASE_URL}/api/valve_control`; 
+
+        fetch(apiUrl, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest' // Para identificar peticiones AJAX
             },
-            body: JSON.stringify({ mac: mac, command: command }) //
+            body: JSON.stringify({ mac: mac, command: command })
         })
         .then(response => {
             if (!response.ok) {
@@ -257,7 +257,6 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
                 valveMessageDiv.textContent = data.message;
                 valveMessageDiv.classList.remove('d-none');
                 valveMessageDiv.classList.add('alert-success');
-                // Aquí podrías actualizar el estado visual de la válvula si tienes un indicador
             } else {
                 valveMessageDiv.textContent = data.message || 'Error al enviar el comando.';
                 valveMessageDiv.classList.remove('d-none');
@@ -271,9 +270,9 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             valveMessageDiv.classList.add('alert-danger');
             // Intentar mostrar un mensaje de error más específico si el error es un objeto
             if (error.message) {
-                 valveMessageDiv.textContent = error.message;
+                valveMessageDiv.textContent = error.message;
             } else if (error.error) { // Si el error es un objeto con una propiedad 'error'
-                 valveMessageDiv.textContent = error.error;
+                valveMessageDiv.textContent = error.error;
             }
         });
     }

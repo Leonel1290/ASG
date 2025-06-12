@@ -135,9 +135,3 @@ $routes->group('/', function($routes) {
     // ... otras rutas que no estén dentro de un grupo con prefijo
     $routes->post('api/valve_control', 'ValveController::controlValve');
 });
-
-// Grupo API
-$routes->group('api', ['namespace' => 'App\Controllers\Api'], function($routes) {
-    $routes->post('valve_control', 'ValveController::controlValve');
-    $routes->post('update_ip', 'IpController::updateIp');
-});
