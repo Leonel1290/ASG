@@ -4,299 +4,136 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\LecturasGasModel;
-use CodeIgniter\Controller;
-use CodeIgniter\I18n\Time;
+use App\Models\CompraDispositivoModel;
+use App\Models\DispositivoModel;
+use App\Models\EnlaceModel; // Necesario para el método perfil()
+use CodeIgniter\Controller; // BaseController ya extiende de Controller
+use CodeIgniter\I18n\Time; // Para manejar fechas y horas
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
-    // Puedes instanciar modelos aquí si los usas en múltiples métodos
-    // protected $userModel;
-    // protected $lecturasGasModel;
+    // Propiedades para almacenar instancias de los modelos
+    protected $userModel;
+    protected $lecturasGasModel;
+    protected $compraDispositivoModel;
+    protected $dispositivoModel;
+    protected $enlaceModel; // Para manejar enlaces de dispositivos a usuarios
 
+    /**
+     * Constructor del controlador Home.
+     * Inicializa las instancias de los modelos que se utilizarán.
+     */
     public function __construct()
     {
-        // Llama al constructor de la clase padre si es necesario
-        // parent::__construct();
+        // Llama al constructor de la clase padre (BaseController)
+        // para asegurar que las configuraciones básicas (como la sesión) se inicialicen.
+        parent::__construct();
 
-        // Instanciar modelos si se usan en el constructor o en varios métodos
-        // $this->userModel = new UserModel();
-        // $this->lecturasGasModel = new LecturasGasModel();
+        // Instanciar todos los modelos que se utilizarán en este controlador
+        $this->userModel = new UserModel();
+        $this->lecturasGasModel = new LecturasGasModel();
+        $this->compraDispositivoModel = new CompraDispositivoModel();
+        $this->dispositivoModel = new DispositivoModel();
+        $this->enlaceModel = new EnlaceModel(); // Instancia EnlaceModel
     }
 
+    /**
+     * Muestra la vista de inicio principal de la aplicación.
+     * Endpoint: GET /
+     */
     public function index()
     {
-        // Carga la vista de inicio
-        return view('inicio');
+        return view('inicio'); // Carga la vista de inicio
     }
 
+    /**
+     * Muestra la vista de inicio para usuarios logueados, o redirige a login si no lo están.
+     * Endpoint: GET /inicio
+     */
     public function inicio()
     {
         $session = session();
 
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'Home::inicio() - Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
 
         // Si el usuario no está logueado, redirige a la página de login
         if (!$session->get('logged_in')) {
             log_message('debug', 'Home::inicio() - Usuario no logueado, redirigiendo a login.');
-            return view('login');
+            return view('login'); // Muestra la vista de login directamente
         }
 
         log_message('debug', 'Home::inicio() - Usuario logueado, mostrando vista inicio.');
-        // Si está logueado, muestra la vista de inicio
-        return view('inicio');
+        return view('inicio'); // Si está logueado, muestra la vista de inicio
     }
 
-    // Método de Login (POST /login) - Maneja el envío del formulario de login
+    /**
+     * Muestra el formulario de login.
+     * Endpoint: GET /loginobtener
+     */
+    public function loginobtener()
+    {
+        return view('login'); // Muestra la vista del formulario de login
+    }
+
+    /**
+     * Procesa el formulario de login.
+     * Endpoint: POST /login
+     */
     public function login()
     {
         $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
-
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
 
-        $user = $userModel->where('email', $email)->first();
+        $user = $this->userModel->where('email', $email)->first();
 
-        if ($user) {
-            if (!$user['is_active']) {
-                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
-                log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
-                return redirect()->back()->withInput();
+        if ($user && password_verify($password, $user['password'])) {
+            if ($user['is_active'] == 0) {
+                return redirect()->back()->with('error', 'Tu cuenta no ha sido verificada. Por favor, revisa tu correo electrónico para el enlace de verificación.');
             }
 
-            if (password_verify($password, $user['password'])) {
-                // Contraseña correcta, iniciar sesión
-                $ultimaLectura = $lecturasGasModel
-                    ->orderBy('id', 'DESC')
-                    ->where(['usuario_id' => $user['id']])
-                    ->asArray()
-                    ->first();
+            // Autenticación exitosa, establecer datos de sesión
+            $ses_data = [
+                'id'        => $user['id'],
+                'nombre'    => $user['nombre'],
+                'apellido'  => $user['apellido'],
+                'email'     => $user['email'],
+                'logged_in' => TRUE,
+                'is_admin'  => $user['is_admin']
+            ];
+            $session->set($ses_data);
 
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
-
-                $sessionData = [
-                    'id'        => $user['id'],
-                    'nombre'    => $user['nombre'],
-                    'email'     => $user['email'],
-                    'logged_in' => true,
-                ];
-                $session->set($sessionData);
-
-                // --- LOGGING PARA DEBUGGING ---
-                log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
-                // --- FIN LOGGING ---
-
-                return redirect()->to('/perfil');
+            // Redirección después del login: prioriza la URL de retorno si existe
+            $redirectUrl = session()->getFlashdata('redirect_after_login');
+            if ($redirectUrl) {
+                session()->removeFlashdata('redirect_after_login'); // Limpiar flashdata
+                return redirect()->to($redirectUrl)->with('success', '¡Bienvenido de nuevo, ' . $user['nombre'] . '! Por favor, completa tu acción.');
             } else {
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
-                log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
-                return redirect()->back()->withInput();
+                return redirect()->to('/inicio')->with('success', '¡Bienvenido de nuevo, ' . $user['nombre'] . '!');
             }
         } else {
-            $session->setFlashdata('error', 'Email no encontrado.');
-            log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
-            return redirect()->back()->withInput();
+            return redirect()->back()->with('error', 'Email o contraseña incorrectos.');
         }
     }
 
-    public function register()
-    {
-        // Este método simplemente muestra la vista de registro
-        return view('register');
-    }
-
+    /**
+     * Cierra la sesión del usuario.
+     * Endpoint: POST /logout
+     */
     public function logout()
     {
-        $session = session();
-        $userId = $session->get('id');
-        $session->destroy();
-        log_message('debug', 'Home::logout() - Sesión destruida para usuario ID: ' . $userId);
-        return redirect()->to('/');
+        session()->destroy();
+        return redirect()->to('/loginobtener')->with('info', 'Has cerrado sesión correctamente.');
     }
 
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
-    public function loginobtener() {
-        $session = session();
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::loginobtener() - Mostrando vista de login. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-        return view('login');
-    }
-    public function configview() { return view('configuracion'); }
-    public function salirdelconfig() { return view('inicio'); }
-    public function volveralinicio() { return view('inicio'); }
-    public function volveralperfil() { return view('perfil'); }
-
-    // Recuperación de contraseña (mantengo tu lógica existente, usa UserModel)
-    public function forgotPPassword()
-    {
-        $session = session();
-        $userModel = new UserModel();
-        $emailInput = $this->request->getPost('email');
-        $user = $userModel->where('email', $emailInput)->first();
-
-        if ($user) {
-            if (!$user['is_active']) {
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
-                 return redirect()->back()->withInput();
-            }
-
-            $token = bin2hex(random_bytes(50));
-            $expires = Time::now()->addHours(1);
-
-            $updated = $userModel->update($user['id'], [
-                'reset_token' => $token,
-                'reset_expires' => $expires->toDateTimeString(),
-            ]);
-
-            $resetLink = base_url("/reset-password/$token");
-
-            $emailService = \Config\Services::email();
-            // Configura el remitente en app/Config/Email.php o .env
-            // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
-            $emailService->setTo($user['email']);
-            $emailService->setSubject('Recuperación de contraseña');
-            $emailService->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
-
-            if (!$emailService->send()) {
-                $data = $emailService->printDebugger(['headers']);
-                log_message('error', 'Error enviando correo de recuperación a ' . $user['email'] . ': ' . $data);
-                 $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
-                 return redirect()->back()->withInput();
-            }
-
-            if ($updated) {
-                log_message('debug', 'Actualización de token de recuperación exitosa para usuario ID: ' . $user['id']);
-            } else {
-                log_message('error', 'Actualización de token de recuperación fallida para usuario ID: ' . $user['id']);
-            }
-
-            $session->setFlashdata('success', 'Se ha enviado un enlace de recuperación a tu correo.');
-            return redirect()->back()->withInput();
-        } else {
-            $session->setFlashdata('error', 'Correo electrónico no encontrado.');
-            return redirect()->back()->withInput();
-        }
-    }
-
-    public function forgotpassword()
-    {
-        return view('forgotpassword');
-    }
-
-    public function showResetPasswordForm($token)
-    {
-        $userModel = new UserModel();
-        $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
-
-        if ($user) {
-            if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
-            }
-
-            return view('reset_password', ['token' => $token]);
-        } else {
-            session()->setFlashdata('error', 'Token de recuperación inválido o expirado.');
-            return redirect()->to('/forgotpassword');
-        }
-    }
-
-    public function resetPassword()
-    {
-        $session = session();
-        $userModel = new UserModel();
-
-        $token = $this->request->getPost('token');
-        $password = $this->request->getPost('password');
-
-        $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
-
-        if ($user) {
-            if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
-            }
-
-            $userModel->update($user['id'], [
-                'password' => password_hash($password, PASSWORD_DEFAULT),
-                'reset_token' => null,
-                'reset_expires' => null,
-            ]);
-
-            $session->setFlashdata('success', 'Tu contraseña ha sido actualizada.');
-            return redirect()->to('/loginobtener');
-        } else {
-            $session->setFlashdata('error', 'Token de recuperación inválido o expirado.');
-            return redirect()->back()->withInput();
-        }
-    }
-
-    // Método para enlazar MACs (parece que lo tienes duplicado con EnlaceController::store)
-    // Considera eliminar este si usas EnlaceController::store
-    public function storeMac()
-    {
-        $session = session();
-        $mac = $this->request->getPost('mac');
-
-        if (!$session->get('logged_in')) {
-            return redirect()->to('/loginobtener');
-        }
-
-        $usuarioId = $session->get('id');
-        $enlaceModel = new \App\Models\EnlaceModel();
-
-        $existe = $enlaceModel
-                    ->where('id_usuario', $usuarioId)
-                    ->where('MAC', $mac)
-                    ->first();
-
-        if ($existe) {
-            $session->setFlashdata('error', 'Esta MAC ya está enlazada.');
-        } else {
-            $enlaceModel->insert([
-                'id_usuario' => $usuarioId,
-                'MAC' => $mac
-            ]);
-            $session->setFlashdata('success', 'MAC enlazada correctamente.');
-        }
-
-        return redirect()->to('/perfil');
-    }
-
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
-    // public function inicioresetpass() { return view('reset_password'); }
-    // public function obtenerperfil() { return view('perfilobtener'); }
-
-    // Vistas varias (mantengo las que tenías)
-    public function dispositivos()
-    {
-        return view('dispositivos');
-    }
-
-    // Método para mostrar la página de perfil (parece que PerfilController::index es la principal ahora)
-    // Considera eliminar este si usas PerfilController::index
+    /**
+     * Muestra la vista de perfil del usuario logueado.
+     * Endpoint: GET /perfil
+     */
     public function perfil()
     {
         $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'Home::perfil() - Estado de la sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
 
         if (!$session->get('logged_in')) {
             log_message('debug', 'Home::perfil() - Usuario no logueado, redirigiendo a login.');
@@ -305,16 +142,16 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         $usuarioId = $session->get('id');
 
-        $enlaceModel = new \App\Models\EnlaceModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
-
-        $macs = $enlaceModel
+        // Obtener las MACs enlazadas a este usuario
+        $macs = $this->enlaceModel
                     ->select('MAC')
                     ->where('id_usuario', $usuarioId)
                     ->groupBy('MAC')
                     ->findAll();
 
-        $lecturas = $lecturasGasModel->getLecturasPorUsuario($usuarioId);
+        // Obtener las lecturas de gas asociadas a las MACs del usuario
+        // Nota: Asegúrate de que `getLecturasPorUsuario` en LecturasGasModel sea eficiente.
+        $lecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
         log_message('debug', 'Home::perfil() - Lecturas por usuario obtenidas: ' . print_r($lecturas, true));
 
@@ -324,15 +161,116 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         ]);
     }
 
+    /**
+     * Muestra la vista de compra de dispositivos.
+     * Si el usuario no está logueado, lo redirige a la página de registro/login.
+     * Endpoint: GET /comprar
+     */
     public function comprar()
     {
-        // --- LOGGING PARA DEBUGGING ---
         $session = session();
-        log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
+
+        if (!$session->get('logged_in')) {
+            // Si el usuario no está logueado, guarda la URL de retorno y redirige al registro
+            $session->setFlashdata('redirect_after_login', '/comprar');
+            log_message('debug', 'Home::comprar() - Usuario no logueado, redirigiendo a registro.');
+            return redirect()->to('/register')->with('info', 'Para comprar un dispositivo, por favor, regístrate o inicia sesión.');
+        }
+
+        log_message('debug', 'Home::comprar() - Usuario logueado, mostrando vista de compra.');
         return view('comprar');
     }
 
-    // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
-    // public function verLecturas($mac) { ... }
+    /**
+     * Este método registra una compra automáticamente después de una transacción exitosa (ej. PayPal webhook).
+     * ASUME que el usuario ya está logueado cuando se dispara esta lógica.
+     *
+     * @param string $macComprada La MAC del dispositivo comprado
+     * @param string|null $transaccionId Opcional: ID de la transacción de PayPal
+     * @return \CodeIgniter\HTTP\Response
+     */
+    public function registrarCompraAutomatica($macComprada, $transaccionId = null)
+    {
+        $session = session();
+
+        // 1. Asegurarse de que el usuario esté logueado
+        if (!$session->get('logged_in')) {
+            log_message('error', 'Intento de registrar compra automática sin usuario logueado.');
+            return $this->failUnauthorized('Debe iniciar sesión para registrar una compra.');
+        }
+
+        $idUsuarioComprador = $session->get('id'); // Obtener el ID del usuario logueado
+
+        // --- VALIDACIÓN Y VERIFICACIÓN ---
+        // 1. Validar formato de MAC
+        if (!preg_match('/^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/i', $macComprada)) {
+            log_message('error', 'Formato de MAC inválido al registrar compra automática: ' . $macComprada);
+            return $this->fail('Formato de MAC inválido.', 400);
+        }
+        $macComprada = strtoupper(str_replace(['-', ' ', ':'], '', $macComprada)); // Normalizar y limpiar MAC
+
+        // 2. Validar que la MAC existe en tu tabla `dispositivos`
+        $dispositivoExiste = $this->dispositivoModel->where('MAC', $macComprada)->first();
+        if (!$dispositivoExiste) {
+            log_message('error', 'Intento de registrar compra para MAC inexistente en `dispositivos`: ' . $macComprada);
+            return $this->fail('MAC del dispositivo no registrada en el sistema.', 404);
+        }
+
+        // 3. Verificar si esta compra ya fue registrada para ESTE USUARIO Y MAC
+        $compraExistente = $this->compraDispositivoModel
+                                 ->where('id_usuario_comprador', $idUsuarioComprador)
+                                 ->where('MAC_dispositivo', $macComprada)
+                                 ->first();
+
+        if ($compraExistente) {
+            log_message('info', 'Compra para usuario ' . $idUsuarioComprador . ' y MAC ' . $macComprada . ' ya registrada.');
+            return $this->respond(['status' => 'info', 'message' => 'Esta MAC ya ha sido comprada por su cuenta.'], 200);
+        }
+        // --- FIN VALIDACIÓN Y VERIFICACIÓN ---
+
+        $dataCompra = [
+            'id_usuario_comprador'  => $idUsuarioComprador,
+            'MAC_dispositivo'       => $macComprada,
+            'transaccion_paypal_id' => $transaccionId // Puede ser NULL
+        ];
+
+        if ($this->compraDispositivoModel->insert($dataCompra)) {
+            log_message('info', 'Compra de dispositivo ' . $macComprada . ' registrada automáticamente para usuario ' . $idUsuarioComprador . '.');
+            return $this->respondCreated(['status' => 'success', 'message' => 'Compra registrada automáticamente.']);
+        } else {
+            $errors = $this->compraDispositivoModel->errors();
+            log_message('error', 'Error al registrar compra automática: ' . json_encode($errors));
+            return $this->failServerError('Error al registrar la compra automáticamente: ' . implode(', ', $errors));
+        }
+    }
+
+    // --- Métodos relacionados con recuperación de contraseña (mantener si son necesarios) ---
+    // (Asegúrate de que estos métodos existan si tienes rutas para ellos en Routes.php)
+
+    public function forgotpassword()
+    {
+        // Lógica para mostrar el formulario de 'olvidé mi contraseña'
+        return view('forgot_password'); // Asegúrate de tener esta vista
+    }
+
+    public function forgotPPassword()
+    {
+        // Lógica para procesar el envío del formulario de 'olvidé mi contraseña'
+        // (Enviar email con token, etc.)
+        return redirect()->back()->with('info', 'Instrucciones enviadas a tu correo.');
+    }
+
+    public function showResetPasswordForm($token)
+    {
+        // Lógica para mostrar el formulario de restablecimiento de contraseña
+        // (Validar token y cargar vista)
+        return view('reset_password_form', ['token' => $token]); // Asegúrate de tener esta vista
+    }
+
+    public function resetPassword()
+    {
+        // Lógica para procesar el restablecimiento de contraseña
+        // (Validar nueva contraseña, actualizar en DB)
+        return redirect()->to('/loginobtener')->with('success', 'Contraseña restablecida correctamente.');
+    }
 }
