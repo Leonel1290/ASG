@@ -4,27 +4,47 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\LecturasGasModel;
-use App\Models\CompraDispositivoModel; // Asegúrate de importar el modelo CompraDispositivoModel
-use App\Models\EnlaceModel; // Importa EnlaceModel
-use CodeIgniter\Controller;
+use App\Models\CompraDispositivoModel;
+use App\Models\EnlaceModel;
 use CodeIgniter\I18n\Time;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
-class Home extends BaseController // Asegúrate de extender de BaseController
+class Home extends BaseController
 {
     protected $userModel;
     protected $lecturasGasModel;
     protected $compraDispositivoModel;
-    protected $enlaceModel; // Agrega la propiedad para EnlaceModel
+    protected $enlaceModel;
 
-    public function __construct()
+    /**
+     * Constructor.
+     * Aquí no se deben instanciar modelos ni cargar helpers.
+     * Usa initController() para eso.
+     */
+    // public function __construct()
+    // {
+    //     // No se llama a parent::__construct() aquí.
+    // }
+
+    /**
+     * Se llama después del constructor del padre para inicializar propiedades.
+     * Aquí es donde debes instanciar tus modelos y cargar helpers.
+     */
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // Llama al constructor de la clase padre
-        parent::__construct(); // Es importante llamar al constructor del padre si hay inicializaciones allí
+        // No edites esta línea.
+        parent::initController($request, $response, $logger);
 
+        // Preload any models, libraries, etc, here.
         $this->userModel = new UserModel();
         $this->lecturasGasModel = new LecturasGasModel();
         $this->compraDispositivoModel = new CompraDispositivoModel();
-        $this->enlaceModel = new EnlaceModel(); // Instancia EnlaceModel
+        $this->enlaceModel = new EnlaceModel();
+
+        // Cargar helpers necesarios si aún no están cargados en BaseController
+        helper(['url', 'form', 'text', 'email']);
     }
 
     public function index()
@@ -260,8 +280,6 @@ class Home extends BaseController // Asegúrate de extender de BaseController
         return redirect()->to('/cambio_exitoso')->with('success', '¡Contraseña restablecida exitosamente!');
     }
 
-    // Este método ya debería estar en PerfilController.php, pero lo mantengo aquí si lo usas directamente.
-    // Lo ideal es que PerfilController maneje esto.
     public function perfil()
     {
         $session = session();
@@ -273,10 +291,6 @@ class Home extends BaseController // Asegúrate de extender de BaseController
         }
 
         $usuarioId = $session->get('id');
-
-        // Los modelos ya están instanciados en el constructor si quieres
-        // $enlaceModel = new \App\Models\EnlaceModel();
-        // $lecturasGasModel = new \App\Models\LecturasGasModel();
 
         $macs = $this->enlaceModel
             ->select('MAC')
