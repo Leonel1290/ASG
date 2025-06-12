@@ -16,9 +16,8 @@ class registerController extends BaseController // Asumo que extiendes de BaseCo
      */
     public function __construct()
     {
-        // Llama al constructor de la clase padre (BaseController)
-        // para asegurar que las configuraciones básicas se inicialicen.
-        parent::__construct();
+        // NO se llama a parent::__construct() aquí cuando se extiende de BaseController.
+        // La inicialización del padre se maneja a través de initController().
 
         // Instancia el modelo de usuario
         $this->userModel = new UserModel();
