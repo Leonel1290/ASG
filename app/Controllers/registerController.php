@@ -2,29 +2,44 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use CodeIgniter\Controller;
+use CodeIgniter\Controller; // Asegúrate de extender de Controller o BaseController
 use CodeIgniter\I18n\Time; // Para manejar expiración de tokens
 
-class registerController extends Controller
+// Si extiendes de BaseController, cambia 'extends Controller' a 'extends BaseController'
+class registerController extends BaseController // Asumo que extiendes de BaseController
 {
     protected $userModel; // Propiedad para el modelo de usuario
 
+    /**
+     * Constructor del controlador registerController.
+     * Instancia el modelo de usuario y carga helpers necesarios.
+     */
     public function __construct()
     {
+        // Llama al constructor de la clase padre (BaseController)
+        // para asegurar que las configuraciones básicas se inicialicen.
+        parent::__construct();
+
         // Instancia el modelo de usuario
         $this->userModel = new UserModel();
 
         // Cargar helpers necesarios
-        helper(['form', 'url', 'text', 'email']); // Asegúrate de que 'text' y 'email' estén aquí
+        helper(['form', 'url', 'text', 'email']);
     }
 
-    // Método para mostrar la vista del formulario de registro (GET /register)
+    /**
+     * Muestra la vista del formulario de registro.
+     * Endpoint: GET /register
+     */
     public function index()
     {
         return view('register'); // Tu vista del formulario de registro
     }
 
-    // Método para procesar el formulario de registro (POST /register/store)
+    /**
+     * Procesa el formulario de registro, valida los datos y crea un nuevo usuario.
+     * Endpoint: POST /register/store
+     */
     public function store()
     {
         // Validación del formulario
@@ -47,13 +62,12 @@ class registerController extends Controller
                     'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
                 ]
             ],
-            'email'   => [
-                'rules' => 'required|valid_email|is_unique[usuarios.email]|max_length[100]',
+            'email'    => [
+                'rules' => 'required|valid_email|is_unique[usuarios.email]',
                 'errors' => [
                     'required' => 'El campo email es obligatorio.',
-                    'valid_email' => 'El campo email debe contener una dirección válida.',
-                    'is_unique' => 'El email ya está registrado.',
-                    'max_length' => 'El campo email no puede exceder los 100 caracteres.'
+                    'valid_email' => 'Por favor, introduce un email válido.',
+                    'is_unique' => 'Este email ya está registrado.'
                 ]
             ],
             'password' => [
@@ -62,100 +76,92 @@ class registerController extends Controller
                     'required' => 'El campo contraseña es obligatorio.',
                     'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
                 ]
+            ],
+            'confirm_password' => [
+                'rules' => 'required|matches[password]',
+                'errors' => [
+                    'required' => 'Debes confirmar tu contraseña.',
+                    'matches' => 'Las contraseñas no coinciden.'
+                ]
+            ],
+            'terminos' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Debes aceptar los términos y condiciones.'
+                ]
             ]
         ]);
 
+        // Si la validación falla, redirige de vuelta con los errores y los datos ingresados
         if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
-        // Procesar los datos del formulario si la validación es exitosa
-        $nombre = $this->request->getPost('nombre');
-        $apellido = $this->request->getPost('apellido');
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        // Generar un token de verificación único y su tiempo de expiración
+        $verificationToken = bin2hex(random_bytes(32)); // Genera un token aleatorio
+        $tokenExpires = Time::now()->addHours(24)->toDateTimeString(); // Expira en 24 horas
 
-        // Generar token de verificación y definir expiración
-        $token = random_string('alnum', 32); // Genera un token alfanumérico de 32 caracteres
-        $expires = Time::now()->addHours(24); // Token válido por 24 horas
-
-        // Preparar datos para guardar el usuario (inicialmente inactivo)
-        $userData = [
-            'nombre'   => $nombre,
-            'apellido' => $apellido,
-            'email'    => $email,
-            'password' => password_hash($password, PASSWORD_BCRYPT), // Encriptar la contraseña
-            'is_active' => 0, // <-- Marcar como inactivo por defecto
-            'reset_token' => $token, // Usamos reset_token para el token de verificación
-            'reset_expires' => $expires->toDateTimeString(), // Guardar expiración
+        // Preparar los datos del usuario para insertar en la base de datos
+        $data = [
+            'nombre'     => $this->request->getPost('nombre'),
+            'apellido'   => $this->request->getPost('apellido'),
+            'email'      => $this->request->getPost('email'),
+            'password'   => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'is_active'  => 0, // El usuario no estará activo hasta verificar el email
+            'reset_token' => $verificationToken, // Almacenar el token para verificación
+            'reset_expires' => $tokenExpires, // Almacenar la fecha de expiración
         ];
 
-        // Guardar el usuario en la base de datos
-        // Usamos insert() en lugar de save() para obtener el ID del nuevo registro
-        $userId = $this->userModel->insert($userData);
+        // Intentar insertar el usuario en la base de datos
+        if ($this->userModel->insert($data)) {
+            // Envío del correo de verificación
+            $email = \Config\Services::email();
 
-        if ($userId) {
-            // --- Enviar el correo electrónico de verificación ---
-            $emailService = \Config\Services::email();
+            $email->setFrom('no-reply@tudominio.com', 'Sistema de Monitoreo de Gas');
+            $email->setTo($data['email']);
+            $email->setSubject('Verifica tu cuenta en ASG');
 
-            // Configura el remitente. Es mejor configurar esto en app/Config/Email.php o .env
-            // Si no está configurado globalmente, descomenta y ajusta las siguientes líneas:
-            // $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
+            $verificationLink = base_url('/register/verify-email/' . $verificationToken);
+            $message = view('email/verification_email', ['verificationLink' => $verificationLink, 'userName' => $data['nombre']]);
 
-            $emailService->setTo($email);
-            $emailService->setSubject('Verifica tu cuenta de ASG');
+            $email->setMessage($message);
 
-            // Crear el enlace de verificación
-            $verificationLink = base_url("register/verify-email/{$token}"); // <-- NUEVA RUTA
-
-            $message = "Hola {$nombre},\n\nGracias por registrarte en ASG.\n\nPor favor, haz clic en el siguiente enlace para verificar tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nSi no te registraste en ASG, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
-
-            $emailService->setMessage($message);
-
-            // Intentar enviar el correo
-            if ($emailService->send()) {
-                // Éxito al enviar el correo
-                log_message('debug', 'Correo de verificación de registro enviado a: ' . $email);
-                // Redirigir a una página que le dice al usuario que revise su email
-                return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un correo de verificación a tu email. Por favor, revisa tu bandeja de entrada para activar tu cuenta.');
+            if ($email->send()) {
+                log_message('info', 'Correo de verificación enviado a ' . $data['email']);
+                return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Por favor, verifica tu correo electrónico para activar tu cuenta.');
             } else {
-                // Error al enviar el correo
-                // Puedes loguear el error para depuración
-                log_message('error', 'Error al enviar correo de verificación de registro a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
-                // Opcional: Eliminar el usuario recién creado si el email no se pudo enviar
-                // $this->userModel->delete($userId);
-                return redirect()->back()->withInput()->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
+                // Si falla el envío del email, loguear el error y notificar al usuario
+                log_message('error', 'Fallo al enviar correo de verificación a ' . $data['email'] . ': ' . $email->printDebugger(['headers']));
+                // Aunque el email falle, el usuario ya está en la DB, solo que inactivo.
+                // Podrías ofrecer reenviar el email o que contacte soporte.
+                return redirect()->to('/register/check-email')->with('error', 'Registro exitoso, pero no pudimos enviar el correo de verificación. Por favor, contacta a soporte.');
             }
-            // --- Fin Enviar el correo electrónico ---
-
         } else {
-            // Error al guardar el usuario en la base de datos
+            // Si hay un error al insertar el usuario en la base de datos
             return redirect()->back()->withInput()->with('error', 'Hubo un error al registrar el usuario. Por favor, inténtalo de nuevo.');
         }
     }
 
-    // Método para mostrar la página que le dice al usuario que revise su email (GET /register/check-email)
+    /**
+     * Muestra la página que informa al usuario que debe revisar su email.
+     * Endpoint: GET /register/check-email
+     */
     public function checkEmail()
     {
-        // Esta vista simplemente informa al usuario sobre el email enviado
-        return view('register/verification_message'); // <-- Vista para mensaje de verificación
+        return view('verification_message'); // Asume que tienes esta vista
     }
 
-
-    // Método para verificar el token recibido por email (GET /register/verify-email/(:segment))
-    public function verifyEmailToken($token = null)
+    /**
+     * Verifica el token de activación recibido por email.
+     * Endpoint: GET /register/verify-email/(:segment)
+     */
+    public function verifyEmailToken($token)
     {
-        if ($token === null) {
-            return redirect()->to('/register')->with('error', 'Token de verificación no proporcionado.');
-        }
+        $user = $this->userModel->where('reset_token', $token)->first();
 
-        // Buscar al usuario por el token
-        $user = $this->userModel->getUserByToken($token); // Usamos el método del modelo
-
-        // Verificar si se encontró un usuario con ese token
+        // Verificar si el token es válido
         if (!$user) {
-            return redirect()->to('/register')->with('error', 'Token de verificación inválido.');
+            return redirect()->to('/register')->with('error', 'El token de verificación es inválido o ya ha sido utilizado.');
         }
 
         // Verificar si el token ha expirado
@@ -173,10 +179,7 @@ class registerController extends Controller
              return redirect()->to('/loginobtener')->with('info', 'Tu cuenta ya ha sido verificada. Por favor, inicia sesión.');
         }
 
-
         // --- Token válido: Activar la cuenta del usuario ---
-
-        // Marcar al usuario como activo en la base de datos
         $updateData = [
             'is_active' => 1, // Marcar como activo
             'reset_token' => null, // Limpiar el token después de usarlo
@@ -184,7 +187,16 @@ class registerController extends Controller
         ];
         $this->userModel->update($user['id'], $updateData);
 
-        // Redirigir al usuario a la página de login con un mensaje de éxito
-        return redirect()->to('/loginobtener')->with('success', '¡Tu cuenta ha sido verificada exitosamente! Ahora puedes iniciar sesión.');
+        // --- REDIRECCIÓN DESPUÉS DEL REGISTRO/VERIFICACIÓN ---
+        // Verificar si hay una URL de redirección guardada en flashdata (ej. si venía de /comprar)
+        $redirectUrl = session()->getFlashdata('redirect_after_login');
+        if ($redirectUrl) {
+            session()->removeFlashdata('redirect_after_login'); // Limpiar flashdata
+            return redirect()->to($redirectUrl)->with('success', '¡Tu cuenta ha sido verificada exitosamente! Por favor, completa tu compra.');
+        } else {
+            // Redirigir al usuario a la página de login con un mensaje de éxito
+            return redirect()->to('/loginobtener')->with('success', '¡Tu cuenta ha sido verificada exitosamente! Ahora puedes iniciar sesión.');
+        }
+        // --- FIN REDIRECCIÓN ---
     }
 }
