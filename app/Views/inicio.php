@@ -281,7 +281,7 @@
                     <h1>Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
-                    <a href="<?= base_url('/login') ?>" class="btn btn-custom mt-4">Inicia Sesión</a>
+                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-4">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-5 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
