@@ -29,11 +29,7 @@
         </div>
     <?php endif; ?>
 
-          <form action="<?php echo base_url('/login') ?>" method="POST">
-            <div class="form-group">
-              <label for="nombre">Nombre</label>
-              <input type="text" name="nombre" id="nombre" class="form-control" required>
-            </div>
+          <form action="<?= base_url('procesar-login') ?>" method="POST">
             <div class="form-group">
               <label for="email">Email</label>
               <input type="email" name="email" id="email" class="form-control" required>
