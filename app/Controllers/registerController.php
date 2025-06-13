@@ -1,18 +1,21 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
+use CodeIgniter\Email\Email; // Importar la clase Email para usarla directamente si es necesario
 
-class registerController extends Controller
+// CAMBIO: La clase del controlador debe empezar con mayúscula (PascalCase)
+class RegisterController extends Controller
 {
     protected $userModel;
 
     public function __construct()
     {
         $this->userModel = new UserModel();
-        helper(['form', 'url', 'text', 'email']);
+        helper(['form', 'url', 'text', 'email']); // Asegúrate de que el helper 'email' esté cargado
     }
 
     public function index()
@@ -86,16 +89,19 @@ class registerController extends Controller
             $user_id = $this->userModel->getInsertID();
 
             $emailService = \Config\Services::email();
-            $emailService->setFrom('no-reply@tudominio.com', 'Sistema ASG');
+            // Usar getenv para los datos del remitente, como en PerfilController
+            $fromAddress = (string) (getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com');
+            $fromName = (string) (getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+            $emailService->setFrom($fromAddress, $fromName);
             $emailService->setTo($data['email']);
             $emailService->setSubject('Verifica tu Cuenta en ASG');
             $verificationLink = base_url('/register/verify-email/' . $token);
             $message = "Hola " . esc($data['nombre']) . ",\n\n"
-                     . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\n"
-                     . $verificationLink . "\n\n"
-                     . "Este enlace expirará en 2 horas.\n\n"
-                     . "Si no te registraste en ASG, puedes ignorar este correo.\n\n"
-                     . "Saludos,\nEl equipo de ASG";
+                             . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\n"
+                             . $verificationLink . "\n\n"
+                             . "Este enlace expirará en 2 horas.\n\n"
+                             . "Si no te registraste en ASG, puedes ignorar este correo.\n\n"
+                             . "Saludos,\nEl equipo de ASG";
             $emailService->setMessage($message);
 
             if ($emailService->send()) {
@@ -214,17 +220,20 @@ class registerController extends Controller
 
         if ($this->userModel->insert($data)) {
             $emailService = \Config\Services::email();
-            $emailService->setFrom('tucorreo@ejemplo.com', 'ASG Support'); // Cambia esto
+            // Usar getenv para los datos del remitente, como en PerfilController
+            $fromAddress = (string) (getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com');
+            $fromName = (string) (getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+            $emailService->setFrom($fromAddress, $fromName); // Cambiado a usar getenv
             $emailService->setTo($data['email']);
             $emailService->setSubject('Verifica tu dirección de correo electrónico');
 
             $verificationLink = site_url('register/verify-email/' . $token); // La verificación es la misma
             $message = "Hola " . esc($data['nombre']) . ",\\n\\n"
-                     . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\\n"
-                     . $verificationLink . "\\n\\n"
-                     . "Este enlace expirará en 2 horas.\\n\\n"
-                     . "Si no te registraste en ASG, puedes ignorar este correo.\\n\\n"
-                     . "Saludos,\\nEl equipo de ASG";
+                             . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\\n"
+                             . $verificationLink . "\\n\\n"
+                             . "Este enlace expirará en 2 horas.\\n\\n"
+                             . "Si no te registraste en ASG, puedes ignorar este correo.\\n\\n"
+                             . "Saludos,\\nEl equipo de ASG";
             $emailService->setMessage($message);
 
             if ($emailService->send()) {
@@ -241,4 +250,3 @@ class registerController extends Controller
         }
     }
 }
-
