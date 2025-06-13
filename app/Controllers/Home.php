@@ -4,8 +4,9 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\LecturasGasModel;
-use App\Models\CompraDispositivoModel;
+use App\Models\CompraDispositivoModel; // Usa CompraDispositivoModel
 use App\Models\EnlaceModel;
+use App\Models\DispositivoModel; // ¡Importa el DispositivoModel!
 use CodeIgniter\I18n\Time;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -17,6 +18,7 @@ class Home extends BaseController
     protected $lecturasGasModel;
     protected $compraDispositivoModel;
     protected $enlaceModel;
+    protected $dispositivoModel; // ¡Declara la propiedad para DispositivoModel!
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -26,6 +28,7 @@ class Home extends BaseController
         $this->lecturasGasModel = new LecturasGasModel();
         $this->compraDispositivoModel = new CompraDispositivoModel();
         $this->enlaceModel = new EnlaceModel();
+        $this->dispositivoModel = new DispositivoModel(); // ¡Inicializa DispositivoModel!
 
         helper(['url', 'form', 'text', 'email']);
     }
@@ -337,20 +340,21 @@ class Home extends BaseController
             return redirect()->to('/login')->with('info', 'Para ver tu perfil, por favor, inicia sesión.');
         }
 
-        $usuarioId = $session->get('id');
+        $userId = $session->get('id');
 
-        $macs = $this->enlaceModel
-            ->select('MAC')
-            ->where('id_usuario', $usuarioId)
-            ->groupBy('MAC')
+        // Modifica esta consulta para obtener los detalles del dispositivo (nombre y ubicacion)
+        $linkedDevices = $this->enlaceModel
+            ->select('enlace.id as enlace_id, dispositivos.id as dispositivo_id, dispositivos.MAC, dispositivos.nombre, dispositivos.ubicacion')
+            ->join('dispositivos', 'enlace.MAC = dispositivos.MAC')
+            ->where('enlace.id_usuario', $userId)
             ->findAll();
 
-        $lecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
+        $lecturas = $this->lecturasGasModel->getLecturasPorUsuario($userId);
 
         log_message('debug', 'Home::perfil() - Lecturas por usuario obtenidas: ' . print_r($lecturas, true));
 
         return view('perfil', [
-            'macs' => $macs,
+            'linkedDevices' => $linkedDevices, // Pasa los dispositivos enlazados con sus detalles
             'lecturas' => $lecturas
         ]);
     }
@@ -365,33 +369,200 @@ class Home extends BaseController
             // Redirigir a la página de login específica para PayPal
             return redirect()->to('/login/paypal')->with('info', 'Debes iniciar sesión para comprar un dispositivo.');
         }
+        // La vista de compra simplemente presentará un botón para iniciar la compra
         return view('comprar');
     }
 
+    /**
+     * Procesa la compra de un dispositivo, asignando automáticamente una MAC disponible.
+     * Esta función es llamada después de que el usuario "confirma" la compra (ej. clic en un botón de PayPal).
+     */
+    public function procesarCompra()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para completar la compra.');
+        }
+
+        $userId = session()->get('id');
+
+        // 1. (Opcional pero recomendado) Implementa la lógica de pasarela de pago aquí (ej. PayPal)
+        // Por ahora, simularemos un ID de transacción.
+        $transaccionPaypalId = 'PAYPAL_SIMULADO_' . uniqid(); // ID de transacción simulado
+
+        // 2. Encuentra una MAC disponible para asignar
+        $assignedMAC = $this->compraDispositivoModel->getAvailableMacForAssignment();
+
+        if (empty($assignedMAC)) {
+            // Esto significa que no hay dispositivos 'disponible' en tu inventario.
+            return redirect()->back()->with('error', 'Lo sentimos, no hay dispositivos disponibles para la compra en este momento. Por favor, inténtalo más tarde.');
+        }
+
+        // Inicia una transacción de base de datos para asegurar la atomicidad de las operaciones
+        $this->db->transBegin();
+
+        try {
+            // 3. Registra la compra en la tabla compras_dispositivos
+            $dataCompra = [
+                'id_usuario_comprador' => $userId,
+                'MAC_dispositivo'      => $assignedMAC,
+                'fecha_compra'         => date('Y-m-d H:i:s'), // Timestamp actual
+                'transaccion_paypal_id'=> $transaccionPaypalId,
+                'estado_compra'        => 'completada'
+            ];
+
+            if (!$this->compraDispositivoModel->insert($dataCompra)) {
+                throw new \Exception('Error al registrar la compra: ' . json_encode($this->compraDispositivoModel->errors()));
+            }
+
+            // 4. Crea el enlace en la tabla 'enlace'
+            $dataEnlace = [
+                'id_usuario' => $userId,
+                'MAC'        => $assignedMAC,
+            ];
+
+            if (!$this->enlaceModel->insert($dataEnlace)) {
+                throw new \Exception('Error al crear el enlace de dispositivo: ' . json_encode($this->enlaceModel->errors()));
+            }
+
+            // 5. Actualiza el estado del dispositivo a 'en_uso' (o 'asignado') en la tabla 'dispositivos'
+            if (!$this->dispositivoModel->updateDeviceStatusByMac($assignedMAC, 'en_uso')) {
+                throw new \Exception('Error al actualizar el estado del dispositivo: ' . json_encode($this->dispositivoModel->errors()));
+            }
+
+            $this->db->transCommit(); // Confirma la transacción si todas las operaciones son exitosas
+
+            return redirect()->to('/perfil')->with('success', '¡Felicidades! Tu dispositivo ASG ha sido comprado y enlazado exitosamente a tu cuenta. ¡Comienza a monitorear!');
+
+        } catch (\Exception $e) {
+            $this->db->transRollback(); // Revierte la transacción en caso de error
+            log_message('error', 'Error en procesarCompra: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocurrió un error al procesar tu compra. Por favor, inténtalo de nuevo o contacta a soporte.');
+        }
+    }
+
+
+    // El método registrarCompraAutomatica parece ser un auxiliar que no se usa directamente con una ruta.
+    // Su lógica se ha movido/fusionado con procesarCompra para un flujo más completo.
+    // Si aún lo necesitas para otros propósitos, asegúrate de que no se duplique la funcionalidad.
+    /*
     public function registrarCompraAutomatica($mac_dispositivo, $transaccion_paypal_id)
     {
-        $session = session();
-        $usuario_id = $session->get('id');
+        // ... (Tu código existente si aún lo necesitas)
+    }
+    */
 
-        if (!$usuario_id) {
-            log_message('error', 'registrarCompraAutomatica: No se pudo obtener el ID de usuario de la sesión.');
-            return false;
+    // Métodos para eliminar y editar dispositivos enlazados (manteniendo MAC oculta al usuario)
+    public function eliminarDispositivo($mac)
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para realizar esta acción.');
+        }
+
+        $userId = session()->get('id');
+
+        // Verify that the device is actually linked to the current user
+        $enlace = $this->enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->first();
+
+        if (!$enlace) {
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para desvincular este dispositivo.');
+        }
+
+        // Start a database transaction
+        $this->db->transBegin();
+
+        try {
+            // 1. Delete the link from the 'enlace' table
+            if (!$this->enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->delete()) {
+                throw new \Exception('Error al eliminar el enlace del dispositivo.');
+            }
+
+            // 2. Update the device status back to 'disponible' (or another appropriate status)
+            // This makes the device available for another purchase.
+            if (!$this->dispositivoModel->updateDeviceStatusByMac($mac, 'disponible')) {
+                throw new \Exception('Error al actualizar el estado del dispositivo.');
+            }
+
+            $this->db->transCommit(); // Commit if both operations succeed
+
+            return redirect()->to('/perfil')->with('success', 'Dispositivo desvinculado exitosamente.');
+
+        } catch (\Exception $e) {
+            $this->db->transRollback(); // Rollback on error
+            log_message('error', 'Error al desvincular dispositivo: ' . $e->getMessage());
+            return redirect()->to('/perfil')->with('error', 'Ocurrió un error al desvincular el dispositivo. Por favor, inténtalo de nuevo.');
+        }
+    }
+
+
+    public function editarDispositivo($mac)
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para editar un dispositivo.');
+        }
+
+        $userId = session()->get('id');
+
+        // Verify that the device is actually linked to the current user
+        $enlace = $this->enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->first();
+
+        if (!$enlace) {
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo o no está enlazado a tu cuenta.');
+        }
+
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+        if (!$dispositivo) {
+            return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
         $data = [
-            'MAC_dispositivo' => $mac_dispositivo,
-            'id_usuario' => $usuario_id,
-            'fecha_compra' => date('Y-m-d H:i:s'),
-            'transaccion_paypal_id' => $transaccion_paypal_id,
+            'titulo' => 'Editar Dispositivo',
+            'dispositivo' => $dispositivo
+        ];
+        return view('edit_device', $data);
+    }
+
+    public function actualizarDispositivo()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar un dispositivo.');
+        }
+
+        $userId = session()->get('id');
+        $mac = $this->request->getPost('MAC'); // Get MAC from hidden input
+
+        // First, validate input (nombre and ubicacion)
+        $rules = [
+            'nombre'    => 'required|max_length[255]',
+            'ubicacion' => 'required|max_length[255]',
         ];
 
-        try {
-            $this->compraDispositivoModel->insert($data);
-            log_message('info', 'Compra registrada exitosamente para MAC: ' . $mac_dispositivo . ' y usuario: ' . $usuario_id);
-            return true;
-        } catch (\Exception $e) {
-            log_message('error', 'Error al registrar compra automática: ' . $e->getMessage());
-            return false;
+        if (!$this->validate($rules)) {
+            // If validation fails, redirect back with errors and old input
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // Verify that the device is actually linked to the current user before updating
+        $enlace = $this->enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->first();
+
+        if (!$enlace) {
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para actualizar este dispositivo.');
+        }
+
+        $dataToUpdate = [
+            'nombre'    => $this->request->getPost('nombre'),
+            'ubicacion' => $this->request->getPost('ubicacion'),
+        ];
+
+        // Update the device
+        // Necesitas el ID del dispositivo, no la MAC para el método update() de CodeIgniter.
+        // Si tu DispositivoModel tiene un método como updateByMac, úsalo.
+        // Si no, primero busca el ID del dispositivo por la MAC:
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+        if ($dispositivo && $this->dispositivoModel->update($dispositivo['id'], $dataToUpdate)) {
+             return redirect()->to('/perfil')->with('success', 'Dispositivo actualizado exitosamente.');
+        } else {
+             return redirect()->back()->withInput()->with('error', 'Error al actualizar el dispositivo. Por favor, inténtalo de nuevo.');
         }
     }
 }
