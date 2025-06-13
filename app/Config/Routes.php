@@ -15,6 +15,7 @@ $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEma
 
 $routes->get('/login', 'Home::loginobtener');        // Mostrar formulario
 $routes->post('/procesar-login', 'Home::login');
+$routes->get('/loginobtener', 'Home::loginoobtener');
 $routes->post('/logout', 'Home::logout');
 
 
