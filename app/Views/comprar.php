@@ -37,13 +37,15 @@
         }
 
         .navbar-nav .nav-link:hover {
-            color: #48bb78 !important;
+            color: #48bb78;
         }
 
-        .container {
-            flex: 1; /* Permite que el contenedor se expanda y ocupe el espacio disponible */
-            padding-top: 56px; /* Espacio para la navbar fija */
-            padding-bottom: 2rem;
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .card {
@@ -51,7 +53,33 @@
             color: #fff;
             border: none;
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card-title {
+            color: #48bb78;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: #a0aec0;
+        }
+
+        .form-control {
+            background-color: #4a5568;
+            color: #fff;
+            border: 1px solid #6b7280;
+        }
+
+        .form-control:focus {
+            background-color: #4a5568;
+            color: #fff;
+            border-color: #48bb78;
+            box-shadow: 0 0 0 0.25rem rgba(72, 187, 120, 0.25);
         }
 
         .btn-primary {
@@ -59,101 +87,75 @@
             border-color: #48bb78;
             transition: background-color 0.3s ease;
         }
+
         .btn-primary:hover {
             background-color: #38a169;
             border-color: #38a169;
         }
 
-        .form-group label {
-            color: #a0aec0;
-            font-weight: bold;
+        .alert-info {
+            background-color: #2a69ac;
+            color: #fff;
+            border-color: #2a69ac;
         }
-
-        .form-control {
-            background-color: #4a5568;
-            border: 1px solid #2d3748;
-            color: #e2e8f0;
-        }
-
-        .form-control:focus {
-            background-color: #4a5568;
-            color: #e2e8f0;
-            border-color: #48bb78;
-            box-shadow: 0 0 0 0.25rem rgba(72, 187, 120, 0.25);
-        }
-
-        .invalid-feedback {
-            color: #fc8181;
-        }
-
-        .alert {
-            border-radius: 0.3rem;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid transparent;
-        }
-
         .alert-success {
-            background-color: #c6f6d5;
-            color: #1a202c;
-            border-color: #a7f3d0;
+            background-color: #48bb78;
+            color: #fff;
+            border-color: #48bb78;
         }
-
         .alert-danger {
-            background-color: #fed7d7;
-            color: #1a202c;
-            border-color: #fbcbcb;
+            background-color: #e53e3e;
+            color: #fff;
+            border-color: #e53e3e;
         }
 
-        .paypal-button-container {
-            margin-top: 20px;
-        }
-
-        /* Footer */
+        /* Footer styles */
         .footer {
             background-color: #2d3748;
             color: #cbd5e0;
             padding: 1rem 0;
             text-align: center;
-            margin-top: auto; /* Empuja el footer hacia abajo */
+            margin-top: auto; /* Pushes footer to the bottom */
         }
     </style>
+    <script src="https://www.paypal.com/sdk/js?client-id=<?= getenv('PAYPAL_CLIENT_ID') ?>&currency=USD"></script>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="<?= base_url('/') ?>">ASG</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="<?= base_url('/') ?>">
+                <img src="<?= base_url('/imagenes/Logo.png'); ?>" alt="Logo ASG" width="40" height="40" class="d-inline-block align-top">
+                ASG
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('/') ?>"><i class="fas fa-home me-1"></i> Inicio</a>
+                    </li>
+                    <?php if (session()->get('logged_in')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil') ?>"><i class="fas fa-user me-1"></i> Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="<?= base_url('/comprar') ?>"><i class="fas fa-shopping-cart me-1"></i> Comprar</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
                 <ul class="navbar-nav ms-auto">
                     <?php if (session()->get('logged_in')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/inicio') ?>">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil') ?>">Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/enlace') ?>">Enlazar MAC</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="<?= base_url('/comprar') ?>">Comprar</a>
-                        </li>
-                        <li class="nav-item">
-                            <form action="<?= base_url('/logout') ?>" method="post" class="d-inline">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="nav-link btn btn-link text-decoration-none" style="border: none; background: none;">Cerrar Sesión</button>
-                            </form>
+                            <a class="nav-link" href="<?= base_url('/logout') ?>"><i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/login') ?>">Iniciar Sesión</a>
+                            <a class="nav-link" href="<?= base_url('/loginobtener') ?>"><i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/register') ?>">Registrarse</a>
+                            <a class="nav-link" href="<?= base_url('/register') ?>"><i class="fas fa-user-plus me-1"></i> Registrarse</a>
                         </li>
                     <?php endif; ?>
                 </ul>
@@ -161,154 +163,105 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title text-center mb-4">Comprar Dispositivo ASG</h4>
+    <div class="main-content">
+        <div class="card">
+            <h2 class="card-title">Comprar Dispositivo ASG</h2>
 
-                        <?php if (session('success')): ?>
-                            <div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
-                        <?php endif; ?>
-                        <?php if (session('error')): ?>
-                            <div class="alert alert-danger mt-3"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
-                        <?php endif; ?>
-                        <?php if (session('info')): ?>
-                            <div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i> <?= session('info') ?></div>
-                        <?php endif; ?>
-
-                        <p class="text-center">
-                            Adquiere tu dispositivo ASG para monitorear tu hogar.
-                            <br>
-                            **Precio: $19.99 USD**
-                        </p>
-
-                        <div class="mb-3">
-                            <label for="mac_input" class="form-label">Ingresa la MAC de tu Dispositivo:</label>
-                            <input type="text" class="form-control" id="mac_input" placeholder="Ej: AA:BB:CC:DD:EE:FF">
-                            <small class="form-text text-muted">Asegúrate de ingresar la MAC correcta de tu dispositivo ASG.</small>
-                        </div>
-                        <div id="mac-error" class="text-danger mb-3" style="display: none;"></div>
-
-                        <div class="paypal-button-container">
-                            <div id="paypal-button-container"></div>
-                        </div>
-
-                    </div>
+            <?php if (session()->getFlashdata('success')): ?>
+                <div class="alert alert-success">
+                    <?= session()->getFlashdata('success') ?>
                 </div>
-            </div>
+            <?php endif; ?>
+            <?php if (session()->getFlashdata('error')): ?>
+                <div class="alert alert-danger">
+                    <?= session()->getFlashdata('error') ?>
+                </div>
+            <?php endif; ?>
+            <?php if (session()->getFlashdata('info')): ?>
+                <div class="alert alert-info">
+                    <?= session()->getFlashdata('info') ?>
+                </div>
+            <?php endif; ?>
+
+            <p>
+                El precio del dispositivo es de **USD 10.00**.
+            </p>
+            <p>
+                Al completar la compra, se te asignará automáticamente un dispositivo disponible y se vinculará a tu cuenta.
+            </p>
+
+            <div id="paypal-button-container"></div>
         </div>
     </div>
 
     <footer class="footer">
         <div class="container">
-            <span>© <?= date('Y') ?> ASG. Todos los derechos reservados.</span>
+            <p>&copy; <?= date('Y') ?> ASG. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="https://www.paypal.com/sdk/js?client-id=TU_PAYPAL_CLIENT_ID&currency=USD"></script>
-
     <script>
-        // Reemplaza 'TU_PAYPAL_CLIENT_ID' con tu Client ID real de PayPal
-        // Este ID puede ser de Sandbox para pruebas o de Live para producción.
-        // Lo ideal es cargar este ID de forma segura (ej. desde una variable de entorno en tu servidor).
-        const PAYPAL_CLIENT_ID = "TU_PAYPAL_CLIENT_ID"; // <--- ¡CAMBIA ESTO!
-
-        // URL base de tu aplicación CodeIgniter
-        const BASE_URL = "<?= base_url() ?>";
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Validar la MAC antes de inicializar PayPal
-            const macInput = document.getElementById('mac_input');
-            const macErrorDiv = document.getElementById('mac-error');
-            let validatedMac = null;
+            const BASE_URL = '<?= base_url() ?>';
+            const price = 10.00; // Define el precio del dispositivo
 
-            function validateMac(mac) {
-                const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-                return macRegex.test(mac);
-            }
-
-            macInput.addEventListener('input', function() {
-                const rawMac = macInput.value;
-                if (!validateMac(rawMac)) {
-                    macErrorDiv.textContent = 'Formato de MAC inválido. Ej: AA:BB:CC:DD:EE:FF';
-                    macErrorDiv.style.display = 'block';
-                    validatedMac = null;
-                } else {
-                    macErrorDiv.style.display = 'none';
-                    validatedMac = rawMac.toUpperCase().replace(/[:-]/g, ''); // Limpiar la MAC
-                }
-            });
-
-            // Renderizar los botones de PayPal
             paypal.Buttons({
+                // Configuración del estilo del botón
                 style: {
-                    layout: 'vertical', // o 'horizontal'
+                    layout: 'vertical', // 'vertical' o 'horizontal'
                     color:  'gold',     // 'gold', 'blue', 'silver', 'white', 'black'
-                    shape:  'rect',     // 'rect', 'pill'
-                    label:  'paypal'    // 'paypal', 'checkout', 'pay', 'buynow', 'installment'
+                    shape:  'rect',     // 'rect' o 'pill'
+                    label:  'paypal',   // 'paypal', 'checkout', 'pay', 'buynow', 'installment'
                 },
-                // Función que se llama cuando se crea una orden en PayPal
-                createOrder: function(data, actions) {
-                    if (!validatedMac) {
-                        macErrorDiv.textContent = 'Por favor, ingresa una MAC válida para continuar.';
-                        macErrorDiv.style.display = 'block';
-                        return actions.reject('MAC inválida.'); // Detiene el proceso de PayPal
-                    }
 
-                    // Llama a tu endpoint del servidor para crear la orden de PayPal
+                // Función que se llama para crear la orden de pago
+                createOrder: function(data, actions) {
                     return fetch(BASE_URL + '/paypal/create-order', {
                         method: 'post',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest', // Opcional, para identificar la solicitud como AJAX
-                            'X-CSRF-TOKEN': '<?= csrf_hash() ?>' // Añadir token CSRF
+                            'X-Requested-With': 'XMLHttpRequest', // Importante para CI4 CSRF si lo tienes activado
+                            '<?= csrf_header() ?>': '<?= csrf_hash() ?>' // Añadir token CSRF
                         },
                         body: JSON.stringify({
-                            mac_dispositivo: validatedMac // Envía la MAC validada al servidor
+                             // No necesitamos enviar MAC aquí, la MAC ya está en la sesión
+                             // o se asignará en el backend.
                         })
-                    })
-                    .then(response => response.json())
-                    .then(order => {
-                        if (order.id) {
-                            return order.id; // Retorna el ID de la orden de PayPal
-                        } else {
-                            // Manejar errores del servidor
-                            console.error('Error al crear la orden:', order.message || 'Error desconocido');
-                            alert('Hubo un error al preparar el pago. Inténtalo de nuevo.');
-                            return actions.reject('Error en el servidor al crear la orden.'); // Detiene el proceso de PayPal
+                    }).then(function(response) {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                console.error('Error en createOrder:', errorData);
+                                throw new Error(errorData.message || 'Error al crear la orden de PayPal.');
+                            });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        alert('Error de red o servidor al crear la orden. Inténtalo de nuevo.');
-                        return actions.reject('Error de red al crear la orden.'); // Detiene el proceso de PayPal
+                        return response.json();
+                    }).then(function(orderData) {
+                        return orderData.id; // Retorna el ID de la orden de PayPal
+                    }).catch(error => {
+                        console.error('Fetch error during createOrder:', error);
+                        alert('Error al crear la orden de pago: ' + error.message);
+                        return null; // Devuelve null para evitar que el proceso de PayPal continúe
                     });
                 },
-                // Función que se llama cuando el usuario aprueba el pago en PayPal
+
+                // Función que se llama cuando el usuario aprueba el pago
                 onApprove: function(data, actions) {
-                    // Llama a tu endpoint del servidor para capturar la orden
-                    return fetch(BASE_URL + '/paypal/capture-order', {
+                    return fetch(BASE_URL + '/paypal/capture-order/' + data.orderID, {
                         method: 'post',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': '<?= csrf_hash() ?>' // Añadir token CSRF
+                            'X-Requested-With': 'XMLHttpRequest', // Importante para CI4 CSRF
+                            '<?= csrf_header() ?>': '<?= csrf_hash() ?>' // Añadir token CSRF
                         },
-                        body: JSON.stringify({
-                            orderID: data.orderID
-                        })
+                        body: JSON.stringify({}) // Cuerpo vacío o datos adicionales si los necesitas
                     })
                     .then(response => response.json())
                     .then(captureData => {
                         if (captureData.status === 'success') {
-                            // Pago exitoso, redirigir a la página de éxito
-                            window.location.href = BASE_URL + '/paypal/success';
+                            alert('¡Pago completado! Se ha asignado y vinculado un dispositivo a tu cuenta.');
+                            window.location.href = BASE_URL + '/paypal/success'; // Redirigir a una página de éxito
                         } else {
-                            // Pago no completado o error, redirigir a la página de cancelación/error
                             console.error('Error al capturar el pago:', captureData.message || 'Error desconocido');
                             alert('Hubo un error al procesar el pago: ' + (captureData.message || 'Transacción no completada.'));
                             window.location.href = BASE_URL + '/paypal/cancel';
@@ -335,5 +288,19 @@
             }).render('#paypal-button-container'); // Renderiza el botón en el div
         });
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
+
 </body>
 </html>

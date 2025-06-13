@@ -166,85 +166,65 @@ class registerController extends Controller
      */
     public function storePaypal()
     {
-        $session = session();
-        if ($session->get('logged_in')) {
-            return redirect()->to('/comprar'); // Si ya está logueado, va directo a la compra
-        }
-
         $validation = \Config\Services::validation();
 
         $validation->setRules([
-            'nombre'  => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El campo nombre debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
-                ]
-            ],
-            'apellido' => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El campo apellido debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
-                ]
-            ],
+            'nombre'  => ['rules' => 'required|min_length[3]|max_length[50]', 'errors' => ['required' => 'El campo nombre es obligatorio.']],
+            'apellido' => ['rules' => 'required|min_length[3]|max_length[50]', 'errors' => ['required' => 'El campo apellido es obligatorio.']],
             'email' => [
                 'rules' => 'required|valid_email|is_unique[usuarios.email]',
                 'errors' => [
                     'required' => 'El campo email es obligatorio.',
-                    'valid_email' => 'Por favor, introduce una dirección de email válida.',
-                    'is_unique' => 'Este email ya está registrado.'
+                    'valid_email' => 'Por favor, introduce una dirección de correo válida.',
+                    'is_unique' => 'Este correo electrónico ya está registrado.'
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[6]',
+                'rules' => 'required|min_length[8]',
                 'errors' => [
                     'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
+                    'min_length' => 'La contraseña debe tener al menos 8 caracteres.'
                 ]
             ],
             'confirm_password' => [
                 'rules' => 'required|matches[password]',
                 'errors' => [
-                    'required' => 'Debes confirmar la contraseña.',
+                    'required' => 'Por favor, confirma tu contraseña.',
                     'matches' => 'Las contraseñas no coinciden.'
                 ]
             ]
         ]);
 
-        if (!$validation->withRequest($this->request)->run()) {
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        if (!$this->validate($validation->getRules(), $validation->getErrors())) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $token = bin2hex(random_bytes(32));
         $expires = Time::now()->addHours(2)->toDateTimeString();
 
         $data = [
-            'nombre' => $this->request->getPost('nombre'),
-            'apellido' => $this->request->getPost('apellido'),
-            'email' => $this->request->getPost('email'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'is_active' => 0, // No activo hasta la verificación por email
-            'reset_token' => $token,
+            'nombre'        => $this->request->getPost('nombre'),
+            'apellido'      => $this->request->getPost('apellido'),
+            'email'         => $this->request->getPost('email'),
+            'password'      => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'is_active'     => 0, // Por defecto, inactivo hasta verificar email
+            'reset_token'   => $token,
             'reset_expires' => $expires,
         ];
 
         if ($this->userModel->insert($data)) {
-            $user_id = $this->userModel->getInsertID();
-
             $emailService = \Config\Services::email();
-            $emailService->setFrom('no-reply@tudominio.com', 'Sistema ASG');
+            $emailService->setFrom('tucorreo@ejemplo.com', 'ASG Support'); // Cambia esto
             $emailService->setTo($data['email']);
-            $emailService->setSubject('Verifica tu Cuenta en ASG');
-            $verificationLink = base_url('/register/verify-email/' . $token); // La verificación es la misma
-            $message = "Hola " . esc($data['nombre']) . ",\n\n"
-                     . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\n"
-                     . $verificationLink . "\n\n"
-                     . "Este enlace expirará en 2 horas.\n\n"
-                     . "Si no te registraste en ASG, puedes ignorar este correo.\n\n"
-                     . "Saludos,\nEl equipo de ASG";
+            $emailService->setSubject('Verifica tu dirección de correo electrónico');
+
+            $verificationLink = site_url('register/verify-email/' . $token); // La verificación es la misma
+            $message = "Hola " . esc($data['nombre']) . ",\\n\\n"
+                     . "Gracias por registrarte en ASG. Por favor, haz clic en el siguiente enlace para activar tu cuenta:\\n"
+                     . $verificationLink . "\\n\\n"
+                     . "Este enlace expirará en 2 horas.\\n\\n"
+                     . "Si no te registraste en ASG, puedes ignorar este correo.\\n\\n"
+                     . "Saludos,\\nEl equipo de ASG";
             $emailService->setMessage($message);
 
             if ($emailService->send()) {
@@ -261,3 +241,4 @@ class registerController extends Controller
         }
     }
 }
+

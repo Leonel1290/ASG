@@ -13,6 +13,7 @@ $routes->post('/register/store', 'registerController::store');
 $routes->get('/register/check-email', 'registerController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
+
 $routes->post('/login', 'Home::login');
 $routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
@@ -29,7 +30,7 @@ $routes->post('/reset-password', 'Home::resetPassword');
 
 // --- RUTAS ESPECÍFICAS PARA COMPRA/PAYPAL ---
 $routes->get('/login/paypal', 'Home::loginPaypal');
-$routes->post('/login/paypal', 'Home::processLoginPaypal');
+$routes->post('/login/paypal', 'Home::processLoginPaypal'); // Este maneja el POST del login para compra
 
 $routes->get('/register/paypal', 'registerController::registerPaypal');
 $routes->post('/register/paypal/store', 'registerController::storePaypal');
@@ -37,17 +38,19 @@ $routes->post('/register/paypal/store', 'registerController::storePaypal');
 
 
 // Perfil (Agrupamos rutas relacionadas al perfil)
-$routes->group('perfil', function ($routes) {
-    $routes->get('/', 'PerfilController::index'); // Esta será tu función perfil() principal
+$routes->group('perfil', ['filter' => 'authFilter'], function ($routes) {
+    $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->post('actualizar-perfil', 'PerfilController::actualizarPerfil');
-    $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
-    $routes->get('verificar-email', 'PerfilController::verificarEmail');
-    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacionEmail');
-    $routes->get('verificar-email-token/(:segment)', 'PerfilController::verificarEmailConfiguracion/$1');
-    // Rutas para la gestión de dispositivos en el perfil
-    $routes->get('dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
-    $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo'); // No necesitas (:any) aquí si MAC va por POST
+    $routes->post('actualizar', 'PerfilController::actualizar');
+    $routes->post('cambiar-password', 'PerfilController::cambiarPassword');
+    $routes->get('verificar-email', 'PerfilController::verificarEmail'); // Vista para solicitar verificación
+    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacionEmail'); // Para enviar el email
+    $routes->get('verificar-email-token/(:segment)', 'PerfilController::verificarEmailToken/$1'); // Para procesar el token del email
+
+    // Rutas para editar y eliminar dispositivos (en el perfil, no en la compra)
+    $routes->get('dispositivo/editar/(:any)', 'Home::editDevice/$1'); // Apunta a Home, como en tu snippet
+    $routes->post('dispositivo/update/(:any)', 'Home::updateDevice/$1'); // Apunta a Home
+    $routes->post('dispositivo/eliminar', 'PerfilController::eliminarDispositivo'); // No necesitas (:any) aquí si MAC va por POST
     $routes->get('dispositivo/eliminar/(:any)', 'PerfilController::eliminarDispositivo/$1');
 });
 
@@ -74,11 +77,13 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Rutas de compra
 $routes->get('/comprar', 'Home::comprar');
-$routes->post('/procesar-compra', 'Home::procesarCompra'); // ¡Añadida la ruta para procesar la compra!
+// La ruta '/procesar-compra' ya no se usa para el flujo de PayPal, puedes comentarla o eliminarla.
+// $routes->post('/procesar-compra', 'Home::procesarCompra'); // ¡Añadida la ruta para procesar la compra!
+
+// Rutas de la API de PayPal (llamadas por el frontend JS y el backend)
+$routes->post('/paypal/create-order', 'PayPalController::createOrder');
+$routes->post('/paypal/capture-order/(:any)', 'PayPalController::captureOrder/$1');
 
 // Asumo que esta es la ruta a la que redirige PayPal después de una compra exitosa
-$routes->get('/paypal/success', 'PaypalController::success');
-$routes->get('/paypal/cancel', 'PaypalController::cancel');
-
-// Ruta para la página de cambio de contraseña exitoso
-$routes->get('/cambio_exitoso', 'Home::cambioExitoso'); // Asumo que tienes este método en Home.php
+$routes->get('/paypal/success', 'PayPalController::success');
+$routes->get('/paypal/cancel', 'PayPalController::cancel');
