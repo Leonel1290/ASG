@@ -90,7 +90,7 @@ public function login()
         return redirect()->back()->withInput();
     }
 }
-}
+
     public function processLoginPaypal()
     {
         $session = session();
