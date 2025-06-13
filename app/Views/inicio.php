@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -214,7 +215,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* --- Estilos para las líneas del menú hamburguesa --- */
+        /* --- Estilos para las líneas del menú  */
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28201, 214, 223, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
@@ -280,7 +281,7 @@
                     <h1>Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
-                    <a href="<?= base_url('login') ?>" class="btn btn-custom mt-4">Inicia Sesión</a>
+                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-4">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-5 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
