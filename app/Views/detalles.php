@@ -4,9 +4,9 @@ $nombreDispositivo = $nombreDispositivo ?? $mac; // Usar la MAC como nombre por 
 $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
 $message = $message ?? null;
 
-// Estas variables se actualizarán dinámicamente con JavaScript
-$nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas']) ? esc($lecturas[$ultimoIndice]['nivel_gas']) . ' PPM' : 'Sin datos';
-$estadoValvulaDisplay = 'Cargando...'; // Estado inicial de la válvula
+// Estas variables se actualizarán dinámicamente con JavaScript.
+// No necesitamos calcular el último índice de $lecturas aquí en PHP.
+// El nivel de gas y el estado de la válvula serán llenados por JavaScript.
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -222,10 +222,14 @@ $estadoValvulaDisplay = 'Cargando...'; // Estado inicial de la válvula
 
     <div class="current-gas-level-card-simple">
         <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
-        <p class="current-gas-level-value" id="gasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
+        <p class="current-gas-level-value" id="gasLevelDisplay">Cargando...</p> <!-- Inicializado con "Cargando..." -->
         <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
             Umbral para Abrir: <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM |
             Umbral para Cerrar: <span class="font-bold text-red-500" id="closeThresholdDisplay"></span> PPM
+        </p>
+        <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">
+            (La válvula se abre si el gas es MENOR al umbral de apertura. Se cierra si el gas es MAYOR al umbral de cierre.)
+        </p>
     </div>
 
     <div class="valve-buttons">
@@ -316,7 +320,7 @@ $estadoValvulaDisplay = 'Cargando...'; // Estado inicial de la válvula
 
     // Función para actualizar el estado del dispositivo (nivel de gas y estado de válvula)
     async function updateDeviceStatus() {
-        const apiUrl = `${API_BASE_URL}/api/get_valve_state/${MAC_ADDRESS}`;
+        const apiUrl = `${API_BASE_URL}/api/getValveState/${MAC_ADDRESS}`;
         
         try {
             const response = await fetch(apiUrl);
