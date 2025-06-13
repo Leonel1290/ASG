@@ -115,6 +115,13 @@ class Home extends BaseController
             return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos.');
         }
     }
+     public function loginobtener() {
+        $session = session();
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::loginobtener() - Mostrando vista de login. Estado de la sesión: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
+        return view('login');
+    }
 
 
     /**
