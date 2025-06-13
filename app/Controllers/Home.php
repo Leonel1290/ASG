@@ -115,7 +115,7 @@ class Home extends BaseController
         $session = session();
         if ($session->get('logged_in')) {
             // Si ya está logueado, redirigir directamente a la página de compra
-            return redirect()->to('/comprar')->with('info', 'Ya has iniciado sesión. Puedes proceder con tu compra.');
+            return redirect()->to('comprar')->with('info', 'Ya has iniciado sesión. Puedes proceder con tu compra.');
         }
         return view('login_paypal');
     }
