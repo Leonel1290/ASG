@@ -112,7 +112,6 @@ class PerfilController extends BaseController
                 $session->destroy();
                 return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
             }
-            // CAMBIO: Asegúrate de que esta vista también esté en la subcarpeta 'perfil'
             return view('perfil/configuracion_form', ['userData' => $userData]);
         } else {
             // Si no se ha verificado para la configuración, redirigir a la página de solicitud de verificación
@@ -139,7 +138,6 @@ class PerfilController extends BaseController
             return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
         }
 
-        // CAMBIO: La vista se busca en la subcarpeta 'perfil'
         return view('perfil/verificar_email', ['userEmail' => $user['email']]);
     }
 
@@ -166,9 +164,10 @@ class PerfilController extends BaseController
         $token = bin2hex(random_bytes(32));
         $expires = Time::now()->addHours(1)->toDateTimeString(); // Token válido por 1 hora
 
+        // CAMBIO: Usar 'reset_token' y 'reset_expires' que son los nombres de columnas correctos en tu DB y UserModel
         $this->userModel->update($loggedInUserId, [
-            'verification_token' => $token, // Usamos el mismo campo que para el registro inicial
-            'token_expires_at' => $expires,
+            'reset_token' => $token,
+            'reset_expires' => $expires,
         ]);
 
         $emailService = \Config\Services::email();
@@ -204,15 +203,18 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil/verificar-email')->with('error', 'Token de verificación no proporcionado.');
         }
 
-        $user = $this->userModel->where('verification_token', $token)->first();
+        // CAMBIO: Usar 'reset_token' para buscar el usuario
+        $user = $this->userModel->where('reset_token', $token)->first();
 
         if (!$user) {
             return redirect()->to('/perfil/verificar-email')->with('error', 'Token de verificación inválido o ya utilizado.');
         }
 
-        $expires = Time::parse($user['token_expires_at']);
+        // CAMBIO: Usar 'reset_expires' para verificar la expiración
+        $expires = Time::parse($user['reset_expires']);
         if ($expires->isBefore(Time::now())) {
-            $this->userModel->update($user['id'], ['verification_token' => null, 'token_expires_at' => null]);
+            // CAMBIO: Limpiar 'reset_token' y 'reset_expires' al expirar
+            $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
             return redirect()->to('/perfil/verificar-email')->with('error', 'El token de verificación ha expirado. Por favor, solicita uno nuevo.');
         }
 
@@ -220,9 +222,10 @@ class PerfilController extends BaseController
         $session = session();
         $session->set('email_verified_for_config', true);
         // Limpiar el token una vez usado
+        // CAMBIO: Limpiar 'reset_token' y 'reset_expires'
         $this->userModel->update($user['id'], [
-            'verification_token' => null,
-            'token_expires_at' => null,
+            'reset_token' => null,
+            'reset_expires' => null,
         ]);
 
         return redirect()->to('/perfil/configuracion')->with('success', '¡Email verificado exitosamente! Ahora puedes actualizar tu perfil.');
@@ -288,8 +291,9 @@ class PerfilController extends BaseController
         if ($emailChanged) {
             // Si el email cambia, invalidar la cuenta hasta que el nuevo email sea verificado
             $updateData['is_active'] = 0; // Marcar como inactivo hasta verificar el nuevo email
-            $updateData['verification_token'] = bin2hex(random_bytes(32)); // Nuevo token para el nuevo email
-            $updateData['token_expires_at'] = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            // CAMBIO: Usar 'reset_token' y 'reset_expires'
+            $updateData['reset_token'] = bin2hex(random_bytes(32)); // Nuevo token para el nuevo email
+            $updateData['reset_expires'] = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             if ($this->userModel->update($loggedInUserId, $updateData)) {
                 // Enviar correo de verificación para el nuevo email
@@ -298,7 +302,7 @@ class PerfilController extends BaseController
                 $emailService->setTo($email);
                 $emailService->setSubject('Verifica tu nuevo Email - ASG');
                 // Reutilizamos la ruta de verificación de registro para la activación del nuevo email
-                $verificationLink = base_url('register/verify-email/' . $updateData['verification_token']);
+                $verificationLink = base_url('register/verify-email/' . $updateData['reset_token']); // CAMBIO: Usar 'reset_token'
                 $message = "Hola " . esc($nombre) . ",\n\n"
                                  . "Has actualizado tu email en el Sistema ASG. Por favor, verifica tu nuevo email haciendo clic en el siguiente enlace:\n"
                                  . $verificationLink . "\n\n"
@@ -308,10 +312,6 @@ class PerfilController extends BaseController
 
                 if (!$emailService->send()) {
                     log_message('error', 'Error al enviar email de verificación de nuevo email de perfil: ' . $emailService->printDebugger(['headers']));
-                    // Si falla el envío de correo, considerar revertir la actualización o dejar un estado consistente
-                    // Para simplificar aquí, se asume que el envío de correo es crítico para el cambio de email.
-                    // Si el email no se puede enviar, es mejor que el usuario no pueda cambiar su email.
-                    // Podrías revertir: $this->userModel->update($loggedInUserId, ['is_active' => $currentUserData['is_active'], 'email' => $currentUserData['email'], 'verification_token' => null, 'token_expires_at' => null]);
                     return redirect()->back()->withInput()->with('error', 'Error al enviar el correo de verificación para el nuevo email. Inténtalo de nuevo.');
                 }
 
@@ -328,7 +328,6 @@ class PerfilController extends BaseController
                 $session->set('email', $email);
                 $session->remove('email_verified_for_config'); // Limpiar la bandera ya que los cambios se aplicaron
 
-                // CAMBIO: Si tienes una vista para el éxito del cambio de contraseña, asegúrate de que también esté en 'perfil/'
                 return redirect()->to('/perfil/configuracion')->with('success', '¡Perfil actualizado exitosamente!');
             } else {
                 return redirect()->back()->withInput()->with('error', 'No se pudo actualizar el perfil. Inténtalo de nuevo.');
@@ -399,8 +398,6 @@ class PerfilController extends BaseController
         if ($this->userModel->update($loggedInUserId, ['password' => $hashedPassword])) {
             $session->remove('email_verified_for_config'); // Limpiar la bandera después de un cambio importante
 
-            // Si tienes una vista de "cambio exitoso" para la contraseña y está en 'perfil/', cárgala así
-            // return view('perfil/cambio_exitoso'); // EJEMPLO
             return redirect()->to('/perfil/configuracion')->with('success', '¡Contraseña actualizada exitosamente!');
         } else {
             return redirect()->to('/perfil/configuracion')->withInput()->with('error', 'No se pudo actualizar la contraseña. Inténtalo de nuevo.');
@@ -443,7 +440,6 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
-        // CAMBIO: La vista se busca en la subcarpeta 'perfil'
         return view('perfil/edit_device', [
             'dispositivo' => $dispositivo
         ]);
