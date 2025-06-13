@@ -13,8 +13,8 @@ $routes->post('/register/store', 'registerController::store');
 $routes->get('/register/check-email', 'registerController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
-$routes->post('procesar-login', 'Home::loginobtener');
-$routes->post('/login', 'Home::login');
+$routes->post('procesar-login', 'Home::login');
+$routes->get('/login', 'Home::login');
 $routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
 
