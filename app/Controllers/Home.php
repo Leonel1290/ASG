@@ -18,32 +18,15 @@ class Home extends BaseController
     protected $compraDispositivoModel;
     protected $enlaceModel;
 
-    /**
-     * Constructor.
-     * Aquí no se deben instanciar modelos ni cargar helpers.
-     * Usa initController() para eso.
-     */
-    // public function __construct()
-    // {
-    //     // No se llama a parent::__construct() aquí.
-    // }
-
-    /**
-     * Se llama después del constructor del padre para inicializar propiedades.
-     * Aquí es donde debes instanciar tus modelos y cargar helpers.
-     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // No edites esta línea.
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
         $this->userModel = new UserModel();
         $this->lecturasGasModel = new LecturasGasModel();
         $this->compraDispositivoModel = new CompraDispositivoModel();
         $this->enlaceModel = new EnlaceModel();
 
-        // Cargar helpers necesarios si aún no están cargados en BaseController
         helper(['url', 'form', 'text', 'email']);
     }
 
@@ -59,31 +42,25 @@ class Home extends BaseController
 
         if (!$session->get('logged_in')) {
             log_message('debug', 'Home::inicio() - Usuario no logueado, redirigiendo a login.');
-            return redirect()->to('/login'); // Redirige a la nueva ruta /login
+            return redirect()->to('/login');
         }
 
         log_message('debug', 'Home::inicio() - Usuario logueado, mostrando vista inicio.');
         return view('inicio');
     }
 
-    /**
-     * Muestra el formulario de login (GET) o procesa el login (POST).
-     */
     public function login()
     {
         $session = session();
 
-        // Si ya está logueado, redirigir al perfil
         if ($session->get('logged_in')) {
             return redirect()->to('/perfil');
         }
 
-        // Si es una solicitud GET, mostrar el formulario de login
         if ($this->request->getMethod() === 'get') {
             return view('login');
         }
 
-        // Si es una solicitud POST, procesar el login
         $validation = \Config\Services::validation();
         $validation->setRules([
             'email' => [
@@ -115,7 +92,6 @@ class Home extends BaseController
             return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos.');
         }
 
-        // Verificar si la cuenta está activa
         if (!$user['is_active']) {
             return redirect()->back()->withInput()->with('error', 'Tu cuenta aún no ha sido activada. Por favor, revisa tu correo electrónico para verificarla.');
         }
@@ -128,7 +104,83 @@ class Home extends BaseController
                 'logged_in' => TRUE,
             ];
             $session->set($ses_data);
-            return redirect()->to('/perfil')->with('success', '¡Bienvenido de nuevo, ' . $user['nombre'] . '!');
+
+            $redirectUrl = $session->getFlashdata('redirect_after_login') ?? '/perfil';
+            return redirect()->to($redirectUrl)->with('success', '¡Bienvenido de nuevo, ' . $user['nombre'] . '!');
+
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos.');
+        }
+    }
+
+
+    /**
+     * Muestra el formulario de login específico para el flujo de PayPal.
+     */
+    public function loginPaypal()
+    {
+        $session = session();
+        if ($session->get('logged_in')) {
+            return redirect()->to('/comprar'); // Si ya está logueado, va directo a la compra
+        }
+        return view('login_paypal');
+    }
+
+    /**
+     * Procesa el login específico para el flujo de PayPal.
+     */
+    public function processLoginPaypal()
+    {
+        $session = session();
+        if ($session->get('logged_in')) {
+            return redirect()->to('/comprar'); // Si ya está logueado, va directo a la compra
+        }
+
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'email' => [
+                'rules' => 'required|valid_email',
+                'errors' => [
+                    'required' => 'El email es obligatorio.',
+                    'valid_email' => 'Por favor, introduce un email válido.'
+                ]
+            ],
+            'password' => [
+                'rules' => 'required|min_length[6]',
+                'errors' => [
+                    'required' => 'La contraseña es obligatoria.',
+                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
+                ]
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            // Pasar los errores a la vista específica de PayPal login
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        $email = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+
+        $user = $this->userModel->where('email', $email)->first();
+
+        if (!$user) {
+            return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos.');
+        }
+
+        if (!$user['is_active']) {
+            return redirect()->back()->withInput()->with('error', 'Tu cuenta aún no ha sido activada. Por favor, revisa tu correo electrónico para verificarla.');
+        }
+
+        if (password_verify($password, $user['password'])) {
+            $ses_data = [
+                'id' => $user['id'],
+                'nombre' => $user['nombre'],
+                'email' => $user['email'],
+                'logged_in' => TRUE,
+            ];
+            $session->set($ses_data);
+            return redirect()->to('/comprar')->with('success', '¡Bienvenido de nuevo, ' . $user['nombre'] . '! Ahora puedes continuar con tu compra.');
         } else {
             return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos.');
         }
@@ -144,7 +196,6 @@ class Home extends BaseController
 
     public function forgotpassword()
     {
-        // Si el usuario ya está logueado, no debería estar en esta página
         $session = session();
         if ($session->get('logged_in')) {
             return redirect()->to('/perfil');
@@ -173,16 +224,14 @@ class Home extends BaseController
         $user = $this->userModel->where('email', $email)->first();
 
         if ($user) {
-            // Generar un token único
             $token = bin2hex(random_bytes(32));
-            $expires = Time::now()->addHours(1)->toDateTimeString(); // Token válido por 1 hora
+            $expires = Time::now()->addHours(1)->toDateTimeString();
 
             $this->userModel->update($user['id'], [
                 'reset_token' => $token,
                 'reset_expires' => $expires,
             ]);
 
-            // Enviar correo electrónico con el enlace de restablecimiento
             $emailService = \Config\Services::email();
             $emailService->setFrom('no-reply@tudominio.com', 'Sistema ASG');
             $emailService->setTo($email);
@@ -219,10 +268,8 @@ class Home extends BaseController
             return redirect()->to('/forgotpassword')->with('error', 'Token de restablecimiento de contraseña inválido o ya utilizado.');
         }
 
-        // Verificar si el token ha expirado
         $expires = Time::parse($user['reset_expires']);
         if ($expires->isBefore(Time::now())) {
-            // Token expirado, limpiar el token en la base de datos
             $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
             return redirect()->to('/forgotpassword')->with('error', 'El token de restablecimiento de contraseña ha expirado. Por favor, solicita uno nuevo.');
         }
@@ -270,7 +317,6 @@ class Home extends BaseController
             return redirect()->to('/forgotpassword')->with('error', 'El token de restablecimiento de contraseña ha expirado. Por favor, solicita uno nuevo.');
         }
 
-        // Actualizar la contraseña y limpiar el token
         $this->userModel->update($user['id'], [
             'password' => password_hash($password, PASSWORD_DEFAULT),
             'reset_token' => null,
@@ -287,7 +333,8 @@ class Home extends BaseController
 
         if (!$session->get('logged_in')) {
             log_message('debug', 'Home::perfil() - Usuario no logueado, redirigiendo a login.');
-            return redirect()->to('/login'); // Redirige a la nueva ruta /login
+            $session->setFlashdata('redirect_after_login', current_url());
+            return redirect()->to('/login')->with('info', 'Para ver tu perfil, por favor, inicia sesión.');
         }
 
         $usuarioId = $session->get('id');
@@ -315,18 +362,12 @@ class Home extends BaseController
 
         if (!$session->get('logged_in')) {
             log_message('debug', 'Home::comprar() - Usuario no logueado, redirigiendo a login.');
-            return redirect()->to('/login')->with('info', 'Debes iniciar sesión para comprar un dispositivo.'); // Redirige a la nueva ruta /login
+            // Redirigir a la página de login específica para PayPal
+            return redirect()->to('/login/paypal')->with('info', 'Debes iniciar sesión para comprar un dispositivo.');
         }
         return view('comprar');
     }
 
-    /**
-     * Registra una compra de dispositivo después de un pago exitoso de PayPal.
-     * Es llamado por PayPalController.
-     * @param string $mac_dispositivo La MAC del dispositivo comprado.
-     * @param string $transaccion_paypal_id El ID de la transacción de PayPal.
-     * @return bool True si la compra se registró exitosamente, false en caso contrario.
-     */
     public function registrarCompraAutomatica($mac_dispositivo, $transaccion_paypal_id)
     {
         $session = session();
@@ -342,7 +383,6 @@ class Home extends BaseController
             'id_usuario' => $usuario_id,
             'fecha_compra' => date('Y-m-d H:i:s'),
             'transaccion_paypal_id' => $transaccion_paypal_id,
-            // 'monto' => '19.99', // Si necesitas guardar el monto específico de la compra
         ];
 
         try {
