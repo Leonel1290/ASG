@@ -139,7 +139,7 @@ class ValveController extends Controller
 
     /**
      * Recibe las lecturas de gas desde el microcontrolador.
-     * Recibe id_placa y nivel_gas vía POST (form-urlencoded).
+     * Recibe MAC y nivel_gas vía POST (form-urlencoded).
      * Este método es llamado por el ESP32.
      */
     public function receiveSensorData()
