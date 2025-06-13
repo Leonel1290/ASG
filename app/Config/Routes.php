@@ -38,7 +38,7 @@ $routes->post('/register/paypal/store', 'registerController::storePaypal');
 
 
 // Perfil (Agrupamos rutas relacionadas al perfil)
-$routes->group('perfil', ['filter' => 'authFilter'], function ($routes) {
+$routes->group('perfil', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('actualizar', 'PerfilController::actualizar');
