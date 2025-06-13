@@ -4,10 +4,9 @@ $nombreDispositivo = $nombreDispositivo ?? $mac; // Usar la MAC como nombre por 
 $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
 $message = $message ?? null;
 
-// Obtener el último nivel de gas para mostrarlo en la tarjeta simple
-$ultimoIndice = count($lecturas ?? []) - 1; 
+// Estas variables se actualizarán dinámicamente con JavaScript
 $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['nivel_gas']) ? esc($lecturas[$ultimoIndice]['nivel_gas']) . ' PPM' : 'Sin datos';
-
+$estadoValvulaDisplay = 'Cargando...'; // Estado inicial de la válvula
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -124,6 +123,15 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             font-weight: bold;
             color: #f6e05e;
         }
+        
+        .current-valve-state {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .valve-state-open { color: #48bb78; } /* Verde para abierta */
+        .valve-state-closed { color: #e53e3e; } /* Rojo para cerrada */
+
 
         /* Estilos para los nuevos botones */
         .valve-buttons {
@@ -141,7 +149,7 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             font-size: 1.2rem;
             font-weight: bold;
             border-radius: 0.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
             color: #fff; /* Color de texto blanco para todos los botones */
         }
 
@@ -155,9 +163,16 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             border-color: #e53e3e;
         }
 
-        .btn-valve:hover {
+        .btn-valve:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-valve:disabled {
+            background-color: #6c757d; /* Gris para deshabilitado */
+            border-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         /* Responsive adjustments */
@@ -202,21 +217,28 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 
     <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Detalle del Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
     <p class="device-details-line">
-        MAC: <?= esc($mac) ?> | Ubicación: <?= esc($ubicacionDispositivo) ?>
+        MAC: <span id="macDisplay"><?= esc($mac) ?></span> | Ubicación: <?= esc($ubicacionDispositivo) ?>
     </p>
 
     <div class="current-gas-level-card-simple">
         <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
-        <p class="current-gas-level-value"><?= $nivelGasActualDisplay ?></p>
+        <p class="current-gas-level-value" id="gasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
+        <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
+            Umbral para Abrir: <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM |
+            Umbral para Cerrar: <span class="font-bold text-red-500" id="closeThresholdDisplay"></span> PPM
     </div>
 
     <div class="valve-buttons">
-        <button type="button" class="btn btn-valve btn-valve-open" onclick="sendValveCommand('<?= esc($mac) ?>', 'open')">
+        <button type="button" class="btn btn-valve btn-valve-open" id="openValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'open')" disabled>
             <i class="fas fa-door-open me-2"></i> Abrir Válvula
         </button>
-        <button type="button" class="btn btn-valve btn-valve-close" onclick="sendValveCommand('<?= esc($mac) ?>', 'close')">
+        <button type="button" class="btn btn-valve btn-valve-close" id="closeValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'close')" disabled>
             <i class="fas fa-door-closed me-2"></i> Cerrar Válvula
         </button>
+    </div>
+
+    <div class="mt-4 p-4 text-center font-semibold rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+        <p>Estado Actual de la Válvula (ESP32): <span id="valveStateDisplay" class="current-valve-state">Cargando...</span></p>
     </div>
 
     <div id="valveMessage" class="alert alert-info mt-4 text-center d-none" role="alert"></div>
@@ -224,23 +246,39 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
 </div>
 
 <script>
-    // Define la URL base de tu aplicación de CodeIgniter en Render, ahora sin 'index.php'
-    const API_BASE_URL = 'https://pwa-1s1m.onrender.com'; 
+    // Define la URL base de tu aplicación de CodeIgniter en Render
+    const API_BASE_URL = 'https://pwa-1s1m.onrender.com';
+    const MAC_ADDRESS = document.getElementById('macDisplay').textContent;
+
+    // --- Umbrales de Gas (Deben coincidir con los del controlador PHP) ---
+    const OPEN_VALVE_THRESHOLD = 100; // Si el nivel de gas es MENOR a este, se permite abrir la válvula.
+    const CLOSE_VALVE_THRESHOLD = 200; // Si el nivel de gas es MAYOR a este, se permite cerrar la válvula.
+
+    // Elementos del DOM
+    const gasLevelDisplay = document.getElementById('gasLevelDisplay');
+    const valveStateDisplay = document.getElementById('valveStateDisplay');
+    const openValveBtn = document.getElementById('openValveBtn');
+    const closeValveBtn = document.getElementById('closeValveBtn');
+    const valveMessageDiv = document.getElementById('valveMessage');
+    const openThresholdDisplay = document.getElementById('openThresholdDisplay');
+    const closeThresholdDisplay = document.getElementById('closeThresholdDisplay');
+
+    // Mostrar umbrales en la interfaz
+    openThresholdDisplay.textContent = OPEN_VALVE_THRESHOLD;
+    closeThresholdDisplay.textContent = CLOSE_VALVE_THRESHOLD;
 
     // Función para enviar comandos a la válvula
     function sendValveCommand(mac, command) {
-        const valveMessageDiv = document.getElementById('valveMessage');
         valveMessageDiv.classList.add('d-none'); // Ocultar mensaje anterior
         valveMessageDiv.classList.remove('alert-success', 'alert-danger'); // Limpiar clases de estilo
 
-        // Construye la URL completa del endpoint API
-        const apiUrl = `${API_BASE_URL}/api/valve_control`; 
+        const apiUrl = `${API_BASE_URL}/api/valve_control`;
 
         fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest' // Para identificar peticiones AJAX
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify({ mac: mac, command: command })
         })
@@ -260,6 +298,8 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
                 valveMessageDiv.classList.remove('d-none');
                 valveMessageDiv.classList.add('alert-danger');
             }
+            // Después de enviar un comando, actualizamos el estado para reflejar los cambios
+            updateDeviceStatus(); 
         })
         .catch(error => {
             console.error('Error:', error);
@@ -273,6 +313,62 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[$ultimoIndice]['ni
             }
         });
     }
+
+    // Función para actualizar el estado del dispositivo (nivel de gas y estado de válvula)
+    async function updateDeviceStatus() {
+        const apiUrl = `${API_BASE_URL}/api/get_valve_state/${MAC_ADDRESS}`;
+        
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const nivelGas = data.ultimo_nivel_gas;
+                const estadoValvula = data.estado_valvula;
+
+                gasLevelDisplay.textContent = `${nivelGas} PPM`;
+
+                // Actualizar estado visual de la válvula
+                valveStateDisplay.textContent = estadoValvula === 1 ? 'ABIERTA' : 'CERRADA';
+                valveStateDisplay.classList.toggle('valve-state-open', estadoValvula === 1);
+                valveStateDisplay.classList.toggle('valve-state-closed', estadoValvula === 0);
+
+                // Lógica para habilitar/deshabilitar botones
+                if (nivelGas !== null) {
+                    // Botón Abrir: habilitado si el gas es MENOR al umbral de apertura
+                    openValveBtn.disabled = !(nivelGas < OPEN_VALVE_THRESHOLD);
+
+                    // Botón Cerrar: habilitado si el gas es MAYOR al umbral de cierre
+                    closeValveBtn.disabled = !(nivelGas > CLOSE_VALVE_THRESHOLD);
+                } else {
+                    // Si no hay datos de gas, deshabilitar ambos botones por seguridad
+                    openValveBtn.disabled = true;
+                    closeValveBtn.disabled = true;
+                }
+
+            } else {
+                console.error('Error al obtener estado del dispositivo:', data.message);
+                gasLevelDisplay.textContent = 'Error';
+                valveStateDisplay.textContent = 'Error';
+                openValveBtn.disabled = true;
+                closeValveBtn.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error al obtener estado del dispositivo:', error);
+            gasLevelDisplay.textContent = 'Sin conexión';
+            valveStateDisplay.textContent = 'Sin conexión';
+            openValveBtn.disabled = true;
+            closeValveBtn.disabled = true;
+        }
+    }
+
+    // Actualizar estado inicial y luego periódicamente
+    updateDeviceStatus(); // Llamada inicial al cargar la página
+    setInterval(updateDeviceStatus, 5000); // Actualizar cada 5 segundos
+
 </script>
 
     <script>
