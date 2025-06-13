@@ -223,20 +223,21 @@ $message = $message ?? null;
     <div class="current-gas-level-card-simple">
         <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
         <p class="current-gas-level-value" id="gasLevelDisplay">Cargando...</p> <!-- Inicializado con "Cargando..." -->
+        <!-- ELIMINADO: Texto explicativo de los umbrales que afectaban el control de la válvula -->
+        <!-- Las líneas con los umbrales se mantienen para información del usuario, si la ESP32 los usa para alarma local. -->
         <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
-            Umbral para Abrir: <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM |
-            Umbral para Cerrar: <span class="font-bold text-red-500" id="closeThresholdDisplay"></span> PPM
+            Umbral para Alarma (ESP32): <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM
         </p>
         <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">
-            (La válvula se abre si el gas es MENOR al umbral de apertura. Se cierra si el gas es MAYOR al umbral de cierre.)
+            (Este umbral es para la alarma local del dispositivo, no para el control de la válvula desde la web.)
         </p>
     </div>
 
     <div class="valve-buttons">
-        <button type="button" class="btn btn-valve btn-valve-open" id="openValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'open')" disabled>
+        <button type="button" class="btn btn-valve btn-valve-open" id="openValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'open')">
             <i class="fas fa-door-open me-2"></i> Abrir Válvula
         </button>
-        <button type="button" class="btn btn-valve btn-valve-close" id="closeValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'close')" disabled>
+        <button type="button" class="btn btn-valve btn-valve-close" id="closeValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'close')">
             <i class="fas fa-door-closed me-2"></i> Cerrar Válvula
         </button>
     </div>
@@ -254,9 +255,11 @@ $message = $message ?? null;
     const API_BASE_URL = 'https://pwa-1s1m.onrender.com';
     const MAC_ADDRESS = document.getElementById('macDisplay').textContent;
 
-    // --- Umbrales de Gas (Deben coincidir con los del controlador PHP) ---
-    const OPEN_VALVE_THRESHOLD = 100; // Si el nivel de gas es MENOR a este, se permite abrir la válvula.
-    const CLOSE_VALVE_THRESHOLD = 200; // Si el nivel de gas es MAYOR a este, se permite cerrar la válvula.
+    // --- Umbrales de Gas (Estos se mantienen como referencia para el frontend,
+    // pero ya NO inhabilitan los botones de control de válvula en el frontend.
+    // La ESP32 aún podría usarlos para alarmas locales.) ---
+    const OPEN_VALVE_THRESHOLD = 100;
+    const CLOSE_VALVE_THRESHOLD = 200; // Aunque no se muestre explícitamente para control, se mantiene para consistencia
 
     // Elementos del DOM
     const gasLevelDisplay = document.getElementById('gasLevelDisplay');
@@ -265,11 +268,10 @@ $message = $message ?? null;
     const closeValveBtn = document.getElementById('closeValveBtn');
     const valveMessageDiv = document.getElementById('valveMessage');
     const openThresholdDisplay = document.getElementById('openThresholdDisplay');
-    const closeThresholdDisplay = document.getElementById('closeThresholdDisplay');
+    // const closeThresholdDisplay = document.getElementById('closeThresholdDisplay'); // Ya no se usa para mostrar.
 
-    // Mostrar umbrales en la interfaz
+    // Mostrar umbral de alarma en la interfaz (si la ESP32 lo usa localmente)
     openThresholdDisplay.textContent = OPEN_VALVE_THRESHOLD;
-    closeThresholdDisplay.textContent = CLOSE_VALVE_THRESHOLD;
 
     // Función para enviar comandos a la válvula
     function sendValveCommand(mac, command) {
@@ -340,32 +342,23 @@ $message = $message ?? null;
                 valveStateDisplay.classList.toggle('valve-state-open', estadoValvula === 1);
                 valveStateDisplay.classList.toggle('valve-state-closed', estadoValvula === 0);
 
-                // Lógica para habilitar/deshabilitar botones
-                if (nivelGas !== null) {
-                    // Botón Abrir: habilitado si el gas es MENOR al umbral de apertura
-                    openValveBtn.disabled = !(nivelGas < OPEN_VALVE_THRESHOLD);
-
-                    // Botón Cerrar: habilitado si el gas es MAYOR al umbral de cierre
-                    closeValveBtn.disabled = !(nivelGas > CLOSE_VALVE_THRESHOLD);
-                } else {
-                    // Si no hay datos de gas, deshabilitar ambos botones por seguridad
-                    openValveBtn.disabled = true;
-                    closeValveBtn.disabled = true;
-                }
+                // Lógica para habilitar/deshabilitar botones - AHORA SIEMPRE HABILITADOS
+                openValveBtn.disabled = false; // Siempre habilitado
+                closeValveBtn.disabled = false; // Siempre habilitado
 
             } else {
                 console.error('Error al obtener estado del dispositivo:', data.message);
                 gasLevelDisplay.textContent = 'Error';
                 valveStateDisplay.textContent = 'Error';
-                openValveBtn.disabled = true;
-                closeValveBtn.disabled = true;
+                openValveBtn.disabled = false; // Asegurar que estén habilitados incluso con error de datos
+                closeValveBtn.disabled = false; // Asegurar que estén habilitados incluso con error de datos
             }
         } catch (error) {
             console.error('Error al obtener estado del dispositivo:', error);
             gasLevelDisplay.textContent = 'Sin conexión';
             valveStateDisplay.textContent = 'Sin conexión';
-            openValveBtn.disabled = true;
-            closeValveBtn.disabled = true;
+            openValveBtn.disabled = false; // Asegurar que estén habilitados incluso sin conexión
+            closeValveBtn.disabled = false; // Asegurar que estén habilitados incluso sin conexión
         }
     }
 
