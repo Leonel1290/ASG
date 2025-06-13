@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\DispositivoModel;
-use App\Models\EnlaceModel; // Necesitamos el modelo para la tabla 'enlace'
-use App\Models\LecturasGasModel; // Necesitamos el modelo para la tabla 'lecturas_gas'
+use App\Models\EnlaceModel;
+use App\Models\LecturasGasModel;
 
 class ValveController extends Controller
 {
@@ -34,32 +34,32 @@ class ValveController extends Controller
         }
 
         // --- VERIFICACIÓN DE USUARIO Y ENLACE (PARA LA PÁGINA WEB) ---
-        // Asumimos que la sesión del usuario ya está iniciada y su ID está disponible.
-        // Adaptar esto según cómo manejas las sesiones en CodeIgniter.
         $session = \Config\Services::session();
-        $userId = $session->get('id_usuario'); // Asume que el ID del usuario se guarda en 'id_usuario' en la sesión.
+        $userId = $session->get('id_usuario');
 
         if (!$userId) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Usuario no autenticado.'
-            ])->setStatusCode(401); // Unauthorized
+            ])->setStatusCode(401);
         }
 
         $enlaceModel = new EnlaceModel();
         // Verifica si la MAC está enlazada al usuario actual
+        // Esto devolverá un ARRAY porque EnlaceModel no especifica 'object'
         $isEnlazada = $enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->first();
 
-        if (!$isEnlazada) {
+        if (!$isEnlazada) { // Si es null (no encontrado) o array vacío
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'El dispositivo con MAC "' . $mac . '" no está enlazado a tu cuenta.'
-            ])->setStatusCode(403); // Forbidden
+            ])->setStatusCode(403);
         }
         // --- FIN VERIFICACIÓN DE USUARIO Y ENLACE ---
 
 
         $dispositivoModel = new DispositivoModel();
+        // DispositivoModel devuelve objetos (lo configuramos con returnType = 'object')
         $dispositivo = $dispositivoModel->where('MAC', $mac)->first();
 
         if (!$dispositivo) {
@@ -69,7 +69,7 @@ class ValveController extends Controller
             ])->setStatusCode(404);
         }
 
-        $nivelGasActual = (int)($dispositivo->ultimo_nivel_gas ?? 0); // Asume 0 si no hay datos de gas
+        $nivelGasActual = (int)($dispositivo->ultimo_nivel_gas ?? 0); // Acceso a propiedad de objeto
 
         $permisoOtorgado = false;
         $motivoDenegado = '';
@@ -135,35 +135,6 @@ class ValveController extends Controller
             ])->setStatusCode(400);
         }
 
-        // --- VERIFICACIÓN DE USUARIO Y ENLACE (PARA LA PÁGINA WEB) ---
-        // Si esta llamada viene de la página web, también debe verificar que el usuario
-        // esté autenticado y tenga la MAC enlazada.
-        // Si esta llamada es SOLO para el ESP32, puedes omitir esta verificación aquí
-        // o asegurarte de que el ESP32 no tiene un 'id_usuario' de sesión.
-        // Para la vista 'detalles', la verificación se hace en el controlador que carga la vista,
-        // no en esta API que solo devuelve datos.
-        // Sin embargo, si quieres que la API de estado también requiera autenticación,
-        // puedes descomentar y adaptar la siguiente sección.
-        /*
-        $session = \Config\Services::session();
-        $userId = $session->get('id_usuario');
-        if (!$userId) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Usuario no autenticado para consultar estado.'
-            ])->setStatusCode(401);
-        }
-        $enlaceModel = new EnlaceModel();
-        $isEnlazada = $enlaceModel->where('id_usuario', $userId)->where('MAC', $mac)->first();
-        if (!$isEnlazada) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No tienes permiso para consultar el estado de esta MAC.'
-            ])->setStatusCode(403);
-        }
-        */
-        // --- FIN VERIFICACIÓN DE USUARIO Y ENLACE ---
-
         $dispositivoModel = new DispositivoModel();
         $dispositivo = $dispositivoModel->where('MAC', $mac)->first();
 
@@ -204,8 +175,8 @@ class ValveController extends Controller
         }
 
         $dispositivoModel = new DispositivoModel();
-        $lecturasGasModel = new LecturasGasModel(); // Instanciamos el modelo de lecturas_gas
-        $enlaceModel = new EnlaceModel(); // Instanciamos el modelo de enlace
+        $lecturasGasModel = new LecturasGasModel();
+        $enlaceModel = new EnlaceModel();
 
         $dispositivoExistente = $dispositivoModel->where('MAC', $idPlaca)->first();
 
@@ -219,54 +190,39 @@ class ValveController extends Controller
             $updated = $dispositivoModel->where('MAC', $idPlaca)->set($dataToSaveDispositivo)->update();
             $action = 'actualizado';
         } else {
-            // Si el dispositivo NO existe, crearlo
             $dataToSaveDispositivo['MAC'] = $idPlaca;
-            $dataToSaveDispositivo['estado_valvula'] = 0; // Estado inicial por defecto (cerrado)
-            $dataToSaveDispositivo['nombre'] = 'Dispositivo ' . $idPlaca; // Nombre por defecto
-            $dataToSaveDispositivo['ubicacion'] = 'Desconocida'; // Ubicación por defecto
-            $dispositivoModel->insert($dataToSaveDispositivo); // Insertar el nuevo dispositivo
+            $dataToSaveDispositivo['nombre'] = 'Dispositivo ' . $idPlaca;
+            $dataToSaveDispositivo['ubicacion'] = 'Desconocida';
+            $dataToSaveDispositivo['estado_valvula'] = 0;
+
+            $dispositivoModel->insert($dataToSaveDispositivo);
             $action = 'creado';
-            // Después de insertar, el dispositivoExistente sigue siendo null, lo obtenemos
-            $dispositivoExistente = $dispositivoModel->where('MAC', $idPlaca)->first();
         }
 
         // --- Lógica para insertar en `lecturas_gas` ---
         $userIdForLectura = null;
-        // Buscar el id_usuario asociado a esta MAC en la tabla 'enlace'
-        $enlace = $enlaceModel->where('MAC', $idPlaca)->first();
+        $enlace = $enlaceModel->where('MAC', $idPlaca)->first(); // Esto devuelve un ARRAY
 
-        if ($enlace && $enlace->id_usuario) {
-            $userIdForLectura = (int)$enlace->id_usuario;
+        // --- CORRECCIÓN AQUÍ: Acceso a propiedad de array con [] ---
+        if ($enlace && isset($enlace['id_usuario'])) {
+            $userIdForLectura = (int)$enlace['id_usuario'];
         } else {
-            // Si la MAC no está enlazada a un usuario, o no se encontró el enlace,
-            // puedes optar por no registrar la lectura de gas o usar un ID de usuario por defecto
-            // (Asegúrate de que 'usuario_id' en 'lecturas_gas' permita NULL o tenga un valor por defecto válido si decides no asignarlo)
-            // Para tu esquema donde usuario_id es NOT NULL, debes asignar un id.
-            // Opción 1: Asignar a un usuario "genérico" o "no asignado" si existe en tu tabla de usuarios.
-            // $userIdForLectura = 1; // Asume ID 1 es un usuario genérico.
-            // Opción 2: Si no encuentras un enlace y quieres que falle, puedes retornar un error aquí.
-            // Por ahora, si no hay enlace, no asignamos usuario_id, lo que causará un error si es NOT NULL.
-            // Considerando tu `lecturas_gas` esquema: `usuario_id` int NOT NULL.
-            // Esto significa que SIEMPRE necesitas un usuario. Si la MAC no está enlazada,
-            // NECESITAS una estrategia. Una opción es no insertar la lectura de gas.
-            // Otra opción es insertar con un ID de usuario predefinido para "dispositivos no asignados".
             log_message('warning', 'Lectura de gas recibida para MAC no enlazada: ' . $idPlaca);
-            // Si usuario_id es NOT NULL, debemos evitar insertar si no tenemos un id válido.
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Lectura de gas recibida, pero la MAC "' . $idPlaca . '" no está enlazada a ningún usuario. No se registró la lectura detallada.'
-            ])->setStatusCode(400); // Bad Request o 403 Forbidden
+            ])->setStatusCode(400);
         }
+        // --- FIN CORRECCIÓN ---
 
         $dataToSaveLectura = [
             'MAC' => $idPlaca,
             'nivel_gas' => $nivelGas,
             'fecha' => date('Y-m-d H:i:s'),
             'created_at' => date('Y-m-d H:i:s'),
-            'usuario_id' => $userIdForLectura // Asignamos el ID de usuario encontrado
+            'usuario_id' => $userIdForLectura
         ];
 
-        // Intentar insertar la nueva lectura de gas
         $lecturaInsertada = $lecturasGasModel->insert($dataToSaveLectura);
 
         if ($lecturaInsertada !== false) {
