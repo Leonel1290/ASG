@@ -12,66 +12,76 @@ class DispositivoModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'MAC',
-        'nombre',
-        'ubicacion',
-        'estado_dispositivo', // <-- ¡Asegúrate de que este campo esté aquí!
-        // created_at y updated_at se gestionan automáticamente si useTimestamps es true
-    ];
+    // Asegúrate de que 'estado_dispositivo' esté en los campos permitidos
+    protected $allowedFields    = ['MAC', 'nombre', 'ubicacion', 'estado_dispositivo'];
 
-    protected $useTimestamps = true; // Si usas los campos created_at y updated_at
+    protected bool $updateOnlyChanged = true;
+
+    protected array $casts = [];
+    protected array $castHandlers = [];
+
+    // Dates
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
-    // Reglas de validación para los campos del dispositivo
-    protected $validationRules = [
-        'MAC'               => 'required|exact_length[17]|regex_match[/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/]|is_unique[dispositivos.MAC,id,{id}]',
-        'nombre'            => 'required|min_length[3]|max_length[255]',
-        'ubicacion'         => 'required|min_length[3]|max_length[255]',
-        'estado_dispositivo'=> 'required|in_list[disponible,asignado,en_uso,desactivado]', // Regla para el nuevo campo
+    // Validation
+    protected $validationRules      = [
+        'MAC'       => 'required|exact_length[17]|regex_match[/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/]|is_unique[dispositivos.MAC,id,{id}]',
+        'nombre'    => 'required|max_length[255]',
+        'ubicacion' => 'required|max_length[255]',
+        'estado_dispositivo' => 'required|in_list[disponible,asignado,en_uso,desactivado]', // Agrega validación para la nueva columna
     ];
-
-    protected $validationMessages = [
+    protected $validationMessages   = [
         'MAC' => [
             'required'      => 'La dirección MAC es obligatoria.',
             'exact_length'  => 'La dirección MAC debe tener 17 caracteres (ej. AA:BB:CC:DD:EE:FF).',
-            'regex_match'   => 'El formato de la dirección MAC es incorrecto. Usa el formato AA:BB:CC:DD:EE:FF o AA-BB-CC-DD-EE-FF.',
-            'is_unique'     => 'Esta dirección MAC ya está registrada.',
+            'regex_match'   => 'El formato de la dirección MAC es incorrecto.',
+            'is_unique'     => 'Esta dirección MAC ya está registrada.'
         ],
         'nombre' => [
-            'required'   => 'El nombre del dispositivo es obligatorio.',
-            'min_length' => 'El nombre debe tener al menos 3 caracteres.',
+            'required'      => 'El nombre del dispositivo es obligatorio.',
+            'max_length'    => 'El nombre no puede exceder los 255 caracteres.'
         ],
         'ubicacion' => [
-            'required'   => 'La ubicación es obligatoria.',
-            'min_length' => 'La ubicación debe tener al menos 3 caracteres.',
+            'required'      => 'La ubicación del dispositivo es obligatoria.',
+            'max_length'    => 'La ubicación no puede exceder los 255 caracteres.'
         ],
-        'estado_dispositivo' => [ // Mensajes para el nuevo campo
-            'required'  => 'El estado del dispositivo es obligatorio.',
-            'in_list'   => 'El estado del dispositivo no es válido.',
-        ],
+        'estado_dispositivo' => [
+            'required'      => 'El estado del dispositivo es obligatorio.',
+            'in_list'       => 'El estado del dispositivo no es válido.'
+        ]
     ];
 
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+
+
     /**
-     * Obtiene una MAC disponible para asignación.
-     * Busca un dispositivo que no esté enlazado y que tenga estado 'disponible'.
-     * @return string|null La MAC disponible o null si no hay.
+     * Actualiza el estado de un dispositivo por su dirección MAC.
+     *
+     * @param string $mac La dirección MAC del dispositivo.
+     * @param string $status El nuevo estado ('disponible', 'asignado', 'en_uso', 'desactivado').
+     * @return bool True si tiene éxito, false si falla.
      */
-    public function getAvailableMacForAssignment(): ?string
+    public function updateDeviceStatusByMac(string $mac, string $status): bool
     {
-        // Buscar un dispositivo que tenga estado 'disponible' en la tabla 'dispositivos'
-        // Y que no esté ya enlazado a ningún usuario en la tabla 'enlace'.
-        // Esto es crucial para asegurar que la MAC no se asigne dos veces a diferentes compras/usuarios.
-        $builder = $this->db->table('dispositivos d');
-        $builder->select('d.MAC');
-        $builder->join('enlace e', 'd.MAC = e.MAC', 'left'); // LEFT JOIN para encontrar los que NO están en 'enlace'
-        $builder->where('d.estado_dispositivo', 'disponible');
-        $builder->where('e.id IS NULL'); // Asegura que no haya un enlace existente para esta MAC
-
-        $result = $builder->get()->getRowArray();
-
-        return $result ? $result['MAC'] : null;
+        // CodeIgniter 4 update method needs the primary key or a where clause for batch updates.
+        // This will update the first record found matching the MAC.
+        $device = $this->where('MAC', $mac)->first();
+        if ($device) {
+            return $this->update($device['id'], ['estado_dispositivo' => $status]);
+        }
+        return false;
     }
 }
