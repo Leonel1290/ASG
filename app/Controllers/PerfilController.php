@@ -164,15 +164,15 @@ class PerfilController extends BaseController
         $token = bin2hex(random_bytes(32));
         $expires = Time::now()->addHours(1)->toDateTimeString(); // Token válido por 1 hora
 
-        // CAMBIO: Usar 'reset_token' y 'reset_expires' que son los nombres de columnas correctos en tu DB y UserModel
         $this->userModel->update($loggedInUserId, [
             'reset_token' => $token,
             'reset_expires' => $expires,
         ]);
 
         $emailService = \Config\Services::email();
-        // Configura el remitente en app/Config/Email.php o .env
-        $emailService->setFrom(getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com', getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+        $fromAddress = (string) (getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com');
+        $fromName = (string) (getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+        $emailService->setFrom($fromAddress, $fromName);
         $emailService->setTo($user['email']);
         $emailService->setSubject('Verificación de Email para Acceso a Configuración de Perfil - ASG');
         $verificationLink = base_url('perfil/verificar-email-token/' . $token);
@@ -203,17 +203,14 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil/verificar-email')->with('error', 'Token de verificación no proporcionado.');
         }
 
-        // CAMBIO: Usar 'reset_token' para buscar el usuario
         $user = $this->userModel->where('reset_token', $token)->first();
 
         if (!$user) {
             return redirect()->to('/perfil/verificar-email')->with('error', 'Token de verificación inválido o ya utilizado.');
         }
 
-        // CAMBIO: Usar 'reset_expires' para verificar la expiración
         $expires = Time::parse($user['reset_expires']);
         if ($expires->isBefore(Time::now())) {
-            // CAMBIO: Limpiar 'reset_token' y 'reset_expires' al expirar
             $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
             return redirect()->to('/perfil/verificar-email')->with('error', 'El token de verificación ha expirado. Por favor, solicita uno nuevo.');
         }
@@ -222,7 +219,6 @@ class PerfilController extends BaseController
         $session = session();
         $session->set('email_verified_for_config', true);
         // Limpiar el token una vez usado
-        // CAMBIO: Limpiar 'reset_token' y 'reset_expires'
         $this->userModel->update($user['id'], [
             'reset_token' => null,
             'reset_expires' => null,
@@ -254,6 +250,14 @@ class PerfilController extends BaseController
         }
 
         $rules = [
+            // CAMBIO: La regla de validación ahora espera 'MAC' (mayúscula) para coincidir con la vista
+            'MAC' => [
+                'rules' => 'required|exact_length[17]',
+                'errors' => [
+                    'required' => 'La MAC es obligatoria.',
+                    'exact_length' => 'El formato de la MAC es incorrecto.'
+                ]
+            ],
             'nombre' => [
                 'rules' => 'required|min_length[3]|max_length[100]',
                 'errors' => [
@@ -274,7 +278,10 @@ class PerfilController extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->to('/perfil/configuracion')->withInput()->with('errors', $this->validator->getErrors());
+            // Si la validación falla, redirigir de nuevo al formulario de edición con errores
+            // Asegúrate de pasar la MAC para que el redirect pueda construir la URL correcta
+            $macFromPost = $this->request->getPost('MAC'); // Obtener la MAC para la redirección
+            return redirect()->to("/perfil/dispositivo/editar/{$macFromPost}")->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $nombre = $this->request->getPost('nombre');
@@ -291,18 +298,18 @@ class PerfilController extends BaseController
         if ($emailChanged) {
             // Si el email cambia, invalidar la cuenta hasta que el nuevo email sea verificado
             $updateData['is_active'] = 0; // Marcar como inactivo hasta verificar el nuevo email
-            // CAMBIO: Usar 'reset_token' y 'reset_expires'
             $updateData['reset_token'] = bin2hex(random_bytes(32)); // Nuevo token para el nuevo email
             $updateData['reset_expires'] = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             if ($this->userModel->update($loggedInUserId, $updateData)) {
                 // Enviar correo de verificación para el nuevo email
                 $emailService = \Config\Services::email();
-                $emailService->setFrom(getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com', getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+                $fromAddress = (string) (getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com');
+                $fromName = (string) (getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
+                $emailService->setFrom($fromAddress, $fromName);
                 $emailService->setTo($email);
                 $emailService->setSubject('Verifica tu nuevo Email - ASG');
-                // Reutilizamos la ruta de verificación de registro para la activación del nuevo email
-                $verificationLink = base_url('register/verify-email/' . $updateData['reset_token']); // CAMBIO: Usar 'reset_token'
+                $verificationLink = base_url('register/verify-email/' . $updateData['reset_token']);
                 $message = "Hola " . esc($nombre) . ",\n\n"
                                  . "Has actualizado tu email en el Sistema ASG. Por favor, verifica tu nuevo email haciendo clic en el siguiente enlace:\n"
                                  . $verificationLink . "\n\n"
@@ -462,12 +469,13 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil');
         }
 
-        $mac = $this->request->getPost('MAC'); // Obtener MAC del input oculto
+        // OBTENEMOS LA MAC CON LA CAPITALIZACIÓN CORRECTA (MAC)
+        $mac = $this->request->getPost('MAC');
         $nombre = $this->request->getPost('nombre');
         $ubicacion = $this->request->getPost('ubicacion');
 
         $rules = [
-            'MAC' => [ // Cambiado de 'mac' a 'MAC' para coincidir con el campo de POST
+            'MAC' => [ // Esta regla de validación espera el campo 'MAC' (mayúscula)
                 'rules' => 'required|exact_length[17]',
                 'errors' => [
                     'required' => 'La MAC es obligatoria.',
@@ -496,7 +504,7 @@ class PerfilController extends BaseController
 
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
-                        ->where('MAC', $mac)
+                        ->where('MAC', $mac) // Usamos la MAC obtenida correctamente
                         ->first();
 
         if (!$enlace) {
@@ -509,7 +517,7 @@ class PerfilController extends BaseController
         ];
 
         // Obtener el ID del dispositivo para usar el método update() del modelo
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first(); // Usamos la MAC obtenida correctamente
         if (!$dispositivo) {
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
