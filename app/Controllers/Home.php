@@ -109,13 +109,24 @@ class Home extends BaseController
             return redirect()->back()->withInput();
         }
     }
-    public function loginobtener() {
-        $session = session();
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::loginobtener() - Mostrando vista de login. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-        return view('login');
+    public function loginobtener()
+{
+    $session = session();
+    $email = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
+
+    // Simulamos autenticación (después podés reemplazar con base de datos)
+    if ($email === 'admin@example.com' && $password === '123456') {
+        $session->set([
+            'isLoggedIn' => true,
+            'email' => $email
+        ]);
+
+        return redirect()->to('/perfil');
+    } else {
+        return redirect()->back()->with('error', 'Credenciales inválidas');
     }
+}
     public function processLoginPaypal()
     {
         $session = session();
