@@ -13,9 +13,7 @@ $routes->post('/register/store', 'registerController::store');
 $routes->get('/register/check-email', 'registerController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
-$routes->post('/loginobtener', 'Home::login');
-$routes->get('/loginobtener', 'Home::login');
-
+$routes->get('login', 'Home::login');
 $routes->post('/logout', 'Home::logout');
 
 
