@@ -55,12 +55,59 @@ class Home extends BaseController
     public function login()
     {
         $session = session();
-        if ($session->get('logged_in')) {
-            return redirect()->to('/perfil');
-        }
 
-        helper(['form']);
-        echo view('login');
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
+
+        $userModel = new UserModel();
+        $lecturasGasModel = new \App\Models\LecturasGasModel();
+
+        $email = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+
+        $user = $userModel->where('email', $email)->first();
+
+        if ($user) {
+            if (!$user['is_active']) {
+                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
+                log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
+                return redirect()->back()->withInput();
+            }
+
+            if (password_verify($password, $user['password'])) {
+                // Contraseña correcta, iniciar sesión
+                $ultimaLectura = $lecturasGasModel
+                    ->orderBy('id', 'DESC')
+                    ->where(['usuario_id' => $user['id']])
+                    ->asArray()
+                    ->first();
+
+                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
+
+                $sessionData = [
+                    'id'        => $user['id'],
+                    'nombre'    => $user['nombre'],
+                    'email'     => $user['email'],
+                    'logged_in' => true,
+                ];
+                $session->set($sessionData);
+
+                // --- LOGGING PARA DEBUGGING ---
+                log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
+                // --- FIN LOGGING ---
+
+                return redirect()->to('/perfil');
+            } else {
+                $session->setFlashdata('error', 'Contraseña incorrecta.');
+                log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
+                return redirect()->back()->withInput();
+            }
+        } else {
+            $session->setFlashdata('error', 'Email no encontrado.');
+            log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
+            return redirect()->back()->withInput();
+        }
     }
     public function loginobtener() {
         $session = session();
