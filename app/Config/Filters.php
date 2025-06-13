@@ -12,20 +12,11 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
-use App\Filters\AuthFilter;
+use App\Filters\AuthFilter; // Asegúrate de que esta línea esté presente si no lo está
 
 
 class Filters extends BaseFilters
 {
-    /**
-     * Configures aliases for Filter classes to
-     * make reading things nicer and simpler.
-     *
-     * @var array<string, class-string|list<class-string>>
-     *
-     * [filter_name => classname]
-     * or [filter_name => [classname1, classname2, ...]]
-     */
     public array $aliases = [
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
@@ -36,89 +27,40 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'auth'     => \App\Filters\AuthFilter::class,
-        // Alias para tu filtro de sesión de administrador
+        'auth'          => \App\Filters\AuthFilter::class, // Asegúrate de que este alias esté correcto
         'SessionAdmin'  => \App\Filters\SessionAdmin::class,
     ];
 
-    /**
-     * List of special required filters.
-     *
-     * The filters listed here are special. They are applied before and after
-     * other kinds of filters, and always applied even if a route does not exist.
-     *
-     * Filters set by default provide framework functionality. If removed,
-     * those functions will no longer work.
-     *
-     * @see https://codeigniter.com/user_guide/incoming/filters.html#provided-filters
-     *
-     * @var array{before: list<string>, after: list<string>}
-     */
     public array $required = [
-        'before' => [
-            // 'forcehttps', // Force Global Secure Requests (consider habilitar en producción si usas HTTPS)
-            // 'pagecache',  // Web Page Caching (considerar para rendimiento)
-        ],
+        'before' => [],
         'after' => [
-            // 'pagecache',   // Web Page Caching
-            // 'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar (deshabilitar en producción)
+            'toolbar',
         ],
     ];
 
-    /**
-     * List of filter aliases that are always
-     * applied before and after every request.
-     *
-     * @var array<string, array<string, array<string, string>>>|array<string, list<string>>
-     */
     public array $globals = [
         'before' => [
-            // 'honeypot', // Protección básica contra spam en formularios
-            // 'csrf', // Protección CSRF (recomendado para formularios POST)
-            // 'invalidchars', // Filtra caracteres potencialmente dañinos en la entrada
+            // 'honeypot',
+            // 'csrf',
+            // 'invalidchars',
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders', // Añade cabeceras de seguridad (recomendado para producción)
+            // 'secureheaders',
         ],
     ];
 
-    /**
-     * List of filter aliases that works on a
-     * particular HTTP method (GET, POST, etc.).
-     *
-     * Example:
-     * 'POST' => ['foo', 'bar']
-     *
-     * If you use this, you should disable auto-routing because auto-routing
-     * permits any HTTP method to access a controller. Accessing the controller
-     * with a method you don't expect could bypass the filter.
-     *
-     * @var array<string, list<string>>
-     */
     public array $methods = [];
 
-    /**
-     * List of filter aliases that should run on any
-     * before or after URI patterns.
-     *
-     * Example:
-     * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
-     *
-     * @var array<string, array<string, list<string>>>
-     */
     public array $filters = [
-        // Aplica el filtro SessionAdmin a la ruta /inicio
-        // Asegúrate de que la lógica de este filtro redirija si el usuario no cumple los requisitos
         "SessionAdmin" => [
             "before" => [
                 "/inicio"
-                // Añade aquí otras rutas que solo los administradores deberían acceder
-                // Por ejemplo: '/admin/*', '/dashboard', etc.
             ]
-        ]
-        // Ejemplo de filtro de autenticación general (si tuvieras uno)
-        // 'auth' => ['before' => ['/perfil/*', '/enlace', '/enlace/store', '/lecturas_gas/guardar', '/detalles/*']],
+        ],
+        // DESCOMENTAR Y APLICAR ESTE FILTRO A LAS RUTAS PROTEGIDAS
+        'auth' => ['before' => ['/perfil', '/perfil/*', '/enlace', '/enlace/*', '/lecturas_gas/*', '/detalles/*']],
+        // Añade aquí todas las rutas o grupos de rutas que requieran que el usuario esté logueado
+        // Por ejemplo: '/perfil' (para la ruta exacta) y '/perfil/*' (para sub-rutas dentro de perfil)
     ];
 }
