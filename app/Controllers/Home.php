@@ -52,80 +52,44 @@ class Home extends BaseController
         return view('inicio');
     }
 
-    public function login()
-    {
-        $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
-
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
-
-        $user = $userModel->where('email', $email)->first();
-
-        if ($user) {
-            if (!$user['is_active']) {
-                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
-                log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
-                return redirect()->back()->withInput();
-            }
-
-            if (password_verify($password, $user['password'])) {
-                // Contraseña correcta, iniciar sesión
-                $ultimaLectura = $lecturasGasModel
-                    ->orderBy('id', 'DESC')
-                    ->where(['usuario_id' => $user['id']])
-                    ->asArray()
-                    ->first();
-
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
-
-                $sessionData = [
-                    'id'        => $user['id'],
-                    'nombre'    => $user['nombre'],
-                    'email'     => $user['email'],
-                    'logged_in' => true,
-                ];
-                $session->set($sessionData);
-
-                // --- LOGGING PARA DEBUGGING ---
-                log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
-                // --- FIN LOGGING ---
-
-                return redirect()->to('/perfil');
-            } else {
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
-                log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
-                return redirect()->back()->withInput();
-            }
-        } else {
-            $session->setFlashdata('error', 'Email no encontrado.');
-            log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
-            return redirect()->back()->withInput();
-        }
-    }
     public function loginobtener()
 {
+    return view('login');  // Solo muestra el formulario
+}
+
+public function login()
+{
     $session = session();
+
     $email = $this->request->getPost('email');
     $password = $this->request->getPost('password');
 
-    // Simulamos autenticación (después podés reemplazar con base de datos)
-    if ($email === 'admin@example.com' && $password === '123456') {
-        $session->set([
-            'isLoggedIn' => true,
-            'email' => $email
-        ]);
+    $userModel = new UserModel();
+    $user = $userModel->where('email', $email)->first();
 
-        return redirect()->to('/perfil');
+    if ($user) {
+        if (!$user['is_active']) {
+            $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada.');
+            return redirect()->back()->withInput();
+        }
+        if (password_verify($password, $user['password'])) {
+            $sessionData = [
+                'id' => $user['id'],
+                'nombre' => $user['nombre'],
+                'email' => $user['email'],
+                'logged_in' => true,
+            ];
+            $session->set($sessionData);
+            return redirect()->to('/perfil');
+        } else {
+            $session->setFlashdata('error', 'Contraseña incorrecta.');
+            return redirect()->back()->withInput();
+        }
     } else {
-        return redirect()->back()->with('error', 'Credenciales inválidas');
+        $session->setFlashdata('error', 'Email no encontrado.');
+        return redirect()->back()->withInput();
     }
+}
 }
     public function processLoginPaypal()
     {

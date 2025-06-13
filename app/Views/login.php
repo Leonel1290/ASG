@@ -23,11 +23,11 @@
             <h1 class="h3">Login</h1>
           </div>
           <!-- Mostrar mensaje de error si existe -->
-          <?php if (session()->get('error')): ?>
-        <div>
-            <p style="color: red;"><?= session()->get('error') ?></p>
-        </div>
-    <?php endif; ?>
+          <?php if(session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?= session()->getFlashdata('error') ?>
+  </div>
+<?php endif; ?>
 
           <form action="<?= base_url('procesar-login') ?>" method="POST">
             <div class="form-group">
