@@ -112,7 +112,8 @@ class PerfilController extends BaseController
                 $session->destroy();
                 return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
             }
-            return view('configuracion_form', ['userData' => $userData]);
+            // CAMBIO: Asegúrate de que esta vista también esté en la subcarpeta 'perfil'
+            return view('perfil/configuracion_form', ['userData' => $userData]);
         } else {
             // Si no se ha verificado para la configuración, redirigir a la página de solicitud de verificación
             return redirect()->to('/perfil/verificar-email');
@@ -138,8 +139,8 @@ class PerfilController extends BaseController
             return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
         }
 
-        // Pasar el email actual del usuario para mostrarlo en la vista
-        return view('verificar_email', ['userEmail' => $user['email']]);
+        // CAMBIO: La vista se busca en la subcarpeta 'perfil'
+        return view('perfil/verificar_email', ['userEmail' => $user['email']]);
     }
 
     /**
@@ -299,10 +300,10 @@ class PerfilController extends BaseController
                 // Reutilizamos la ruta de verificación de registro para la activación del nuevo email
                 $verificationLink = base_url('register/verify-email/' . $updateData['verification_token']);
                 $message = "Hola " . esc($nombre) . ",\n\n"
-                         . "Has actualizado tu email en el Sistema ASG. Por favor, verifica tu nuevo email haciendo clic en el siguiente enlace:\n"
-                         . $verificationLink . "\n\n"
-                         . "Este enlace expirará en 1 hora. Si no realizaste este cambio, ignora este correo.\n\n"
-                         . "Gracias,\nSistema ASG";
+                                 . "Has actualizado tu email en el Sistema ASG. Por favor, verifica tu nuevo email haciendo clic en el siguiente enlace:\n"
+                                 . $verificationLink . "\n\n"
+                                 . "Este enlace expirará en 1 hora. Si no realizaste este cambio, ignora este correo.\n\n"
+                                 . "Gracias,\nSistema ASG";
                 $emailService->setMessage($message);
 
                 if (!$emailService->send()) {
@@ -327,6 +328,7 @@ class PerfilController extends BaseController
                 $session->set('email', $email);
                 $session->remove('email_verified_for_config'); // Limpiar la bandera ya que los cambios se aplicaron
 
+                // CAMBIO: Si tienes una vista para el éxito del cambio de contraseña, asegúrate de que también esté en 'perfil/'
                 return redirect()->to('/perfil/configuracion')->with('success', '¡Perfil actualizado exitosamente!');
             } else {
                 return redirect()->back()->withInput()->with('error', 'No se pudo actualizar el perfil. Inténtalo de nuevo.');
@@ -397,6 +399,8 @@ class PerfilController extends BaseController
         if ($this->userModel->update($loggedInUserId, ['password' => $hashedPassword])) {
             $session->remove('email_verified_for_config'); // Limpiar la bandera después de un cambio importante
 
+            // Si tienes una vista de "cambio exitoso" para la contraseña y está en 'perfil/', cárgala así
+            // return view('perfil/cambio_exitoso'); // EJEMPLO
             return redirect()->to('/perfil/configuracion')->with('success', '¡Contraseña actualizada exitosamente!');
         } else {
             return redirect()->to('/perfil/configuracion')->withInput()->with('error', 'No se pudo actualizar la contraseña. Inténtalo de nuevo.');
@@ -439,7 +443,8 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
-        return view('edit_device', [ // La vista es edit_device.php (asumo que está en app/Views/)
+        // CAMBIO: La vista se busca en la subcarpeta 'perfil'
+        return view('perfil/edit_device', [
             'dispositivo' => $dispositivo
         ]);
     }
