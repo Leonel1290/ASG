@@ -8,10 +8,11 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 
 // --- RUTAS DE REGISTRO Y LOGIN GENERALES ---
-$routes->get('/register', 'registerController::index');
-$routes->post('/register/store', 'registerController::store');
-$routes->get('/register/check-email', 'registerController::checkEmail');
-$routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
+// CAMBIO: Asegurarse de que el controlador de registro se referencia con PascalCase (R mayúscula)
+$routes->get('/register', 'RegisterController::index');
+$routes->post('/register/store', 'RegisterController::store');
+$routes->get('/register/check-email', 'RegisterController::checkEmail');
+$routes->get('/register/verify-email/(:segment)', 'RegisterController::verifyEmailToken/$1');
 $routes->post('/login', 'Home::login');
 $routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
@@ -30,8 +31,9 @@ $routes->post('/reset-password', 'Home::resetPassword');
 $routes->get('/login/paypal', 'Home::loginPaypal');
 $routes->post('/login/paypal', 'Home::processLoginPaypal'); // Este maneja el POST del login para compra
 
-$routes->get('/register/paypal', 'registerController::registerPaypal');
-$routes->post('/register/paypal/store', 'registerController::storePaypal');
+// CAMBIO: Asegurarse de que el controlador de registro se referencia con PascalCase (R mayúscula)
+$routes->get('/register/paypal', 'RegisterController::registerPaypal');
+$routes->post('/register/paypal/store', 'RegisterController::storePaypal');
 // --- FIN RUTAS ESPECÍFICAS PARA COMPRA/PAYPAL ---
 
 
@@ -39,17 +41,20 @@ $routes->post('/register/paypal/store', 'registerController::storePaypal');
 $routes->group('perfil', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->post('actualizar', 'PerfilController::actualizar');
-    $routes->post('cambiar-password', 'PerfilController::cambiarPassword');
+    $routes->post('actualizar', 'PerfilController::actualizarPerfil'); // Asumo que este es el método correcto para actualizar perfil
+    $routes->post('cambiar-password', 'PerfilController::cambiarContrasena'); // Asumo que este es el método correcto para cambiar contraseña
     $routes->get('verificar-email', 'PerfilController::verificarEmail'); // Vista para solicitar verificación
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacionEmail'); // Para enviar el email
-    $routes->get('verificar-email-token/(:segment)', 'PerfilController::verificarEmailToken/$1'); // Para procesar el token del email
+    // CAMBIO CLAVE: El método en PerfilController es verificarEmailConfiguracion
+    $routes->get('verificar-email-token/(:segment)', 'PerfilController::verificarEmailConfiguracion/$1'); // Para procesar el token del email
 
     // Rutas para editar y eliminar dispositivos (en el perfil, no en la compra)
-    $routes->get('dispositivo/editar/(:any)', 'Home::editDevice/$1'); // Apunta a Home, como en tu snippet
-    $routes->post('dispositivo/update/(:any)', 'Home::updateDevice/$1'); // Apunta a Home
-    $routes->post('dispositivo/eliminar', 'PerfilController::eliminarDispositivo'); // No necesitas (:any) aquí si MAC va por POST
-    $routes->get('dispositivo/eliminar/(:any)', 'PerfilController::eliminarDispositivo/$1');
+    // CAMBIO: Asegurarse de que estos métodos están en PerfilController o ajustar la referencia
+    $routes->get('dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1'); // Apunta a PerfilController
+    $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo'); // Apunta a PerfilController (ajustado el nombre de la ruta POST)
+    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos'); // Ajustado el nombre de la ruta POST para eliminar varios
+    // La ruta GET para eliminar un solo dispositivo si es que aún se usa (siempre es mejor POST para eliminaciones)
+    // $routes->get('dispositivo/eliminar/(:any)', 'PerfilController::eliminarDispositivos/$1');
 });
 
 
