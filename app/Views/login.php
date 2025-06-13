@@ -29,7 +29,7 @@
         </div>
     <?php endif; ?>
 
-          <form action="<?php echo base_url('/login') ?>" method="POST">
+          <form action="<?php echo base_url('/loginobtener') ?>" method="POST">
             <div class="form-group">
               <label for="nombre">Nombre</label>
               <input type="text" name="nombre" id="nombre" class="form-control" required>
