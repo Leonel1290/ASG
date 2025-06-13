@@ -14,7 +14,7 @@ $routes->get('/register/check-email', 'registerController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
 $routes->post('/login', 'Home::login');
-$routes->get('/login', 'Home::login'); // Cambiado de 'loginobtener' a 'login' para consistencia
+$routes->get('/login', 'Home::login');
 
 $routes->post('/logout', 'Home::logout');
 
@@ -29,32 +29,34 @@ $routes->post('/reset-password', 'Home::resetPassword');
 
 
 // --- RUTAS ESPECÍFICAS PARA COMPRA/PAYPAL ---
-$routes->get('/login/paypal', 'Home::loginPaypal'); // Muestra el formulario de login para PayPal
-$routes->post('/login/paypal', 'Home::processLoginPaypal'); // Procesa el login para PayPal
+$routes->get('/login/paypal', 'Home::loginPaypal');
+$routes->post('/login/paypal', 'Home::processLoginPaypal');
 
-$routes->get('/register/paypal', 'registerController::registerPaypal'); // Muestra el formulario de registro para PayPal
-$routes->post('/register/paypal/store', 'registerController::storePaypal'); // Procesa el registro para PayPal
+$routes->get('/register/paypal', 'registerController::registerPaypal');
+$routes->post('/register/paypal/store', 'registerController::storePaypal');
 // --- FIN RUTAS ESPECÍFICAS PARA COMPRA/PAYPAL ---
 
 
 // Perfil (Agrupamos rutas relacionadas al perfil)
 $routes->group('perfil', function ($routes) {
-    $routes->get('/', 'PerfilController::index');
+    $routes->get('/', 'PerfilController::index'); // Esta será tu función perfil() principal
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('actualizar-perfil', 'PerfilController::actualizarPerfil');
     $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
-    $routes->get('verificar-email', 'PerfilController::verificarEmail'); // Para solicitar un nuevo email de verificación de perfil
+    $routes->get('verificar-email', 'PerfilController::verificarEmail');
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacionEmail');
     $routes->get('verificar-email-token/(:segment)', 'PerfilController::verificarEmailConfiguracion/$1');
+    // Rutas para la gestión de dispositivos en el perfil
     $routes->get('dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
-    $routes->post('dispositivo/actualizar/(:any)', 'PerfilController::actualizarDispositivo/$1');
-    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
+    $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo'); // No necesitas (:any) aquí si MAC va por POST
+    $routes->get('dispositivo/eliminar/(:any)', 'PerfilController::eliminarDispositivo/$1');
 });
 
 
-// Rutas de enlace de MACs
-$routes->get('/enlace', 'EnlaceController::index');
-$routes->post('/enlace/store', 'EnlaceController::store');
+// Rutas de enlace de MACs - ESTAS RUTAS YA NO SERÍAN NECESARIAS SI LA COMPRA ES AUTOMÁTICA
+// Te recomiendo comentarlas o eliminarlas si no planeas que el usuario introduzca MACs manualmente.
+// $routes->get('/enlace', 'EnlaceController::index');
+// $routes->post('/enlace/store', 'EnlaceController::store');
 
 
 // Endpoints de la API para dispositivos (usado por ESP32)
@@ -71,17 +73,13 @@ $routes->group('lecturas_gas', function ($routes) {
 // Detalles del dispositivo (mostrar lecturas, etc.)
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
-// Otras rutas
+// Rutas de compra
 $routes->get('/comprar', 'Home::comprar');
+$routes->post('/procesar-compra', 'Home::procesarCompra'); // ¡Añadida la ruta para procesar la compra!
 
 // Asumo que esta es la ruta a la que redirige PayPal después de una compra exitosa
 $routes->get('/paypal/success', 'PaypalController::success');
-$routes->get('/paypal/cancel', 'PaypalController::cancel'); // Si tienes una ruta de cancelación
+$routes->get('/paypal/cancel', 'PaypalController::cancel');
 
-// Ruta para la página de compra exitosa después de un restablecimiento de contraseña
+// Ruta para la página de cambio de contraseña exitoso
 $routes->get('/cambio_exitoso', 'Home::cambioExitoso'); // Asumo que tienes este método en Home.php
-// Método dummy para cambioExitoso (si no lo tienes en Home.php)
-// En Home.php:
-// public function cambioExitoso() {
-//     return view('cambio_exitoso'); // Crea esta vista si no existe
-// }
