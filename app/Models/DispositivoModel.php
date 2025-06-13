@@ -8,30 +8,28 @@ class DispositivoModel extends Model
 {
     protected $table          = 'dispositivos'; // Tabla 'dispositivos'
     protected $primaryKey     = 'id';           // Llave primaria 'id'
-    protected $useAutoIncrement = true;       // Asumo que el ID es auto-incremental
-    protected $returnType     = 'array';      // Usaremos 'array'
-    protected $useSoftDeletes = false;        // No usas soft deletes
+    protected $useAutoIncrement = true;         // El ID es auto-incremental
+    protected $returnType     = 'object';       // <-- CAMBIADO: Usaremos 'object' para acceder propiedades con ->
+    protected $useSoftDeletes = false;          // No usas soft deletes
 
     // Campos permitidos para insertar o actualizar.
-    // **Importante: he añadido 'estado_valvula' aquí.**
-    // También he incluido 'usuario_id', 'numero_serie', 'estado', 'ultima_conexion'
-    // asumiendo que podrían existir en tu tabla aunque no estén explícitamente en el DUMP inicial,
-    // pero son comunes en tablas de dispositivos. Si no existen, elimínalos.
+    // ¡IMPORTANTE: Estos campos deben coincidir exactamente con tus columnas de DB!
     protected $allowedFields = [
         'MAC',
         'nombre',
         'ubicacion',
-        'estado_valvula', // <-- ¡Este es el campo nuevo y crucial!
-        'usuario_id',     // Añadir si existe en tu tabla 'dispositivos'
-        'numero_serie',   // Añadir si existe en tu tabla 'dispositivos'
-        'estado',         // Añadir si existe en tu tabla 'dispositivos' (estado general del dispositivo)
-        'ultima_conexion',// Añadir si existe en tu tabla 'dispositivos'
+        'estado_valvula',
+        'ultimo_nivel_gas',      // <-- AÑADIDO: Campo para el último nivel de gas reportado
+        'ultima_actualizacion'   // <-- AÑADIDO: Campo para la última fecha/hora de actualización
+        // Campos como 'usuario_id', 'numero_serie', 'estado', 'ultima_conexion'
+        // no están en tu esquema SQL de 'dispositivos', por lo tanto, se han ELIMINADO.
     ];
 
     // Habilitamos el uso de timestamps si quieres manejar la fecha de creación o actualización de registros
-    // Tu tabla `dispositivos` en el script SQL tiene `created_at` y `updated_at`.
+    // Tu tabla `dispositivos` en el script SQL tiene `created_at` y `updated_at` con DEFAULT CURRENT_TIMESTAMP.
+    // Configurando useTimestamps a true, CodeIgniter los gestionará automáticamente.
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime'; // El DUMP muestra 'timestamp', por lo que 'datetime' es apropiado
+    protected $dateFormat    = 'datetime'; // El DUMP muestra 'timestamp', 'datetime' es apropiado para CI4
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at'; // Solo si useSoftDeletes es true
@@ -39,7 +37,7 @@ class DispositivoModel extends Model
     // Validación (opcional, puedes añadir reglas si es necesario)
     protected $validationRules      = [];
     protected $validationMessages   = [];
-    protected $skipValidation       = false; // Cambia a true para omitir la validación del modelo
+    protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
     // Callbacks (si necesitas, por ejemplo, formatear la MAC antes de guardar)
@@ -75,10 +73,6 @@ class DispositivoModel extends Model
      */
     public function updateDispositivoByMac($mac, $data)
     {
-        // Usa where() para encontrar el registro por MAC y luego update()
-        // CodeIgniter 4 permite esto directamente:
         return $this->where('MAC', $mac)->update(null, $data);
-        // O alternativamente, como lo tenías y también funciona:
-        // return $this->where('MAC', $mac)->set($data)->update();
     }
 }
