@@ -157,22 +157,42 @@ class ValveController extends Controller
 
         $dispositivoModel = new DispositivoModel();
 
-        // Actualiza una columna 'ultimo_nivel_gas' y 'ultima_actualizacion' en tu tabla de dispositivos.
-        // Asegúrate de que estas columnas existan en tu tabla 'dispositivos'.
-        $updated = $dispositivoModel->where('MAC', $idPlaca)->set(['ultimo_nivel_gas' => $nivelGas, 'ultima_actualizacion' => date('Y-m-d H:i:s')])->update();
+        // --- INICIO DE LA LÓGICA DE CORRECCIÓN (UPSERT) ---
+        // 1. Intentar encontrar el dispositivo por su MAC
+        $dispositivoExistente = $dispositivoModel->where('MAC', $idPlaca)->first();
 
-        if ($updated) {
+        $dataToSave = [
+            'ultimo_nivel_gas' => $nivelGas,
+            'ultima_actualizacion' => date('Y-m-d H:i:s')
+        ];
+
+        if ($dispositivoExistente) {
+            // 2. Si el dispositivo existe, actualizarlo
+            $updated = $dispositivoModel->where('MAC', $idPlaca)->set($dataToSave)->update();
+            $action = 'updated';
+        } else {
+            // 3. Si el dispositivo NO existe, crearlo (insertar)
+            // Asegúrate de que las columnas 'MAC', 'estado_valvula', 'nombre', 'ubicacion'
+            // estén permitidas en tu modelo DispositivoModel ($allowedFields).
+            $dataToSave['MAC'] = $idPlaca;
+            $dataToSave['estado_valvula'] = 0; // Estado inicial por defecto (cerrado)
+            $dataToSave['nombre'] = 'Dispositivo ' . $idPlaca; // Nombre por defecto
+            $dataToSave['ubicacion'] = 'Desconocida'; // Ubicación por defecto
+
+            $updated = $dispositivoModel->insert($dataToSave); // insert() devuelve el ID insertado o false
+            $action = 'inserted';
+        }
+        // --- FIN DE LA LÓGICA DE CORRECCIÓN (UPSERT) ---
+
+        if ($updated !== false) { // updated puede ser true/false para update, o ID/false para insert
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => 'Lectura de gas recibida y procesada para el dispositivo ' . $idPlaca . '. Nivel: ' . $nivelGas
+                'message' => 'Lectura de gas recibida y procesada para el dispositivo ' . $idPlaca . '. Nivel: ' . $nivelGas . ' (Dispositivo ' . $action . ').'
             ]);
         } else {
-            // Si no se pudo actualizar (ej. MAC no encontrada o no hubo cambios)
-            // Aquí puedes decidir si quieres crear el dispositivo si no existe.
-            // Por ahora, simplemente reporta el error.
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'No se pudo procesar la lectura de gas para el dispositivo "' . $idPlaca . '". Puede que no exista o no haya cambios.'
+                'message' => 'No se pudo procesar la lectura de gas para el dispositivo "' . $idPlaca . '". Error al ' . ($action === 'updated' ? 'actualizar' : 'insertar') . '.'
             ])->setStatusCode(500);
         }
     }
