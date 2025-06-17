@@ -228,9 +228,6 @@ $message = $message ?? null;
         <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
             Umbral para Alarma (ESP32): <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM
         </p>
-        <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">
-            (Este umbral es para la alarma local del dispositivo, no para el control de la válvula desde la web.)
-        </p>
     </div>
 
     <div class="valve-buttons">
