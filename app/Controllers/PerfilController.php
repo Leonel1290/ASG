@@ -16,17 +16,15 @@ class PerfilController extends BaseController
     protected $lecturasGasModel;
     protected $dispositivoModel;
 
-
     public function __construct()
     {
-        // Llama al constructor de la clase padre (BaseController) si es necesario
-        // parent::__construct();
+        // Llama al constructor de la clase padre (BaseController)
+        parent::__construct(); // Asegúrate de que BaseController tenga un constructor adecuado si es necesario
 
         $this->userModel = new UserModel();
         $this->enlaceModel = new EnlaceModel();
         $this->lecturasGasModel = new LecturasGasModel();
         $this->dispositivoModel = new DispositivoModel();
-
 
         // --- CARGAR HELPERS ---
         helper(['form', 'url', 'text', 'email']);
@@ -34,21 +32,21 @@ class PerfilController extends BaseController
     }
 
     // Método para mostrar la página principal del perfil (GET /perfil)
+    // Asume que SessionAdmin ya ha verificado que el usuario está logueado.
     public function index()
     {
         $session = session();
         $usuarioId = $session->get('id');
 
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'PerfilController::index() - Estado de la sesión al inicio: ' . json_encode($session->get()));
-        log_message('debug', 'PerfilController::index() - Usuario ID de la sesión: ' . ($usuarioId ?? 'null'));
-        // --- FIN LOGGING ---
-
-        // Redirigir si el usuario no está logueado
+        // Esta verificación es redundante si SessionAdmin hace su trabajo,
+        // pero la mantengo como una capa de seguridad extra.
+        // Si el filtro no redirige, esta sí lo hará.
         if (!$usuarioId) {
-            log_message('debug', 'PerfilController::index() - Usuario ID no encontrado en sesión, redirigiendo a login.');
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+            log_message('debug', 'PerfilController::index() - Usuario ID no encontrado en sesión, redirigiendo a login (FALLBACK).');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión para acceder a esta página.');
         }
+
+        log_message('debug', 'PerfilController::index() - Acceso a perfil para usuario ID: ' . $usuarioId);
 
         // Obtener las direcciones MAC enlazadas al usuario actual desde la tabla 'enlace'
         $enlaces = $this->enlaceModel
@@ -82,13 +80,6 @@ class PerfilController extends BaseController
             }
         }
 
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'PerfilController::index() - Dispositivos enlazados obtenidos: ' . json_encode($dispositivosEnlazados));
-        log_message('debug', 'PerfilController::index() - Lecturas por MAC procesadas: ' . json_encode($lecturasPorMac));
-        // --- FIN LOGGING ---
-
-
-        // Pasar los datos a la vista.
         return view('perfil', [
             'dispositivosEnlazados' => $dispositivosEnlazados,
             'lecturasPorMac' => $lecturasPorMac
@@ -97,21 +88,24 @@ class PerfilController extends BaseController
 
 
     // --- MÉTODOS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN ---
+    // (Estos métodos no se modifican significativamente ya que su lógica es sólida)
 
     public function configuracion()
     {
         $session = session();
         $loggedInUserId = $session->get('id');
 
+        // Esta verificación también es redundante si el grupo de rutas ya está protegido
+        // pero la mantengo por robustez.
         if (!$loggedInUserId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión para acceder a esta página.');
         }
 
         $userData = $this->userModel->find($loggedInUserId);
 
          if (!$userData) {
             $session->destroy();
-            return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
+            return redirect()->to('/loginobtener')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
         }
 
         $data['userEmail'] = $userData['email'] ?? 'No disponible';
@@ -125,14 +119,14 @@ class PerfilController extends BaseController
         $loggedInUserId = $session->get('id');
 
         if (!$loggedInUserId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para enviar el correo de verificación.');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión para enviar el correo de verificación.');
         }
 
         $user = $this->userModel->find($loggedInUserId);
 
         if (!$user) {
             $session->destroy();
-            return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
+            return redirect()->to('/loginobtener')->with('error', 'Usuario no encontrado.');
         }
 
         $email = $user['email'];
@@ -145,9 +139,6 @@ class PerfilController extends BaseController
         ]);
 
         $emailService = \Config\Services::email();
-        // Configura el remitente en app/Config/Email.php o .env
-        // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
-
         $emailService->setTo($email);
         $emailService->setSubject('Verificación de Email para Configuración de Perfil');
         $verificationLink = base_url("perfil/verificar-email/{$token}");
@@ -193,11 +184,13 @@ class PerfilController extends BaseController
         $session = session();
         $loggedInUserId = $session->get('id');
 
+         // Estas verificaciones también son redundantes si el grupo de rutas ya está protegido
+         // pero la mantengo por robustez.
          if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
              if ($loggedInUserId) {
                  return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de acceder a la configuración.');
              } else {
-                 return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+                 return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión para acceder a esta página.');
              }
         }
 
@@ -205,7 +198,7 @@ class PerfilController extends BaseController
 
          if (!$userData) {
             $session->destroy();
-            return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
+            return redirect()->to('/loginobtener')->with('error', 'Usuario no encontrado.');
         }
 
          $data['userData'] = [
@@ -221,11 +214,13 @@ class PerfilController extends BaseController
         $session = session();
         $loggedInUserId = $session->get('id');
 
+         // Estas verificaciones también son redundantes si el grupo de rutas ya está protegido
+         // pero la mantengo por robustez.
          if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
              if ($loggedInUserId) {
                  return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de actualizar tu perfil.');
              } else {
-                 return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar tu perfil.');
+                 return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión para actualizar tu perfil.');
              }
         }
 
@@ -299,7 +294,7 @@ class PerfilController extends BaseController
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión.');
         }
 
         if ($mac === null) {
@@ -332,7 +327,7 @@ class PerfilController extends BaseController
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión.');
         }
 
         $mac = $this->request->getPost('mac');
@@ -395,7 +390,7 @@ class PerfilController extends BaseController
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
+            return redirect()->to('/loginobtener')->with('error', 'Debes iniciar sesión.');
         }
 
         $macs_a_eliminar = $this->request->getPost('macs');
