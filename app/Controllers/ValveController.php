@@ -7,19 +7,30 @@ use App\Models\DispositivoModel;
 use App\Models\EnlaceModel;
 use App\Models\LecturasGasModel;
 
+/**
+ * Nombre del archivo: ValveController.php
+ * Ubicación: app/Controllers/ValveController.php
+ *
+ * Este controlador maneja la lógica para el control de la válvula de gas,
+ * la recepción de lecturas de sensores y la consulta del estado del dispositivo.
+ * Actúa como la API principal para la comunicación entre la PWA (interfaz de usuario)
+ * y los microcontroladores ESP32.
+ */
 class ValveController extends Controller
 {
-    // Los umbrales de gas se mantienen aquí solo como referencia
-    // o para otras lógicas (ej. alarmas en la ESP32 o reportes),
-    // pero YA NO controlan directamente la apertura/cierre de la válvula desde esta API.
-    private const OPEN_VALVE_THRESHOLD = 100;
-    private const CLOSE_VALVE_THRESHOLD = 200;
+    // Define los umbrales de gas aquí.
+    // Usaremos OPEN_VALVE_SAFE_THRESHOLD para determinar si es seguro abrir.
+    private const OPEN_VALVE_SAFE_THRESHOLD = 50; // Ejemplo: Si el nivel de gas es 50 o menos, es seguro abrir.
+    private const CLOSE_VALVE_THRESHOLD_ALARM = 200; // Podría usarse para cerrar automáticamente o activar alarma.
 
     /**
      * Maneja el comando de abrir o cerrar la válvula para un dispositivo específico.
      * Recibe la MAC del dispositivo y el comando ('open' o 'close') vía JSON POST.
      * Este método es llamado por la página web.
-     * La válvula puede ser abierta o cerrada siempre, sin importar los umbrales de gas.
+     *
+     * Reglas:
+     * - La válvula SIEMPRE puede ser cerrada.
+     * - La válvula SOLO puede ser abierta si el 'ultimo_nivel_gas' es igual o menor a OPEN_VALVE_SAFE_THRESHOLD.
      *
      * @return \CodeIgniter\HTTP\ResponseInterface
      */
@@ -38,7 +49,6 @@ class ValveController extends Controller
         }
 
         // --- VERIFICACIÓN DE USUARIO Y ENLACE (PARA LA PÁGINA WEB) ---
-        // Se mantiene la verificación de que el usuario tiene enlazado el dispositivo por seguridad.
         $session = \Config\Services::session();
         $userId = $session->get('id_usuario');
 
@@ -61,15 +71,37 @@ class ValveController extends Controller
         // --- FIN VERIFICACIÓN DE USUARIO Y ENLACE ---
 
         $dispositivoModel = new DispositivoModel();
+        $dispositivo = $dispositivoModel->where('MAC', $mac)->first();
+
+        if (!$dispositivo) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Dispositivo con MAC "' . $mac . '" no encontrado.'
+            ])->setStatusCode(404);
+        }
 
         // Determinar el valor numérico para 'estado_valvula' basado en el comando
         // 1 para 'open' (abrir), 0 para 'close' (cerrar)
         $estadoValvula = null;
+        $messageSuffix = '';
 
         if ($command === 'open') {
-            $estadoValvula = 1;
+            // Lógica para abrir: SOLO si es seguro (nivel de gas bajo el umbral)
+            $currentGasLevel = (int)($dispositivo->ultimo_nivel_gas ?? 0);
+
+            if ($currentGasLevel <= self::OPEN_VALVE_SAFE_THRESHOLD) {
+                $estadoValvula = 1; // Abrir la válvula
+                $messageSuffix = ' abierta';
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'No es seguro abrir la válvula para el dispositivo ' . $mac . '. Nivel de gas actual (' . $currentGasLevel . ') supera el umbral de seguridad (' . self::OPEN_VALVE_SAFE_THRESHOLD . ').'
+                ])->setStatusCode(403); // Forbidden
+            }
         } elseif ($command === 'close') {
-            $estadoValvula = 0;
+            // Lógica para cerrar: SIEMPRE se puede cerrar
+            $estadoValvula = 0; // Cerrar la válvula
+            $messageSuffix = ' cerrada';
         } else {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -77,24 +109,27 @@ class ValveController extends Controller
             ])->setStatusCode(400);
         }
 
-        // No se requiere verificar $permisoOtorgado basado en niveles de gas,
-        // ya que la solicitud es que la válvula siempre pueda ser controlada.
+        // Si el estado de la válvula ya es el deseado, no necesitamos hacer un UPDATE real
+        if ((int)$dispositivo->estado_valvula === $estadoValvula) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'La válvula para el dispositivo ' . $mac . ' ya está' . $messageSuffix . '.'
+            ]);
+        }
 
         // Actualizar el estado de la válvula en la base de datos
-        // NOTA: Se actualiza el campo 'estado_valvula' de la tabla 'dispositivos'.
         $updated = $dispositivoModel->where('MAC', $mac)->set(['estado_valvula' => $estadoValvula])->update();
 
         if ($updated) {
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => 'Válvula ' . (($command === 'open') ? 'abierta' : 'cerrada') . ' correctamente para el dispositivo ' . $mac . '.'
+                'message' => 'Válvula' . $messageSuffix . ' correctamente para el dispositivo ' . $mac . '.'
             ]);
         } else {
-            // Esto puede ocurrir si la MAC no se encontró (aunque ya se verificó antes)
-            // o si el estado de la válvula ya es el solicitado (no se realiza un UPDATE real en la DB).
+            // Esto puede ocurrir si hubo un problema desconocido al actualizar.
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'No se pudo actualizar el estado de la válvula. Es posible que el estado ya sea el solicitado o la MAC no existe.'
+                'message' => 'No se pudo actualizar el estado de la válvula para el dispositivo ' . $mac . '. Por favor, intente de nuevo.'
             ])->setStatusCode(500);
         }
     }
@@ -118,15 +153,14 @@ class ValveController extends Controller
         }
 
         $dispositivoModel = new DispositivoModel();
-        // DispositivoModel devuelve objetos (lo configuramos con returnType = 'object')
         $dispositivo = $dispositivoModel->where('MAC', $mac)->first();
 
         if ($dispositivo) {
             return $this->response->setJSON([
                 'status' => 'success',
                 'mac' => $mac,
-                'estado_valvula' => (int)$dispositivo->estado_valvula, // Acceso a propiedad de objeto
-                'ultimo_nivel_gas' => (int)($dispositivo->ultimo_nivel_gas ?? 0) // Acceso a propiedad de objeto
+                'estado_valvula' => (int)$dispositivo->estado_valvula,
+                'ultimo_nivel_gas' => (int)($dispositivo->ultimo_nivel_gas ?? 0)
             ]);
         } else {
             return $this->response->setJSON([
@@ -163,7 +197,6 @@ class ValveController extends Controller
 
         $dispositivoExistente = $dispositivoModel->where('MAC', $idPlaca)->first();
 
-        // Datos para actualizar/insertar en la tabla 'dispositivos'
         $dataToSaveDispositivo = [
             'ultimo_nivel_gas' => $nivelGas,
             'ultima_actualizacion' => date('Y-m-d H:i:s')
@@ -171,11 +204,9 @@ class ValveController extends Controller
 
         $action = '';
         if ($dispositivoExistente) {
-            // Si el dispositivo existe, actualizarlo
             $updated = $dispositivoModel->where('MAC', $idPlaca)->set($dataToSaveDispositivo)->update();
             $action = 'actualizado';
         } else {
-            // Si el dispositivo NO existe, crearlo
             $dataToSaveDispositivo['MAC'] = $idPlaca;
             $dataToSaveDispositivo['nombre'] = 'Dispositivo ' . $idPlaca;
             $dataToSaveDispositivo['ubicacion'] = 'Desconocida';
@@ -187,12 +218,11 @@ class ValveController extends Controller
 
         // --- Lógica para insertar en `lecturas_gas` ---
         $userIdForLectura = null;
-        $enlace = $enlaceModel->where('MAC', $idPlaca)->first(); // Esto devuelve un ARRAY
+        $enlace = $enlaceModel->where('MAC', $idPlaca)->first();
 
-        if ($enlace && isset($enlace['id_usuario'])) { // Acceso a propiedad de array con []
+        if ($enlace && isset($enlace['id_usuario'])) {
             $userIdForLectura = (int)$enlace['id_usuario'];
         } else {
-            // Si la MAC no está enlazada a un usuario, no se registra la lectura detallada.
             log_message('warning', 'Lectura de gas recibida para MAC no enlazada: ' . $idPlaca . '. No se registró la lectura detallada en lecturas_gas.');
             return $this->response->setJSON([
                 'status' => 'error',
