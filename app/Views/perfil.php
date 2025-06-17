@@ -28,549 +28,414 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
 
         /* --- NAVBAR IMPROVEMENTS --- */
         .navbar {
-            background-color: #2d3748 !important; /* Dark background */
-            /* Navbar is block level and takes full width by default */
+            background-color: #2d3748 !important;
+            /* Dark background */
         }
 
         .navbar-brand {
-            color: #fff !important; /* White color for brand text */
+            color: #4299e1 !important;
+            /* Blue for brand */
             font-weight: bold;
-            /* Increase font size for brand */
-            font-size: 1.4rem; /* Slightly larger for brand */
         }
 
         .navbar-nav .nav-link {
-            color: #cbd5e0 !important; /* Color for links */
-            /* Increase font size for links */
-            font-size: 1.1rem; /* Larger font size */
-            /* Add vertical padding to make links taller */
-            padding-top: .75rem;
-            padding-bottom: .75rem;
-        }
-
-        .navbar-nav .nav-link.active {
-            color: #4299e1 !important; /* Blue for active link */
-            font-weight: bold;
+            color: #a0aec0 !important;
+            /* Light gray for links */
+            transition: color 0.3s ease;
+            /* Smooth transition for hover */
         }
 
         .navbar-nav .nav-link:hover {
-             color: #fff !important; /* White on hover */
+            color: #fff !important;
+            /* White on hover */
         }
+
+        .dropdown-menu {
+            background-color: #2d3748;
+            /* Dark background for dropdown */
+            border: none;
+        }
+
+        .dropdown-item {
+            color: #a0aec0;
+            /* Light gray for dropdown items */
+        }
+
+        .dropdown-item:hover {
+            background-color: #4a5568;
+            /* Slightly lighter dark on hover */
+            color: #fff;
+        }
+
         /* --- END NAVBAR IMPROVEMENTS --- */
 
-
-        /* --- BUTTON IMPROVEMENTS (using Bootstrap classes and tailoring where needed) --- */
-
-        /* Logout Button (already decent, kept custom styles for outline variant) */
-        .btn-outline-secondary {
-            color: #cbd5e0;
-            border-color: #cbd5e0;
-        }
-         .btn-outline-secondary:hover {
-            color: #1a202c;
-            background-color: #cbd5e0;
-            border-color: #cbd5e0;
-        }
-
-        /* Override Bootstrap default colors to match dark theme palette */
-        .btn-primary {
-             background-color: #4299e1; /* Maintain desired blue */
-             border-color: #4299e1;
-             color: white; /* Ensure text is white */
-        }
-        .btn-primary:hover {
-             background-color: #2b6cb0; /* Darker blue on hover */
-             border-color: #2b6cb0;
-             color: white;
-        }
-
-        .btn-success {
-            background-color: #48bb78; /* Maintain desired green */
-            border-color: #48bb78;
-            color: white; /* Ensure text is white */
-        }
-        .btn-success:hover {
-            background-color: #38a169; /* Darker green on hover */
-            border-color: #38a169;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #e53e3e; /* Maintain desired red */
-            border-color: #e53e3e;
-            color: white; /* Ensure text is white */
-        }
-        .btn-danger:hover {
-            background-color: #c53030; /* Darker red on hover */
-            border-color: #c53030;
-            color: white;
-        }
-
-        .btn-info {
-            /* Using a color similar to primary for info/view details in this theme */
-            background-color: #4299e1;
-            border-color: #4299e1;
-            color: white; /* Ensure text is white */
-        }
-         .btn-info:hover {
-            background-color: #2b6cb0; /* Darker blue on hover */
-            border-color: #2b6cb0;
-            color: white;
-        }
-
-        /* Specific style for the add MAC form button - using btn-success */
-        #add-mac-form .btn-success {
-             margin-top: 0.5rem; /* Add space above the button in the form */
-        }
-
-        /* --- END BUTTON IMPROVEMENTS --- */
-
-
-        /* Contenedor principal del contenido */
         .container {
             flex: 1;
-            padding: 2rem;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
 
-        /* Card styles (kept as is, they fit the dark theme) */
         .card {
             background-color: #2d3748;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
+            /* Card background */
+            color: #cbd5e0;
+            /* Card text */
+            border: 1px solid #4a5568;
+            /* Card border */
+            margin-bottom: 20px;
         }
 
         .card-header {
             background-color: #4a5568;
-            color: #edf2f7;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #2d3748;
-            border-radius: 0.5rem 0.5rem 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-title i {
-            margin-right: 0.5rem;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Alert styles (kept as is) */
-        .alert {
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: 0.375rem;
-        }
-
-        .alert-success {
-            background-color: #c6f6d5;
-            color: #1a202c;
-            border-color: #a7f3d0;
-        }
-
-        .alert-danger {
-            background-color: #fed7d7;
-            color: #1a202c;
-            border-color: #fbcbcb;
-        }
-
-         .alert-info {
-            background-color: #bee3f8;
-            color: #1a202c;
-            border-color: #90cdf4;
-        }
-
-        /* Devices Section Title (kept as is) */
-        .devices-section-title {
-            color: #edf2f7;
-            font-size: 1.5rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #4a5568;
-            padding-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-         .devices-section-title i {
-             margin-right: 0.5rem;
-         }
-
-        /* Add MAC Form (kept most styles, added Bootstrap form control style) */
-        #add-mac-form {
-            background-color: #4a5568;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-         #add-mac-form label {
-             color: #edf2f7;
-             font-weight: bold;
-             margin-bottom: 0.5rem;
-             display: block;
-         }
-
-         /* Ensure Bootstrap form-control styles apply */
-         #add-mac-form .form-control {
-             width: 100%;
-             padding: 0.75rem;
-             background-color: #2d3748; /* Dark background for input */
-             border: 1px solid #718096; /* Border color */
-             border-radius: 0.375rem;
-             color: #edf2f7; /* Text color */
-             box-sizing: border-box;
-             margin-bottom: 1rem;
-         }
-         /* Style for Bootstrap's default focus ring in dark mode */
-         #add-mac-form .form-control:focus {
-             background-color: #2d3748;
-             color: #edf2f7;
-             border-color: #63b3ed; /* Blue focus border */
-             box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Blue focus shadow */
-         }
-
-
-        /* Delete Devices Form wrapper */
-        #delete-devices-form {
-             margin-top: 1.5rem;
-        }
-
-        /* Device List and Item styles (kept as is, they look good) */
-        .device-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-         .device-item {
-             background-color: #2d3748;
-             border: 1px solid #4a5568;
-             border-radius: 0.5rem;
-             padding: 1.5rem;
-             margin-bottom: 1.5rem;
-             display: flex;
-             justify-content: space-between;
-             align-items: center;
-             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
-             transition: box-shadow 0.3s ease;
-         }
-
-         .device-item:hover {
-              box-shadow: 0 0 10px rgba(66, 153, 225, 0.4); /* Use a blue glow on hover */
-         }
-
-        .device-info {
-            flex-grow: 1;
-            margin-right: 1rem;
-        }
-
-        .device-name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #edf2f7;
-            margin-bottom: 0.25rem;
-        }
-
-        .device-details {
-            font-size: 0.9rem;
-            color: #a0aec0;
-        }
-
-        .device-actions {
-             display: flex;
-             align-items: center;
-             /* Space out the checkbox and the buttons */
-             gap: 0.5rem; /* Gap between flex items */
-        }
-         /* Removed old margin-left rules as gap handles spacing */
-
-
-        /* Custom Checkbox styles for dark theme */
-        .delete-checkbox {
-            width: 1.2em;
-            height: 1.2em;
-            vertical-align: middle;
-            cursor: pointer;
-            background-color: #4a5568; /* Dark background */
-            border: 1px solid #718096; /* Border color */
-            border-radius: 0.25em; /* Slight border radius */
-            appearance: none; /* Hide default checkbox */
-            -webkit-appearance: none;
-            position: relative;
-            flex-shrink: 0; /* Prevent shrinking in flex container */
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-         }
-
-         .delete-checkbox:checked {
-             background-color: #48bb78; /* Green when checked */
-             border-color: #48bb78;
-         }
-
-         .delete-checkbox:focus {
-              outline: none; /* Remove default focus outline */
-              box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Add custom focus ring */
-         }
-
-         /* Add custom checkmark using Font Awesome */
-         .delete-checkbox:checked::after {
-             content: '\f00c'; /* Font Awesome check icon */
-             font-family: 'Font Awesome 6 Free';
-             font-weight: 900; /* Solid icon weight */
-             color: white; /* White checkmark */
-             font-size: 0.8em;
-             position: absolute;
-             top: 50%;
-             left: 50%;
-             transform: translate(-50%, -50%);
-         }
-
-
-        /* Modal styles (kept as is, fit dark theme) */
-        .modal-content {
-            background-color: #2d3748;
+            /* Card header background */
             color: #fff;
-            border: none;
-            border-radius: 0.5rem;
+            /* Card header text */
+            font-weight: bold;
         }
 
-        .modal-header {
-            background-color: #4a5568;
-            border-bottom: 1px solid #2d3748;
-            color: #edf2f7;
+        .btn-primary {
+            background-color: #4299e1;
+            border-color: #4299e1;
         }
 
-        .modal-footer {
-            border-top: 1px solid #2d3748;
+        .btn-primary:hover {
+            background-color: #3182ce;
+            border-color: #3182ce;
         }
 
-         /* Modal button styles - kept as is */
-         .modal-footer .btn-secondary {
-             background-color: #6b7280;
-             border-color: #6b7280;
-             color: white;
-         }
-
-         .modal-footer .btn-danger {
-             background-color: #e53e3e;
-             border-color: #e53e3e;
-             color: white;
-         }
-
-        /* Ensure close button color is visible in dark modal header */
-        .modal-header .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%); /* Makes the close button white */
+        .btn-success {
+            background-color: #48bb78;
+            border-color: #48bb78;
         }
 
+        .btn-success:hover {
+            background-color: #38a169;
+            border-color: #38a169;
+        }
 
+        .btn-info {
+            background-color: #4fd1c5;
+            border-color: #4fd1c5;
+        }
+
+        .btn-info:hover {
+            background-color: #38b2ac;
+            border-color: #38b2ac;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+        }
+
+        .btn-secondary {
+            background-color: #a0aec0;
+            border-color: #a0aec0;
+        }
+
+        .btn-secondary:hover {
+            background-color: #718096;
+            border-color: #718096;
+        }
+
+        .form-control {
+            background-color: #2d3748;
+            color: #cbd5e0;
+            border-color: #4a5568;
+        }
+
+        .form-control:focus {
+            background-color: #2d3748;
+            color: #cbd5e0;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+        .table {
+            color: #cbd5e0;
+        }
+
+        .table th,
+        .table td {
+            border-color: #4a5568;
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: #2d3748;
+            color: #cbd5e0;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                text-align: center;
+            }
+
+            .navbar-toggler {
+                margin-left: auto;
+            }
+        }
     </style>
-
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ASG">
-    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-
 </head>
 
 <body>
-
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
-                        </li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="<?= base_url('/') ?>">
+                <img src="<?= base_url('/imagenes/Logo.png'); ?>" alt="Logo ASG" width="30" height="30" class="d-inline-block align-text-top me-2">
+                ASG
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('/dashboard') ?>">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
+                    </li>
                     </ul>
-
-                    <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
-                         </button>
-                    </form>
-                </div>
+                <ul class="navbar-nav ms-auto">
+                    <?php if (session()->get('isLoggedIn')): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <?= esc(session()->get('nombre')) ?>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="<?= base_url('/logout') ?>">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/login') ?>">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/register') ?>">Registrarse</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
-    <div class="container my-5">
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Mi Perfil</h1>
 
-        <?php if (session('success')): ?>
-             <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
-         <?php endif; ?>
-         <?php if (session('error')): ?>
-             <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
-         <?php endif; ?>
-         <?php if (session('info')): ?>
-             <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i> <?= session('info') ?></div>
-         <?php endif; ?>
+        <?= view('CodeIgniter\Shield\Views\messages\message_info') ?>
+        <?= view('CodeIgniter\Shield\Views\messages\message_success') ?>
+        <?= view('CodeIgniter\Shield\Views\messages\message_errors') ?>
 
+        <?php if (session()->has('success')): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?= session('success') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        <?php if (session()->has('error')): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?= session('error') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
 
         <div class="card">
-             <div class="card-header">
-                 <h5 class="card-title"><i class="fas fa-user-circle me-2"></i> Mi Perfil</h5>
-             </div>
-             <div class="card-body">
-                 <p><strong>Nombre:</strong> <?= esc(session()->get('nombre')) ?></p>
-                 <p><strong>Email:</strong> <?= esc(session()->get('email')) ?></p>
-             </div>
+            <div class="card-header">
+                Información del Usuario
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> <?= esc(session()->get('nombre')) ?></p>
+                <p><strong>Email:</strong> <?= esc(session()->get('email')) ?></p>
+                <a href="<?= base_url('/perfil/configuracion') ?>" class="btn btn-info"><i class="fas fa-cog me-2"></i> Configuración del Perfil</a>
+            </div>
         </div>
 
-        <div class="devices-section-title">
-             <h2 style="margin: 0;"><i class="fas fa-microchip me-2"></i> Mis Dispositivos Enlazados</h2>
-             <button id="show-add-mac-form" class="btn btn-primary btn-sm">
-                 <i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo
-             </button>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Mis Dispositivos Enlazados
+                <button type="button" class="btn btn-danger btn-sm" id="deleteSelectedBtn" style="display: none;">
+                    <i class="fas fa-trash me-2"></i> Eliminar Seleccionados
+                </button>
+            </div>
+            <div class="card-body">
+                <?php if (empty($dispositivosEnlazados)): ?>
+                    <p class="text-center">No tienes dispositivos enlazados todavía.</p>
+                <?php else: ?>
+                    <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
+                        <?= csrf_field() ?>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllCheckbox"></th>
+                                        <th>MAC</th>
+                                        <th>Nombre</th>
+                                        <th>Ubicación</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo['MAC']) ?>" class="delete-checkbox">
+                                            </td>
+                                            <td><?= esc($dispositivo['MAC']) ?></td>
+                                            <td><?= esc($dispositivo['nombre']) ?></td>
+                                            <td><?= esc($dispositivo['ubicacion']) ?></td>
+                                            <td>
+                                                <?php
+                                                $estado_clase = '';
+                                                switch ($dispositivo['estado_dispositivo']) {
+                                                    case 'disponible':
+                                                        $estado_clase = 'badge bg-success';
+                                                        break;
+                                                    case 'en_uso':
+                                                        $estado_clase = 'badge bg-primary';
+                                                        break;
+                                                    case 'mantenimiento':
+                                                        $estado_clase = 'badge bg-warning text-dark';
+                                                        break;
+                                                    default:
+                                                        $estado_clase = 'badge bg-secondary';
+                                                        break;
+                                                }
+                                                ?>
+                                                <span class="<?= $estado_clase ?>"><?= esc(ucfirst(str_replace('_', ' ', $dispositivo['estado_dispositivo']))) ?></span>
+                                            </td>
+                                            <td>
+                                                <a href="<?= base_url('perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-sm btn-warning me-2" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="<?= base_url('lecturas/dispositivo/' . esc($dispositivo['MAC'])) ?>" class="btn btn-sm btn-secondary" title="Ver Lecturas">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                <?php endif; ?>
+            </div>
         </div>
-
-
-        <div id="add-mac-form" style="display: none;">
-             <form action="<?= base_url('/enlace/store') ?>" method="post">
-                 <?= csrf_field() ?>
-                 <div class="mb-3">
-                     <label for="mac">Dirección MAC:</label>
-                     <input type="text" class="form-control" id="mac" name="mac" placeholder="Ej: XX:XX:XX:XX:XX:XX" required>
-                 </div>
-                 <button type="submit" class="btn btn-success"><i class="fas fa-link me-2"></i> Enlazar Dispositivo</button>
-             </form>
-              <hr class="my-4" style="border-color: #4a5568;">
-        </div>
-
-
-        <?php if (empty($dispositivosEnlazados)): ?>
-             <p>No tienes dispositivos enlazados aún.</p>
-         <?php else: ?>
-             <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
-                 <?= csrf_field() ?>
-                 <button type="button" id="delete-selected-btn" class="btn btn-danger mb-3">
-                     <i class="fas fa-trash-alt me-2"></i> Eliminar Seleccionados
-                 </button>
-
-                 <ul class="device-list">
-                     <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
-                         <li class="device-item">
-                             <div class="device-info">
-                                 <div class="device-name"><?= esc($dispositivo['nombre'] ?: 'Dispositivo sin nombre') ?></div>
-                                 <div class="device-details">
-                                      MAC: <?= esc($dispositivo['MAC'] ?? 'Desconocida') ?> |
-                                      Ubicación: <?= esc($dispositivo['ubicacion'] ?: 'Desconocida') ?>
-                                 </div>
-                             </div>
-                             <div class="device-actions">
-                                 <input type="checkbox" name="macs[]" value="<?= esc($dispositivo['MAC']) ?>" class="delete-checkbox">
-                                 <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
-                                     <i class="fas fa-edit"></i> Editar
-                                 </a>
-                                 <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
-                                     <i class="fas fa-chart-bar"></i> Ver Detalles
-                                 </a>
-                             </div>
-                         </li>
-                     <?php endforeach; ?>
-                 </ul>
-
-             </form>
-         <?php endif; ?>
 
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-             <div class="modal-dialog">
-                 <div class="modal-content">
-                     <div class="modal-header">
-                         <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                     </div>
-                     <div class="modal-body">
-                         ¿Estás seguro de que deseas desenlazar los dispositivos seleccionados?
-                     </div>
-                     <div class="modal-footer">
-                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                         <button type="button" class="btn btn-danger" id="confirm-delete-btn">Eliminar</button>
-                     </div>
-                 </div>
-             </div>
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que quieres eliminar los dispositivos seleccionados de tu perfil? Esta acción los desvinculará de tu cuenta y los marcará como disponibles.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-
     </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <?= date('Y') ?> ASG. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Script para manejar la visibilidad del formulario de añadir MAC y el modal de eliminación
         document.addEventListener('DOMContentLoaded', function () {
-            const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-            const deleteDevicesForm = document.getElementById('delete-devices-form');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const deleteCheckboxes = document.querySelectorAll('.delete-checkbox');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
             const confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
-            const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalElement); // Get Bootstrap modal instance
-            const addMacForm = document.getElementById('add-mac-form');
-            const showAddMacFormButton = document.getElementById('show-add-mac-form');
+            const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalElement);
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteDevicesForm = document.getElementById('delete-devices-form');
 
-            // Mostrar/ocultar formulario de añadir MAC
-            if (showAddMacFormButton && addMacForm) { // Check if both elements exist
-                 showAddMacFormButton.addEventListener('click', function () {
-                     // Use class 'd-none' for better Bootstrap compatibility, but style="display: none" is also fine
-                     if (addMacForm.style.display === "none" || addMacForm.style.display === "") {
-                         addMacForm.style.display = "block"; // Show
-                         this.innerHTML = '<i class="fas fa-minus-circle me-2"></i> Ocultar Formulario'; // Change text
-                     } else {
-                         addMacForm.style.display = "none"; // Hide
-                         this.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo'; // Change text
-                     }
-                 });
-             }
+            // Función para actualizar la visibilidad del botón de eliminar
+            function updateDeleteButtonVisibility() {
+                const checkedCount = document.querySelectorAll('.delete-checkbox:checked').length;
+                if (checkedCount > 0) {
+                    deleteSelectedBtn.style.display = 'block';
+                } else {
+                    deleteSelectedBtn.style.display = 'none';
+                }
+            }
 
+            // Manejar el checkbox "Seleccionar todos"
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    deleteCheckboxes.forEach(checkbox => {
+                        checkbox.checked = selectAllCheckbox.checked;
+                    });
+                    updateDeleteButtonVisibility();
+                });
+            }
 
-            // Mostrar modal de confirmación al hacer clic en "Eliminar Seleccionados"
-            if (deleteSelectedBtn && confirmDeleteModalElement) { // Check if button and modal element exist
-                 deleteSelectedBtn.addEventListener('click', function () {
-                     const checkedDevices = document.querySelectorAll('#delete-devices-form .delete-checkbox:checked');
-                     if (checkedDevices.length > 0) {
-                         confirmDeleteModal.show(); // Use Bootstrap's show method
-                     } else {
-                         alert('Por favor, selecciona al menos un dispositivo para eliminar.');
-                     }
-                 });
-             }
+            // Manejar cambios en los checkboxes individuales
+            deleteCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (!this.checked) {
+                        if (selectAllCheckbox) {
+                            selectAllCheckbox.checked = false;
+                        }
+                    } else {
+                        // Si todos los individuales están marcados, marcar "Seleccionar todos"
+                        const allChecked = Array.from(deleteCheckboxes).every(cb => cb.checked);
+                        if (selectAllCheckbox) {
+                            selectAllCheckbox.checked = allChecked;
+                        }
+                    }
+                    updateDeleteButtonVisibility();
+                });
+            });
+
+            // Mostrar el modal de confirmación al hacer clic en el botón de eliminar
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', function () {
+                    const checkedDevices = document.querySelectorAll('#delete-devices-form .delete-checkbox:checked');
+                    if (checkedDevices.length > 0) {
+                        confirmDeleteModal.show(); // Use Bootstrap's show method
+                    } else {
+                        alert('Por favor, selecciona al menos un dispositivo para eliminar.');
+                    }
+                });
+            }
 
 
             // Enviar el formulario de eliminación cuando se confirma en el modal
             if (confirmDeleteBtn && deleteDevicesForm && confirmDeleteModalElement) { // Check if all elements exist
-                 confirmDeleteBtn.addEventListener('click', function () {
-                     confirmDeleteModal.hide(); // Use Bootstrap's hide method
-                     deleteDevicesForm.submit();
-                 });
-             }
+                confirmDeleteBtn.addEventListener('click', function () {
+                    confirmDeleteModal.hide(); // Use Bootstrap's hide method
+                    deleteDevicesForm.submit();
+                });
+            }
 
         });
     </script>
