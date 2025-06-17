@@ -231,114 +231,76 @@ class PerfilController extends BaseController
      * Procesa la actualización del perfil (nombre y email).
      * Corresponde a POST /perfil/actualizar-perfil
      */
-    public function actualizarPerfil() // Renombrado de 'actualizar'
+    public function actualizarDispositivo()
     {
         $session = session();
-        $loggedInUserId = $session->get('id');
+        $usuarioId = $session->get('id');
 
-        if (!$loggedInUserId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar tu perfil.');
-        }
-
-        // Asegurarse de que el email ha sido verificado para acceder a esta función
-        if (!$session->get('email_verified_for_config')) {
-            return redirect()->to('/perfil/verificar-email')->with('error', 'Por favor, verifica tu email antes de actualizar tu perfil.');
+        if (!$usuarioId) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
         if ($this->request->getMethod() !== 'post') {
-            return redirect()->to('/perfil/configuracion');
+            return redirect()->to('/perfil');
         }
 
+        // OBTENEMOS LA MAC (es un identificador, no se está actualizando directamente)
+        $mac = $this->request->getPost('MAC');
+        $nombre = $this->request->getPost('nombre');
+        $ubicacion = $this->request->getPost('ubicacion');
+
+        // Validar SOLO los campos que se están actualizando
         $rules = [
-            // CAMBIO: La regla de validación ahora espera 'MAC' (mayúscula) para coincidir con la vista
-            'MAC' => [
-                'rules' => 'required|exact_length[17]',
-                'errors' => [
-                    'required' => 'La MAC es obligatoria.',
-                    'exact_length' => 'El formato de la MAC es incorrecto.'
-                ]
-            ],
             'nombre' => [
-                'rules' => 'required|min_length[3]|max_length[100]',
+                'rules' => 'required|max_length[255]',
                 'errors' => [
-                    'required' => 'El campo Nombre es obligatorio.',
-                    'min_length' => 'El Nombre debe tener al menos 3 caracteres.',
-                    'max_length' => 'El Nombre no puede exceder los 100 caracteres.'
+                    'required' => 'El Nombre del dispositivo es obligatorio.',
+                    'max_length' => 'El Nombre no puede exceder los 255 caracteres.'
                 ]
             ],
-            'email'  => [
-                'rules' => "required|valid_email|max_length[100]|is_unique[usuarios.email,id,{$loggedInUserId}]",
+            'ubicacion' => [
+                'rules' => 'max_length[255]',
                 'errors' => [
-                    'required' => 'El campo Email es obligatorio.',
-                    'valid_email' => 'Por favor, ingresa un Email válido.',
-                    'max_length' => 'El Email no puede exceder los 100 caracteres.',
-                    'is_unique' => 'Este Email ya está registrado por otro usuario.'
+                    'max_length' => 'La Ubicación no puede exceder los 255 caracteres.'
                 ]
             ],
         ];
 
         if (!$this->validate($rules)) {
             // Si la validación falla, redirigir de nuevo al formulario de edición con errores
-            // Asegúrate de pasar la MAC para que el redirect pueda construir la URL correcta
-            $macFromPost = $this->request->getPost('MAC'); // Obtener la MAC para la redirección
-            return redirect()->to("/perfil/dispositivo/editar/{$macFromPost}")->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $nombre = $this->request->getPost('nombre');
-        $email = $this->request->getPost('email');
+        // Primero, verificar si el usuario tiene permiso para editar este dispositivo
+        $enlace = $this->enlaceModel
+                        ->where('id_usuario', $usuarioId)
+                        ->where('MAC', $mac)
+                        ->first();
 
-        $currentUserData = $this->userModel->find($loggedInUserId);
+        if (!$enlace) {
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para actualizar este dispositivo.');
+        }
+
+        // Obtener el dispositivo por su MAC para obtener su ID (ya que el modelo usa 'id' como primaryKey)
+        $dispositivoExistente = $this->dispositivoModel->where('MAC', $mac)->first();
+        if (!$dispositivoExistente) {
+            return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado para la MAC proporcionada.');
+        }
+
         $updateData = [
             'nombre' => $nombre,
-            'email'  => $email,
+            'ubicacion' => $ubicacion,
+            // 'updated_at' se manejará automáticamente por DispositivoModel gracias a useTimestamps
         ];
 
-        $emailChanged = ($currentUserData['email'] !== $email);
-
-        if ($emailChanged) {
-            // Si el email cambia, invalidar la cuenta hasta que el nuevo email sea verificado
-            $updateData['is_active'] = 0; // Marcar como inactivo hasta verificar el nuevo email
-            $updateData['reset_token'] = bin2hex(random_bytes(32)); // Nuevo token para el nuevo email
-            $updateData['reset_expires'] = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
-            if ($this->userModel->update($loggedInUserId, $updateData)) {
-                // Enviar correo de verificación para el nuevo email
-                $emailService = \Config\Services::email();
-                $fromAddress = (string) (getenv('EMAIL_FROM_ADDRESS') ?? 'no-reply@tudominio.com');
-                $fromName = (string) (getenv('EMAIL_FROM_NAME') ?? 'Sistema ASG');
-                $emailService->setFrom($fromAddress, $fromName);
-                $emailService->setTo($email);
-                $emailService->setSubject('Verifica tu nuevo Email - ASG');
-                $verificationLink = base_url('register/verify-email/' . $updateData['reset_token']);
-                $message = "Hola " . esc($nombre) . ",\n\n"
-                                 . "Has actualizado tu email en el Sistema ASG. Por favor, verifica tu nuevo email haciendo clic en el siguiente enlace:\n"
-                                 . $verificationLink . "\n\n"
-                                 . "Este enlace expirará en 1 hora. Si no realizaste este cambio, ignora este correo.\n\n"
-                                 . "Gracias,\nSistema ASG";
-                $emailService->setMessage($message);
-
-                if (!$emailService->send()) {
-                    log_message('error', 'Error al enviar email de verificación de nuevo email de perfil: ' . $emailService->printDebugger(['headers']));
-                    return redirect()->back()->withInput()->with('error', 'Error al enviar el correo de verificación para el nuevo email. Inténtalo de nuevo.');
-                }
-
-                $session->setFlashdata('success', '¡Perfil actualizado! Se ha enviado un correo de verificación a tu nuevo email. Por favor, actívalo para recuperar el acceso.');
-                $session->destroy(); // Forzar logout para que el usuario se re-autentique con el nuevo estado
-                return redirect()->to('/login')->with('info', 'Tu email ha sido actualizado. Por favor, verifica tu nuevo email y vuelve a iniciar sesión.');
-            } else {
-                return redirect()->back()->withInput()->with('error', 'No se pudo actualizar el perfil. Inténtalo de nuevo.');
-            }
+        // Usar update por ID
+        // El primer parámetro es la clave primaria (ID), el segundo es el array de datos.
+        if ($this->dispositivoModel->update($dispositivoExistente['id'], $updateData)) {
+            return redirect()->to('/perfil')->with('success', "¡Dispositivo '{$nombre}' actualizado exitosamente!");
         } else {
-            // Si el email no cambia, solo actualizar el nombre
-            if ($this->userModel->update($loggedInUserId, $updateData)) {
-                $session->set('nombre', $nombre);
-                $session->set('email', $email);
-                $session->remove('email_verified_for_config'); // Limpiar la bandera ya que los cambios se aplicaron
-
-                return redirect()->to('/perfil/configuracion')->with('success', '¡Perfil actualizado exitosamente!');
-            } else {
-                return redirect()->back()->withInput()->with('error', 'No se pudo actualizar el perfil. Inténtalo de nuevo.');
-            }
+            // Considera añadir un log aquí para depuración en caso de que la actualización falle.
+            log_message('error', 'Error al actualizar dispositivo en la base de datos para MAC: ' . $mac . ' - Datos: ' . json_encode($updateData));
+            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('error', 'Hubo un error al intentar actualizar el dispositivo. Por favor, revisa los logs del servidor.');
         }
     }
 
