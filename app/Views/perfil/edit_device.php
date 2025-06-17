@@ -1,7 +1,15 @@
 <?php
 // Esta vista espera la variable $dispositivo del controlador,
 // que contiene los detalles del dispositivo a editar (MAC, nombre, ubicacion).
-$dispositivo = $dispositivo ?? ['MAC' => '', 'nombre' => '', 'ubicacion' => ''];
+
+// Si $dispositivo no está seteado o no es un objeto, creamos un objeto stdClass por defecto.
+// Esto asegura que siempre trabajemos con un objeto y evitamos errores si la variable no llega.
+if (!isset($dispositivo) || !is_object($dispositivo)) {
+    $dispositivo = new stdClass();
+    $dispositivo->MAC = '';
+    $dispositivo->nombre = '';
+    $dispositivo->ubicacion = '';
+}
 
 // CodeIgniter pasa los errores de validación en la variable $errors si la validación falla con with('errors', ...)'
 // Si la validación es exitosa, $errors será null o un array vacío.
@@ -58,7 +66,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
         }
 
         .navbar-nav .nav-link:hover {
-             color: #fff !important; /* Color al pasar el ratón */
+            color: #fff !important; /* Color al pasar el ratón */
         }
         /* --- FIN ESTILOS NAVBAR --- */
 
@@ -68,7 +76,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             color: #cbd5e0;
             border-color: #cbd5e0;
         }
-         .btn-outline-secondary:hover {
+        .btn-outline-secondary:hover {
             color: #1a202c;
             background-color: #cbd5e0;
             border-color: #cbd5e0;
@@ -131,16 +139,16 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             border-color: #2b6cb0;
         }
 
-         .btn-secondary {
-             background-color: #6b7280;
-             border-color: #6b7280;
-             color: white; /* Asegurar texto blanco */
-             transition: background-color 0.3s ease;
-         }
-         .btn-secondary:hover {
-             background-color: #4b5563;
-             border-color: #4b5563;
-         }
+        .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: white; /* Asegurar texto blanco */
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+        }
 
 
         /* Estilos para mensajes de alerta */
@@ -185,12 +193,12 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             box-sizing: border-box; /* Incluir padding y borde en el ancho total */
         }
 
-         /* Estilo para input deshabilitado */
-         .form-control:disabled {
-             background-color: #5a6678; /* Fondo ligeramente distinto para deshabilitados */
-             color: #a0aec0; /* Texto más claro */
-             opacity: 1; /* Asegurar que no se vea transparente */
-         }
+        /* Estilo para input deshabilitado */
+        .form-control:disabled {
+            background-color: #5a6678; /* Fondo ligeramente distinto para deshabilitados */
+            color: #a0aec0; /* Texto más claro */
+            opacity: 1; /* Asegurar que no se vea transparente */
+        }
 
 
         .form-control::placeholder {
@@ -204,10 +212,10 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
             font-size: 0.875em; /* Tamaño de fuente más pequeño */
             margin-top: 0.25rem;
         }
-         /* Estilo del input cuando hay error de validación */
-         .form-control.is-invalid {
-             border-color: #e53e3e;
-         }
+        /* Estilo del input cuando hay error de validación */
+        .form-control.is-invalid {
+            border-color: #e53e3e;
+        }
 
 
         /* Utilidades de espaciado (ya definidas por Bootstrap, pero se incluyen por consistencia) */
@@ -294,7 +302,7 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
                     <div class="form-group">
                         <label for="mac_display"><i class="fas fa-fingerprint me-2"></i> MAC del Dispositivo:</label>
                         <input type="text" class="form-control" id="mac_display" value="<?= esc($dispositivo->MAC ?? 'Desconocida') ?>" disabled>
-                         <?php if (isset($errors['mac'])): ?>
+                        <?php if (isset($errors['mac'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['mac']) ?>
                             </div>
@@ -315,13 +323,13 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
 
                     <div class="form-group">
                         <label for="ubicacion"><i class="fas fa-map-marker-alt me-2"></i> Ubicación:</label>
-                         <input type="text" class="form-control <?= isset($errors['ubicacion']) ? 'is-invalid' : '' ?>" id="ubicacion" name="ubicacion"
-                             value="<?= esc(set_value('ubicacion', $dispositivo['ubicacion'] ?? '')) ?>">
-                         <?php if (isset($errors['ubicacion'])): ?>
-                             <div class="invalid-feedback">
-                                 <?= esc($errors['ubicacion']) ?>
-                             </div>
-                         <?php endif; ?>
+                        <input type="text" class="form-control <?= isset($errors['ubicacion']) ? 'is-invalid' : '' ?>" id="ubicacion" name="ubicacion"
+                            value="<?= esc(set_value('ubicacion', $dispositivo->ubicacion ?? '')) ?>">
+                        <?php if (isset($errors['ubicacion'])): ?>
+                            <div class="invalid-feedback">
+                                <?= esc($errors['ubicacion']) ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <button type="submit" class="btn btn-primary mt-2 me-2"><i class="fas fa-save me-2"></i> Guardar Cambios</button>
