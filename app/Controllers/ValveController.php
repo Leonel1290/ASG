@@ -22,16 +22,16 @@ class ValveController extends Controller
     {
         $model = new DispositivoModel();
 
-        // Obtener la MAC y el nivel de gas del cuerpo de la solicitud POST.
+        // Obtener la mac y el nivel de gas del cuerpo de la solicitud POST.
         // Asegúrate de que el ESP32 envíe estos datos como application/x-www-form-urlencoded.
-        $MAC = $this->request->getPost('MAC');
+        $mac = $this->request->getPost('mac');
         $nivelGas = $this->request->getPost('nivel_gas');
 
         if (self::DEBUG_SENSOR_DATA) {
-            log_message('debug', "receiveSensorData: MAC recibida: " . $MAC . ", Nivel de Gas: " . $nivelGas);
+            log_message('debug', "receiveSensorData: mac recibida: " . $mac . ", Nivel de Gas: " . $nivelGas);
         }
 
-        if (!$MAC || $nivelGas === null) {
+        if (!$mac || $nivelGas === null) {
             log_message('error', 'receiveSensorData: Datos incompletos recibidos.');
             return $this->response->setJSON([
                 'status' => 'error',
@@ -39,15 +39,15 @@ class ValveController extends Controller
             ])->setStatusCode(400); // Bad Request
         }
 
-        // Buscar el dispositivo por MAC. Si no existe, puedes crearlo o devolver un error.
-        $dispositivo = $model->where('MAC', $MAC)->first();
+        // Buscar el dispositivo por mac. Si no existe, puedes crearlo o devolver un error.
+        $dispositivo = $model->where('mac', $mac)->first();
 
         if (!$dispositivo) {
-            log_message('warning', 'receiveSensorData: Dispositivo no encontrado con MAC: ' . $MAC . '. Creando nuevo dispositivo.');
+            log_message('warning', 'receiveSensorData: Dispositivo no encontrado con mac: ' . $mac . '. Creando nuevo dispositivo.');
             // Opcional: Crear un nuevo dispositivo si no existe.
             $model->insert([
-                'MAC' => $MAC,
-                'nombre' => 'ESP32_Nuevo_' . substr($MAC, -5), // Nombre por defecto
+                'mac' => $mac,
+                'nombre' => 'ESP32_Nuevo_' . substr($mac, -5), // Nombre por defecto
                 'ultimo_nivel_gas' => $nivelGas,
                 'estado_valvula' => 0 // Por defecto, la válvula cerrada para un nuevo dispositivo
             ]);
@@ -65,7 +65,7 @@ class ValveController extends Controller
         ]);
 
         if (self::DEBUG_SENSOR_DATA) {
-            log_message('debug', 'receiveSensorData: Nivel de gas actualizado para MAC ' . $MAC . ': ' . $nivelGas);
+            log_message('debug', 'receiveSensorData: Nivel de gas actualizado para mac ' . $mac . ': ' . $nivelGas);
         }
 
         return $this->response->setJSON([
@@ -78,22 +78,22 @@ class ValveController extends Controller
     // Endpoint para que el ESP32 consulte el estado deseado de su válvula.
     // La PWA actualiza este estado, y el ESP32 lo consulta periódicamente.
     // -------------------------------------------------------------------------
-    public function getValveState($MAC)
+    public function getValveState($mac)
     {
         $model = new DispositivoModel();
 
-        if (!$MAC) {
-            log_message('error', 'getValveState: MAC Address no proporcionada.');
+        if (!$mac) {
+            log_message('error', 'getValveState: mac Address no proporcionada.');
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'MAC Address requerida.'
+                'message' => 'mac Address requerida.'
             ])->setStatusCode(400);
         }
 
-        $dispositivo = $model->where('MAC', $MAC)->first();
+        $dispositivo = $model->where('mac', $mac)->first();
 
         if (!$dispositivo) {
-            log_message('warning', 'getValveState: Dispositivo no encontrado con MAC: ' . $MAC);
+            log_message('warning', 'getValveState: Dispositivo no encontrado con mac: ' . $mac);
             // Por seguridad, si el dispositivo no existe, asumimos que la válvula debe estar cerrada.
             return $this->response->setJSON([
                 'status' => 'success',
@@ -104,7 +104,7 @@ class ValveController extends Controller
 
         // Devuelve el 'estado_valvula' almacenado en la base de datos.
         // Este estado es el que el usuario deseó a través de la PWA.
-        log_message('debug', 'getValveState: Devolviendo estado de válvula ' . $dispositivo['estado_valvula'] . ' para MAC: ' . $MAC);
+        log_message('debug', 'getValveState: Devolviendo estado de válvula ' . $dispositivo['estado_valvula'] . ' para mac: ' . $mac);
         return $this->response->setJSON([
             'status' => 'success',
             'estado_valvula' => (int)$dispositivo['estado_valvula']
@@ -136,21 +136,21 @@ class ValveController extends Controller
 
         // Obtener los datos del cuerpo de la solicitud JSON de la PWA.
         $json = $this->request->getJSON();
-        $MAC = $json->MAC ?? null;
+        $mac = $json->mac ?? null;
         $action = $json->action ?? null; // 'open' o 'close'
 
-        if (!$MAC || !$action) {
-            log_message('error', 'controlValve: Datos incompletos desde la PWA. MAC o acción faltante.');
+        if (!$mac || !$action) {
+            log_message('error', 'controlValve: Datos incompletos desde la PWA. mac o acción faltante.');
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'MAC Address o acción requerida.'
+                'message' => 'mac Address o acción requerida.'
             ])->setStatusCode(400);
         }
 
-        $dispositivo = $model->where('MAC', $MAC)->first();
+        $dispositivo = $model->where('mac', $mac)->first();
 
         if (!$dispositivo) {
-            log_message('error', 'controlValve: Dispositivo no encontrado con MAC: ' . $MAC);
+            log_message('error', 'controlValve: Dispositivo no encontrado con mac: ' . $mac);
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Dispositivo no encontrado.'
@@ -167,11 +167,11 @@ class ValveController extends Controller
             if ($currentGasLevel <= self::OPEN_VALVE_SAFE_THRESHOLD) {
                 $valveUpdateStatus = 1; // 1 = Abrir
                 $message = 'Válvula comandada a abrir. Nivel de gas seguro (' . $currentGasLevel . ').';
-                log_message('info', 'controlValve: ' . $message . ' para MAC: ' . $MAC);
+                log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
             } else {
                 // Si el gas no es seguro, NO se permite abrir la válvula.
                 $message = 'No se puede abrir la válvula. Nivel de gas (' . $currentGasLevel . ') excede el umbral de seguridad (' . self::OPEN_VALVE_SAFE_THRESHOLD . ').';
-                log_message('warning', 'controlValve: ' . $message . ' para MAC: ' . $MAC);
+                log_message('warning', 'controlValve: ' . $message . ' para mac: ' . $mac);
                 return $this->response->setJSON([
                     'status' => 'warning',
                     'message' => $message,
@@ -182,7 +182,7 @@ class ValveController extends Controller
             // **La acción de CERRAR es siempre permitida, independientemente del nivel de gas.**
             $valveUpdateStatus = 0; // 0 = Cerrar
             $message = 'Válvula comandada a cerrar.';
-            log_message('info', 'controlValve: ' . $message . ' para MAC: ' . $MAC);
+            log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
         } else {
             log_message('error', 'controlValve: Acción de válvula no válida: ' . $action);
             return $this->response->setJSON([
