@@ -7,37 +7,58 @@ use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
-class Home extends BaseController
+class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
 {
+    // Puedes instanciar modelos aquí si los usas en múltiples métodos
+    // protected $userModel;
+    // protected $lecturasGasModel;
+
     public function __construct()
     {
-        // No es necesario instanciar modelos aquí si no se usan en todos los métodos o en el constructor.
-        // Los instanciamos directamente en los métodos que los necesitan.
+        // Llama al constructor de la clase padre si es necesario
+        // parent::__construct();
+
+        // Instanciar modelos si se usan en el constructor o en varios métodos
+        // $this->userModel = new UserModel();
+        // $this->lecturasGasModel = new LecturasGasModel();
     }
 
     public function index()
     {
-        // Carga la vista de inicio por defecto (puede ser la página pública de bienvenida)
+        // Carga la vista de inicio
         return view('inicio');
     }
 
-    // Este método ahora asume que el filtro SessionAdmin ya ha verificado la sesión.
-    // Si llegamos aquí, el usuario debería estar logueado.
     public function inicio()
     {
         $session = session();
-        log_message('debug', 'Home::inicio() - Acceso a página de inicio para usuario logueado. Sesión ID: ' . ($session->get('id') ?? 'null'));
-        return view('inicio'); // Muestra la vista de inicio para usuarios logueados
+
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::inicio() - Estado de la sesión: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
+
+        // Si el usuario no está logueado, redirige a la página de login
+        if (!$session->get('logged_in')) {
+            log_message('debug', 'Home::inicio() - Usuario no logueado, redirigiendo a login.');
+            return view('login');
+        }
+
+        log_message('debug', 'Home::inicio() - Usuario logueado, mostrando vista inicio.');
+        // Si está logueado, muestra la vista de inicio
+        return view('inicio');
     }
 
     // Método de Login (POST /login) - Maneja el envío del formulario de login
     public function login()
     {
         $session = session();
-        log_message('debug', 'Home::login() - Iniciando proceso de login.');
+
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
 
         $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel(); // Asegúrate de que el namespace sea correcto
+        $lecturasGasModel = new \App\Models\LecturasGasModel();
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
@@ -59,19 +80,21 @@ class Home extends BaseController
                     ->asArray()
                     ->first();
 
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null; // Si no lo usas, puedes omitirlo aquí
+                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
 
                 $sessionData = [
                     'id'        => $user['id'],
                     'nombre'    => $user['nombre'],
                     'email'     => $user['email'],
-                    'logged_in' => true, // Establece que el usuario está logueado
+                    'logged_in' => true,
                 ];
                 $session->set($sessionData);
 
+                // --- LOGGING PARA DEBUGGING ---
                 log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
+                // --- FIN LOGGING ---
 
-                return redirect()->to('/perfil'); // Redirige a la página de perfil después del login
+                return redirect()->to('/perfil');
             } else {
                 $session->setFlashdata('error', 'Contraseña incorrecta.');
                 log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
@@ -84,11 +107,11 @@ class Home extends BaseController
         }
     }
 
-    // No necesitas este método aquí si registerController ya lo maneja
-    // public function register()
-    // {
-    //     return view('register');
-    // }
+    public function register()
+    {
+        // Este método simplemente muestra la vista de registro
+        return view('register');
+    }
 
     public function logout()
     {
@@ -96,28 +119,23 @@ class Home extends BaseController
         $userId = $session->get('id');
         $session->destroy();
         log_message('debug', 'Home::logout() - Sesión destruida para usuario ID: ' . $userId);
-        return redirect()->to('/'); // Redirige a la página de inicio pública
+        return redirect()->to('/');
     }
 
-    // Método para mostrar el formulario de login (GET /loginobtener)
-    public function loginobtener()
-    {
+    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
+    public function loginobtener() {
         $session = session();
-        // Si el usuario ya está logueado, redirige a la página de inicio para logueados
-        if ($session->get('logged_in')) {
-            return redirect()->to('/inicio');
-        }
-        log_message('debug', 'Home::loginobtener() - Mostrando vista de login.');
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::loginobtener() - Mostrando vista de login. Estado de la sesión: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
         return view('login');
     }
-
-    // Vistas directas (mantengo las que tenías, puedes decidir si quieres que se manejen por rutas o controladores específicos)
     public function configview() { return view('configuracion'); }
     public function salirdelconfig() { return view('inicio'); }
     public function volveralinicio() { return view('inicio'); }
-    public function volveralperfil() { return view('perfil'); } // Considera redirigir a /perfil, no renderizar directamente
+    public function volveralperfil() { return view('perfil'); }
 
-    // Recuperación de contraseña
+    // Recuperación de contraseña (mantengo tu lógica existente, usa UserModel)
     public function forgotPPassword()
     {
         $session = session();
@@ -142,6 +160,8 @@ class Home extends BaseController
             $resetLink = base_url("/reset-password/$token");
 
             $emailService = \Config\Services::email();
+            // Configura el remitente en app/Config/Email.php o .env
+            // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
             $emailService->setTo($user['email']);
             $emailService->setSubject('Recuperación de contraseña');
             $emailService->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
@@ -219,30 +239,100 @@ class Home extends BaseController
             ]);
 
             $session->setFlashdata('success', 'Tu contraseña ha sido actualizada.');
-            return redirect()->to('/loginobtener'); // Redirige al formulario de login
+            return redirect()->to('/loginobtener');
         } else {
             $session->setFlashdata('error', 'Token de recuperación inválido o expirado.');
             return redirect()->back()->withInput();
         }
     }
 
-    // --- MÉTODOS DUPLICADOS O REDUNDANTES ELIMINADOS ---
-    // public function storeMac() { ... } // Ahora en EnlaceController::store
-    // public function perfil() { ... } // Ahora en PerfilController::index
+    // Método para enlazar MACs (parece que lo tienes duplicado con EnlaceController::store)
+    // Considera eliminar este si usas EnlaceController::store
+    public function storeMac()
+    {
+        $session = session();
+        $mac = $this->request->getPost('mac');
 
+        if (!$session->get('logged_in')) {
+            return redirect()->to('/loginobtener');
+        }
+
+        $usuarioId = $session->get('id');
+        $enlaceModel = new \App\Models\EnlaceModel();
+
+        $existe = $enlaceModel
+                    ->where('id_usuario', $usuarioId)
+                    ->where('MAC', $mac)
+                    ->first();
+
+        if ($existe) {
+            $session->setFlashdata('error', 'Esta MAC ya está enlazada.');
+        } else {
+            $enlaceModel->insert([
+                'id_usuario' => $usuarioId,
+                'MAC' => $mac
+            ]);
+            $session->setFlashdata('success', 'MAC enlazada correctamente.');
+        }
+
+        return redirect()->to('/perfil');
+    }
+
+    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
+    // public function inicioresetpass() { return view('reset_password'); }
+    // public function obtenerperfil() { return view('perfilobtener'); }
+
+    // Vistas varias (mantengo las que tenías)
     public function dispositivos()
     {
-        // Esta vista ahora puede estar protegida por el filtro en Routes.php
         return view('dispositivos');
+    }
+
+    // Método para mostrar la página de perfil (parece que PerfilController::index es la principal ahora)
+    // Considera eliminar este si usas PerfilController::index
+    public function perfil()
+    {
+        $session = session();
+
+        // --- LOGGING PARA DEBUGGING ---
+        log_message('debug', 'Home::perfil() - Estado de la sesión al inicio: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
+
+        if (!$session->get('logged_in')) {
+            log_message('debug', 'Home::perfil() - Usuario no logueado, redirigiendo a login.');
+            return redirect()->to('/loginobtener');
+        }
+
+        $usuarioId = $session->get('id');
+
+        $enlaceModel = new \App\Models\EnlaceModel();
+        $lecturasGasModel = new \App\Models\LecturasGasModel();
+
+        $macs = $enlaceModel
+                    ->select('MAC')
+                    ->where('id_usuario', $usuarioId)
+                    ->groupBy('MAC')
+                    ->findAll();
+
+        $lecturas = $lecturasGasModel->getLecturasPorUsuario($usuarioId);
+
+        log_message('debug', 'Home::perfil() - Lecturas por usuario obtenidas: ' . print_r($lecturas, true));
+
+        return view('perfil', [
+            'macs' => $macs,
+            'lecturas' => $lecturas
+        ]);
     }
 
     public function comprar()
     {
-        $session = session(); // Mantener para logging o si necesitas info de sesión
+        // --- LOGGING PARA DEBUGGING ---
+        $session = session();
         log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
+        // --- FIN LOGGING ---
         return view('comprar');
     }
 
-    // Si tienes un método verLecturas en Home, descomenta y úsalo, si no, elimínalo
+    // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
     // public function verLecturas($mac) { ... }
 }
