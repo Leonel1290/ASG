@@ -289,11 +289,11 @@ $errors = session('errors') ?? []; // Obtener errores de validaci√≥n de la sesi√
 
                 <form method="post" action="<?= base_url('/perfil/dispositivo/actualizar') ?>">
                     <?= csrf_field() ?>
-                    <input type="hidden" name="mac" value="<?= esc($dispositivo['MAC'] ?? '') ?>">
+                    <input type="hidden" name="mac" value="<?= esc($dispositivo->MAC ?? '') ?>">
 
                     <div class="form-group">
                         <label for="mac_display"><i class="fas fa-fingerprint me-2"></i> MAC del Dispositivo:</label>
-                        <input type="text" class="form-control" id="mac_display" value="<?= esc($dispositivo['MAC'] ?? 'Desconocida') ?>" disabled>
+                        <input type="text" class="form-control" id="mac_display" value="<?= esc($dispositivo->MAC ?? 'Desconocida') ?>" disabled>
                          <?php if (isset($errors['mac'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['mac']) ?>
