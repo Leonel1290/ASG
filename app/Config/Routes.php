@@ -59,7 +59,7 @@ $routes->post('/enlace/store', 'EnlaceController::store');
 
 // --- RUTAS DEL PANEL DE USUARIO (PERFIL) ---
 // Ruta para el perfil del usuario (GET /perfil)
-$routes->get('/perfil', 'PerfilController::index', ['filter' => 'auth']); // Asumo que necesitas autenticación
+$routes->get('/perfil', 'PerfilController::index', ['filter' => 'SessionAdmin']);
 
 
 // --- RUTAS PARA VISTAS GENÉRICAS (Ej. si PerfilController no maneja todo) ---
