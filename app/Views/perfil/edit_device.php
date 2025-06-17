@@ -305,7 +305,7 @@ $errors = session('errors') ?? []; // Obtener errores de validaci√≥n de la sesi√
                     <div class="form-group">
                         <label for="nombre"><i class="fas fa-tag me-2"></i> Nombre del Dispositivo:</label>
                         <input type="text" class="form-control <?= isset($errors['nombre']) ? 'is-invalid' : '' ?>" id="nombre" name="nombre"
-                            value="<?= esc(set_value('nombre', $dispositivo['nombre'] ?? '')) ?>" required>
+                            value="<?= esc(set_value('nombre', $dispositivo->nombre ?? '')) ?>" required>
                         <?php if (isset($errors['nombre'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['nombre']) ?>
