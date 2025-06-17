@@ -1,29 +1,21 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use App\Models\DispositivoModel;
+use App\Models\DispositivoModel; // Asegúrate de que tu modelo DispositivoModel esté configurado correctamente para interactuar con tu base de datos.
 
 class ValveController extends Controller
 {
-    // Umbral de gas SEGURO para permitir la APERTURA de la válvula.
-    // Si el 'ultimo_nivel_gas' es MENOR o IGUAL a este valor, se considera seguro abrir.
-    // ¡AJUSTA ESTE VALOR SEGÚN LAS LECTURAS DE TU SENSOR MQ6 EN AMBIENTE SEGURO!
-    private const OPEN_VALVE_SAFE_THRESHOLD = 50; 
+    // NO NECESITAMOS OPEN_VALVE_SAFE_THRESHOLD para control manual sin lógica de gas.
+    // private const OPEN_VALVE_SAFE_THRESHOLD = 50; // Esto se puede comentar o eliminar.
 
-    // Mensaje de depuración para ver los datos recibidos del ESP32.
-    // En un entorno de producción, considera deshabilitarlo o enviarlo a un log.
+    // Puedes mantener DEBUG_SENSOR_DATA si aún envías datos de sensor pero no es relevante para el control directo.
     private const DEBUG_SENSOR_DATA = true;
 
-    // -------------------------------------------------------------------------
-    // Endpoint para que el ESP32 envíe las lecturas del sensor de gas.
-    // El ESP32 solo INFORMA el nivel de gas aquí; no se toma ninguna acción directa sobre la válvula.
-    // -------------------------------------------------------------------------
+    // El método receiveSensorData puede permanecer si aún quieres que el ESP32 reporte el nivel de gas al servidor.
+    // Su función ahora sería solo de monitoreo, no de control de la válvula.
     public function receiveSensorData()
     {
         $model = new DispositivoModel();
-
-        // Obtener la mac y el nivel de gas del cuerpo de la solicitud POST.
-        // Asegúrate de que el ESP32 envíe estos datos como application/x-www-form-urlencoded.
         $mac = $this->request->getPost('mac');
         $nivelGas = $this->request->getPost('nivel_gas');
 
@@ -36,10 +28,9 @@ class ValveController extends Controller
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Datos incompletos.'
-            ])->setStatusCode(400); // Bad Request
+            ])->setStatusCode(400);
         }
 
-        // Buscar el dispositivo por mac. Si no existe, puedes crearlo o devolver un error.
         $dispositivo = $model->where('mac', $mac)->first();
 
         if (!$dispositivo) {
@@ -47,18 +38,17 @@ class ValveController extends Controller
             // Opcional: Crear un nuevo dispositivo si no existe.
             $model->insert([
                 'mac' => $mac,
-                'nombre' => 'ESP32_Nuevo_' . substr($mac, -5), // Nombre por defecto
+                'nombre' => 'ESP32_Nuevo_' . substr($mac, -5),
                 'ultimo_nivel_gas' => $nivelGas,
                 'estado_valvula' => 0 // Por defecto, la válvula cerrada para un nuevo dispositivo
             ]);
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Dispositivo creado y datos de sensor guardados.'
-            ])->setStatusCode(201); // Created
+            ])->setStatusCode(201);
         }
 
         // Actualizar solo el nivel de gas del dispositivo existente.
-        // La última vez que se reportó el gas.
         $model->update($dispositivo['id_dispositivo'], [
             'ultimo_nivel_gas' => $nivelGas,
             'ultima_actualizacion_gas' => date('Y-m-d H:i:s')
@@ -74,10 +64,7 @@ class ValveController extends Controller
         ]);
     }
 
-    // -------------------------------------------------------------------------
-    // Endpoint para que el ESP32 consulte el estado deseado de su válvula.
-    // La PWA actualiza este estado, y el ESP32 lo consulta periódicamente.
-    // -------------------------------------------------------------------------
+    // El método getValveState permanece igual, ya que es el que el ESP32 consulta.
     public function getValveState($mac)
     {
         $model = new DispositivoModel();
@@ -102,8 +89,6 @@ class ValveController extends Controller
             ]);
         }
 
-        // Devuelve el 'estado_valvula' almacenado en la base de datos.
-        // Este estado es el que el usuario deseó a través de la PWA.
         log_message('debug', 'getValveState: Devolviendo estado de válvula ' . $dispositivo['estado_valvula'] . ' para mac: ' . $mac);
         return $this->response->setJSON([
             'status' => 'success',
@@ -111,18 +96,20 @@ class ValveController extends Controller
         ]);
     }
 
-    // -------------------------------------------------------------------------
-    // Endpoint para que la PWA controle la válvula (abrir/cerrar).
-    // Aquí se aplica la lógica de seguridad del gas para la acción de "abrir".
-    // -------------------------------------------------------------------------
+    ---
+
+    ### Endpoint Modificado para Control Directo de Válvula
+
+    ```php
     public function controlValve()
     {
         $model = new DispositivoModel();
 
         // **PASO CLAVE 1: Autenticación del usuario de la PWA**
-        // Este código verifica si hay un usuario autenticado en la sesión.
-        // Si la PWA no tiene un sistema de login o no está manteniendo la sesión,
-        // este será el origen de tu "Usuario no autenticado."
+        // Mantén esto si tu PWA tiene un sistema de login y gestión de sesiones.
+        // Si no tienes autenticación en la PWA y quieres probar rápido,
+        // puedes COMENTAR TEMPORALMENTE las siguientes 4 líneas.
+        // PERO ¡CUIDADO!: Esto hace que cualquiera pueda controlar tu válvula.
         $session = \Config\Services::session();
         $userId = $session->get('id_usuario');
 
@@ -157,31 +144,20 @@ class ValveController extends Controller
             ])->setStatusCode(404);
         }
 
-        // **PASO CLAVE 2: Lógica de Control y Seguridad**
-        $currentGasLevel = $dispositivo['ultimo_nivel_gas'];
-        $valveUpdateStatus = $dispositivo['estado_valvula']; // Estado actual en DB, por si no se cambia
+        $valveUpdateStatus = (int)$dispositivo['estado_valvula']; // Estado actual en DB
+        $message = "";
 
         if ($action === 'open') {
-            // **¡AQUÍ ES DONDE LA LÓGICA DE SEGURIDAD DEL GAS ENTRA EN JUEGO!**
-            // Solo permitir abrir si el nivel de gas es seguro (menor o igual al umbral).
-            if ($currentGasLevel <= self::OPEN_VALVE_SAFE_THRESHOLD) {
-                $valveUpdateStatus = 1; // 1 = Abrir
-                $message = 'Válvula comandada a abrir. Nivel de gas seguro (' . $currentGasLevel . ').';
-                log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
-            } else {
-                // Si el gas no es seguro, NO se permite abrir la válvula.
-                $message = 'No se puede abrir la válvula. Nivel de gas (' . $currentGasLevel . ') excede el umbral de seguridad (' . self::OPEN_VALVE_SAFE_THRESHOLD . ').';
-                log_message('warning', 'controlValve: ' . $message . ' para mac: ' . $mac);
-                return $this->response->setJSON([
-                    'status' => 'warning',
-                    'message' => $message,
-                    'current_gas_level' => $currentGasLevel
-                ])->setStatusCode(403); // Forbidden
-            }
+            // **¡MODIFICACIÓN CLAVE AQUÍ!**
+            // Se ELIMINA la verificación del nivel de gas.
+            // La acción de abrir ahora se permite SIEMPRE que se reciba el comando.
+            $valveUpdateStatus = 1; // 1 = Abrir
+            $message = 'Válvula comandada a abrir manualmente.';
+            log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
         } elseif ($action === 'close') {
-            // **La acción de CERRAR es siempre permitida, independientemente del nivel de gas.**
+            // La acción de CERRAR siempre ha sido permitida, sin importar el gas.
             $valveUpdateStatus = 0; // 0 = Cerrar
-            $message = 'Válvula comandada a cerrar.';
+            $message = 'Válvula comandada a cerrar manualmente.';
             log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
         } else {
             log_message('error', 'controlValve: Acción de válvula no válida: ' . $action);
@@ -201,8 +177,8 @@ class ValveController extends Controller
         return $this->response->setJSON([
             'status' => 'success',
             'message' => $message,
-            'new_valve_state' => $valveUpdateStatus,
-            'current_gas_level' => $currentGasLevel // Incluir el nivel de gas para feedback en PWA
+            'new_valve_state' => $valveUpdateStatus
+            // Ya no es relevante incluir 'current_gas_level' en la respuesta para el control directo.
         ]);
     }
 }
