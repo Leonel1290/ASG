@@ -36,7 +36,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         // Alias para tu filtro de sesión de administrador
-        'SessionAdmin'  => \App\Filters\SessionAdmin::class,
+        'SessionAdmin'  => \App\Filters\SessionAdmin::class,    
     ];
 
     /**
