@@ -59,8 +59,8 @@ class PerfilController extends BaseController
         if (!empty($macs)) {
             // Obtener detalles de los dispositivos enlazados
             $dispositivosEnlazados = $this->dispositivoModel
-                                            ->whereIn('MAC', $macs)
-                                            ->findAll();
+                                        ->whereIn('MAC', $macs)
+                                        ->findAll();
         }
 
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
@@ -231,78 +231,72 @@ class PerfilController extends BaseController
      * Procesa la actualización del perfil (nombre y email).
      * Corresponde a POST /perfil/actualizar-perfil
      */
-    public function actualizarDispositivo()
+    public function actualizarPerfil() // Renombrado para claridad si existía uno con este nombre
     {
         $session = session();
-        $usuarioId = $session->get('id');
+        $loggedInUserId = $session->get('id');
 
-        if (!$usuarioId) {
+        if (!$loggedInUserId) {
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
-        if ($this->request->getMethod() !== 'post') {
-            return redirect()->to('/perfil');
+        // Asegurarse de que el email ha sido verificado para acceder a esta función
+        if (!$session->get('email_verified_for_config')) {
+            return redirect()->to('/perfil/verificar-email')->with('error', 'Por favor, verifica tu email antes de actualizar tu perfil.');
         }
 
-        // OBTENEMOS LA MAC (es un identificador, no se está actualizando directamente)
-        $mac = $this->request->getPost('MAC');
-        $nombre = $this->request->getPost('nombre');
-        $ubicacion = $this->request->getPost('ubicacion');
+        if ($this->request->getMethod() !== 'post') {
+            return redirect()->to('/perfil/configuracion');
+        }
 
-        // Validar SOLO los campos que se están actualizando
         $rules = [
             'nombre' => [
                 'rules' => 'required|max_length[255]',
                 'errors' => [
-                    'required' => 'El Nombre del dispositivo es obligatorio.',
+                    'required' => 'El Nombre es obligatorio.',
                     'max_length' => 'El Nombre no puede exceder los 255 caracteres.'
                 ]
             ],
-            'ubicacion' => [
-                'rules' => 'max_length[255]',
+            'email' => [
+                'rules' => 'required|valid_email|is_unique[users.email,id,' . $loggedInUserId . ']',
                 'errors' => [
-                    'max_length' => 'La Ubicación no puede exceder los 255 caracteres.'
+                    'required' => 'El Email es obligatorio.',
+                    'valid_email' => 'El Email no tiene un formato válido.',
+                    'is_unique' => 'Este Email ya está registrado.'
                 ]
             ],
         ];
 
         if (!$this->validate($rules)) {
-            // Si la validación falla, redirigir de nuevo al formulario de edición con errores
-            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->to('/perfil/configuracion')->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Primero, verificar si el usuario tiene permiso para editar este dispositivo
-        $enlace = $this->enlaceModel
-                        ->where('id_usuario', $usuarioId)
-                        ->where('MAC', $mac)
-                        ->first();
-
-        if (!$enlace) {
-            return redirect()->to('/perfil')->with('error', 'No tienes permiso para actualizar este dispositivo.');
-        }
-
-        // Obtener el dispositivo por su MAC para obtener su ID (ya que el modelo usa 'id' como primaryKey)
-        $dispositivoExistente = $this->dispositivoModel->where('MAC', $mac)->first();
-        if (!$dispositivoExistente) {
-            return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado para la MAC proporcionada.');
-        }
+        $nombre = $this->request->getPost('nombre');
+        $email = $this->request->getPost('email');
 
         $updateData = [
             'nombre' => $nombre,
-            'ubicacion' => $ubicacion,
-            // 'updated_at' se manejará automáticamente por DispositivoModel gracias a useTimestamps
+            'email' => $email,
         ];
 
-        // Usar update por ID
-        // El primer parámetro es la clave primaria (ID), el segundo es el array de datos.
-        if ($this->dispositivoModel->update($dispositivoExistente['id'], $updateData)) {
-            return redirect()->to('/perfil')->with('success', "¡Dispositivo '{$nombre}' actualizado exitosamente!");
+        if ($this->userModel->update($loggedInUserId, $updateData)) {
+            // Si el email cambia, se debe verificar de nuevo para futuras configuraciones
+            if ($email !== $session->get('email')) { // Asumiendo que guardas el email en sesión
+                $session->remove('email_verified_for_config');
+            }
+
+            // Actualizar el nombre y email en la sesión también
+            $session->set([
+                'nombre' => $nombre,
+                'email' => $email,
+            ]);
+
+            return redirect()->to('/perfil/configuracion')->with('success', '¡Perfil actualizado exitosamente!');
         } else {
-            // Considera añadir un log aquí para depuración en caso de que la actualización falle.
-            log_message('error', 'Error al actualizar dispositivo en la base de datos para MAC: ' . $mac . ' - Datos: ' . json_encode($updateData));
-            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('error', 'Hubo un error al intentar actualizar el dispositivo. Por favor, revisa los logs del servidor.');
+            return redirect()->to('/perfil/configuracion')->withInput()->with('error', 'No se pudo actualizar el perfil. Inténtalo de nuevo.');
         }
     }
+
 
     /**
      * Procesa el cambio de contraseña del usuario.
@@ -431,19 +425,13 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil');
         }
 
-        // OBTENEMOS LA MAC CON LA CAPITALIZACIÓN CORRECTA (MAC)
+        // OBTENEMOS LA MAC (es un identificador, no se está actualizando directamente)
         $mac = $this->request->getPost('MAC');
         $nombre = $this->request->getPost('nombre');
         $ubicacion = $this->request->getPost('ubicacion');
 
+        // Validar SOLO los campos que se están actualizando
         $rules = [
-            'MAC' => [ // Esta regla de validación espera el campo 'MAC' (mayúscula)
-                'rules' => 'required|exact_length[17]',
-                'errors' => [
-                    'required' => 'La MAC es obligatoria.',
-                    'exact_length' => 'El formato de la MAC es incorrecto.'
-                ]
-            ],
             'nombre' => [
                 'rules' => 'required|max_length[255]',
                 'errors' => [
@@ -464,30 +452,36 @@ class PerfilController extends BaseController
             return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        // Primero, verificar si el usuario tiene permiso para editar este dispositivo
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
-                        ->where('MAC', $mac) // Usamos la MAC obtenida correctamente
+                        ->where('MAC', $mac)
                         ->first();
 
         if (!$enlace) {
             return redirect()->to('/perfil')->with('error', 'No tienes permiso para actualizar este dispositivo.');
         }
 
+        // Obtener el dispositivo por su MAC para obtener su ID (ya que el modelo usa 'id' como primaryKey)
+        $dispositivoExistente = $this->dispositivoModel->where('MAC', $mac)->first();
+        if (!$dispositivoExistente) {
+            return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado para la MAC proporcionada.');
+        }
+
         $updateData = [
             'nombre' => $nombre,
             'ubicacion' => $ubicacion,
+            // 'updated_at' se manejará automáticamente por DispositivoModel gracias a useTimestamps
         ];
 
-        // Obtener el ID del dispositivo para usar el método update() del modelo
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first(); // Usamos la MAC obtenida correctamente
-        if (!$dispositivo) {
-            return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
-        }
-
-        if ($this->dispositivoModel->update($dispositivo['id'], $updateData)) { // Usar update por ID
+        // Usar update por ID
+        // El primer parámetro es la clave primaria (ID), el segundo es el array de datos.
+        if ($this->dispositivoModel->update($dispositivoExistente['id'], $updateData)) {
             return redirect()->to('/perfil')->with('success', "¡Dispositivo '{$nombre}' actualizado exitosamente!");
         } else {
-            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('error', 'Hubo un error al intentar actualizar el dispositivo.');
+            // Considera añadir un log aquí para depuración en caso de que la actualización falle.
+            log_message('error', 'Error al actualizar dispositivo en la base de datos para MAC: ' . $mac . ' - Datos: ' . json_encode($updateData));
+            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('error', 'Hubo un error al intentar actualizar el dispositivo. Por favor, revisa los logs del servidor.');
         }
     }
 
