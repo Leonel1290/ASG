@@ -27,7 +27,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'auth'          => \App\Filters\AuthFilter::class, // Asegúrate de que este alias esté correcto
+        'auth'          => \CodeIgniter\Shield\Filters\ChainAuth::class,, // Asegúrate de que este alias esté correcto
         'SessionAdmin'  => \App\Filters\SessionAdmin::class,
     ];
 
