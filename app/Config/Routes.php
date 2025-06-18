@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// --- RUTAS DE REGISTRO Y LOGIN (AJUSTADAS PARA VERIFICACIÓN) ---
+// --- RUTAS DE REGISTRO Y LOGIN ---
 $routes->get('/register', 'registerController::index');
 $routes->post('/register/store', 'registerController::store');
 $routes->get('/register/check-email', 'registerController::checkEmail');
@@ -22,9 +22,6 @@ $routes->post('/forgotpassword1', 'Home::forgotPPassword');
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword');
 
-// --- FIN RUTAS DE REGISTRO Y LOGIN ---
-
-
 // Perfil (Agrupamos rutas relacionadas con PerfilController)
 $routes->group('perfil', function($routes) {
     $routes->get('/', 'PerfilController::index');
@@ -38,9 +35,6 @@ $routes->group('perfil', function($routes) {
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
-
-// --- FIN RUTAS GESTIÓN DE DISPOSITIVOS ---
-
 
 // --- RUTAS DE LA API (Agrupadas bajo el prefijo 'api') ---
 $routes->group('api', function($routes){
@@ -59,14 +53,13 @@ $routes->group('api', function($routes){
 // --- FIN RUTAS DE LA API ---
 
 
-// --- RUTAS QUE YA TENÍAS Y NO SON PARTE DEL GRUPO 'API' O 'PERFIL' ---
+// --- OTRAS RUTAS DE LA APLICACIÓN ---
 
-// IMPORTANTE:
-// Si esta ruta era para que el ESP32 enviara datos, la funcionalidad
-// ahora la cubre 'api/receiveSensorData'.
-// Si otros módulos la usan, deberás decidir si migrar o mantenerla.
-// Para el flujo que te proporcioné, esta ruta ya no es necesaria para el ESP32.
-$routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
+// La siguiente ruta ha sido comentada ya que su funcionalidad
+// de recibir lecturas de gas del ESP32 ahora es manejada por
+// el endpoint 'api/receiveSensorData' bajo el 'ValveController'.
+// Si otros módulos la utilizan, deberías migrar su uso al nuevo endpoint de la API.
+// $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 
 // Vista para enlazar dispositivos (formulario para ingresar MAC)
@@ -74,6 +67,7 @@ $routes->get('/enlace', 'EnlaceController::index');
 $routes->post('/enlace/store', 'EnlaceController::store');
 
 // Detalles del dispositivo (mostrar lecturas, etc.)
+// Nota: La vista 'detalles' cargará la interfaz PWA para el control de la válvula.
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Ruta para la vista de "comprar"

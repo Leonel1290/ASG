@@ -1,0 +1,206 @@
+/* Añadimos un reset general para asegurar que no haya márgenes/paddings por defecto */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #1a202c;
+    color: #cbd5e0;
+    font-family: 'Inter', Arial, sans-serif; /* Usando Inter para una tipografía moderna */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* Estilo para el botón Volver */
+.btn-outline-secondary {
+    color: #cbd5e0;
+    border-color: #cbd5e0;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-radius: 8px; /* Redondeado */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra suave */
+}
+.btn-outline-secondary:hover {
+    color: #1a202c;
+    background-color: #cbd5e0;
+    border-color: #cbd5e0;
+    transform: translateY(-1px); /* Efecto hover sutil */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.page-title {
+    color: #f7fafc;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+/* Estilo para la línea de detalles (MAC y Ubicación) */
+.device-details-line {
+    text-align: center;
+    color: #a0aec0;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    background-color: #2d3748;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+}
+
+.card-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+/* Estilos específicos para la tarjeta de Nivel de Gas Actual */
+.current-gas-level-card-simple {
+    background-color: #2d3748;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+    transition: box-shadow 0.3s ease;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.current-gas-level-card-simple:hover {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
+}
+
+.current-gas-level-card-simple .card-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.current-gas-level-card-simple .current-gas-level-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #f6e05e; /* Color amarillo/oro para el valor de gas */
+}
+
+.current-valve-state {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+.valve-state-open { color: #48bb78; } /* Verde para abierta */
+.valve-state-closed { color: #e53e3e; } /* Rojo para cerrada */
+
+
+/* Estilos para los nuevos botones */
+.valve-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espacio entre los botones */
+    margin-top: 2rem;
+    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+}
+
+.btn-valve {
+    flex: 1; /* Permite que los botones ocupen el espacio disponible */
+    max-width: 200px; /* Ancho máximo para los botones */
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    color: #fff; /* Color de texto blanco para todos los botones */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Sombra para los botones de acción */
+}
+
+.btn-valve-open {
+    background-color: #48bb78; /* Verde para abrir */
+    border-color: #48bb78;
+}
+
+.btn-valve-close {
+    background-color: #e53e3e; /* Rojo para cerrar */
+    border-color: #e53e3e;
+}
+
+.btn-valve:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.btn-valve:disabled {
+    background-color: #6c757d; /* Gris para deshabilitado */
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estilos para los mensajes de alerta */
+.alert-info {
+    background-color: #bfdbfe; /* Azul claro */
+    color: #1e40af; /* Azul oscuro */
+    border: 1px solid #93c5fd;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+.alert-success {
+    background-color: #d1fae5; /* Verde claro */
+    color: #065f46; /* Verde oscuro */
+    border: 1px solid #a7f3d0;
+}
+.alert-danger {
+    background-color: #fee2e2; /* Rojo claro */
+    color: #991b1b; /* Rojo oscuro */
+    border: 1px solid #fca5a5;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+    }
+    .current-gas-level-card-simple .card-title {
+        font-size: 1.5rem;
+    }
+    .current-gas-level-card-simple .current-gas-level-value {
+        font-size: 1.75rem;
+    }
+    .valve-buttons {
+        flex-direction: column; /* Apila los botones en pantallas pequeñas */
+        align-items: center;
+    }
+    .btn-valve {
+        width: 80%; /* Ocupa más ancho en móvil */
+        max-width: 300px; /* Asegura que no sea demasiado ancho */
+    }
+}
