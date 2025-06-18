@@ -1,25 +1,19 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use App\Models\DispositivoModel; // Asegúrate de que tu modelo DispositivoModel esté configurado correctamente para interactuar con tu base de datos.
+use App\Models\DispositivoModel;
 
 class ValveController extends Controller
 {
     private const DEBUG_SENSOR_DATA = true;
 
-    // El método receiveSensorData puede permanecer si aún quieres que el ESP32 reporte el nivel de gas al servidor.
-    // Su función ahora sería solo de monitoreo, no de control de la válvula.
     public function receiveSensorData()
     {
-        // --- INICIO DE LÍNEA DE DEPURACIÓN CRÍTICA ---
-        // Lee el cuerpo crudo de la solicitud POST.
         $raw_post_data = file_get_contents('php://input');
         log_message('debug', 'receiveSensorData: Raw POST Data: ' . $raw_post_data);
-        // --- FIN DE LÍNEA DE DEPURACIÓN CRÍTICA ---
 
         $model = new DispositivoModel();
-        // Usar getPost() para form-urlencoded data del ESP32
-        $mac = $this->request->getPost('MAC'); // El ESP32 envía 'MAC'
+        $mac = $this->request->getPost('MAC'); // ESP32 envía 'MAC'
         $nivelGas = $this->request->getPost('nivel_gas');
 
         if (self::DEBUG_SENSOR_DATA) {
@@ -38,12 +32,11 @@ class ValveController extends Controller
 
         if (!$dispositivo) {
             log_message('warning', 'receiveSensorData: Dispositivo no encontrado con mac: ' . $mac . '. Creando nuevo dispositivo.');
-            // Opcional: Crear un nuevo dispositivo si no existe.
             $model->insert([
                 'mac' => $mac,
                 'nombre' => 'ESP32_Nuevo_' . substr($mac, -5),
                 'ultimo_nivel_gas' => $nivelGas,
-                'estado_valvula' => 0 // Por defecto, la válvula cerrada para un nuevo dispositivo
+                'estado_valvula' => 0 // Por defecto, la válvula cerrada
             ]);
             return $this->response->setJSON([
                 'status' => 'success',
@@ -51,8 +44,8 @@ class ValveController extends Controller
             ])->setStatusCode(201);
         }
 
-        // Actualizar solo el nivel de gas del dispositivo existente.
-        $model->update($dispositivo['id_dispositivo'], [
+        // --- CORRECCIÓN AQUÍ: Acceder a propiedades del objeto con -> ---
+        $model->update($dispositivo->id_dispositivo, [
             'ultimo_nivel_gas' => $nivelGas,
             'ultima_actualizacion_gas' => date('Y-m-d H:i:s')
         ]);
@@ -67,8 +60,6 @@ class ValveController extends Controller
         ]);
     }
 
-    // El método getValveState permanece igual, ya que es el que el ESP32 consulta.
-    // MODIFICADO: Ahora también devuelve 'ultimo_nivel_gas'.
     public function getValveState($mac)
     {
         $model = new DispositivoModel();
@@ -85,30 +76,26 @@ class ValveController extends Controller
 
         if (!$dispositivo) {
             log_message('warning', 'getValveState: Dispositivo no encontrado con mac: ' . $mac);
-            // Por seguridad, si el dispositivo no existe, asumimos que la válvula debe estar cerrada.
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Dispositivo no encontrado, estado por defecto: cerrado.',
-                'estado_valvula' => 0, // 0 = Cerrado
-                'ultimo_nivel_gas' => 0 // También se devuelve 0 para el gas si no existe el dispositivo
+                'estado_valvula' => 0,
+                'ultimo_nivel_gas' => 0
             ]);
         }
 
-        log_message('debug', 'getValveState: Devolviendo estado de válvula ' . $dispositivo['estado_valvula'] . ' y nivel de gas ' . $dispositivo['ultimo_nivel_gas'] . ' para mac: ' . $mac);
+        log_message('debug', 'getValveState: Devolviendo estado de válvula ' . $dispositivo->estado_valvula . ' y nivel de gas ' . $dispositivo->ultimo_nivel_gas . ' para mac: ' . $mac);
         return $this->response->setJSON([
             'status' => 'success',
-            'estado_valvula' => (int)$dispositivo['estado_valvula'],
-            'ultimo_nivel_gas' => (int)$dispositivo['ultimo_nivel_gas'] // ¡Esta línea es la adición clave!
+            'estado_valvula' => (int)$dispositivo->estado_valvula,
+            'ultimo_nivel_gas' => (int)$dispositivo->ultimo_nivel_gas
         ]);
     }
 
-    // Endpoint para control directo de válvula desde la PWA.
-    // Permanece esperando JSON.
     public function controlValve()
     {
         $model = new DispositivoModel();
 
-        // **PASO CLAVE 1: Autenticación del usuario de la PWA**
         $session = \Config\Services::session();
         $userId = $session->get('id_usuario');
 
@@ -117,13 +104,12 @@ class ValveController extends Controller
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Usuario no autenticado.'
-            ])->setStatusCode(401); // Unauthorized
+            ])->setStatusCode(401);
         }
 
-        // Obtener los datos del cuerpo de la solicitud JSON de la PWA.
         $json = $this->request->getJSON();
         $mac = $json->mac ?? null;
-        $action = $json->action ?? null; // 'open' o 'close'
+        $action = $json->action ?? null;
 
         if (!$mac || !$action) {
             log_message('error', 'controlValve: Datos incompletos desde la PWA. mac o acción faltante.');
@@ -143,15 +129,16 @@ class ValveController extends Controller
             ])->setStatusCode(404);
         }
 
-        $valveUpdateStatus = (int)$dispositivo['estado_valvula']; // Estado actual en DB
+        // --- CORRECCIÓN AQUÍ: Acceder a propiedades del objeto con -> ---
+        $valveUpdateStatus = (int)$dispositivo->estado_valvula;
         $message = "";
 
         if ($action === 'open') {
-            $valveUpdateStatus = 1; // 1 = Abrir
+            $valveUpdateStatus = 1;
             $message = 'Válvula comandada a abrir manualmente.';
             log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
         } elseif ($action === 'close') {
-            $valveUpdateStatus = 0; // 0 = Cerrar
+            $valveUpdateStatus = 0;
             $message = 'Válvula comandada a cerrar manualmente.';
             log_message('info', 'controlValve: ' . $message . ' para mac: ' . $mac);
         } else {
@@ -162,9 +149,7 @@ class ValveController extends Controller
             ])->setStatusCode(400);
         }
 
-        // Actualizar el estado deseado de la válvula en la base de datos.
-        // El ESP32 leerá este estado y ajustará su servo.
-        $model->update($dispositivo['id_dispositivo'], [
+        $model->update($dispositivo->id_dispositivo, [ // También aquí
             'estado_valvula' => $valveUpdateStatus,
             'ultima_actualizacion_valvula' => date('Y-m-d H:i:s')
         ]);
