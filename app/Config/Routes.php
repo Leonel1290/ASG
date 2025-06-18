@@ -39,8 +39,8 @@ $routes->group('perfil', function($routes) {
 // --- RUTAS DE LA API (Agrupadas bajo el prefijo 'api') ---
 $routes->group('api', function($routes){
     // Endpoint para controlar la válvula (abrir/cerrar) desde la web
-    // POST /api/valve_control
-    $routes->post('valve_control', 'ValveController::controlValve');
+    // POST /api/controlValve  <-- ¡CAMBIO AQUÍ!
+    $routes->post('controlValve', 'ValveController::controlValve'); // <- Cuidado, era 'valve_control'
 
     // Endpoint para que el ESP32 (o la web) consulte el estado de la válvula y el nivel de gas
     // GET /api/getValveState/MAC_DEL_DISPOSITIVO
