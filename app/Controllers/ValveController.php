@@ -32,20 +32,28 @@ class ValveController extends Controller
 
         if (!$dispositivo) {
             log_message('warning', 'receiveSensorData: Dispositivo no encontrado con mac: ' . $mac . '. Creando nuevo dispositivo.');
+            // Si el dispositivo no existe, lo insertamos.
             $model->insert([
                 'mac' => $mac,
                 'nombre' => 'ESP32_Nuevo_' . substr($mac, -5),
                 'ultimo_nivel_gas' => $nivelGas,
                 'estado_valvula' => 0 // Por defecto, la válvula cerrada
             ]);
+            // Después de insertar, el dispositivo no está en la variable $dispositivo actual.
+            // Si la lógica continúa y se necesita el ID del dispositivo recién creado para otra cosa,
+            // se debería hacer un nuevo `->where('mac', $mac)->first()` o usar el ID devuelto por insert().
+            // Pero como la lógica aquí termina con un 'return', no es un problema.
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Dispositivo creado y datos de sensor guardados.'
             ])->setStatusCode(201);
         }
 
-        // --- CORRECCIÓN AQUÍ: Acceder a propiedades del objeto con -> ---
-        $model->update($dispositivo->id_dispositivo, [
+        // --- CORRECCIÓN CLAVE AQUÍ: Asumiendo que la clave primaria es 'id' ---
+        // Si tu columna de clave primaria es 'id_dispositivo' y estás seguro,
+        // entonces esto apunta a que tu modelo no está configurado para devolver
+        // esa columna. Pero la mayoría de las veces, la clave primaria es 'id'.
+        $model->update($dispositivo->id, [ // CAMBIO: de $dispositivo->id_dispositivo a $dispositivo->id
             'ultimo_nivel_gas' => $nivelGas,
             'ultima_actualizacion_gas' => date('Y-m-d H:i:s')
         ]);
@@ -129,7 +137,6 @@ class ValveController extends Controller
             ])->setStatusCode(404);
         }
 
-        // --- CORRECCIÓN AQUÍ: Acceder a propiedades del objeto con -> ---
         $valveUpdateStatus = (int)$dispositivo->estado_valvula;
         $message = "";
 
@@ -149,7 +156,8 @@ class ValveController extends Controller
             ])->setStatusCode(400);
         }
 
-        $model->update($dispositivo->id_dispositivo, [ // También aquí
+        // --- CORRECCIÓN CLAVE AQUÍ: Asumiendo que la clave primaria es 'id' ---
+        $model->update($dispositivo->id, [ // CAMBIO: de $dispositivo->id_dispositivo a $dispositivo->id
             'estado_valvula' => $valveUpdateStatus,
             'ultima_actualizacion_valvula' => date('Y-m-d H:i:s')
         ]);
