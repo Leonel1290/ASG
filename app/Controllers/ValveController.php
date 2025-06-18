@@ -15,6 +15,12 @@ class ValveController extends Controller
     // Su función ahora sería solo de monitoreo, no de control de la válvula.
     public function receiveSensorData()
     {
+        // --- INICIO DE LÍNEA DE DEPURACIÓN CRÍTICA ---
+        // Lee el cuerpo crudo de la solicitud POST.
+        $raw_post_data = file_get_contents('php://input');
+        log_message('debug', 'receiveSensorData: Raw POST Data: ' . $raw_post_data);
+        // --- FIN DE LÍNEA DE DEPURACIÓN CRÍTICA ---
+
         $model = new DispositivoModel();
         $mac = $this->request->getPost('mac');
         $nivelGas = $this->request->getPost('nivel_gas');
