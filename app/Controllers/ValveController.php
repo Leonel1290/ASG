@@ -96,11 +96,10 @@ class ValveController extends Controller
         ]);
     }
 
-    ---
+    // ---
+    // ### Endpoint Modificado para Control Directo de Válvula
+    // ```php
 
-    ### Endpoint Modificado para Control Directo de Válvula
-
-    ```php
     public function controlValve()
     {
         $model = new DispositivoModel();
