@@ -32,28 +32,19 @@ class ValveController extends Controller
 
         if (!$dispositivo) {
             log_message('warning', 'receiveSensorData: Dispositivo no encontrado con mac: ' . $mac . '. Creando nuevo dispositivo.');
-            // Si el dispositivo no existe, lo insertamos.
             $model->insert([
                 'mac' => $mac,
                 'nombre' => 'ESP32_Nuevo_' . substr($mac, -5),
                 'ultimo_nivel_gas' => $nivelGas,
-                'estado_valvula' => 0 // Por defecto, la válvula cerrada
+                'estado_valvula' => 0
             ]);
-            // Después de insertar, el dispositivo no está en la variable $dispositivo actual.
-            // Si la lógica continúa y se necesita el ID del dispositivo recién creado para otra cosa,
-            // se debería hacer un nuevo `->where('mac', $mac)->first()` o usar el ID devuelto por insert().
-            // Pero como la lógica aquí termina con un 'return', no es un problema.
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Dispositivo creado y datos de sensor guardados.'
             ])->setStatusCode(201);
         }
 
-        // --- CORRECCIÓN CLAVE AQUÍ: Asumiendo que la clave primaria es 'id' ---
-        // Si tu columna de clave primaria es 'id_dispositivo' y estás seguro,
-        // entonces esto apunta a que tu modelo no está configurado para devolver
-        // esa columna. Pero la mayoría de las veces, la clave primaria es 'id'.
-        $model->update($dispositivo->id, [ // CAMBIO: de $dispositivo->id_dispositivo a $dispositivo->id
+        $model->update($dispositivo->id, [
             'ultimo_nivel_gas' => $nivelGas,
             'ultima_actualizacion_gas' => date('Y-m-d H:i:s')
         ]);
@@ -105,7 +96,15 @@ class ValveController extends Controller
         $model = new DispositivoModel();
 
         $session = \Config\Services::session();
+
+        // --- INICIO DE LOGGING DEPURACIÓN DE SESIÓN ---
+        log_message('debug', 'controlValve: Iniciando verificación de sesión.');
+        log_message('debug', 'controlValve: Sesión activa: ' . ($session->has('id_usuario') ? 'Sí' : 'No'));
+        log_message('debug', 'controlValve: Contenido completo de la sesión: ' . json_encode($session->get()));
+
         $userId = $session->get('id_usuario');
+        log_message('debug', 'controlValve: Valor de $userId obtenido: ' . ($userId ?? 'NULL'));
+        // --- FIN DE LOGGING DEPURACIÓN DE SESIÓN ---
 
         if (!$userId) {
             log_message('error', 'controlValve: Acceso denegado. Usuario no autenticado.');
@@ -156,8 +155,7 @@ class ValveController extends Controller
             ])->setStatusCode(400);
         }
 
-        // --- CORRECCIÓN CLAVE AQUÍ: Asumiendo que la clave primaria es 'id' ---
-        $model->update($dispositivo->id, [ // CAMBIO: de $dispositivo->id_dispositivo a $dispositivo->id
+        $model->update($dispositivo->id, [
             'estado_valvula' => $valveUpdateStatus,
             'ultima_actualizacion_valvula' => date('Y-m-d H:i:s')
         ]);
