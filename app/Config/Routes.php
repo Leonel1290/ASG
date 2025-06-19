@@ -131,8 +131,17 @@ $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1')
 // Descomentamos esta ruta para que la vista sea accesible
 $routes->get('/comprar', 'Home::comprar');
 
-$routes->get('dispositivo/(:segment)/lecturas', 'DeviceController::showAllGasReadings/$1'); // Nueva ruta para el historial completo
+// Ruta para migración temporal (eliminar después de usar)
+$routes->get('migrar-datos', 'DetalleController::migrarDatos');
 
+// Rutas para el nuevo sistema
+$routes->group('registros-gas', function($routes) {
+    $routes->get('/', 'RegistrosGasController::index');
+    $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
+});
+
+// Mantener ruta existente para compatibilidad
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 // --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
 // La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.
 // Si aún la necesitas para otra función de DetalleController, descoméntala y ajusta.
