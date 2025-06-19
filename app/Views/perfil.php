@@ -230,6 +230,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              margin-bottom: 0.5rem;
              display: block;
            }
+           
 
          /* Ensure Bootstrap form-control styles apply */
          #add-mac-form .form-control {
