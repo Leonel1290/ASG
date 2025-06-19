@@ -53,6 +53,7 @@
 
         #paypal-button-container {
             margin-top: 1.5rem;
+            margin-bottom: 1.5rem; /* Agregado para espacio debajo del botón PayPal */
         }
 
         /* Estilos para mensajes de error */
@@ -99,8 +100,25 @@
             margin-right: auto;
         }
 
+        /* Estilo para el botón de volver */
+        .btn-back {
+            background-color: #4a5568; /* Un color oscuro para que combine con el tema */
+            color: #e2e8f0;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.75rem 1.5rem;
+            margin-top: 1rem; /* Espacio arriba del botón */
+            text-decoration: none; /* Quitar subrayado del enlace si se usa <a> */
+            display: inline-block; /* Para que apliquen los márgenes y paddings */
+            transition: background-color 0.3s ease;
+        }
 
-    </style>
+        .btn-back:hover {
+            background-color: #2d3748; /* Oscurecer un poco al pasar el mouse */
+            color: #e2e8f0; /* Mantener el color del texto */
+        }
+
+   </style>
 
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -119,7 +137,11 @@
             <div id="paypal-button-container"></div>
 
             <div id="error-message" class="error-message"></div>
-        </div>
+
+            <button class="btn btn-back" onclick="window.history.back();">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            </div>
     </div>
 
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
@@ -177,13 +199,13 @@
                 // Optional: Set a timeout for automatic redirection if the user doesn't click the button
                 // --- CORRECCIÓN: Cambiar la URL de redirección a loginobtener ---
                 setTimeout(() => {
-                     // Verificar si el modal todavía está abierto antes de redirigir
-                     const modalElement = document.getElementById('successModal');
-                     const isModalOpen = modalElement && modalElement.classList.contains('show');
+                    // Verificar si el modal todavía está abierto antes de redirigir
+                    const modalElement = document.getElementById('successModal');
+                    const isModalOpen = modalElement && modalElement.classList.contains('show');
 
-                     if (isModalOpen) {
-                         window.location.href = '<?= base_url("loginobtener") ?>';
-                     }
+                    if (isModalOpen) {
+                        window.location.href = '<?= base_url("loginobtener") ?>';
+                    }
                 }, 3000); // Redirigir después de 3 segundos si el modal sigue abierto
                 // --- FIN CORRECCIÓN ---
 
