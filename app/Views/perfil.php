@@ -211,7 +211,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
 
          .devices-section-title i {
              margin-right: 0.5rem;
-         }
+           }
 
         /* Add MAC Form (kept most styles, added Bootstrap form control style) */
         #add-mac-form {
@@ -226,7 +226,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              font-weight: bold;
              margin-bottom: 0.5rem;
              display: block;
-         }
+           }
 
          /* Ensure Bootstrap form-control styles apply */
          #add-mac-form .form-control {
@@ -238,14 +238,14 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              color: #edf2f7; /* Text color */
              box-sizing: border-box;
              margin-bottom: 1rem;
-         }
-         /* Style for Bootstrap's default focus ring in dark mode */
-         #add-mac-form .form-control:focus {
+           }
+           /* Style for Bootstrap's default focus ring in dark mode */
+           #add-mac-form .form-control:focus {
              background-color: #2d3748;
              color: #edf2f7;
              border-color: #63b3ed; /* Blue focus border */
              box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Blue focus shadow */
-         }
+           }
 
 
         /* Delete Devices Form wrapper */
@@ -271,11 +271,11 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              align-items: center;
              box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
              transition: box-shadow 0.3s ease;
-         }
+           }
 
-         .device-item:hover {
+           .device-item:hover {
               box-shadow: 0 0 10px rgba(66, 153, 225, 0.4); /* Use a blue glow on hover */
-         }
+           }
 
         .device-info {
             flex-grow: 1;
@@ -317,20 +317,20 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             position: relative;
             flex-shrink: 0; /* Prevent shrinking in flex container */
             transition: background-color 0.2s ease, border-color 0.2s ease;
-         }
+           }
 
-         .delete-checkbox:checked {
+           .delete-checkbox:checked {
              background-color: #48bb78; /* Green when checked */
              border-color: #48bb78;
-         }
+           }
 
-         .delete-checkbox:focus {
-              outline: none; /* Remove default focus outline */
-              box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Add custom focus ring */
-         }
+           .delete-checkbox:focus {
+             outline: none; /* Remove default focus outline */
+             box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Add custom focus ring */
+           }
 
-         /* Add custom checkmark using Font Awesome */
-         .delete-checkbox:checked::after {
+           /* Add custom checkmark using Font Awesome */
+           .delete-checkbox:checked::after {
              content: '\f00c'; /* Font Awesome check icon */
              font-family: 'Font Awesome 6 Free';
              font-weight: 900; /* Solid icon weight */
@@ -340,7 +340,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              top: 50%;
              left: 50%;
              transform: translate(-50%, -50%);
-         }
+           }
 
 
         /* Modal styles (kept as is, fit dark theme) */
@@ -409,7 +409,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-outline-secondary btn-sm">
                              <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
-                         </button>
+                           </button>
                     </form>
                 </div>
             </div>
@@ -420,13 +420,13 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
 
         <?php if (session('success')): ?>
              <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
-         <?php endif; ?>
-         <?php if (session('error')): ?>
+           <?php endif; ?>
+           <?php if (session('error')): ?>
              <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
-         <?php endif; ?>
-         <?php if (session('info')): ?>
+           <?php endif; ?>
+           <?php if (session('info')): ?>
              <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i> <?= session('info') ?></div>
-         <?php endif; ?>
+           <?php endif; ?>
 
 
         <div class="card">
@@ -462,7 +462,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
 
         <?php if (empty($dispositivosEnlazados)): ?>
              <p>No tienes dispositivos enlazados aún.</p>
-         <?php else: ?>
+           <?php else: ?>
              <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
                  <?= csrf_field() ?>
                  <button type="button" id="delete-selected-btn" class="btn btn-danger mb-3">
@@ -482,10 +482,10 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                              <div class="device-actions">
                                  <input type="checkbox" name="macs[]" value="<?= esc($dispositivo['MAC']) ?>" class="delete-checkbox">
                                  <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
-                                     <i class="fas fa-edit"></i> Editar
+                                      <i class="fas fa-edit"></i> Editar
                                  </a>
-                                 <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
-                                     <i class="fas fa-chart-bar"></i> Ver Detalles
+                                 <a href="<?= base_url('/dispositivo/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
+                                      <i class="fas fa-chart-bar"></i> Ver Detalles
                                  </a>
                              </div>
                          </li>
@@ -493,7 +493,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                  </ul>
 
              </form>
-         <?php endif; ?>
+           <?php endif; ?>
 
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
              <div class="modal-dialog">
