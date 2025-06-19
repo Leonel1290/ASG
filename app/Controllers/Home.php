@@ -7,7 +7,7 @@ use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
     // Puedes instanciar modelos aquí si los usas en múltiples métodos
     // protected $userModel;
@@ -25,26 +25,18 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
     public function index()
     {
-        // Carga la vista de inicio
+        // Carga la vista de inicio pública (tu página de aterrizaje)
         return view('inicio');
     }
 
+    // --- MÉTODOS DE LA APLICACIÓN PRINCIPAL (PROTEGIDOS POR FILTRO) ---
+
     public function inicio()
     {
-        $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::inicio() - Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        // Si el usuario no está logueado, redirige a la página de login
-        if (!$session->get('logged_in')) {
-            log_message('debug', 'Home::inicio() - Usuario no logueado, redirigiendo a login.');
-            return view('login');
-        }
-
-        log_message('debug', 'Home::inicio() - Usuario logueado, mostrando vista inicio.');
-        // Si está logueado, muestra la vista de inicio
+        // El filtro SessionAdmin (modificado para verificar 'logged_in')
+        // ya ha asegurado que el usuario está logueado antes de llegar aquí.
+        // Por lo tanto, simplemente muestra la vista de inicio para usuarios logueados.
+        log_message('debug', 'Home::inicio() - Mostrando vista "inicio" para usuario logueado (acceso permitido por filtro).');
         return view('inicio');
     }
 
@@ -53,12 +45,10 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
     {
         $session = session();
 
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
 
         $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
+        $lecturasGasModel = new \App\Models\LecturasGasModel(); // Asegúrate de que el namespace sea correcto
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
@@ -80,20 +70,21 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
                     ->asArray()
                     ->first();
 
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
+                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null; // Esto no se usa para la sesión, pero lo mantengo si es parte de tu lógica
 
                 $sessionData = [
                     'id'        => $user['id'],
                     'nombre'    => $user['nombre'],
                     'email'     => $user['email'],
-                    'logged_in' => true,
+                    'logged_in' => true, // <-- ¡Esta es la variable clave que verifica tu filtro!
+                    // Si tienes un tipo de usuario (admin, normal, etc.), también puedes guardarlo aquí:
+                    // 'type' => $user['tipo_de_usuario'] ?? 'normal',
                 ];
                 $session->set($sessionData);
 
-                // --- LOGGING PARA DEBUGGING ---
                 log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
-                // --- FIN LOGGING ---
 
+                // ¡Esta es la redirección crucial a la página de perfil!
                 return redirect()->to('/perfil');
             } else {
                 $session->setFlashdata('error', 'Contraseña incorrecta.');
@@ -107,37 +98,56 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         }
     }
 
-    public function register()
-    {
-        // Este método simplemente muestra la vista de registro
-        return view('register');
-    }
-
     public function logout()
     {
         $session = session();
         $userId = $session->get('id');
-        $session->destroy();
+        $session->destroy(); // Destruye toda la sesión
         log_message('debug', 'Home::logout() - Sesión destruida para usuario ID: ' . $userId);
-        return redirect()->to('/');
+        return redirect()->to('/'); // Redirige a la página de inicio pública
     }
 
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
-    public function loginobtener() {
+    // --- RUTAS DE FORMULARIOS Y VISTAS BÁSICAS ---
+
+    public function loginobtener()
+    {
+        // Muestra el formulario de login (GET)
         $session = session();
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'Home::loginobtener() - Mostrando vista de login. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
         return view('login');
     }
-    public function configview() { return view('configuracion'); }
-    public function salirdelconfig() { return view('inicio'); }
-    public function volveralinicio() { return view('inicio'); }
-    public function volveralperfil() { return view('perfil'); }
 
-    // Recuperación de contraseña (mantengo tu lógica existente, usa UserModel)
+    public function register()
+    {
+        // Muestra la vista de registro
+        return view('register');
+    }
+
+    public function comprar()
+    {
+        // Muestra la vista de "comprar" (asumimos que es pública o gestionada por otro filtro)
+        $session = session(); // Solo para logging, si es necesario
+        log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
+        return view('comprar');
+    }
+
+    public function dispositivos()
+    {
+        // Muestra la vista de "dispositivos" (protegida por SessionAdmin en tus rutas)
+        return view('dispositivos');
+    }
+
+    // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
+
+    public function forgotpassword()
+    {
+        // Muestra el formulario para "olvidé mi contraseña"
+        return view('forgotpassword');
+    }
+
     public function forgotPPassword()
     {
+        // Procesa el formulario de "olvidé mi contraseña" (envío de email)
         $session = session();
         $userModel = new UserModel();
         $emailInput = $this->request->getPost('email');
@@ -145,8 +155,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         if ($user) {
             if (!$user['is_active']) {
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
-                 return redirect()->back()->withInput();
+                   $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
+                   return redirect()->back()->withInput();
             }
 
             $token = bin2hex(random_bytes(50));
@@ -160,8 +170,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             $resetLink = base_url("/reset-password/$token");
 
             $emailService = \Config\Services::email();
-            // Configura el remitente en app/Config/Email.php o .env
-            // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
+            // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG'); // Descomentar y configurar si no está en Config/Email.php
             $emailService->setTo($user['email']);
             $emailService->setSubject('Recuperación de contraseña');
             $emailService->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
@@ -169,8 +178,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             if (!$emailService->send()) {
                 $data = $emailService->printDebugger(['headers']);
                 log_message('error', 'Error enviando correo de recuperación a ' . $user['email'] . ': ' . $data);
-                 $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
-                 return redirect()->back()->withInput();
+                   $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
+                   return redirect()->back()->withInput();
             }
 
             if ($updated) {
@@ -187,23 +196,19 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         }
     }
 
-    public function forgotpassword()
-    {
-        return view('forgotpassword');
-    }
-
     public function showResetPasswordForm($token)
     {
+        // Muestra el formulario para resetear la contraseña con el token
         $userModel = new UserModel();
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                   $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                   session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                   return redirect()->to('/register');
             }
 
             return view('reset_password', ['token' => $token]);
@@ -215,6 +220,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
     public function resetPassword()
     {
+        // Procesa el reseteo de la contraseña
         $session = session();
         $userModel = new UserModel();
 
@@ -222,14 +228,14 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         $password = $this->request->getPost('password');
 
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                   $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                   $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                   return redirect()->to('/register');
             }
 
             $userModel->update($user['id'], [
@@ -239,15 +245,17 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             ]);
 
             $session->setFlashdata('success', 'Tu contraseña ha sido actualizada.');
-            return redirect()->to('/loginobtener');
+            return redirect()->to('/loginobtener'); // Redirige al login para que el usuario inicie sesión con la nueva contraseña
         } else {
             $session->setFlashdata('error', 'Token de recuperación inválido o expirado.');
             return redirect()->back()->withInput();
         }
     }
 
-    // Método para enlazar MACs (parece que lo tienes duplicado con EnlaceController::store)
-    // Considera eliminar este si usas EnlaceController::store
+    // --- MÉTODOS OBSOLETOS O DUPLICADOS (CONSIDERAR ELIMINAR/MOVER) ---
+
+    // Este método parece duplicar la funcionalidad de EnlaceController::store.
+    // Si EnlaceController::store es el controlador principal para esto, considera eliminar este.
     public function storeMac()
     {
         $session = session();
@@ -275,64 +283,17 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             $session->setFlashdata('success', 'MAC enlazada correctamente.');
         }
 
-        return redirect()->to('/perfil');
+        return redirect()->to('/perfil'); // Redirige al perfil después de enlazar
     }
 
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
-    // public function inicioresetpass() { return view('reset_password'); }
-    // public function obtenerperfil() { return view('perfilobtener'); }
+    // Estos métodos simplemente retornan vistas sin lógica significativa
+    // y pueden ser redundantes si ya tienes rutas y controladores más específicos.
+    // public function configview() { return view('configuracion'); }
+    // public function salirdelconfig() { return view('inicio'); }
+    // public function volveralinicio() { return view('inicio'); }
+    // public function volveralperfil() { return view('perfil'); }
 
-    // Vistas varias (mantengo las que tenías)
-    public function dispositivos()
-    {
-        return view('dispositivos');
-    }
-
-    // Método para mostrar la página de perfil (parece que PerfilController::index es la principal ahora)
-    // Considera eliminar este si usas PerfilController::index
-    public function perfil()
-    {
-        $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::perfil() - Estado de la sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        if (!$session->get('logged_in')) {
-            log_message('debug', 'Home::perfil() - Usuario no logueado, redirigiendo a login.');
-            return redirect()->to('/loginobtener');
-        }
-
-        $usuarioId = $session->get('id');
-
-        $enlaceModel = new \App\Models\EnlaceModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
-
-        $macs = $enlaceModel
-                    ->select('MAC')
-                    ->where('id_usuario', $usuarioId)
-                    ->groupBy('MAC')
-                    ->findAll();
-
-        $lecturas = $lecturasGasModel->getLecturasPorUsuario($usuarioId);
-
-        log_message('debug', 'Home::perfil() - Lecturas por usuario obtenidas: ' . print_r($lecturas, true));
-
-        return view('perfil', [
-            'macs' => $macs,
-            'lecturas' => $lecturas
-        ]);
-    }
-
-    public function comprar()
-    {
-        // --- LOGGING PARA DEBUGGING ---
-        $session = session();
-        log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-        return view('comprar');
-    }
-
-    // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
-    // public function verLecturas($mac) { ... }
+    // Este método Home::perfil() debería ser gestionado por PerfilController::index
+    // Si ya tienes un PerfilController, considera eliminar este método de Home.
+    // public function perfil() { /* ... tu lógica anterior para perfil ... */ }
 }
