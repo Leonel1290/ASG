@@ -484,7 +484,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                                  <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
                                       <i class="fas fa-edit"></i> Editar
                                  </a>
-                                <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
+                                <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
                                     <i class="fas fa-chart-bar"></i> Ver Detalles
                                 </a>
                              </div>
