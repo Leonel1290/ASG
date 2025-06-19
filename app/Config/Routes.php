@@ -145,7 +145,7 @@ $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 // --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
 // La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.
 // Si aún la necesitas para otra función de DetalleController, descoméntala y ajusta.
-// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
 // Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
