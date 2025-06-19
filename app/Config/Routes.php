@@ -76,7 +76,7 @@ $routes->group('perfil', function($routes) {
     // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
 
 
-    // --- RUTAS PARA GESTIÓN DE DISPOSITIVOS ---
+    // --- RUTAS PARA GESTIÓN DE DISPOSITIVOS DESDE EL PERFIL ---
 
     // Ruta para mostrar el formulario de edición de un dispositivo
     // GET /perfil/dispositivo/editar/MAC_DEL_DISPOSITIVO
@@ -92,7 +92,7 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
 
-    // --- FIN RUTAS GESTIÓN DE DISPOSITIVOS ---
+    // --- FIN RUTAS GESTIÓN DE DISPOSITIVOS DESDE EL PERFIL ---
 
 });
 
@@ -108,10 +108,22 @@ $routes->get('/enlace', 'EnlaceController::index');
 // POST /enlace/store
 $routes->post('/enlace/store', 'EnlaceController::store');
 
-// Detalles del dispositivo (mostrar lecturas, etc.)
-// Asumo que esta ruta usa la MAC para identificar el dispositivo
-// GET /detalles/LA_MAC_DEL_DISPOSITIVO
-$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+// --- RUTAS DE DISPOSITIVOS Y REGISTROS DE GAS ---
+
+// Ruta para la nueva vista que lista todos los dispositivos (el "menú")
+// GET /dispositivos
+$routes->get('/dispositivos', 'DeviceController::listDevices');
+
+// Ruta para la vista de detalle de un dispositivo específico (con gráfico y última lectura)
+// GET /dispositivo/LA_MAC_DEL_DISPOSITIVO
+$routes->get('/dispositivo/(:segment)', 'DeviceController::showDeviceDetail/$1');
+
+// Nueva ruta para la vista de todos los registros de gas de un dispositivo específico
+// GET /registros-gas/LA_MAC_DEL_DISPOSITIVO
+$routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1');
+
+// --- FIN RUTAS DE DISPOSITIVOS Y REGISTROS DE GAS ---
+
 
 // --- RUTAS DE VISTA DIRECTA ---
 
@@ -120,14 +132,17 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 $routes->get('/comprar', 'Home::comprar');
 
 
-// --- RUTAS REDUNDANTES O DUPLICADAS EN Home.php (COMENTADAS) ---
+// --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
+// La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.
+// Si aún la necesitas para otra función de DetalleController, descoméntala y ajusta.
+// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+
 // Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
 // Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
 // $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
 // $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
 // $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
 // $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
-// $routes->get('/dispositivos', 'Home::dispositivos'); // Parece una vista directa, no una acción de controlador
 
 // NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
 // que parecen duplicados con PerfilController::index y EnlaceController::store.
