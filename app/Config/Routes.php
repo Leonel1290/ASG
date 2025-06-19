@@ -131,6 +131,7 @@ $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1')
 // Descomentamos esta ruta para que la vista sea accesible
 $routes->get('/comprar', 'Home::comprar');
 
+$routes->get('dispositivo/(:segment)/lecturas', 'DeviceController::showAllGasReadings/$1'); // Nueva ruta para el historial completo
 
 // --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
 // La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.

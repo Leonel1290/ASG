@@ -87,4 +87,9 @@ class DeviceController extends Controller
 
         return view('gas_records', $viewData);
     }
+    public function showAllGasReadings($mac)
+{
+    // ... lógica para obtener $nombreDispositivo, $mac, $ubicacionDispositivo y TODAS las $lecturas ...
+    return view('gas_records', $data); // Carga la vista del historial de gas
+}
 }
