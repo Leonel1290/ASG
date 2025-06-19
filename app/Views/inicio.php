@@ -7,6 +7,8 @@
 
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
+    <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -19,16 +21,15 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            /* overflow: hidden; */ /* Comentamos overflow: hidden en el body para evitar problemas de scroll */
         }
 
         .navbar {
             backdrop-filter: blur(10px);
             background-color: rgba(13, 31, 35, 0.8);
-            position: fixed; /* Mantenemos la posición fija */
-            top: 0; /* La fija en la parte superior */
-            width: 100%; /* Asegura que ocupe todo el ancho */
-            z-index: 1000; /* Asegura que esté por encima del contenido */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .navbar-brand, .nav-link {
@@ -55,18 +56,59 @@
         .hero {
             padding: 6rem 0;
             position: relative;
-            /* --- CORRECCIÓN: Añadir padding-top para compensar la altura del navbar fijo --- */
-            /* Ajusta este valor (ej. 70px) para que sea ligeramente mayor que la altura de tu navbar */
-            /* Puedes necesitar ajustar el valor si la altura del navbar cambia en diferentes tamaños de pantalla */
-            padding-top: 80px; /* Añadimos un padding superior para que el contenido no quede detrás del navbar */
-            /* --- FIN CORRECCIÓN --- */
+            padding-top: 80px;
         }
 
         .hero h1 {
             font-size: 3rem;
-            color: #fff;
             font-weight: 700;
+            position: relative; /* Necesario para posicionar el pseudo-elemento */
+            display: inline-block; /* Para que el pseudo-elemento se ajuste al ancho del texto */
+            color: #fff; /* Color base del texto (las letras blancas fijas) */
+            line-height: 1.2; /* Ajusta si el efecto se ve cortado */
         }
+
+        /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
+        .hero h1::before {
+            content: attr(data-text); /* Toma el texto del atributo data-text */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: transparent; /* Hace el texto del pseudo-elemento transparente */
+
+            /* --- AQUÍ CAMBIA LA IMAGEN Y POSIBLEMENTE EL TAMAÑO --- */
+            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
+            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
+            background-repeat: no-repeat;
+            background-position: center bottom; /* Inicia la imagen desde abajo */
+            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
+            background-clip: text;
+            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
+            opacity: 0; /* Empieza invisible */
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
+        }
+
+        @keyframes greenSmokeTextEffect {
+            0% {
+                background-position: center bottom; /* El humo empieza desde abajo del texto */
+                opacity: 0; /* Empieza invisible */
+            }
+            20% {
+                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
+            }
+            60% {
+                background-position: center top; /* El humo sube y se va por arriba del texto */
+                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
+            }
+            100% {
+                background-position: center top; /* Asegura que termina en la parte superior */
+                opacity: 0; /* Desaparece completamente */
+            }
+        }
+        /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
+
 
         .hero-line {
             width: 80px;
@@ -87,8 +129,8 @@
         }
 
         .features {
-             padding-top: 3rem; /* Asegurar padding si esta sección sigue a hero */
-             padding-bottom: 3rem;
+            padding-top: 3rem;
+            padding-bottom: 3rem;
         }
 
         .features i {
@@ -112,44 +154,24 @@
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
-            margin-top: auto; /* Empuja el footer hacia abajo si el contenido es corto */
+            margin-top: auto;
         }
 
         a {
             text-decoration: none;
         }
 
-        /* Estilos para la animación de explosión/humo */
-        .explosion-animation-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0D1F23; /* Fondo oscuro */
-            z-index: 1001; /* Asegura que esté por encima de todo */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            transition: opacity 1s ease-out 1.5s; /* Desaparece después de 1.5s */
-        }
-        /* @keyframes pulse-fade {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        } */ /* Comentado porque no se usa */
-
-        .explosion-animation-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none; /* Permite interactuar con los elementos debajo una vez que desaparece */
+        main {
+            flex-grow: 1;
         }
 
-        /* Asegurar que el main content tenga espacio por encima del footer si no hay suficiente contenido */
-         main {
-             flex-grow: 1; /* Permite que el main crezca para llenar el espacio */
-         }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
 
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5);
+        }
     </style>
 </head>
 <body>
@@ -173,7 +195,10 @@
                     <li class="nav-item ms-2">
                         <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                     </li>
-                </ul>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
+                    </li>
+                    </ul>
             </div>
         </div>
     </nav>
@@ -182,18 +207,18 @@
 <main>
     <section class="hero" id="inicio">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row align-items-centers">
                 <div class="col-md-6 text-start">
-                    <h1>Protege lo que más importa</h1>
+                    <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de fuga de gas"
-                         class="hero-img img-fluid"
-                         loading="lazy">
+                                 alt="Ilustración de fuga de gas"
+                                 class="hero-img img-fluid"
+                                 loading="lazy">
                 </div>
             </div>
         </div>
@@ -251,8 +276,7 @@
             e.preventDefault();
             const target = $($(this).attr('href'));
             if(target.length) {
-                // Ajusta el desplazamiento para tener en cuenta la altura del navbar fijo
-                const offset = $('.navbar').outerHeight() + 10; // Altura del navbar + un pequeño margen
+                const offset = $('.navbar').outerHeight() + 10;
                 $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
             }
         });
@@ -260,9 +284,21 @@
         // Ocultar overlay de animación al cargar la página
         $(window).on('load', function() {
             $('#explosionOverlay').addClass('fade-out');
-            // $('body').css('overflow', 'auto'); // Esto puede causar un salto visual, a veces es mejor manejarlo con padding
         });
     });
 </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                .then(registration => {
+                    console.log('ServiceWorker registrado con éxito:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Fallo el registro de ServiceWorker:', error);
+                });
+        });
+    }
+</script>
+
 </body>
-</html>
