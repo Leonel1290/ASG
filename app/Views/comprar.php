@@ -1,242 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmar Compra - AgainSafeGas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmar Compra | AgainSafeGas</title>
 
-   <style>
-        body {
-            background-color: #1a202c; /* Dark mode background */
-            font-family: 'Segoe UI', sans-serif;
-            color: #e2e8f0; /* Light text for dark background */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+  <!-- Bootstrap & FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        .checkout-container {
-            flex: 1; /* Allow container to grow */
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            padding: 2rem;
-        }
+  <!-- Icono -->
+  <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
-        .checkout-card {
-            background-color: #2d3748; /* Card background */
-            color: #e2e8f0; /* Card text color */
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            max-width: 500px; /* Max width for the card */
-            width: 100%; /* Make card responsive */
-            text-align: center; /* Center text inside card */
-        }
+  <!-- PayPal -->
+  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
 
-        .checkout-card h2 {
-            color: #4299e1; /* Heading color */
-            margin-bottom: 1.5rem;
-        }
+  <!-- PWA -->
+  <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ASG">
 
-        .checkout-card p {
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        #paypal-button-container {
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem; /* Agregado para espacio debajo del botón PayPal */
-        }
-
-        /* Estilos para mensajes de error */
-        .error-message {
-            color: #f56565; /* Red color for errors */
-            margin-top: 1rem;
-            font-weight: bold;
-        }
-
-        /* Estilos para el modal de éxito */
-        .modal-content {
-            background-color: #2d3748; /* Fondo del modal */
-            color: #e2e8f0; /* Color del texto del modal */
-        }
-
-        .modal-header {
-            border-bottom-color: #4a5568; /* Color del borde del header del modal */
-        }
-
-        .modal-footer {
-            border-top-color: #4a5568; /* Color del borde del footer del modal */
-        }
-
-        .modal-title {
-            color: #48bb78; /* Color verde para el título del modal */
-        }
-
-        .btn-secondary {
-            background-color: #6b7280;
-            border-color: #6b7280;
-            transition: background-color 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: #4b5563;
-            border-color: #4b5563;
-        }
-        /* New style for the image */
-        .checkout-card img {
-            max-width: 150px; /* Adjust as needed */
-            height: auto;
-            margin-bottom: 1rem; /* Space below the image */
-            display: block; /* Make it a block element to center with margin auto */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Estilo para el botón de volver */
-        .btn-back {
-            background-color: #4a5568; /* Un color oscuro para que combine con el tema */
-            color: #e2e8f0;
-            border: none;
-            border-radius: 0.25rem;
-            padding: 0.75rem 1.5rem;
-            margin-top: 1rem; /* Espacio arriba del botón */
-            text-decoration: none; /* Quitar subrayado del enlace si se usa <a> */
-            display: inline-block; /* Para que apliquen los márgenes y paddings */
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-back:hover {
-            background-color: #2d3748; /* Oscurecer un poco al pasar el mouse */
-            color: #e2e8f0; /* Mantener el color del texto */
-        }
-
-   </style>
-
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ASG">
-
-</head>
-<body>
-
-    <div class="checkout-container">
-        <div class="checkout-card">
-            <h2>Confirmar Compra</h2>
-            <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="AgainSafeGas Logo">
-            <p>Estás a punto de adquirir un dispositivo AgainSafeGas. Por favor, procede con el pago a través de PayPal.</p>
-
-            <div id="paypal-button-container"></div>
-
-            <div id="error-message" class="error-message"></div>
-
-            <button class="btn btn-back" onclick="window.history.back();">
-                <i class="fas fa-arrow-left"></i> Volver
-            </button>
-            </div>
-    </div>
-
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Tu pago ha sido procesado exitosamente. ¡Gracias por tu compra!
-                </div>
-                <div class="modal-footer">
-                    <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
-                    </div>
-            </div>
-        </div>
-    </div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // Inicializar el modal de éxito
-    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
-        keyboard: false // Evitar cerrar con la tecla Esc
-    });
-
-    // Función para mostrar mensajes de error
-    function showErrorMessage(message) {
-        const errorMessageDiv = document.getElementById('error-message');
-        if (errorMessageDiv) {
-            errorMessageDiv.innerText = message;
-        }
+  <!-- Estilos personalizados -->
+  <style>
+    body {
+      background-color: #0d1117;
+      font-family: 'Segoe UI', sans-serif;
+      color: #e6edf3;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    // Configurar los botones de PayPal
+    .checkout-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .checkout-card {
+      background-color: #161b22;
+      border-radius: 0.75rem;
+      padding: 2.5rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .checkout-card h2 {
+      color: #58a6ff;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .checkout-card img {
+      max-width: 140px;
+      margin-bottom: 1.5rem;
+    }
+
+    .checkout-card p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    #paypal-button-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .error-message {
+      color: #f87171;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .btn-back {
+      background-color: #2d333b;
+      color: #e6edf3;
+      border: none;
+      border-radius: 0.375rem;
+      padding: 0.6rem 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #21262d;
+      color: #fff;
+    }
+
+    /* Modal personalizado */
+    .modal-content {
+      background-color: #1c2128;
+      color: #c9d1d9;
+    }
+
+    .modal-title {
+      color: #2ea043;
+    }
+
+    .btn-primary {
+      background-color: #238636;
+      border-color: #238636;
+    }
+
+    .btn-primary:hover {
+      background-color: #2ea043;
+      border-color: #2ea043;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="checkout-container">
+    <div class="checkout-card">
+      <h2>Confirmar Compra</h2>
+      <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
+      <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
+      
+      <div id="paypal-button-container"></div>
+      <div id="error-message" class="error-message"></div>
+
+      <button class="btn btn-back mt-3" onclick="window.history.back();">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Éxito -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
+        </div>
+        <div class="modal-footer">
+          <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+      keyboard: false
+    });
+
+    function showErrorMessage(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.innerText = message;
+    }
+
     paypal.Buttons({
-        createOrder: function (data, actions) {
-            // Set up the transaction
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: '100.00' // Replace with dynamic price if needed
-                    }
-                }]
-            });
-        },
-        onApprove: function (data, actions) {
-            // Capture the funds from the transaction
-            return actions.order.capture().then(function (details) {
-                // Show the success modal
-                successModal.show();
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '100.00'
+            }
+          }]
+        });
+      },
+      onApprove: (data, actions) => {
+        return actions.order.capture().then((details) => {
+          successModal.show();
+          setTimeout(() => {
+            const modal = document.getElementById('successModal');
+            if (modal && modal.classList.contains('show')) {
+              window.location.href = '<?= base_url("loginobtener") ?>';
+            }
+          }, 3000);
+        });
+      },
+      onCancel: () => {
+        showErrorMessage('❌ El pago fue cancelado.');
+      },
+      onError: (err) => {
+        console.error('Error en la transacción:', err);
+        showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+      }
+    }).render('#paypal-button-container');
+  </script>
 
-                // Optional: Set a timeout for automatic redirection if the user doesn't click the button
-                // --- CORRECCIÓN: Cambiar la URL de redirección a loginobtener ---
-                setTimeout(() => {
-                    // Verificar si el modal todavía está abierto antes de redirigir
-                    const modalElement = document.getElementById('successModal');
-                    const isModalOpen = modalElement && modalElement.classList.contains('show');
-
-                    if (isModalOpen) {
-                        window.location.href = '<?= base_url("loginobtener") ?>';
-                    }
-                }, 3000); // Redirigir después de 3 segundos si el modal sigue abierto
-                // --- FIN CORRECCIÓN ---
-
-            });
-        },
-        onCancel: function (data) {
-            // Handle cancelation
-            console.log('Payment cancelled', data);
-            showErrorMessage('❌ El pago fue cancelado.');
-        },
-        onError: function (err) {
-            // Handle errors
-            console.error('An error occurred during the transaction', err);
-            showErrorMessage('⚠️ Error al procesar el pago. Por favor, intente de nuevo.');
-        }
-    }).render('#paypal-button-container'); // Render the PayPal button into the container
-</script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado con éxito:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Fallo el registro de ServiceWorker:', error);
-                    });
-            });
-        }
-    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
+          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
+      });
+    }
+  </script>
 
 </body>
 </html>
