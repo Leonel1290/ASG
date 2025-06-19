@@ -74,7 +74,7 @@ $routes->group('perfil', function($routes) {
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
 
     // Ruta para cambiar el idioma
-    $routes->post('cambiar-idioma', 'PerfilController::cambiarIdioma');
+    $routes->POST('cambiar-idioma', 'PerfilController::cambiarIdioma');
 
     // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
 
