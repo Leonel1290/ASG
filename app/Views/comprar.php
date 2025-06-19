@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
 
-    <style>
+   <style>
         body {
             background-color: #1a202c; /* Dark mode background */
             font-family: 'Segoe UI', sans-serif;
@@ -89,15 +89,31 @@
             background-color: #4b5563;
             border-color: #4b5563;
         }
+        /* New style for the image */
+        .checkout-card img {
+            max-width: 150px; /* Adjust as needed */
+            height: auto;
+            margin-bottom: 1rem; /* Space below the image */
+            display: block; /* Make it a block element to center with margin auto */
+            margin-left: auto;
+            margin-right: auto;
+        }
 
 
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+
 </head>
 <body>
 
     <div class="checkout-container">
         <div class="checkout-card">
             <h2>Confirmar Compra</h2>
+            <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="AgainSafeGas Logo">
             <p>Estás a punto de adquirir un dispositivo AgainSafeGas. Por favor, procede con el pago a través de PayPal.</p>
 
             <div id="paypal-button-container"></div>
@@ -185,6 +201,20 @@
         }
     }).render('#paypal-button-container'); // Render the PayPal button into the container
 </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 
 </body>
 </html>
