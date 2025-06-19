@@ -35,7 +35,7 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        // Alias para tu filtro de sesión de administrador
+        'auth'          => \CodeIgniter\Shield\Filters\ChainAuth::class,
         'SessionAdmin'  => \App\Filters\SessionAdmin::class,
     ];
 
