@@ -7,166 +7,165 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// --- RUTAS DE REGISTRO Y LOGIN (AJUSTADAS PARA VERIFICACIÓN) ---
+// --- REGISTRATION AND LOGIN ROUTES (ADJUSTED FOR VERIFICATION) ---
 
-// Ruta para mostrar el formulario de registro
+// Route to display the registration form
 $routes->get('/register', 'registerController::index');
 
-// Ruta para procesar el formulario de registro
-// POST /register/store (Coincide con la action del formulario en register.php)
+// Route to process the registration form
+// POST /register/store (Matches the form action in register.php)
 $routes->post('/register/store', 'registerController::store');
 
-// Ruta para mostrar la página que le dice al usuario que revise su email después del registro
+// Route to display the page telling the user to check their email after registration
 $routes->get('/register/check-email', 'registerController::checkEmail');
 
-// Ruta para verificar el token recibido por email para REGISTRO
+// Route to verify the token received by email for REGISTRATION
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
-// Ruta para procesar el formulario de login
+// Route to process the login form
 $routes->post('/login', 'Home::login');
 
-// Ruta para mostrar el formulario de login (si usas loginobtener para esto)
+// Route to display the login form (if you use loginobtener for this)
 $routes->get('/loginobtener', 'Home::loginobtener');
 
-// Ruta para cerrar sesión (usando POST para mayor seguridad)
+// Route to log out (using POST for better security)
 $routes->post('/logout', 'Home::logout');
 
 
-// RECUPERACION DE CONTRASEÑA
+// PASSWORD RECOVERY
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Asumo que esta es la ruta que procesa el formulario de forgot password
+$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword'); // Asumo que esta es la ruta que procesa el formulario de reset password
+$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
 
-// --- FIN RUTAS DE REGISTRO Y LOGIN ---
+// --- END REGISTRATION AND LOGIN ROUTES ---
 
 
-// Perfil (Agrupamos rutas relacionadas con PerfilController)
+// Profile (Group routes related to PerfilController)
 $routes->group('perfil', function($routes) {
-    // Ruta para la página principal del perfil
+    // Route for the main profile page
     // GET /perfil
     $routes->get('/', 'PerfilController::index');
 
-    // --- RUTAS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
+    // --- ROUTES FOR PROFILE VERIFICATION AND CONFIGURATION FLOW ---
 
-    // Ruta para mostrar la página INICIAL de configuración (pide verificar email)
+    // Route to display the INITIAL configuration page (asks to verify email)
     // GET /perfil/configuracion
     $routes->get('configuracion', 'PerfilController::configuracion');
 
-    // Ruta para procesar el envío del correo de verificación para CONFIGURACIÓN
+    // Route to process sending the verification email for CONFIGURATION
     // POST /perfil/enviar-verificacion
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
 
-    // Ruta para verificar el token recibido por email para CONFIGURACIÓN
-    // GET /perfil/verificar-email/EL_TOKEN_GENERADO
+    // Route to verify the token received by email for CONFIGURATION
+    // GET /perfil/verificar-email/THE_GENERATED_TOKEN
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
 
-    // Ruta para mostrar el formulario de configuración REAL (accesible después de verificar email)
+    // Route to display the REAL configuration form (accessible after email verification)
     // GET /perfil/config_form
     $routes->get('config_form', 'PerfilController::configForm');
 
-    // Ruta para procesar la actualización del perfil (nombre/email)
+    // Route to process profile update (name/email)
     // POST /perfil/actualizar
     $routes->post('actualizar', 'PerfilController::actualizar');
 
-    // Ruta para la página de éxito después de actualizar el perfil
+    // Route for the success page after profile update
     // GET /perfil/cambio-exitoso
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
 
-    // Ruta para cambiar el idioma
+    // Route to change language
     $routes->match(['get', 'post'], 'cambiar-idioma', 'PerfilController::cambiarIdioma');
 
-    // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
+    // --- END PROFILE VERIFICATION AND CONFIGURATION ROUTES ---
 
 
-    // --- RUTAS PARA GESTIÓN DE DISPOSITIVOS DESDE EL PERFIL ---
+    // --- ROUTES FOR DEVICE MANAGEMENT FROM PROFILE ---
 
-    // Ruta para mostrar el formulario de edición de un dispositivo
-    // GET /perfil/dispositivo/editar/MAC_DEL_DISPOSITIVO
-    // (:segment) captura la MAC de la URL
+    // Route to display the device editing form
+    // GET /perfil/dispositivo/editar/DEVICE_MAC
+    // (:segment) captures the MAC from the URL
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
 
-    // Ruta para procesar el formulario de edición de un dispositivo
+    // Route to process the device editing form
     // POST /perfil/dispositivo/actualizar
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
 
-    // Ruta para eliminar dispositivos seleccionados (desenlazar del usuario)
+    // Route to delete selected devices (unlink from user)
     // POST /perfil/eliminar-dispositivos
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
 
-    // --- FIN RUTAS GESTIÓN DE DISPOSITIVOS DESDE EL PERFIL ---
+    // --- END DEVICE MANAGEMENT ROUTES FROM PROFILE ---
 
 });
 
 
-// Recibir los datos de la ESP32:
+// Receive data from ESP32:
 // POST /lecturas_gas/guardar
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
-// Vista para enlazar dispositivos (formulario para ingresar MAC)
+// View to link devices (form to enter MAC)
 // GET /enlace
 $routes->get('/enlace', 'EnlaceController::index');
-// Acción para enlazar MACs (procesa el formulario de /enlace)
+// Action to link MACs (processes the /enlace form)
 // POST /enlace/store
 $routes->post('/enlace/store', 'EnlaceController::store');
 
-// --- RUTAS DE DISPOSITIVOS Y REGISTROS DE GAS ---
+// --- DEVICE AND GAS RECORD ROUTES ---
 
-// Ruta para la nueva vista que lista todos los dispositivos (el "menú")
+// Route for the new view that lists all devices (the "menu")
 // GET /dispositivos
-$routes->get('/dispositivos', 'DeviceController::listDevices');
+// If this route lists devices and then you want to click on one to see the details,
+// make sure the link leads to /dispositivo/DEVICE_MAC
+// $routes->get('/dispositivos', 'DeviceController::listDevices'); // Commented out as DeviceController is not used for details
 
-// Ruta para la vista de detalle de un dispositivo específico (con gráfico y última lectura)
-// GET /dispositivo/LA_MAC_DEL_DISPOSITIVO
-$routes->get('/dispositivo/(:segment)', 'DeviceController::showDeviceDetail/$1');
+// CRUCIAL ROUTE: Route for the detail view of a specific device (with chart and latest reading)
+// THIS ROUTE NOW POINTS TO LECTURASCONTROLLER
+// Example: http://yourdomain.com/dispositivo/AA:BB:CC:DD:EE:FF
+$routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
 
-// Nueva ruta para la vista de todos los registros de gas de un dispositivo específico
-// GET /registros-gas/LA_MAC_DEL_DISPOSITIVO
-$routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1');
+// New route for the view of all gas records of a specific device
+// If you want a separate view just for historical records without the large chart,
+// you can point this to another method in LecturasController or a new controller.
+// For now, if you don't use it, you can comment it out or delete it.
+// $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1'); // Commented out to avoid conflicts
 
-// --- FIN RUTAS DE DISPOSITIVOS Y REGISTROS DE GAS ---
+// --- END DEVICE AND GAS RECORD ROUTES ---
 
 
-// --- RUTAS DE VISTA DIRECTA ---
+// --- DIRECT VIEW ROUTES ---
 
-// Ruta para la vista de "comprar"
-// Descomentamos esta ruta para que la vista sea accesible
+// Route for the "comprar" view
 $routes->get('/comprar', 'Home::comprar');
 
-// Ruta para migración temporal (eliminar después de usar)
-$routes->get('migrar-datos', 'DetalleController::migrarDatos');
+// Temporary migration route (delete after use)
+// $routes->get('migrar-datos', 'DetalleController::migrarDatos'); // Comment or delete after migration.
 
-// Rutas para el nuevo sistema
+// Routes for the new system (if RegistrosGasController exists for other functionality)
 $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
     $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
 });
 
-// Mantener ruta existente para compatibilidad
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
-// --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
-// La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.
-// Si aún la necesitas para otra función de DetalleController, descoméntala y ajusta.
-$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+// Keep existing route for compatibility
+// If DetalleController::detalles is a duplicate of LecturasController::detalle, DELETE THESE LINES.
+// Only keep them if DetalleController::detalles serves a VERY DIFFERENT FUNCTION.
+// $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
-// Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
-// Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
-// $routes->get('/inicioobtener', 'Home::inicioobtener'); // Duplicada con '/' o '/inicio'
-// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot'); // Duplicada con /forgotpassword
-// $routes->get('/inicioresetpass', 'Home::inicioresetpass'); // Duplicada con /reset-password/(:any)
-// $routes->get('/obtenerperfil', 'Home::obtenerperfil'); // Parece una vista directa, no una acción de controlador
 
-// NOTA: También tienes un método `perfil()` y `storeMac()` en Home.php
-// que parecen duplicados con PerfilController::index y EnlaceController::store.
-// Es recomendable usar solo los controladores dedicados (PerfilController y EnlaceController)
-// para estas funcionalidades y eliminar los métodos duplicados en Home.php.
+// --- PREVIOUS ROUTES (COMMENTED FOR CLARITY AND TO AVOID DUPLICATES) ---
+// The following routes are commented because they are likely redundant or do not correspond
+// to methods in the current controllers, or are already covered by the routes above.
 
-// --- RUTAS NO ENCONTRADAS EN CONTROLADORES ADJUNTOS (COMENTADAS) ---
-// Estas rutas estaban en tu Routes.php original pero no vimos métodos correspondientes
-// en los controladores que proporcionaste.
-// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
-// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
+// $routes->get('/inicioobtener', 'Home::inicioobtener');
+// $routes->get('/loginobtenerforgot', 'Home::loginobtenerforgot');
+// $routes->get('/inicioresetpass', 'Home::inicioresetpass');
+// $routes->get('/obtenerperfil', 'Home::obtenerperfil');
+// $routes->get('/mac/(:segment)', 'Home::verLecturas/$1');
+// $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo');
+// If Home::perfil() and EnlaceController::store() duplicate PerfilController::index() and EnlaceController::store(),
+// remove the duplicate methods in Home.php.
 
 $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
