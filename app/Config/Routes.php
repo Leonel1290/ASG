@@ -73,6 +73,9 @@ $routes->group('perfil', function($routes) {
     // GET /perfil/cambio-exitoso
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
 
+    // Ruta para cambiar el idioma
+    $routes->match(['get', 'post'], 'cambiar-idioma', 'PerfilController::cambiarIdioma');
+
     // --- FIN RUTAS VERIFICACIÓN Y CONFIGURACIÓN DE PERFIL ---
 
 
@@ -145,7 +148,7 @@ $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 // --- RUTAS PREVIAS (COMENTADAS PARA CLARIDAD Y EVITAR DUPLICADOS) ---
 // La ruta '/detalles/(:any)' ha sido reemplazada por '/dispositivo/(:segment)' y manejada por DeviceController.
 // Si aún la necesitas para otra función de DetalleController, descoméntala y ajusta.
-// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Estas rutas parecen estar manejadas por otros controladores o no tienen una función clara en Home.
 // Si necesitas alguna, descoméntala y asegúrate de que el método exista en Home.php
@@ -164,3 +167,7 @@ $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 // en los controladores que proporcionaste.
 // $routes->get('/mac/(:segment)', 'Home::verLecturas/$1'); // Método verLecturas no encontrado en Home.php
 // $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo'); // Método actualizarDispositivo no encontrado en DispositivoController.php
+
+$routes->get('prueba', function() {
+    return '¡Ruta de prueba funcionando!';
+});

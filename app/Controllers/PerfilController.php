@@ -410,4 +410,13 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
     }
+
+    public function cambiarIdioma()
+    {
+        $idioma = $this->request->getPost('idioma');
+        if (in_array($idioma, ['es', 'en'])) {
+            session()->set('lang', $idioma);
+        }
+        return redirect()->back();
+    }
 }

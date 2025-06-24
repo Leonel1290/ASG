@@ -1,4 +1,7 @@
 <?php
+$idioma = session('lang') ?? 'es'; // Por defecto español
+$perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
+
 // Ensure these variables are set, even if empty arrays, to avoid undefined variable errors
 $dispositivosEnlazados = $dispositivosEnlazados ?? [];
 $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in the provided code, but keep the null coalesce operator just in case.
@@ -227,6 +230,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              margin-bottom: 0.5rem;
              display: block;
            }
+           
 
          /* Ensure Bootstrap form-control styles apply */
          #add-mac-form .form-control {
@@ -405,10 +409,18 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                         </li>
                     </ul>
 
+                    <form method="post" action="<?= base_url('/cambiar-idioma') ?>"class="d-flex me-3">
+                        <?= csrf_field() ?>
+                        <select name="idioma" onchange="this.form.submit()" class="form-select form-select-sm">
+                            <option value="es" <?= $idioma == 'es' ? 'selected' : '' ?>>Español</option>
+                            <option value="en" <?= $idioma == 'en' ? 'selected' : '' ?>>English</option>
+                        </select>
+                    </form>
+
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-outline-secondary btn-sm">
-                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                             <i class="fas fa-sign-out-alt me-2"></i> <?= $perfilLang['cerrar_sesion'] ?>
                            </button>
                     </form>
                 </div>
@@ -431,18 +443,18 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
 
         <div class="card">
              <div class="card-header">
-                 <h5 class="card-title"><i class="fas fa-user-circle me-2"></i> Mi Perfil</h5>
+                 <h5 class="card-title"><i class="fas fa-user-circle me-2"></i> <?= $perfilLang['mi_perfil'] ?></h5>
              </div>
              <div class="card-body">
-                 <p><strong>Nombre:</strong> <?= esc(session()->get('nombre')) ?></p>
-                 <p><strong>Email:</strong> <?= esc(session()->get('email')) ?></p>
+                 <p><strong><?= $perfilLang['nombre'] ?>:</strong> <?= esc(session()->get('nombre')) ?></p>
+                 <p><strong><?= $perfilLang['email'] ?>:</strong> <?= esc(session()->get('email')) ?></p>
              </div>
         </div>
 
         <div class="devices-section-title">
-             <h2 style="margin: 0;"><i class="fas fa-microchip me-2"></i> Mis Dispositivos Enlazados</h2>
+             <h2 style="margin: 0;"><i class="fas fa-microchip me-2"></i> <?= $perfilLang['mis_dispositivos'] ?></h2>
              <button id="show-add-mac-form" class="btn btn-primary btn-sm">
-                 <i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo
+                 <i class="fas fa-plus-circle me-2"></i> <?= $perfilLang['anadir_dispositivo'] ?>
              </button>
         </div>
 
@@ -451,42 +463,42 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              <form action="<?= base_url('/enlace/store') ?>" method="post">
                  <?= csrf_field() ?>
                  <div class="mb-3">
-                     <label for="mac">Dirección MAC:</label>
+                     <label for="mac"><?= $perfilLang['mac'] ?>:</label>
                      <input type="text" class="form-control" id="mac" name="mac" placeholder="Ej: XX:XX:XX:XX:XX:XX" required>
                  </div>
-                 <button type="submit" class="btn btn-success"><i class="fas fa-link me-2"></i> Enlazar Dispositivo</button>
+                 <button type="submit" class="btn btn-success"><i class="fas fa-link me-2"></i> <?= $perfilLang['enlazar_dispositivo'] ?></button>
              </form>
               <hr class="my-4" style="border-color: #4a5568;">
         </div>
 
 
         <?php if (empty($dispositivosEnlazados)): ?>
-             <p>No tienes dispositivos enlazados aún.</p>
+             <p><?= $perfilLang['no_dispositivos'] ?></p>
            <?php else: ?>
              <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
                  <?= csrf_field() ?>
                  <button type="button" id="delete-selected-btn" class="btn btn-danger mb-3">
-                     <i class="fas fa-trash-alt me-2"></i> Eliminar Seleccionados
+                     <i class="fas fa-trash-alt me-2"></i> <?= $perfilLang['eliminar_seleccionados'] ?>
                  </button>
 
                  <ul class="device-list">
                      <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
                          <li class="device-item">
                              <div class="device-info">
-                                 <div class="device-name"><?= esc($dispositivo['nombre'] ?: 'Dispositivo sin nombre') ?></div>
+                                 <div class="device-name"><?= esc($dispositivo['nombre'] ?: $perfilLang['dispositivo_sin_nombre']) ?></div>
                                  <div class="device-details">
-                                      MAC: <?= esc($dispositivo['MAC'] ?? 'Desconocida') ?> |
-                                      Ubicación: <?= esc($dispositivo['ubicacion'] ?: 'Desconocida') ?>
+                                      <?= $perfilLang['mac'] ?>: <?= esc($dispositivo['MAC'] ?? $perfilLang['desconocida']) ?> |
+                                      <?= $perfilLang['ubicacion'] ?>: <?= esc($dispositivo['ubicacion'] ?: $perfilLang['desconocida']) ?>
                                  </div>
                              </div>
                              <div class="device-actions">
                                  <input type="checkbox" name="macs[]" value="<?= esc($dispositivo['MAC']) ?>" class="delete-checkbox">
-                                 <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
-                                      <i class="fas fa-edit"></i> Editar
+                                 <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="<?= $perfilLang['editar'] ?>">
+                                      <i class="fas fa-edit"></i> <?= $perfilLang['editar'] ?>
                                  </a>
-                                 <a href="<?= base_url('/dispositivo/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
-                                      <i class="fas fa-chart-bar"></i> Ver Detalles
-                                 </a>
+                                <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="<?= $perfilLang['ver_detalles'] ?>">
+                                    <i class="fas fa-chart-bar"></i> <?= $perfilLang['ver_detalles'] ?>
+                                </a>
                              </div>
                          </li>
                      <?php endforeach; ?>
@@ -499,14 +511,14 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
              <div class="modal-dialog">
                  <div class="modal-content">
                      <div class="modal-header">
-                         <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                         <h5 class="modal-title" id="confirmDeleteModalLabel"><?= $perfilLang['confirmar_eliminacion'] ?></h5>
                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                      </div>
                      <div class="modal-body">
-                         ¿Estás seguro de que deseas desenlazar los dispositivos seleccionados?
+                          <?= $perfilLang['seguro_desea_eliminar'] ?>
                      </div>
                      <div class="modal-footer">
-                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= $perfilLang['cancelar'] ?></button>
                          <button type="button" class="btn btn-danger" id="confirm-delete-btn">Eliminar</button>
                      </div>
                  </div>
@@ -535,10 +547,10 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                      // Use class 'd-none' for better Bootstrap compatibility, but style="display: none" is also fine
                      if (addMacForm.style.display === "none" || addMacForm.style.display === "") {
                          addMacForm.style.display = "block"; // Show
-                         this.innerHTML = '<i class="fas fa-minus-circle me-2"></i> Ocultar Formulario'; // Change text
+                         this.innerHTML = '<i class="fas fa-minus-circle me-2"></i> <?= $perfilLang['ocultar_formulario'] ?>'; // Change text
                      } else {
                          addMacForm.style.display = "none"; // Hide
-                         this.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo'; // Change text
+                         this.innerHTML = '<i class="fas fa-plus-circle me-2"></i> <?= $perfilLang['anadir_dispositivo'] ?>'; // Change text
                      }
                  });
              }
