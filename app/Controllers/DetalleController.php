@@ -3,19 +3,16 @@
 namespace App\Controllers;
 
 use App\Models\LecturasGasModel;
-use App\Models\RegistrosGasModel;
 use App\Models\DispositivoModel;
 
 class DetalleController extends BaseController
 {
     protected $lecturaModel;
-    protected $registrosGasModel;
     protected $dispositivoModel;
 
     public function __construct()
     {
         $this->lecturaModel = new LecturasGasModel();
-        $this->registrosGasModel = new RegistrosGasModel();
         $this->dispositivoModel = new DispositivoModel();
         helper(['url']);
     }
@@ -30,9 +27,6 @@ class DetalleController extends BaseController
     // Método actualizado para usar la nueva tabla
     public function detalles($mac)
     {
-        // Obtener lecturas de la nueva tabla
-        $lecturas = $this->registrosGasModel->getLecturasPorDispositivo($mac);
-        
         // Obtener detalles del dispositivo
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
         $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
