@@ -3,29 +3,25 @@
 namespace App\Controllers;
 
 use App\Models\LecturasGasModel;
-use App\Models\DispositivoModel; // Asegúrate de tener este modelo para obtener el nombre y ubicación
-use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\RESTful\ResourceController; // Extiende de ResourceController si manejas recursos RESTful
 
-class LecturasController extends ResourceController
+// Si extiendes de BaseController, considera si es apropiado para un controlador RESTful
+class LecturasController extends ResourceController // Mantengo ResourceController según tu archivo
 {
     protected $lecturasGasModel;
-    protected $dispositivoModel; // Declarar la propiedad para el modelo de dispositivos
 
     public function __construct()
     {
-        // Instancia los modelos necesarios
+        // Instancia el modelo de lecturas de gas
         $this->lecturasGasModel = new LecturasGasModel();
-        $this->dispositivoModel = new DispositivoModel(); // Instanciar el modelo de dispositivos
+        // No es necesario llamar a parent::__construct() si no hay lógica en BaseController que necesites aquí
     }
 
-    /**
-     * Método para recibir y guardar lecturas de gas (POST /lecturas_gas/guardar)
-     *
-     * @return \CodeIgniter\HTTP\ResponseInterface
-     */
+    // Método para recibir y guardar lecturas de gas (POST /lecturas_gas/guardar)
     public function guardar()
     {
         // Obtener los datos enviados en la solicitud POST (asumo JSON o form-data)
+        // getVar() funciona para ambos POST y GET, getPost() es más específico para POST
         $mac = $this->request->getVar('MAC');
         $nivel_gas = $this->request->getVar('nivel_gas');
 
@@ -36,6 +32,9 @@ class LecturasController extends ResourceController
                 'MAC' => $mac,
                 'nivel_gas' => $nivel_gas,
                 'fecha' => date('Y-m-d H:i:s') // Captura la fecha y hora actual
+                // 'update_at' se manejará automáticamente si useTimestamps es true en el modelo,
+                // pero tu modelo LecturasGasModel tiene useTimestamps = false.
+                // Si necesitas update_at, debes incluirlo en $data y en $allowedFields del modelo.
             ];
 
             // Insertar los datos en la tabla 'lecturas_gas'
@@ -44,11 +43,12 @@ class LecturasController extends ResourceController
             // Verificar si la inserción fue exitosa
             if ($inserted) {
                 // Si fue exitosa, retornar una respuesta JSON de éxito
+                 // El ID del registro insertado se puede obtener con $this->lecturasGasModel->insertID()
                 return $this->response->setJSON(['status' => 'success', 'message' => 'Lectura guardada correctamente', 'id' => $inserted]);
             } else {
-                // Si hubo un error en la inserción, loguearlo y retornar una respuesta JSON de error
-                log_message('error', 'Error al guardar lectura de gas para MAC: ' . $mac . ' - Datos: ' . json_encode($data) . ' - Error DB: ' . $this->lecturasGasModel->errors());
-                return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Error al guardar la lectura en la base de datos']);
+                 // Si hubo un error en la inserción, loguearlo y retornar una respuesta JSON de error
+                 log_message('error', 'Error al guardar lectura de gas para MAC: ' . $mac . ' - Datos: ' . json_encode($data) . ' - Error DB: ' . $this->lecturasGasModel->errors());
+                 return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Error al guardar la lectura en la base de datos']);
             }
         } else {
             // Si faltan datos, retornar una respuesta JSON de error
@@ -56,52 +56,23 @@ class LecturasController extends ResourceController
         }
     }
 
-    /**
-     * Muestra los detalles de un dispositivo y sus lecturas de gas.
-     * Este método reemplaza la funcionalidad que antes estaba comentada.
-     *
-     * @param string $mac La dirección MAC del dispositivo.
-     * @return string
-     */
-    public function detalle($mac)
-    {
-        // Obtener los detalles del dispositivo (nombre y ubicación)
-        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
+    // Método 'detalle' que parece duplicado con DetalleController::detalles
+    // Considera eliminar este método si ya usas DetalleController::detalles
+    // public function detalle($mac)
+    // {
+    //     $lecturaModel = new \App\Models\LecturasGasModel();
 
-        // Obtener las lecturas de gas para esta MAC.
-        // El método getLecturasPorMac() del modelo devuelve las lecturas en orden DESC (más recientes primero).
-        $lecturasCrude = $this->lecturasGasModel->getLecturasPorMac($mac);
+    //     $lecturas = $lecturaModel->getLecturasPorMac($mac);
 
-        // Para el gráfico (Chart.js), necesitamos que los datos estén en orden ascendente (más antiguos primero).
-        $lecturasParaGrafico = array_reverse($lecturasCrude);
+    //     // Armamos los datos para el gráfico
+    //     $labels = array_column($lecturas, 'fecha');
+    //     $data = array_column($lecturas, 'nivel_gas');
 
-        // Preparar los datos para el gráfico
-        $labels = [];
-        $data = [];
-        foreach ($lecturasParaGrafico as $lectura) {
-            // Formatear la fecha para que sea legible en el eje X del gráfico
-            $labels[] = date('Y-m-d H:i', strtotime($lectura['fecha']));
-            $data[] = (float) $lectura['nivel_gas']; // Asegurarse de que el nivel de gas sea un número
-        }
-
-        // Obtener el último nivel de gas para la tarjeta simple superior.
-        // Dado que $lecturasCrude está ordenado DESC (más reciente primero), el último valor es el primer elemento.
-        $nivelGasActualDisplay = 'Sin datos';
-        if (!empty($lecturasCrude) && isset($lecturasCrude[0]['nivel_gas'])) {
-            $nivelGasActualDisplay = esc($lecturasCrude[0]['nivel_gas']) . ' PPM';
-        }
-
-        // Pasar los datos a la vista
-        $dataForView = [
-            'mac'                 => esc($mac), // Sanitizar la MAC
-            'nombreDispositivo'   => esc($dispositivo['nombre'] ?? $mac), // Usar MAC si no hay nombre, y sanitizar
-            'ubicacionDispositivo' => esc($dispositivo['ubicacion'] ?? 'Desconocida'), // Sanitizar
-            'lecturas'            => $lecturasCrude,     // Las lecturas para la tabla (más recientes primero)
-            'labels'              => $labels,             // Las etiquetas de fecha para el gráfico (orden ascendente)
-            'data'                => $data,               // Los datos de nivel de gas para el gráfico (orden ascendente)
-            'nivelGasActualDisplay' => $nivelGasActualDisplay // El último nivel de gas para la tarjeta superior
-        ];
-
-        return view('detalles', $dataForView);
-    }
+    //     return view('detalle_dispositivo', [
+    //         'mac' => $mac,
+    //         'lecturas' => $lecturas,
+    //         'labels' => $labels,
+    //         'data' => $data
+    //     ]);
+    // }
 }
