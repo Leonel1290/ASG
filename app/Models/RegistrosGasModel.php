@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class RegistrosGasModel extends Model
 {
-    protected $table = 'registros_gas';
+    protected $table = 'lecturas_gas';
     protected $primaryKey = 'id';
     protected $allowedFields = [
         'dispositivo_id', 
