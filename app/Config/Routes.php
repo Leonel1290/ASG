@@ -114,21 +114,21 @@ $routes->post('/enlace/store', 'EnlaceController::store');
 // --- DEVICE AND GAS RECORD ROUTES ---
 
 // Route for the new view that lists all devices (the "menu")
-// GET /dispositivos
-// If this route lists devices and then you want to click on one to see the details,
-// make sure the link leads to /dispositivo/DEVICE_MAC
-// $routes->get('/dispositivos', 'DeviceController::listDevices'); // Commented out as DeviceController is not used for details
+// This route is typically for a list of devices. If you don't have a DeviceController,
+// this might need to point to a method in another controller that lists devices.
+// Commented out as per previous instructions if DeviceController is not in use.
+// $routes->get('/dispositivos', 'DeviceController::listDevices');
 
 // CRUCIAL ROUTE: Route for the detail view of a specific device (with chart and latest reading)
-// THIS ROUTE NOW POINTS TO LECTURASCONTROLLER
+// THIS ROUTE NOW POINTS TO LECTURASCONTROLLER::detalle
 // Example: http://yourdomain.com/dispositivo/AA:BB:CC:DD:EE:FF
 $routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
 
 // New route for the view of all gas records of a specific device
 // If you want a separate view just for historical records without the large chart,
 // you can point this to another method in LecturasController or a new controller.
-// For now, if you don't use it, you can comment it out or delete it.
-// $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1'); // Commented out to avoid conflicts
+// Commented out to avoid potential conflicts with the /dispositivo route if not distinct.
+// $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1');
 
 // --- END DEVICE AND GAS RECORD ROUTES ---
 
@@ -147,9 +147,9 @@ $routes->group('registros-gas', function($routes) {
     $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
 });
 
-// Keep existing route for compatibility
-// If DetalleController::detalles is a duplicate of LecturasController::detalle, DELETE THESE LINES.
-// Only keep them if DetalleController::detalles serves a VERY DIFFERENT FUNCTION.
+// IMPORTANT: These routes for 'detalles' are commented out to prevent conflicts.
+// If you absolutely need to use 'detalles/(:any)', you MUST decide which controller/method
+// will handle it (e.g., LecturasController::detalle) and uncomment only ONE.
 // $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 // $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 

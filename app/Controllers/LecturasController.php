@@ -102,6 +102,6 @@ class LecturasController extends ResourceController
             'nivelGasActualDisplay' => $nivelGasActualDisplay // El último nivel de gas para la tarjeta superior
         ];
 
-        return view('detalle_dispositivo', $dataForView);
+        return view('detalles', $dataForView);
     }
 }
