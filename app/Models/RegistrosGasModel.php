@@ -9,7 +9,7 @@ class RegistrosGasModel extends Model
     protected $table = 'lecturas_gas';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'dispositivo_id', 
+        'id', 
         'nombre_dispositivo', 
         'ubicacion', 
         'nivel_gas', 
@@ -23,23 +23,23 @@ class RegistrosGasModel extends Model
 
     public function getDispositivosUnicos()
     {
-        return $this->select('dispositivo_id, nombre_dispositivo, ubicacion, MAX(fecha) as ultima_lectura')
-            ->groupBy('dispositivo_id, nombre_dispositivo, ubicacion')
+        return $this->select('id, nombre_dispositivo, ubicacion, MAX(fecha) as ultima_lectura')
+            ->groupBy('id, nombre_dispositivo, ubicacion')
             ->orderBy('nombre_dispositivo')
             ->findAll();
     }
 
-    public function getLecturasPorDispositivo($dispositivoId, $limit = 100)
+    public function getLecturasPorDispositivo($id, $limit = 100)
     {
-        return $this->where('dispositivo_id', $dispositivoId)
+        return $this->where('id', $id)
             ->orderBy('fecha', 'DESC')
             ->limit($limit)
             ->findAll();
     }
 
-    public function getUltimaLectura($dispositivoId)
+    public function getUltimaLectura($id)
     {
-        return $this->where('dispositivo_id', $dispositivoId)
+        return $this->where('id', $id)
             ->orderBy('fecha', 'DESC')
             ->first();
     }
