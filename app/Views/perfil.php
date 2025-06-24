@@ -496,8 +496,8 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                                  <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" class="btn btn-primary btn-sm" title="<?= $perfilLang['editar'] ?>">
                                       <i class="fas fa-edit"></i> <?= $perfilLang['editar'] ?>
                                  </a>
-                                <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="<?= $perfilLang['ver_detalles'] ?>">
-                                    <i class="fas fa-chart-bar"></i> <?= $perfilLang['ver_detalles'] ?>
+                                 <a href="<?= base_url('/dispositivo/' . esc($dispositivo['MAC'])) ?>" class="btn btn-info btn-sm" title="<?= $perfilLang['ver_detalles'] ?>">
+                                 <i class="fas fa-chart-bar"></i> <?= $perfilLang['ver_detalles'] ?>
                                 </a>
                              </div>
                          </li>
