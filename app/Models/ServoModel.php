@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 
 class ServoModel extends Model
 {
-    protected $table = 'Servos';
+    protected $table = 'servos';
     protected $primaryKey = 'id';
     protected $allowedFields = ['MAC', 'nombre', 'ubicacion', 'estado_valvula'];
     protected $useTimestamps = true;

@@ -2,46 +2,63 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
-use App\Models\LecturasGasModel; // Asegúrate de que el namespace y nombre del modelo sean correctos
-use App\Models\DispositivoModel; // Asegúrate de que el namespace y nombre del modelo sean correctos
+use App\Models\ServoModel;
+use App\Models\EnlaceModel;
+use CodeIgniter\Controller; // Asegúrate de que esta importación sea correcta según tu BaseController
 
-class DetalleController extends Controller
+class DetalleController extends BaseController
 {
-    protected $lecturaModel;
-    protected $dispositivoModel;
+    protected $servoModel;
+    protected $enlaceModel;
 
     public function __construct()
     {
-        $this->lecturaModel = new LecturasGasModel();
-        $this->dispositivoModel = new DispositivoModel();
+        $this->servoModel = new ServoModel();
+        $this->enlaceModel = new EnlaceModel();
     }
 
-    public function detalles($mac)
+    public function detalles($mac = null)
     {
-        // La vista 'detalles' ahora obtiene la información en tiempo real vía JavaScript
-        // por lo que las lecturas de gas iniciales aquí son menos críticas,
-        // pero aún pueden ser útiles si quieres pre-cargar algo o manejar el primer render.
-        // Sin embargo, el error viene de cómo accedes a $dispositivo.
+        $session = session();
 
-        $lecturas = $this->lecturaModel->getLecturasPorMac($mac); // Esto devolverá arrays si tu LecturasGasModel lo hace
+        // 1. Verificar si el usuario está logueado
+        if (!$session->get('logged_in')) {
+            // Si no está logueado, redirigir a la página de login con un mensaje de error
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a los detalles del dispositivo.');
+        }
 
-        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac); // Esto devolverá un OBJETO
+        // 2. Verificar si se proporcionó una MAC en la URL
+        if ($mac === null) {
+            // Si no hay MAC, redirigir al dashboard (o una página de error)
+            return redirect()->to('/dashboard')->with('error', 'No se especificó la MAC del dispositivo.');
+        }
 
-        // --- CORRECCIÓN AQUÍ: Acceso a propiedades de objeto con -> ---
-        $nombreDispositivo = $dispositivo->nombre ?? $mac;
-        $ubicacionDispositivo = $dispositivo->ubicacion ?? 'Desconocida';
-        // --- FIN CORRECCIÓN ---
+        // 3. Verificar si el usuario tiene permiso sobre este dispositivo (servo)
+        $tieneAcceso = $this->enlaceModel
+                            ->where('id_usuario', $session->get('id'))
+                            ->where('MAC', $mac)
+                            ->first();
 
-        // La vista 'detalles' ya no usa directamente $lecturas para el display principal del gas,
-        // pero si hay otras partes de la vista que lo usen, asegúrate de que manejen arrays.
-        // Para el propósito principal, solo necesitamos pasar la MAC y los detalles del dispositivo.
+        if (!$tieneAcceso) {
+            // Si el usuario no tiene acceso, redirigir al dashboard con un mensaje de error
+            return redirect()->to('/dashboard')->with('error', 'No tienes permiso para ver los detalles de este dispositivo.');
+        }
 
-        return view('detalles', [
-            'mac' => $mac,
-            'nombreDispositivo' => $nombreDispositivo,
-            'ubicacionDispositivo' => $ubicacionDispositivo,
-            'lecturas' => $lecturas // Aunque la vista ya no lo use para el nivel actual, lo pasamos por si acaso
-        ]);
+        // 4. Obtener los datos del dispositivo (servo) usando la MAC
+        $dispositivo = $this->servoModel->getServoByMac($mac);
+
+        // 5. Verificar si el dispositivo fue encontrado
+        if ($dispositivo) {
+            // Si el dispositivo se encontró, pasar los datos a la vista
+            // La clave 'dispositivo' es crucial para que la variable $dispositivo esté disponible en 'detalles.php'
+            $data['dispositivo'] = $dispositivo;
+
+            // Cargar la vista 'detalles.php' y pasarle los datos
+            return view('detalles', $data);
+        } else {
+            // Si el dispositivo no se encontró en la base de datos
+            return redirect()->to('/dashboard')->with('error', 'Dispositivo no encontrado.');
+        }
     }
 }
+    
