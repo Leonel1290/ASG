@@ -64,3 +64,4 @@ $routes->get('servo/obtenerEstado/(:segment)', 'ServoController::obtenerEstado/$
 $routes->get('dispositivo/control/(:segment)', 'ServoController::controlView/$1');
 
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->get('/dashboard', 'DashboardController::index');
