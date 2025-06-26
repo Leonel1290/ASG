@@ -78,7 +78,7 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
 
     /**
      * Envía un comando para abrir o cerrar la válvula al backend (desde la web).
-     * Esta función usa la nueva ruta en ServoController::controlServoFromWeb.
+     * Esta función usa la ruta /api/controlServo.
      * @param {string} macAddress La dirección MAC del dispositivo.
      * @param {string} command 'open' para abrir, 'close' para cerrar.
      */
@@ -97,8 +97,7 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
         valveMessageDiv.classList.add('d-none'); // Ocultar mensaje anterior
 
         try {
-            // Notar que la ruta ahora es /api/controlServo, mapeada a ServoController::controlServoFromWeb
-            const response = await fetch(`${API_BASE_URL}api/controlServo`, {
+            const response = await fetch(`${API_BASE_URL}api/controlServo`, { // <--- RUTA ACTUALIZADA A /api/controlServo
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -112,7 +111,6 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
                 valveMessageDiv.classList.remove('d-none', 'alert-danger');
                 valveMessageDiv.classList.add('alert-success');
                 // Después de enviar el comando, actualiza el estado mostrado en la UI
-                // Esta llamada también usará la API que lee de ServoController::getServoStateFromWeb
                 getServoStateFromWeb(macAddress);
             } else {
                 valveMessageDiv.textContent = `Error al enviar comando: ${data.message || 'Error desconocido'}.`;
@@ -129,7 +127,7 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
 
     /**
      * Consulta el estado actual del servo desde el backend y actualiza la UI.
-     * Esta función usa la nueva ruta en ServoController::getServoStateFromWeb.
+     * Esta función usa la ruta /api/getServoStateFromWeb.
      * @param {string} macAddress La dirección MAC del dispositivo.
      */
     async function getServoStateFromWeb(macAddress) {
@@ -137,10 +135,8 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
         valveStateDisplay.textContent = 'Actualizando...';
 
         try {
-            // Notar que la ruta ahora es /web/getServoState, mapeada a ServoController::getServoStateFromWeb
-            // Si has decidido consolidar todas las rutas de la PWA bajo /api, entonces sería /api/getServoStateFromWeb
-            // Por ahora, la dejo como /web/getServoState como en el plan de rutas anterior.
-            const response = await fetch(`${API_BASE_URL}web/getServoState/${macAddress}`); // <--- RUTA PWA PARA CONSULTA DE ESTADO
+            // Nota: Se asume que la ruta es /api/getServoStateFromWeb/MAC_ADDRESS
+            const response = await fetch(`${API_BASE_URL}api/getServoStateFromWeb/${macAddress}`); // <--- RUTA ACTUALIZADA A /api/getServoStateFromWeb
             const data = await response.json();
 
             if (data.status === 'success' && typeof data.estado_servo !== 'undefined') {

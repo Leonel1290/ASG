@@ -36,24 +36,28 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
-// --- RUTAS DE LA API (AHORA TODAS APUNTAN A ServoController) ---
+// --- RUTAS DE LA API (AHORA TODAS APUNTAN EXCLUSIVAMENTE A ServoController) ---
 $routes->group('api', function($routes){
     // Endpoint para que el ESP32 envíe las lecturas del sensor de gas
-    // Antes apuntaba a ValveController, ahora a ServoController
     $routes->post('receiveSensorData', 'ServoController::receiveSensorData');
 
     // Endpoint para que el ESP32 consulte el estado de la válvula
-    // Antes apuntaba a ValveController, ahora a ServoController
     $routes->get('getValveState/(:segment)', 'ServoController::getValveState/$1');
 
     // Endpoint para que la PWA envíe el comando de abrir/cerrar servo
-    // Ahora en el grupo 'api' y apunta a ServoController
-    $routes->post('controlServo', 'ServoController::controlServoFromWeb'); // Usará esta ruta
+    $routes->post('controlServo', 'ServoController::controlServoFromWeb');
+
+    // Endpoint para que la PWA consulte el estado actual del servo (si la quieres bajo /api)
+    // Nota: El método en ServoController::getServoStateFromWeb espera la MAC como parámetro directo.
+    // Si la ruta es /api/getServoStateFromWeb/MAC, el controlador la recibirá.
+    $routes->get('getServoStateFromWeb/(:segment)', 'ServoController::getServoStateFromWeb/$1');
 });
+// --- FIN RUTAS DE LA API ---
+
 
 // --- OTRAS RUTAS DE LA APLICACIÓN ---
 
-// Esta ruta ha sido comentada, ya que receiveSensorData está en ServoController.
+// La siguiente ruta ha sido comentada, ya que receiveSensorData está en ServoController.
 // $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 
