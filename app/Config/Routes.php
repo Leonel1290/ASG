@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// --- RUTAS DE REGISTRO Y LOGIN ---
+// --- RUTAS DE REGISTRO Y LOGIN (Las que ya tenías) ---
 $routes->get('/register', 'registerController::index');
 $routes->post('/register/store', 'registerController::store');
 $routes->get('/register/check-email', 'registerController::checkEmail');
@@ -36,24 +36,37 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
-// --- RUTAS DE LA API (Agrupadas bajo el prefijo 'api') ---
+// --- RUTAS DE LA API (EXISTENTES - para ESP32) ---
 $routes->group('api', function($routes){
     // Endpoint para controlar la válvula (abrir/cerrar) desde la web
-    // POST /api/controlValve  <-- ¡CAMBIO AQUÍ!
-    $routes->post('controlValve', 'ValveController::controlValve'); // <- Cuidado, era 'valve_control'
+    // Este es el endpoint que tu anterior ValveController usaba para la PWA.
+    // Si ya no lo usas, puedes eliminarlo, o mantenerlo si otras partes lo referencian.
+    // $routes->post('controlValve', 'ValveController::controlValve');
 
     // Endpoint para que el ESP32 (o la web) consulte el estado de la válvula y el nivel de gas
-    // GET /api/getValveState/MAC_DEL_DISPOSITIVO
     $routes->get('getValveState/(:segment)', 'ValveController::getValveState/$1');
 
     // Endpoint para que el ESP32 envíe las lecturas del sensor de gas
-    // POST /api/receiveSensorData
     $routes->post('receiveSensorData', 'ValveController::receiveSensorData');
 });
-// --- FIN RUTAS DE LA API ---
+// --- FIN RUTAS DE LA API EXISTENTES ---
 
 
-// --- OTRAS RUTAS DE LA APLICACIÓN ---
+// --- NUEVAS RUTAS ESPECÍFICAS PARA EL CONTROL DEL SERVO DESDE LA WEB ---
+// Creando un nuevo grupo 'web' para estos endpoints para mayor claridad.
+$routes->group('web', function($routes){
+    // Endpoint para que la PWA envíe el comando de abrir/cerrar servo
+    // POST /web/controlServo
+    $routes->post('controlServo', 'ServoController::controlServoFromWeb');
+
+    // Endpoint para que la PWA consulte el estado actual del servo (opcional, si necesitas mostrarlo en la UI)
+    // GET /web/getServoState/MAC_DEL_DISPOSITIVO
+    $routes->get('getServoState/(:segment)', 'ServoController::getServoStateFromWeb/$1');
+});
+// --- FIN NUEVAS RUTAS DE CONTROL DE SERVO ---
+
+
+// --- OTRAS RUTAS DE LA APLICACIÓN (Las que ya tenías) ---
 
 // La siguiente ruta ha sido comentada ya que su funcionalidad
 // de recibir lecturas de gas del ESP32 ahora es manejada por

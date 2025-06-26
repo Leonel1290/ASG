@@ -75,6 +75,89 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
     const GAS_ALARM_THRESHOLD_FRONTEND = 100; // Ajusta este valor si es diferente al de tu ESP32
 
     document.getElementById('openThresholdDisplay').textContent = GAS_ALARM_THRESHOLD_FRONTEND;
+
+    /**
+     * Envía un comando para abrir o cerrar la válvula al backend.
+     * @param {string} macAddress La dirección MAC del dispositivo.
+     * @param {string} command 'open' para abrir, 'close' para cerrar.
+     */
+    async function sendValveCommand(macAddress, command) {
+        let state;
+        if (command === 'open') {
+            state = 1;
+        } else if (command === 'close') {
+            state = 0;
+        } else {
+            console.error("Comando de válvula inválido:", command);
+            return;
+        }
+
+        const valveMessageDiv = document.getElementById('valveMessage');
+        valveMessageDiv.classList.add('d-none'); // Ocultar mensaje anterior
+
+        try {
+            const response = await fetch(`${API_BASE_URL}web/controlServo`, { // <--- RUTA ACTUALIZADA
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `MAC=${macAddress}&state=${state}`
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                valveMessageDiv.textContent = `Comando enviado: Válvula ${command === 'open' ? 'Abierta' : 'Cerrada'}.`;
+                valveMessageDiv.classList.remove('d-none', 'alert-danger');
+                valveMessageDiv.classList.add('alert-success');
+                // Después de enviar el comando, actualiza el estado mostrado en la UI
+                getServoStateFromWeb(macAddress);
+            } else {
+                valveMessageDiv.textContent = `Error al enviar comando: ${data.message || 'Error desconocido'}.`;
+                valveMessageDiv.classList.remove('d-none', 'alert-success');
+                valveMessageDiv.classList.add('alert-danger');
+            }
+        } catch (error) {
+            console.error('Error al comunicarse con la API de control de servo:', error);
+            valveMessageDiv.textContent = 'Error de conexión con el servidor. Intenta de nuevo.';
+            valveMessageDiv.classList.remove('d-none', 'alert-success');
+            valveMessageDiv.classList.add('alert-danger');
+        }
+    }
+
+    /**
+     * Consulta el estado actual del servo desde el backend y actualiza la UI.
+     * @param {string} macAddress La dirección MAC del dispositivo.
+     */
+    async function getServoStateFromWeb(macAddress) {
+        const valveStateDisplay = document.getElementById('valveStateDisplay');
+        valveStateDisplay.textContent = 'Actualizando...';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}web/getServoState/${macAddress}`); // <--- RUTA ACTUALIZADA
+            const data = await response.json();
+
+            if (data.status === 'success' && typeof data.estado_servo !== 'undefined') {
+                const currentState = (data.estado_servo === 1) ? 'Abierta' : 'Cerrada';
+                valveStateDisplay.textContent = currentState;
+                valveStateDisplay.className = 'current-valve-state ' + (data.estado_servo === 1 ? 'text-success' : 'text-danger');
+            } else {
+                valveStateDisplay.textContent = 'Error al cargar estado';
+                console.error("Error al obtener estado del servo desde la web:", data);
+            }
+        } catch (error) {
+            valveStateDisplay.textContent = 'Error de red';
+            console.error('Error al comunicarse con la API para obtener estado del servo:', error);
+        }
+    }
+
+    // Llama a la función para obtener el estado del servo cuando la página carga.
+    // También puedes configurar un intervalo para que se actualice periódicamente.
+    window.addEventListener('load', () => {
+        getServoStateFromWeb(MAC_ADDRESS);
+        // Opcional: Actualizar el estado cada 5 segundos
+        // setInterval(() => getServoStateFromWeb(MAC_ADDRESS), 5000);
+    });
+
 </script>
 
 <!-- Enlace al archivo JavaScript externo -->

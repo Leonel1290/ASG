@@ -263,9 +263,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#company">Contacto</a>
                     </li>
-                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                        <a class="btn btn-custom w-100" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
-                    </li>
                 </ul>
             </div>
         </div>
