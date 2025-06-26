@@ -18,6 +18,10 @@
     <meta name="apple-mobile-web-app-title" content="ASG">
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
 
+    <!-- Meta tags para CSRF token si es que lo quieres pasar así o en un input oculto -->
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
+
     <style>
         /* Estilos generales para el cuerpo de la página */
         body {
@@ -151,12 +155,10 @@
             <div class="card">
                 <div class="card-body">
                     <?php if (isset($error_message)): ?>
-                        {{-- Si hay un mensaje de error desde el controlador, mostrarlo --}}
                         <div class="alert alert-danger" role="alert">
                             <i class="fas fa-exclamation-triangle me-2"></i><?= esc($error_message) ?>
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
-                        {{-- Si hay un objeto $dispositivo válido, mostrar su información --}}
                         <h5 class="card-title" id="nombre-dispositivo">
                             <i class="fas fa-microchip me-2"></i>Dispositivo: <?= esc($dispositivo->nombre) ?>
                         </h5>
@@ -179,7 +181,6 @@
                             </button>
                         </div>
                     <?php else: ?>
-                        {{-- Caso por defecto si no hay dispositivo y no se estableció un error_message específico --}}
                         <div class="alert alert-info" role="alert">
                             <i class="fas fa-info-circle me-2"></i>No se pudo cargar la información del dispositivo. Por favor, asegúrese de que la URL sea correcta o seleccione un dispositivo de su lista.
                         </div>
@@ -200,10 +201,13 @@ $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>'; 
     const estadoActualSpan = $('#estado-actual');
 
+    // Obtener el nombre y valor del token CSRF
+    const csrfName = $('meta[name="csrf-name"]').attr('content');
+    const csrfHash = $('meta[name="csrf-token"]').attr('content');
+
     // Función para actualizar el estado mostrado en la UI
     function actualizarEstadoUI(estado) {
         estadoActualSpan.text(estado ? 'Abierta' : 'Cerrada');
-        // Añadir/quitar clases para cambiar el color del texto
         if (estado) {
             estadoActualSpan.removeClass('cerrada').addClass('abierta');
         } else {
@@ -234,12 +238,15 @@ $(document).ready(function() {
     
     // Función para enviar la petición al controlador para controlar el servo
     function controlarServo(mac, estado) {
-        $.post('/servo/actualizarEstado', {
+        // Datos a enviar, incluyendo el token CSRF
+        const postData = {
             mac: mac,
             estado: estado
-            // Si usas CSRF en CodeIgniter, necesitarías enviar el token también
-            // '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-        }, function(response) {
+        };
+        // Añadir el token CSRF dinámicamente
+        postData[csrfName] = csrfHash;
+
+        $.post('/servo/actualizarEstado', postData, function(response) {
             if (response.error) {
                 console.error('Error al controlar servo:', response.error);
             } else {
