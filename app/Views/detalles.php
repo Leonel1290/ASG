@@ -17,8 +17,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ASG">
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Nueva meta tag añadida aquí -->
 
-    <!-- Meta tags para CSRF token si es que lo quieres pasar así o en un input oculto -->
+    <!-- Meta tags para CSRF token. CodeIgniter usa csrf_token() para el nombre y csrf_hash() para el valor. -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
@@ -202,8 +203,11 @@ $(document).ready(function() {
     const estadoActualSpan = $('#estado-actual');
 
     // Obtener el nombre y valor del token CSRF
-    const csrfName = $('meta[name="csrf-name"]').attr('content');
-    const csrfHash = $('meta[name="csrf-token"]').attr('content');
+    // CodeIgniter 4 usa un campo oculto por defecto con el nombre del token y el hash como valor
+    // Si usas meta tags, asegúrate de que CodeIgniter los esté generando en tu layout o vista principal.
+    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>'; // Fallback a función PHP
+    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>'; // Fallback a función PHP
+
 
     // Función para actualizar el estado mostrado en la UI
     function actualizarEstadoUI(estado) {
@@ -243,14 +247,22 @@ $(document).ready(function() {
             mac: mac,
             estado: estado
         };
-        // Añadir el token CSRF dinámicamente
-        postData[csrfName] = csrfHash;
+        // Añadir el token CSRF dinámicamente si los valores son válidos
+        if (csrfName && csrfHash) {
+            postData[csrfName] = csrfHash;
+        } else {
+            console.warn('CSRF token o hash no encontrados. La petición POST podría fallar.');
+        }
+
 
         $.post('/servo/actualizarEstado', postData, function(response) {
             if (response.error) {
                 console.error('Error al controlar servo:', response.error);
             } else {
                 actualizarEstadoUI(response.estado);
+                // Si la actualización es exitosa, se puede recargar el token para la siguiente petición
+                // (Esto es importante si tu CSRF token cambia por cada petición)
+                // csrfHash = response.csrf_new_hash; // Si tu servidor devuelve un nuevo token en la respuesta
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
