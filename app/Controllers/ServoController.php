@@ -1,16 +1,16 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\DispositivoModel;
+use App\Models\ServoModel;
 use CodeIgniter\Controller;
 
 class ServoController extends BaseController
 {
-    protected $dispositivoModel;
+    protected $ServoModel;
 
     public function __construct()
     {
-        $this->dispositivoModel = new DispositivoModel();
+        $this->ServoModel = new ServoModel();
     }
 
     // Actualizar estado del servo
@@ -24,18 +24,18 @@ class ServoController extends BaseController
         $mac = $this->request->getPost('mac');
         $estado = $this->request->getPost('estado');
 
-        // Verificar que el usuario tiene permiso sobre este dispositivo
+        // Verificar que el usuario tiene permiso sobre este Servo
         $enlaceModel = new \App\Models\EnlaceModel();
         $tieneAcceso = $enlaceModel->where('id_usuario', $session->get('id'))
                                   ->where('MAC', $mac)
                                   ->first();
 
         if (!$tieneAcceso) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este dispositivo']);
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este Servo']);
         }
 
         // Actualizar estado en la base de datos
-        $actualizado = $this->dispositivoModel->updateEstadoValvula($mac, $estado);
+        $actualizado = $this->ServoModel->updateEstadoValvula($mac, $estado);
 
         if ($actualizado) {
             return $this->response->setJSON(['success' => true, 'estado' => $estado]);
@@ -52,26 +52,26 @@ class ServoController extends BaseController
             return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado']);
         }
 
-        // Verificar que el usuario tiene permiso sobre este dispositivo
+        // Verificar que el usuario tiene permiso sobre este Servo
         $enlaceModel = new \App\Models\EnlaceModel();
         $tieneAcceso = $enlaceModel->where('id_usuario', $session->get('id'))
                                   ->where('MAC', $mac)
                                   ->first();
 
         if (!$tieneAcceso) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este dispositivo']);
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este Servo']);
         }
 
-        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
+        $Servo = $this->ServoModel->getServoByMac($mac);
         
-        if ($dispositivo) {
+        if ($Servo) {
             return $this->response->setJSON([
-                'estado_valvula' => $dispositivo['estado_valvula'],
-                'nombre' => $dispositivo['nombre'],
-                'ubicacion' => $dispositivo['ubicacion']
+                'estado_valvula' => $Servo['estado_valvula'],
+                'nombre' => $Servo['nombre'],
+                'ubicacion' => $Servo['ubicacion']
             ]);
         } else {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Dispositivo no encontrado']);
+            return $this->response->setStatusCode(404)->setJSON(['error' => 'Servo no encontrado']);
         }
     }
 }
