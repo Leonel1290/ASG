@@ -1,6 +1,5 @@
-<?php
+<?php namespace App\Models;
 
-namespace App\Models;
 use CodeIgniter\Model;
 
 class LecturasGasModel extends Model
@@ -39,7 +38,7 @@ class LecturasGasModel extends Model
             ->join('dispositivos', 'lecturas_gas.MAC = dispositivos.MAC', 'left')
             ->join('enlace', 'dispositivos.MAC = enlace.MAC', 'inner')
             ->where('enlace.id_usuario', $id_usuario)
-            ->where('lecturas_gas.MAC IS NOT NULL')
+            ->where('lecturas_gas.MAC IS NOT NULL') // Asegura que solo se incluyan lecturas con una MAC válida
             ->orderBy('lecturas_gas.fecha', 'DESC')
             ->get()
             ->getResultArray();
