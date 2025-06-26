@@ -35,21 +35,6 @@ $routes->group('perfil', function($routes) {
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
-
-// --- RUTAS DE LA API (TODAS APUNTAN A ServoController) ---
-$routes->group('api', function($routes){
-    // Endpoint para que el ESP32 envíe las lecturas del sensor de gas
-    $routes->post('receiveSensorData', 'ServoController::receiveSensorData');
-
-    // Endpoint para que el ESP32 consulte el estado de la válvula
-    $routes->get('getValveState/(:segment)', 'ServoController::getValveState/$1');
-
-    // Endpoint para que la PWA envíe el comando de abrir/cerrar servo
-    $routes->post('controlServo', 'ServoController::controlServoFromWeb');
-
-    // Endpoint para que la PWA consulte el estado actual del servo
-    $routes->get('getServoStateFromWeb/(:segment)', 'ServoController::getServoStateFromWeb/$1');
-});
 // --- FIN RUTAS DE LA API ---
 
 
@@ -71,3 +56,9 @@ $routes->get('/comprar', 'Home::comprar');
 
 // Ruta para la PWA
 $routes->get('/instalar-pwa', 'Home::instalarPWA');
+
+
+
+$routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado');
+$routes->get('servo/obtenerEstado/(:segment)', 'ServoController::obtenerEstado/$1');
+$routes->get('dispositivo/control/(:segment)', 'ServoController::controlView/$1');

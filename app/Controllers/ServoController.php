@@ -1,126 +1,77 @@
-<?php namespace App\Controllers;
+<?php
+namespace App\Controllers;
 
-use CodeIgniter\API\ResponseTrait;
-use App\Models\ServoControlModel;
-use App\Models\LecturasGasModel;
-use App\Models\EnlaceModel;
+use App\Models\DispositivoModel;
 use CodeIgniter\Controller;
 
-class ServoController extends Controller
+class ServoController extends BaseController
 {
-    use ResponseTrait;
-
-    protected $servoControlModel;
-    protected $lecturasGasModel;
-    protected $enlaceModel;
+    protected $dispositivoModel;
 
     public function __construct()
     {
-        $this->servoControlModel = new ServoControlModel();
-        $this->lecturasGasModel = new LecturasGasModel();
-        $this->enlaceModel = new EnlaceModel();
+        $this->dispositivoModel = new DispositivoModel();
     }
 
-    public function receiveSensorData()
+    // Actualizar estado del servo
+    public function actualizarEstado()
     {
-        // --- LÍNEA DE DEPURACIÓN TEMPORAL ---
-        log_message('debug', 'receiveSensorData: Método de solicitud detectado: ' . $this->request->getMethod());
-        // --- FIN LÍNEA DE DEPURACIÓN ---
-
-        if ($this->request->getMethod() !== 'post') {
-            return $this->failUnauthorized('Método no permitido. Solo se acepta POST.', 405);
+        $session = session();
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado']);
         }
 
-        $macAddress = $this->request->getPost('MAC');
-        $gasLevel = $this->request->getPost('nivel_gas');
+        $mac = $this->request->getPost('mac');
+        $estado = $this->request->getPost('estado');
 
-        if (empty($macAddress) || !isset($gasLevel)) {
-            return $this->fail('Datos incompletos. Se requiere MAC y nivel_gas.', 400);
+        // Verificar que el usuario tiene permiso sobre este dispositivo
+        $enlaceModel = new \App\Models\EnlaceModel();
+        $tieneAcceso = $enlaceModel->where('id_usuario', $session->get('id'))
+                                  ->where('MAC', $mac)
+                                  ->first();
+
+        if (!$tieneAcceso) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este dispositivo']);
         }
 
-        $usuarioId = $this->enlaceModel->getUserIdByMac($macAddress);
+        // Actualizar estado en la base de datos
+        $actualizado = $this->dispositivoModel->updateEstadoValvula($mac, $estado);
 
-        if (is_null($usuarioId)) {
-            log_message('warning', "MAC de dispositivo no encontrada en tabla 'enlace': {$macAddress}. No se pudo asociar a un usuario.");
-            return $this->fail('Dispositivo no asociado a ningún usuario. No se puede guardar la lectura.', 404);
-        }
-
-        $dataToInsert = [
-            'MAC'         => $macAddress,
-            'nivel_gas'   => (float)$gasLevel,
-            'usuario_id'  => $usuarioId,
-            'fecha'       => date('Y-m-d H:i:s')
-        ];
-
-        try {
-            $insertedId = $this->lecturasGasModel->insert($dataToInsert);
-            if ($insertedId) {
-                log_message('info', "Lectura de gas ({$gasLevel}) guardada para MAC: {$macAddress}, Usuario ID: {$usuarioId}");
-                return $this->respondCreated(['status' => 'success', 'message' => 'Datos de sensor recibidos y guardados.', 'id_lectura' => $insertedId]);
-            } else {
-                log_message('error', "Error al insertar lectura de gas. MAC: {$macAddress}, Datos: " . json_encode($dataToInsert) . ", Errores: " . json_encode($this->lecturasGasModel->errors()));
-                return $this->fail('Error al guardar la lectura de gas en la base de datos.', 500);
-            }
-        } catch (\Exception $e) {
-            log_message('error', "Excepción al guardar lectura de gas para MAC: {$macAddress}. Error: " . $e->getMessage());
-            return $this->fail('Error interno del servidor al guardar la lectura de gas.', 500);
-        }
-    }
-
-    public function getValveState(string $macAddress)
-    {
-        // --- LÍNEA DE DEPURACIÓN TEMPORAL ---
-        log_message('debug', 'getValveState: Método de solicitud detectado: ' . $this->request->getMethod());
-        // --- FIN LÍNEA DE DEPURACIÓN ---
-
-        if ($this->request->getMethod() !== 'get') {
-            return $this->failUnauthorized('Método no permitido. Solo se acepta GET.', 405);
-        }
-
-        if (empty($macAddress)) {
-            return $this->fail('Dirección MAC no proporcionada.', 400);
-        }
-
-        $servoState = $this->servoControlModel->getServoStateByMac($macAddress);
-
-        return $this->respond(['status' => 'success', 'estado_valvula' => $servoState]);
-    }
-
-    public function controlServoFromWeb()
-    {
-        if ($this->request->getMethod() !== 'post') {
-            return $this->failUnauthorized('Método no permitido. Solo se acepta POST.', 405);
-        }
-
-        $macAddress = $this->request->getPost('MAC');
-        $desiredState = $this->request->getPost('state');
-
-        if (empty($macAddress) || !isset($desiredState) || !in_array((int)$desiredState, [0, 1])) {
-            return $this->fail('Datos incompletos o inválidos. Se requiere MAC y un estado (0 o 1).', 400);
-        }
-
-        $desiredState = (int)$desiredState;
-
-        if ($this->servoControlModel->updateServoState($macAddress, $desiredState)) {
-            log_message('info', "Comando de servo recibido desde la web para MAC: {$macAddress}, Estado deseado: {$desiredState}");
-            return $this->respondCreated(['status' => 'success', 'message' => 'Estado del servo actualizado correctamente.']);
+        if ($actualizado) {
+            return $this->response->setJSON(['success' => true, 'estado' => $estado]);
         } else {
-            return $this->fail('Error al actualizar el estado del servo en la base de datos.', 500);
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error al actualizar']);
         }
     }
 
-    public function getServoStateFromWeb(string $macAddress)
+    // Obtener estado actual del servo
+    public function obtenerEstado($mac)
     {
-        if ($this->request->getMethod() !== 'get') {
-            return $this->failUnauthorized('Método no permitido. Solo se acepta GET.', 405);
+        $session = session();
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado']);
         }
 
-        if (empty($macAddress)) {
-            return $this->fail('Dirección MAC no proporcionada.', 400);
+        // Verificar que el usuario tiene permiso sobre este dispositivo
+        $enlaceModel = new \App\Models\EnlaceModel();
+        $tieneAcceso = $enlaceModel->where('id_usuario', $session->get('id'))
+                                  ->where('MAC', $mac)
+                                  ->first();
+
+        if (!$tieneAcceso) {
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este dispositivo']);
         }
 
-        $servoState = $this->servoControlModel->getServoStateByMac($macAddress);
-
-        return $this->respond(['status' => 'success', 'estado_servo' => $servoState]);
+        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
+        
+        if ($dispositivo) {
+            return $this->response->setJSON([
+                'estado_valvula' => $dispositivo['estado_valvula'],
+                'nombre' => $dispositivo['nombre'],
+                'ubicacion' => $dispositivo['ubicacion']
+            ]);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON(['error' => 'Dispositivo no encontrado']);
+        }
     }
 }

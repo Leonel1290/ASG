@@ -32,153 +32,75 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
 </head>
 <body>
 
-<div class="container my-5">
-    <a href="<?= base_url('/perfil') ?>" class="btn btn-outline-secondary mb-4">
-        <i class="fas fa-arrow-left me-2"></i> Volver al Perfil
-    </a>
-
-    <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Detalle del Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
-    <p class="device-details-line">
-        MAC: <span id="macDisplay"><?= esc($mac) ?></span> | Ubicación: <?= esc($ubicacionDispositivo) ?>
-    </p>
-
-    <div class="current-gas-level-card-simple">
-        <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
-        <p class="current-gas-level-value" id="gasLevelDisplay">Cargando...</p> <!-- Inicializado con "Cargando..." -->
-        <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">
-            Umbral para Alarma (ESP32): <span class="font-bold text-green-500" id="openThresholdDisplay"></span> PPM
-        </p>
+<div class="container mt-4">
+    <h2>Control de Válvula</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title" id="nombre-dispositivo">Dispositivo: <?= $dispositivo['nombre'] ?></h5>
+            <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">Ubicación: <?= $dispositivo['ubicacion'] ?></h6>
+            <p class="card-text">Estado actual: <span id="estado-actual"><?= $dispositivo['estado_valvula'] ? 'Abierta' : 'Cerrada' ?></span></p>
+            
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-success" id="btn-abrir">Abrir Válvula</button>
+                <button type="button" class="btn btn-danger" id="btn-cerrar">Cerrar Válvula</button>
+            </div>
+        </div>
     </div>
-
-    <div class="valve-buttons">
-        <button type="button" class="btn btn-valve btn-valve-open" id="openValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'open')">
-            <i class="fas fa-door-open me-2"></i> Abrir Válvula
-        </button>
-        <button type="button" class="btn btn-valve btn-valve-close" id="closeValveBtn" onclick="sendValveCommand('<?= esc($mac) ?>', 'close')">
-            <i class="fas fa-door-closed me-2"></i> Cerrar Válvula
-        </button>
-    </div>
-
-    <div class="mt-4 p-4 text-center font-semibold rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-        <p>Estado Actual de la Válvula (ESP32): <span id="valveStateDisplay" class="current-valve-state">Cargando...</span></p>
-    </div>
-
-    <div id="valveMessage" class="alert alert-info mt-4 text-center d-none" role="alert"></div>
-
 </div>
 
-<!-- Pasa la URL base y la MAC a JavaScript como variables globales para que el script externo las use -->
 <script>
-    const API_BASE_URL = '<?= base_url(); ?>';
-    const MAC_ADDRESS = '<?= esc($mac); ?>';
-    // Define el umbral de alarma para el frontend si la ESP32 lo usa localmente
-    const GAS_ALARM_THRESHOLD_FRONTEND = 100; // Ajusta este valor si es diferente al de tu ESP32
-
-    document.getElementById('openThresholdDisplay').textContent = GAS_ALARM_THRESHOLD_FRONTEND;
-
-    /**
-     * Envía un comando para abrir o cerrar la válvula al backend (desde la web).
-     * Esta función usa la ruta /api/controlServo.
-     * @param {string} macAddress La dirección MAC del dispositivo.
-     * @param {string} command 'open' para abrir, 'close' para cerrar.
-     */
-    async function sendValveCommand(macAddress, command) {
-        let state;
-        if (command === 'open') {
-            state = 1;
-        } else if (command === 'close') {
-            state = 0;
+$(document).ready(function() {
+    const mac = '<?= $dispositivo["MAC"] ?>';
+    
+    // Función para actualizar el estado mostrado
+    function actualizarEstado(estado) {
+        $('#estado-actual').text(estado ? 'Abierta' : 'Cerrada');
+    }
+    
+    // Obtener estado inicial
+    $.get('/servo/obtenerEstado/' + mac, function(response) {
+        if (response.error) {
+            alert(response.error);
         } else {
-            console.error("Comando de válvula inválido:", command);
-            return;
+            actualizarEstado(response.estado_valvula);
         }
-
-        const valveMessageDiv = document.getElementById('valveMessage');
-        valveMessageDiv.classList.add('d-none'); // Ocultar mensaje anterior
-
-        try {
-            const response = await fetch(`${API_BASE_URL}api/controlServo`, { // <--- RUTA ACTUALIZADA A /api/controlServo
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `MAC=${macAddress}&state=${state}`
-            });
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                valveMessageDiv.textContent = `Comando enviado: Válvula ${command === 'open' ? 'Abierta' : 'Cerrada'}.`;
-                valveMessageDiv.classList.remove('d-none', 'alert-danger');
-                valveMessageDiv.classList.add('alert-success');
-                // Después de enviar el comando, actualiza el estado mostrado en la UI
-                getServoStateFromWeb(macAddress);
-            } else {
-                valveMessageDiv.textContent = `Error al enviar comando: ${data.message || 'Error desconocido'}.`;
-                valveMessageDiv.classList.remove('d-none', 'alert-success');
-                valveMessageDiv.classList.add('alert-danger');
-            }
-        } catch (error) {
-            console.error('Error al comunicarse con la API de control de servo:', error);
-            valveMessageDiv.textContent = 'Error de conexión con el servidor. Intenta de nuevo.';
-            valveMessageDiv.classList.remove('d-none', 'alert-success');
-            valveMessageDiv.classList.add('alert-danger');
-        }
-    }
-
-    /**
-     * Consulta el estado actual del servo desde el backend y actualiza la UI.
-     * Esta función usa la ruta /api/getServoStateFromWeb.
-     * @param {string} macAddress La dirección MAC del dispositivo.
-     */
-    async function getServoStateFromWeb(macAddress) {
-        const valveStateDisplay = document.getElementById('valveStateDisplay');
-        valveStateDisplay.textContent = 'Actualizando...';
-
-        try {
-            // Nota: Se asume que la ruta es /api/getServoStateFromWeb/MAC_ADDRESS
-            const response = await fetch(`${API_BASE_URL}api/getServoStateFromWeb/${macAddress}`); // <--- RUTA ACTUALIZADA A /api/getServoStateFromWeb
-            const data = await response.json();
-
-            if (data.status === 'success' && typeof data.estado_servo !== 'undefined') {
-                const currentState = (data.estado_servo === 1) ? 'Abierta' : 'Cerrada';
-                valveStateDisplay.textContent = currentState;
-                valveStateDisplay.className = 'current-valve-state ' + (data.estado_servo === 1 ? 'text-success' : 'text-danger');
-            } else {
-                valveStateDisplay.textContent = 'Error al cargar estado';
-                console.error("Error al obtener estado del servo desde la web:", data);
-            }
-        } catch (error) {
-            valveStateDisplay.textContent = 'Error de red';
-            console.error('Error al comunicarse con la API para obtener estado del servo:', error);
-        }
-    }
-
-    // Llama a la función para obtener el estado del servo cuando la página carga.
-    window.addEventListener('load', () => {
-        getServoStateFromWeb(MAC_ADDRESS);
-        // Opcional: Actualizar el estado periódicamente (ej. cada 5 segundos)
-        // setInterval(() => getServoStateFromWeb(MAC_ADDRESS), 5000);
+    }).fail(function() {
+        alert('Error al obtener el estado del dispositivo');
     });
-
-</script>
-
-<!-- Enlace al archivo JavaScript externo (si estas funciones se mueven allí) -->
-<script src="<?= base_url('js/detalle_dispositivo.js'); ?>"></script>
-
-<!-- Registro del Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                .then(registration => {
-                    console.log('ServiceWorker registrado con éxito:', registration.scope);
-                })
-                .catch(error => {
-                    console.log('Fallo el registro de ServiceWorker:', error);
-                });
+    
+    // Control de botones
+    $('#btn-abrir').click(function() {
+        controlarServo(mac, 1);
+    });
+    
+    $('#btn-cerrar').click(function() {
+        controlarServo(mac, 0);
+    });
+    
+    // Función para controlar el servo
+    function controlarServo(mac, estado) {
+        $.post('/servo/actualizarEstado', {
+            mac: mac,
+            estado: estado
+        }, function(response) {
+            if (response.error) {
+                alert(response.error);
+            } else {
+                actualizarEstado(estado);
+                // Aquí podrías agregar notificación de éxito
+            }
+        }).fail(function() {
+            alert('Error al enviar el comando al dispositivo');
         });
     }
+    
+    // Opcional: Actualizar estado periódicamente
+    setInterval(function() {
+        $.get('/servo/obtenerEstado/' + mac, function(response) {
+            if (!response.error) {
+                actualizarEstado(response.estado_valvula);
+            }
+        });
+    }, 5000); // Actualizar cada 5 segundos
+});
 </script>
-
-</body>
-</html>
