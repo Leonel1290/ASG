@@ -42,7 +42,6 @@ $routes->group('api', function($routes){
     $routes->post('receiveSensorData', 'ServoController::receiveSensorData');
 
     // Endpoint para que el ESP32 consulte el estado de la válvula
-    // Asegúrate de que $1 está ahí para pasar la MAC al método del controlador
     $routes->get('getValveState/(:segment)', 'ServoController::getValveState/$1');
 
     // Endpoint para que la PWA envíe el comando de abrir/cerrar servo

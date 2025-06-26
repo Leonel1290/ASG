@@ -23,6 +23,10 @@ class ServoController extends Controller
 
     public function receiveSensorData()
     {
+        // --- LÍNEA DE DEPURACIÓN TEMPORAL ---
+        log_message('debug', 'receiveSensorData: Método de solicitud detectado: ' . $this->request->getMethod());
+        // --- FIN LÍNEA DE DEPURACIÓN ---
+
         if ($this->request->getMethod() !== 'post') {
             return $this->failUnauthorized('Método no permitido. Solo se acepta POST.', 405);
         }
@@ -63,15 +67,12 @@ class ServoController extends Controller
         }
     }
 
-    /**
-     * Endpoint para que el ESP32 consulte el estado deseado del servo.
-     * La MAC se recibe como un parámetro de la función, NO de $this->request->uri.
-     *
-     * @param string $macAddress La dirección MAC del dispositivo ESP32.
-     * @return \CodeIgniter\HTTP\Response
-     */
-    public function getValveState(string $macAddress) // <-- LA MAC AHORA ES UN PARÁMETRO DIRECTO
+    public function getValveState(string $macAddress)
     {
+        // --- LÍNEA DE DEPURACIÓN TEMPORAL ---
+        log_message('debug', 'getValveState: Método de solicitud detectado: ' . $this->request->getMethod());
+        // --- FIN LÍNEA DE DEPURACIÓN ---
+
         if ($this->request->getMethod() !== 'get') {
             return $this->failUnauthorized('Método no permitido. Solo se acepta GET.', 405);
         }
