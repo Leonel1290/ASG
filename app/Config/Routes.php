@@ -36,20 +36,19 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
-// --- RUTAS DE LA API (AHORA TODAS APUNTAN EXCLUSIVAMENTE A ServoController) ---
+// --- RUTAS DE LA API (TODAS APUNTAN A ServoController) ---
 $routes->group('api', function($routes){
     // Endpoint para que el ESP32 envíe las lecturas del sensor de gas
     $routes->post('receiveSensorData', 'ServoController::receiveSensorData');
 
     // Endpoint para que el ESP32 consulte el estado de la válvula
+    // Asegúrate de que $1 está ahí para pasar la MAC al método del controlador
     $routes->get('getValveState/(:segment)', 'ServoController::getValveState/$1');
 
     // Endpoint para que la PWA envíe el comando de abrir/cerrar servo
     $routes->post('controlServo', 'ServoController::controlServoFromWeb');
 
-    // Endpoint para que la PWA consulte el estado actual del servo (si la quieres bajo /api)
-    // Nota: El método en ServoController::getServoStateFromWeb espera la MAC como parámetro directo.
-    // Si la ruta es /api/getServoStateFromWeb/MAC, el controlador la recibirá.
+    // Endpoint para que la PWA consulte el estado actual del servo
     $routes->get('getServoStateFromWeb/(:segment)', 'ServoController::getServoStateFromWeb/$1');
 });
 // --- FIN RUTAS DE LA API ---

@@ -63,10 +63,15 @@ class ServoController extends Controller
         }
     }
 
-    public function getValveState()
+    /**
+     * Endpoint para que el ESP32 consulte el estado deseado del servo.
+     * La MAC se recibe como un parámetro de la función, NO de $this->request->uri.
+     *
+     * @param string $macAddress La dirección MAC del dispositivo ESP32.
+     * @return \CodeIgniter\HTTP\Response
+     */
+    public function getValveState(string $macAddress) // <-- LA MAC AHORA ES UN PARÁMETRO DIRECTO
     {
-        $macAddress = $this->request->uri->getSegment(3); // Asume /api/getValveState/{MAC_ADDRESS}
-
         if ($this->request->getMethod() !== 'get') {
             return $this->failUnauthorized('Método no permitido. Solo se acepta GET.', 405);
         }
