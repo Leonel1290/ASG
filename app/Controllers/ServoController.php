@@ -4,32 +4,36 @@ namespace App\Controllers;
 
 use App\Models\ServoModel;
 use App\Models\EnlaceModel;
-use App\Models\DispositivoModel; // <-- Importar DispositivoModel
+use App\Models\DispositivoModel; // Asegúrate de que DispositivoModel está importado
 use CodeIgniter\Controller;
 
 class ServoController extends BaseController
 {
     protected $ServoModel;
-    protected $DispositivoModel; // <-- Declarar DispositivoModel
-    protected $EnlaceModel; // <-- Declarar EnlaceModel
+    protected $DispositivoModel;
+    protected $EnlaceModel;
 
     public function __construct()
     {
         $this->ServoModel = new ServoModel();
-        $this->DispositivoModel = new DispositivoModel(); // <-- Instanciar DispositivoModel
-        $this->EnlaceModel = new EnlaceModel(); // <-- Instanciar EnlaceModel
+        $this->DispositivoModel = new DispositivoModel();
+        $this->EnlaceModel = new EnlaceModel();
     }
 
-    // Nuevo método para mostrar los detalles del servo en la vista
+    // Método para mostrar los detalles del servo en la vista
     public function mostrarDetalles($mac = null)
     {
         $session = session();
+        $data = []; // Inicializar array de datos para la vista
+
         if (!$session->get('logged_in')) {
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder.');
         }
 
         if ($mac === null) {
-            return redirect()->to('/')->with('error', 'MAC de dispositivo no especificada.');
+            $data['dispositivo'] = null;
+            $data['error_message'] = 'MAC de dispositivo no especificada.';
+            return view('detalles', $data);
         }
 
         // Verificar que el usuario tiene permiso sobre este Servo
@@ -38,7 +42,9 @@ class ServoController extends BaseController
                                         ->first();
 
         if (!$tieneAcceso) {
-            return redirect()->to('/dashboard')->with('error', 'No tienes permiso para ver este dispositivo.');
+            $data['dispositivo'] = null;
+            $data['error_message'] = 'No tienes permiso para ver este dispositivo.';
+            return view('detalles', $data);
         }
 
         // Obtener los datos del dispositivo (donde está estado_valvula)
@@ -48,11 +54,13 @@ class ServoController extends BaseController
             $data['dispositivo'] = $dispositivo;
             return view('detalles', $data);
         } else {
-            return redirect()->to('/dashboard')->with('error', 'Dispositivo no encontrado.');
+            $data['dispositivo'] = null;
+            $data['error_message'] = 'Dispositivo no encontrado.';
+            return view('detalles', $data);
         }
     }
 
-    // Actualizar estado del servo
+    // ... (Mantén los métodos actualizarEstado y obtenerEstado como están)
     public function actualizarEstado()
     {
         $session = session();
@@ -63,7 +71,6 @@ class ServoController extends BaseController
         $mac = $this->request->getPost('mac');
         $estado = $this->request->getPost('estado');
 
-        // Verificar que el usuario tiene permiso sobre este Servo
         $tieneAcceso = $this->EnlaceModel->where('id_usuario', $session->get('id'))
                                         ->where('MAC', $mac)
                                         ->first();
@@ -72,12 +79,7 @@ class ServoController extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este Servo']);
         }
 
-        // AHORA: Actualizar 'estado_valvula' en la tabla 'dispositivos' usando DispositivoModel
-        // Se ha cambiado de updateEstadoValvula a updateDispositivoByMac
         $actualizado = $this->DispositivoModel->updateDispositivoByMac($mac, ['estado_valvula' => $estado]);
-
-        // También puedes querer actualizar el 'estado_servo' en la tabla 'servos' si es diferente
-        // $this->ServoModel->updateEstadoServo($mac, $estado); // Si tu tabla servos tiene 'estado_servo'
 
         if ($actualizado) {
             return $this->response->setJSON(['success' => true, 'estado' => $estado]);
@@ -86,7 +88,6 @@ class ServoController extends BaseController
         }
     }
 
-    // Obtener estado actual del servo
     public function obtenerEstado($mac)
     {
         $session = session();
@@ -94,7 +95,6 @@ class ServoController extends BaseController
             return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado']);
         }
 
-        // Verificar que el usuario tiene permiso sobre este Servo
         $tieneAcceso = $this->EnlaceModel->where('id_usuario', $session->get('id'))
                                         ->where('MAC', $mac)
                                         ->first();
@@ -103,14 +103,13 @@ class ServoController extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['error' => 'No tienes permiso para este Servo']);
         }
 
-        // Obtener el dispositivo de la tabla 'dispositivos' para obtener 'estado_valvula', 'nombre', 'ubicacion'
         $dispositivo = $this->DispositivoModel->getDispositivoByMac($mac);
         
         if ($dispositivo) {
             return $this->response->setJSON([
-                'estado_valvula' => $dispositivo['estado_valvula'], // Usar datos de 'dispositivos'
-                'nombre' => $dispositivo['nombre'],
-                'ubicacion' => $dispositivo['ubicacion']
+                'estado_valvula' => $dispositivo->estado_valvula, // Acceder como propiedad de objeto
+                'nombre' => $dispositivo->nombre,
+                'ubicacion' => $dispositivo->ubicacion
             ]);
         } else {
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Dispositivo no encontrado']);

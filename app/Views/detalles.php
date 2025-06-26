@@ -1,13 +1,7 @@
 <?php
-// Estas variables se pasan desde el controlador
-$mac = $mac ?? 'Desconocida';
-$nombreDispositivo = $nombreDispositivo ?? $mac; // Usar la MAC como nombre por defecto si no se pasa nombre
-$ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
-$message = $message ?? null; // Mensaje general de la vista, no directamente usado por JS de API
-
-// Estas variables se actualizarán dinámicamente con JavaScript.
-// No necesitamos calcular el último índice de $lecturas aquí en PHP.
-// El nivel de gas y el estado de la válvula serán llenados por JavaScript.
+// Estas variables ($dispositivo, $error_message) son pasadas desde el controlador.
+// No es necesario inicializarlas aquí con el operador ??, ya que el controlador
+// se encarga de que estén presentes o que la lógica de la vista las maneje si faltan.
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -36,31 +30,48 @@ $message = $message ?? null; // Mensaje general de la vista, no directamente usa
     <h2>Control de Válvula</h2>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title" id="nombre-dispositivo">Dispositivo: <?= $dispositivo['nombre'] ?></h5>
-            <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">Ubicación: <?= $dispositivo['ubicacion'] ?></h6>
-            <p class="card-text">Estado actual: <span id="estado-actual"><?= $dispositivo['estado_valvula'] ? 'Abierta' : 'Cerrada' ?></span></p>
-            
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-success" id="btn-abrir">Abrir Válvula</button>
-                <button type="button" class="btn btn-danger" id="btn-cerrar">Cerrar Válvula</button>
-            </div>
+            <?php if (isset($error_message)): ?>
+                {{-- Si hay un mensaje de error desde el controlador, mostrarlo --}}
+                <div class="alert alert-danger" role="alert">
+                    <?= $error_message ?>
+                </div>
+            <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
+                {{-- Si hay un dispositivo válido, mostrar su información --}}
+                <h5 class="card-title" id="nombre-dispositivo">Dispositivo: <?= $dispositivo->nombre ?></h5>
+                <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">Ubicación: <?= $dispositivo->ubicacion ?></h6>
+                {{-- Acceso a estado_valvula como propiedad de objeto --}}
+                <p class="card-text">Estado actual: <span id="estado-actual"><?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?></span></p>
+                
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-success" id="btn-abrir">Abrir Válvula</button>
+                    <button type="button" class="btn btn-danger" id="btn-cerrar">Cerrar Válvula</button>
+                </div>
+            <?php else: ?>
+                {{-- Caso por defecto si no hay dispositivo y no se estableció un error_message específico --}}
+                <p>No se pudo cargar la información del dispositivo. Por favor, asegúrese de que la URL sea correcta o seleccione un dispositivo de su lista.</p>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
+<!-- Incluir jQuery antes de tu script personalizado -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+// Solo ejecutar el script si el dispositivo está definido, de lo contrario, no hay MAC para usar
+<?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
-    const mac = '<?= $dispositivo["MAC"] ?>';
+    const mac = '<?= $dispositivo->MAC ?>'; // Acceso a MAC como propiedad de objeto
     
-    // Función para actualizar el estado mostrado
+    // Función para actualizar el estado mostrado en la UI
     function actualizarEstado(estado) {
         $('#estado-actual').text(estado ? 'Abierta' : 'Cerrada');
     }
     
-    // Obtener estado inicial
+    // Obtener estado inicial del dispositivo al cargar la página
     $.get('/servo/obtenerEstado/' + mac, function(response) {
         if (response.error) {
-            alert(response.error);
+            // Considera usar un modal o un div para mostrar errores en lugar de alert()
+            alert(response.error); 
         } else {
             actualizarEstado(response.estado_valvula);
         }
@@ -68,33 +79,36 @@ $(document).ready(function() {
         alert('Error al obtener el estado del dispositivo');
     });
     
-    // Control de botones
+    // Event listener para el botón "Abrir Válvula"
     $('#btn-abrir').click(function() {
-        controlarServo(mac, 1);
+        controlarServo(mac, 1); // 1 para abrir
     });
     
+    // Event listener para el botón "Cerrar Válvula"
     $('#btn-cerrar').click(function() {
-        controlarServo(mac, 0);
+        controlarServo(mac, 0); // 0 para cerrar
     });
     
-    // Función para controlar el servo
+    // Función para enviar la petición al controlador para controlar el servo
     function controlarServo(mac, estado) {
         $.post('/servo/actualizarEstado', {
             mac: mac,
             estado: estado
         }, function(response) {
             if (response.error) {
+                // Considera usar un modal o un div para mostrar errores en lugar de alert()
                 alert(response.error);
             } else {
                 actualizarEstado(estado);
-                // Aquí podrías agregar notificación de éxito
+                // Aquí podrías agregar notificación de éxito si lo deseas
             }
         }).fail(function() {
             alert('Error al enviar el comando al dispositivo');
         });
     }
     
-    // Opcional: Actualizar estado periódicamente
+    // Opcional: Actualizar el estado del dispositivo periódicamente
+    // Esto asegura que la UI refleje el estado más reciente del dispositivo
     setInterval(function() {
         $.get('/servo/obtenerEstado/' + mac, function(response) {
             if (!response.error) {
@@ -103,4 +117,7 @@ $(document).ready(function() {
         });
     }, 5000); // Actualizar cada 5 segundos
 });
+<?php endif; ?>
 </script>
+</body>
+</html>
