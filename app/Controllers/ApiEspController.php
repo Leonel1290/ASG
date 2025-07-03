@@ -13,7 +13,7 @@ class ApiEspController extends ResourceController
         $apiKeyReceived = $this->request->getGet('api_key');
 
         // 2. Leer la clave API desde variable de entorno
-        $apiKeyExpected = getenv('YOUR_SUPER_SECRET_API_KEY_HERE');
+        $apiKeyExpected = getenv('API_KEY_SECRET');
 
         // 3. Validar la clave API
         if (empty($apiKeyExpected) || $apiKeyReceived !== $apiKeyExpected) {
