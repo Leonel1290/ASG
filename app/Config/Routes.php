@@ -59,8 +59,7 @@ $routes->get('/instalar-pwa', 'Home::instalarPWA');
 
 
 
+$routes->get('servo/obtenerEstado/(:any)', 'ServoController::obtenerEstado/$1');
 $routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado');
-$routes->get('servo/obtenerEstado/(:segment)', 'ServoController::obtenerEstado/$1');
-$routes->get('dispositivo/control/(:segment)', 'ServoController::controlView/$1');
 
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
