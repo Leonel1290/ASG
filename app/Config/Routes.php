@@ -63,4 +63,6 @@ $routes->get('servo/obtenerEstado/(:any)', 'ServoController::obtenerEstado/$1');
 $routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado');
 
 $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
-$routes->get('api/estado_valvula', 'ApiEspController::estadoValvula');
+
+// RUTA CORREGIDA: Cambiado 'estado_valvula' a 'valve_status' para que coincida con la solicitud del ESP
+$routes->get('api/valve_status', 'ApiEspController::estadoValvula');
