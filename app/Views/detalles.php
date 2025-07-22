@@ -3,9 +3,9 @@
 $mac = $mac ?? 'Desconocida';
 $nombreDispositivo = $nombreDispositivo ?? $mac; // Use MAC as default name if no name is passed
 $ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
-$lecturas = $lecturas ?? []; // Array of readings for the table
-$labels = $labels ?? [];     // Date/time labels for the chart
-$data = $data ?? [];         // Gas levels for the chart
+$lecturas = $lecturas ?? []; // Array of readings for the table (expected DESC order)
+$labels = $labels ?? [];     // Date/time labels for the chart (expected ASC order)
+$data = $data ?? [];         // Gas levels for the chart (expected ASC order)
 $message = $message ?? null; // Optional messages
 
 // Get the latest gas level to display in the simple card
@@ -24,24 +24,30 @@ if (!function_exists('esc')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Dispositivo</title>
+    <title>Detalle del Dispositivo: <?= esc($nombreDispositivo) ?></title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* General reset to ensure no default margins/paddings */
-        html, body {
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg-dark: #1a202c;
+            --text-light: #cbd5e0;
+            --text-lighter: #e2e8f0;
+            --text-darker: #f7fafc;
+            --primary-color: #667eea;
+            --secondary-color: #a0aec0;
+            --card-bg: #2d3748;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+            --warning-color: #f6e05e;
+            --danger-color: #e53e3e;
         }
 
         body {
-            background-color: #1a202c;
-            color: #cbd5e0;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; /* Ensure margin is 0 */
-            padding: 0; /* Ensure padding is 0 */
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -52,216 +58,183 @@ if (!function_exists('esc')) {
             padding: 2rem;
         }
 
-        /* Style for the "Volver" button */
         .btn-outline-secondary {
-            color: #cbd5e0;
-            border-color: #cbd5e0;
-            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Add hover transition */
+            color: var(--text-light);
+            border-color: var(--text-light);
+            transition: all 0.2s ease-in-out;
         }
         .btn-outline-secondary:hover {
-            color: #1a202c;
-            background-color: #cbd5e0;
-            border-color: #cbd5e0;
+            color: var(--bg-dark);
+            background-color: var(--text-light);
+            border-color: var(--text-light);
         }
 
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
 
         .page-title {
-            color: #f7fafc;
-            font-size: 2rem;
+            color: var(--text-darker);
+            font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 0.5rem; /* Reduced bottom margin */
-            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .page-title .text-primary {
+            color: var(--primary-color) !important;
         }
 
-        /* Style for device details line (MAC and Location) */
-        .device-details-line {
-            text-align: center;
-            color: #a0aec0; /* Secondary text color */
-            font-size: 1rem;
-            margin-bottom: 1.5rem; /* Space below details */
+        .device-info {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
         }
 
+        .card {
+            background-color: var(--card-bg);
+            color: var(--text-lighter);
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center horizontally */
+        }
+        .card-title .fas {
+            margin-right: 0.75rem;
+        }
+
+        .current-gas-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--warning-color);
+            margin-top: 1rem;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.03); opacity: 0.95; }
+        }
 
         .section-title {
-            color: #edf2f7;
-            font-size: 1.5rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #4a5568;
-            padding-bottom: 0.5rem;
+            color: var(--text-darker);
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        .section-title .fas {
+            margin-right: 0.75rem;
         }
 
         .table-responsive {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 0.75rem;
+            overflow: hidden; /* Ensures rounded corners on table */
         }
 
         .table {
             width: 100%;
-            color: #e2e8f0;
+            color: var(--text-lighter);
             border-collapse: collapse;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            border-radius: 0.5rem;
-            overflow: hidden; /* Ensure rounded corners are visible */
-            background-color: #2d3748;
+            background-color: var(--card-bg);
         }
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #4a5568;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .table th {
-            background-color: #4a5568;
-            color: #f7fafc;
+            background-color: var(--border-color);
+            color: var(--text-darker);
             font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
         .table tbody tr:nth-child(even) {
-            background-color: #374151;
+            background-color: #374151; /* Slightly different shade for zebra striping */
         }
 
         .table tbody tr:hover {
             background-color: #4a5568;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
+            transition: background-color 0.2s ease;
+            cursor: default; /* Change cursor for clarity */
         }
 
-        /* Bootstrap classes for badge/span background colors */
-        .bg-success {
-            background-color: #48bb78 !important;
-            color: #2d3748; /* Ensure text is readable on background */
-        }
-
-        .bg-warning {
-            background-color: #f6e05e !important;
-            color: #2d3748; /* Ensure text is readable on background */
-        }
-
-        .bg-danger {
-            background-color: #e53e3e !important;
-            color: #edf2f7;
-        }
-
-
-        .card {
-            background-color: #2d3748;
-            color: #fff;
-            border: none;
+        .badge {
+            padding: 0.5em 0.8em;
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
-            transition: box-shadow 0.3s ease; /* Shadow animation */
-        }
-
-        .card:hover {
-             /* Neon and wide shadow - Adjust colors and blur as needed */
-             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .card-title {
-            font-size: 1.75rem;
             font-weight: bold;
-            color: #667eea;
-            margin-bottom: 1rem;
+            font-size: 0.85rem;
         }
+        .badge.bg-success { background-color: var(--success-color) !important; color: var(--bg-dark); }
+        .badge.bg-warning { background-color: var(--warning-color) !important; color: var(--bg-dark); }
+        .badge.bg-danger { background-color: var(--danger-color) !important; color: var(--text-darker); }
 
-        /* Specific styles for the Current Gas Level card (from the first code) */
-        .current-gas-level-card-simple {
-            background-color: #2d3748; /* Use general card color */
-            color: #fff;
-            border: none;
+
+        .chart-container {
+            max-width: 800px;
+            height: 350px; /* Fixed height for consistency */
+            margin: 0 auto 2rem auto;
+            background-color: rgba(0,0,0,0.1); /* Subtle background for chart area */
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-top: 2rem;
-            transition: box-shadow 0.3s ease;
-            padding: 1.5rem; /* Same as card-body */
-            text-align: center; /* Center content */
+            padding: 1rem;
         }
-
-        .current-gas-level-card-simple:hover {
-             box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(102, 126, 234, 0.4), 0 0 60px rgba(102, 126, 234, 0.2);
-        }
-
-        .current-gas-level-card-simple .card-title {
-            font-size: 1.75rem; /* Same as general card-title */
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-
-        .current-gas-level-card-simple .current-gas-level-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #f6e05e; /* Yellow/gold color */
-        }
-
 
         .progress {
-            height: 1rem;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            background-color: #4a5568;
+            height: 1.25rem;
+            border-radius: 0.625rem;
+            background-color: var(--border-color);
+            margin-bottom: 1rem;
         }
 
         .progress-bar {
-            background-color: #48bb78; /* Default color, changed with JS */
-            transition: width 0.5s ease; /* Smoother animation */
-            color: #fff;
-            text-align: center;
-            line-height: 1rem; /* Vertically center text if any */
-        }
-
-        .security-level-text {
+            background-color: var(--success-color); /* Default color */
+            transition: width 0.6s ease-in-out; /* Smoother animation */
+            color: var(--text-darker);
             font-weight: bold;
-            margin-top: 0.5rem;
-            color: #f7fafc;
+            line-height: 1.25rem; /* Vertically center text */
         }
 
-        .current-gas-level-card {
-            background-color: #4a5568;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .current-gas-level-title {
+        .security-level-display {
             font-size: 1.25rem;
-            color: #edf2f7;
-            margin-bottom: 0.5rem;
-        }
-
-        .current-gas-level {
-            font-size: 1.5rem;
             font-weight: bold;
-            color: #667eea; /* Default color, can be changed with JS if desired */
+            color: var(--text-darker);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .security-level-display .fas {
+            margin-right: 0.5rem;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 1.75rem;
-            }
-
-            .section-title {
-                font-size: 1.25rem;
-            }
-
-            .card-title {
-                font-size: 1.5rem;
-            }
-            .current-gas-level-card-simple .card-title {
-                font-size: 1.5rem;
-            }
-            .current-gas-level-card-simple .current-gas-level-value {
-                font-size: 1.75rem;
-            }
+        /* Chart.js overrides for dark theme */
+        .chartjs-render-monitor {
+            background-color: transparent !important; /* Ensure canvas background is transparent */
         }
     </style>
 </head>
@@ -272,146 +245,159 @@ if (!function_exists('esc')) {
         <i class="fas fa-arrow-left me-2"></i> Volver al Perfil
     </a>
 
-    <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Detalle del Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
-    <p class="device-details-line">
-        MAC: <?= esc($mac) ?> | Ubicación: <?= esc($ubicacionDispositivo) ?>
-    </p>
+    <header class="page-header">
+        <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
+        <p class="device-info">
+            <i class="fas fa-network-wired me-1"></i> MAC: <?= esc($mac) ?> | <i class="fas fa-map-marker-alt me-1"></i> Ubicación: <?= esc($ubicacionDispositivo) ?>
+        </p>
+    </header>
 
-    <div class="current-gas-level-card-simple">
-        <h3 class="card-title"><i class="fas fa-gas-pump me-2"></i>Nivel de Gas Actual</h3>
-        <p class="current-gas-level-value"><?= $nivelGasActualDisplay ?></p>
-    </div>
+    <?php if ($message): ?>
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <?= esc($message) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
-    <h2 class="section-title"><i class="fas fa-list-alt me-2"></i> Registros de Lecturas de Gas</h2>
-    <div class="table-responsive">
-        <table class="table table-striped mt-3">
-            <thead>
-                <tr>
-                    <th><i class="fas fa-calendar-alt me-2"></i> Fecha</th>
-                    <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
-                    <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($lecturas)): ?>
-                    <tr><td colspan="3" class="text-center">No hay lecturas registradas.</td></tr>
-                <?php else: ?>
-                    <?php foreach ($lecturas as $lectura): ?>
-                        <tr>
-                            <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
-                            <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
-                            <td class="text-center">
-                                <?php
-                                    $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
-                                    $estado = 'Desconocido';
-                                    $class = '';
-
-                                    if ($nivel >= 500) {
-                                        $estado = 'Peligro';
-                                        $class = 'bg-danger';
-                                    } elseif ($nivel >= 200) {
-                                        $estado = 'Precaución';
-                                        $class = 'bg-warning';
-                                    } elseif ($nivel >= 0) {
-                                        $estado = 'Seguro';
-                                        $class = 'bg-success';
-                                    }
-                                ?>
-                                <span class="badge <?= $class ?>"><?= $estado ?></span>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="card mt-5">
-        <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-chart-line me-2"></i> Gráfico de Niveles de Gas</h5>
-            <div class="chart-container" style="max-width: 700px; margin: 0 auto;">
-                <canvas id="gasChart" width="400" height="200"></canvas>
-            </div>
-
-            <div class="mt-4">
-                <p class="security-level-text"><i class="fas fa-shield-alt me-2"></i> Nivel de Seguridad (PPM): <span id="securityLevel">Sin datos</span></p>
-                <div class="progress">
-                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h2 class="card-title"><i class="fas fa-gas-pump"></i> Nivel de Gas Actual</h2>
+                    <p class="current-gas-value" id="currentGasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
                 </div>
             </div>
-
-            <div class="current-gas-level-card mt-4">
-                <h5 class="current-gas-level-title"><i class="fas fa-tachometer-alt me-2"></i> Última Lectura (PPM)</h5>
-                <p class="current-gas-level" id="nivelGas">Cargando...</p>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> Nivel de Seguridad</h2>
+                    <p class="security-level-display">
+                        <span id="securityLevelText">Cargando...</span>
+                    </p>
+                    <div class="progress mt-3">
+                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <section>
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> Histórico de Niveles de Gas</h2>
+        <div class="card">
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="gasChart"></canvas>
+                </div>
+                <?php if (empty($labels) || empty($data)): ?>
+                    <p class="text-center text-muted mt-3">No hay datos suficientes para mostrar el gráfico.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title"><i class="fas fa-table"></i> Registros Detallados de Lecturas</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
+                        <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
+                        <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($lecturas)): ?>
+                        <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($lecturas as $lectura): ?>
+                            <tr>
+                                <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
+                                <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
+                                <td class="text-center">
+                                    <?php
+                                        $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
+                                        $estado = 'Desconocido';
+                                        $class = '';
+
+                                        if ($nivel >= 500) {
+                                            $estado = 'Peligro';
+                                            $class = 'bg-danger';
+                                        } elseif ($nivel >= 200) {
+                                            $estado = 'Precaución';
+                                            $class = 'bg-warning';
+                                        } elseif ($nivel >= 0) {
+                                            $estado = 'Seguro';
+                                            $class = 'bg-success';
+                                        }
+                                    ?>
+                                    <span class="badge <?= $class ?>"><?= $estado ?></span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Ensure $lecturas, $labels, and $data are correctly passed from PHP
-    // Use ?? [] to handle null/undefined cases if no data
-    const lecturas = <?= json_encode($lecturas ?? []) ?>;
-    const labels = <?= json_encode($labels ?? []) ?>; // Labels for the chart (dates in ascending order)
-    const data = <?= json_encode($data ?? []) ?>;     // Data for the chart (gas levels in ascending order)
+    const lecturas = <?= json_encode($lecturas ?? []) ?>; // For the table (expected DESC order)
+    const labels = <?= json_encode($labels ?? []) ?>;     // For the chart (expected ASC order)
+    const data = <?= json_encode($data ?? []) ?>;         // For the chart (expected ASC order)
 
-    // Find the last valid gas level value for the "Última Lectura" card
-    // Since Chart.js data (labels and data) are in ASC order (oldest to newest),
-    // the last element in 'data' will be the most recent.
+    // Get the last valid gas level for the "Nivel de Seguridad" card
+    // Chart data is ASC (oldest to newest), so the last element is the most recent.
     const ultimoValor = data.length > 0 ? (parseFloat(data[data.length - 1]) || 0) : null;
 
+    // Update the "Nivel de Seguridad" card and progress bar
     if (ultimoValor !== null) {
-        document.getElementById('nivelGas').textContent = `${ultimoValor} PPM`;
-        updateProgressBar(ultimoValor);
+        updateSecurityProgressBar(ultimoValor);
     } else {
-        document.getElementById('nivelGas').textContent = 'Sin datos';
-        document.getElementById('securityLevel').textContent = 'Sin datos';
+        document.getElementById('securityLevelText').textContent = 'Sin datos';
         const progressBar = document.getElementById('progressBar');
         progressBar.style.width = '0%';
         progressBar.className = 'progress-bar';
         progressBar.setAttribute('aria-valuenow', 0);
     }
 
-    function updateProgressBar(value) {
+    function updateSecurityProgressBar(value) {
         const progressBar = document.getElementById('progressBar');
-        const securityLevelSpan = document.getElementById('securityLevel');
+        const securityLevelText = document.getElementById('securityLevelText');
         let width = 0;
         let levelText = 'Sin datos';
         let barClass = '';
 
         const safeValue = Math.max(0, value); // Ensure value is not negative
 
-        if (safeValue >= 0 && safeValue < 200) {
-            // Scale: 0-199 PPM -> 0-33% of the bar
-            width = Math.min(100, (safeValue / 200) * 33);
+        if (safeValue < 200) {
+            width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
             levelText = 'Seguro';
             barClass = 'bg-success';
-        } else if (safeValue >= 200 && safeValue < 500) {
-            // Scale: 200-499 PPM -> 33%-66% of the bar (range of 300 PPM)
-            width = Math.min(100, 33 + ((safeValue - 200) / 300) * 33);
-            width = Math.min(100, width);
+        } else if (safeValue < 500) {
+            width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
             levelText = 'Precaución';
             barClass = 'bg-warning';
-        } else if (safeValue >= 500) {
-            // Scale: 500+ PPM -> 66%-100% of the bar
-            width = Math.min(100, 66 + ((safeValue - 500) / 500) * 34); // Example with divisor 500
-            width = Math.min(100, width);
+        } else { // 500 PPM and above
+            width = 66 + ((safeValue - 500) / 500) * 34; // Scale 500+ PPM to 66-100%
             levelText = 'Peligro';
             barClass = 'bg-danger';
-        } else {
-            width = 0;
-            levelText = 'Inválido';
-            barClass = '';
         }
+
+        width = Math.min(100, Math.max(0, width)); // Cap width between 0 and 100
 
         progressBar.style.width = `${width}%`;
         progressBar.className = `progress-bar ${barClass}`;
         progressBar.setAttribute('aria-valuenow', width);
-        securityLevelSpan.textContent = levelText;
+        securityLevelText.textContent = levelText;
     }
 
-    // Only try to create the chart if there is labels and data
+    // Chart.js configuration
     if (labels.length > 0 && data.length > 0) {
         const ctx = document.getElementById('gasChart').getContext('2d');
         const gasChart = new Chart(ctx, {
@@ -425,7 +411,9 @@ if (!function_exists('esc')) {
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderWidth: 2,
                     fill: true,
-                    tension: 0.3
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
                 }]
             },
             options: {
@@ -435,25 +423,26 @@ if (!function_exists('esc')) {
                     legend: {
                         position: 'top',
                         labels: {
-                            color: '#f7fafc'
+                            color: 'var(--text-darker)',
+                            font: {
+                                size: 14
+                            }
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const label = context.dataset.label || '';
-                                if (context.parsed.y !== null) {
-                                    return `${label}: ${context.parsed.y} PPM`;
-                                }
-                                return label;
+                                return `Nivel de Gas: ${context.parsed.y} PPM`;
                             },
                             title: function(context) {
-                                if (context && context[0] && context[0].label) {
-                                    return `Fecha: ${context[0].label}`;
-                                }
-                                return null;
+                                return `Fecha: ${context[0].label}`;
                             }
-                        }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleColor: 'var(--text-lighter)',
+                        bodyColor: 'var(--text-light)',
+                        borderColor: 'var(--primary-color)',
+                        borderWidth: 1
                     }
                 },
                 scales: {
@@ -461,51 +450,56 @@ if (!function_exists('esc')) {
                         title: {
                             display: true,
                             text: 'Fecha',
-                            color: '#e2e8f0'
+                            color: 'var(--text-lighter)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         },
                         ticks: {
-                            color: '#cbd5e0',
-                            display: false // Hide X-axis labels if there are too many
+                            color: 'var(--text-light)',
+                            maxRotation: 45,
+                            minRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10 // Limit number of labels to avoid overlap
                         },
                         grid: {
-                            display: false,
-                            color: '#4a5568'
+                            color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
+                            drawBorder: true
                         }
                     },
                     y: {
                         title: {
                             display: true,
                             text: 'Nivel de Gas (PPM)',
-                            color: '#e2e8f0'
+                            color: 'var(--text-lighter)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         },
                         beginAtZero: true,
                         ticks: {
-                            color: '#cbd5e0'
+                            color: 'var(--text-light)',
+                            callback: function(value) {
+                                return value + ' PPM';
+                            }
                         },
                         grid: {
-                            color: '#4a5568'
+                            color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
+                            drawBorder: true
                         }
                     }
                 }
             }
         });
-        console.log('Gráfico creado');
     } else {
-        // Display a message if there is not enough data for the chart
-        const chartContainer = document.querySelector('.chart-container');
-        if(chartContainer) {
-            chartContainer.innerHTML = '<p class="text-center text-muted">No hay datos suficientes para mostrar el gráfico.</p>';
-            chartContainer.style.height = '150px';
-            chartContainer.style.display = 'flex';
-            chartContainer.style.alignItems = 'center';
-            chartContainer.style.justifyContent = 'center';
+        // If no chart data, hide the canvas and display the message provided in HTML
+        const chartCanvas = document.getElementById('gasChart');
+        if (chartCanvas) {
+            chartCanvas.style.display = 'none';
         }
-        console.log('No hay datos para crear el gráfico');
     }
-
-    console.log('Lecturas (para tabla, DESC):', lecturas);
-    console.log('Labels (para gráfico, ASC):', labels);
-    console.log('Data (para gráfico, ASC):', data);
 </script>
 
 </body>
