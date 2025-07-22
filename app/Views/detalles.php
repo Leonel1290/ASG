@@ -3,271 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Válvula - ASG</title>
+    <title>Detalle del Dispositivo</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Enlace al archivo CSS externo (si lo tienes) -->
+    <!-- <link rel="stylesheet" href="<?= base_url('css/detalle_dispositivo.css'); ?>"> -->
 
+    <!-- Configuración PWA -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ASG">
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Nueva meta tag añadida aquí -->
 
+    <!-- Meta tags para CSRF token. CodeIgniter usa csrf_token() para el nombre y csrf_hash() para el valor. -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
-        :root {
-            --primary-color: #007bff;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --text-dark: #343a40;
-            --text-muted: #6c757d;
-            --bg-light: #f8f9fa;
-            --card-bg: #ffffff;
-            --shadow-light: rgba(0, 0, 0, 0.1);
-            --shadow-success: rgba(40, 167, 69, 0.3);
-            --shadow-danger: rgba(220, 53, 69, 0.3);
-        }
-
+        /* Estilos generales para el cuerpo de la página */
         body {
-            background-color: var(--bg-light);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark); /* Color de texto base */
-            line-height: 1.6; /* Mejorar legibilidad */
+            background-color: #f8f9fa; /* Fondo gris claro */
+            font-family: 'Inter', sans-serif; /* Fuente moderna */
         }
-
+        /* Contenedor principal de la página */
         .container.main-content {
-            margin-top: 4rem; /* Un poco más de margen superior */
-            padding-bottom: 3rem;
+            margin-top: 50px;
+            padding-bottom: 50px;
         }
-
+        /* Estilo para las tarjetas (cards) */
         .card {
-            border-radius: 1rem; /* Bordes más redondeados */
-            box-shadow: 0 0.5rem 1.5rem var(--shadow-light); /* Sombra más pronunciada pero suave */
-            background-color: var(--card-bg);
-            padding: 2.5rem; /* Padding uniforme */
-            border: none; /* Eliminar borde por defecto de Bootstrap */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición para efecto hover */
+            border-radius: 15px; /* Bordes redondeados */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            background-color: #ffffff;
+            padding: 30px; /* Más padding interno */
         }
-
-        .card:hover {
-            transform: translateY(-5px); /* Pequeña elevación al pasar el mouse */
-            box-shadow: 0 0.8rem 2rem var(--shadow-light); /* Sombra más intensa al pasar el mouse */
-        }
-
-        h1, h2 {
-            color: var(--text-dark);
-            font-weight: 700;
-            margin-bottom: 2rem;
+        /* Estilo para el título principal */
+        h2 {
+            color: #343a40; /* Color oscuro */
+            font-weight: 700; /* Negrita */
+            margin-bottom: 30px;
             text-align: center;
         }
-
+        /* Estilo para el título de la tarjeta (nombre del dispositivo) */
         .card-title {
-            color: var(--primary-color);
+            color: #007bff; /* Color primario de Bootstrap */
             font-size: 1.8rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem; /* Espacio entre el icono y el texto */
+            margin-bottom: 15px;
         }
-
+        /* Estilo para el subtítulo de la tarjeta (ubicación) */
         .card-subtitle {
-            color: var(--text-muted);
+            color: #6c757d; /* Gris para subtítulos */
             font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            margin-bottom: 20px;
         }
-
+        /* Estilo para el texto general de la tarjeta */
         .card-text {
-            font-size: 1.15rem; /* Ajuste ligeramente el tamaño de la fuente */
-            margin-bottom: 1.8rem; /* Más espacio antes de los botones */
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
         }
-
+        /* Estilo para el span que muestra el estado actual de la válvula */
         #estado-actual {
             font-weight: 700;
-            transition: color 0.3s ease; /* Suavizar el cambio de color */
         }
-
+        /* Clases para colorear el estado de la válvula */
         #estado-actual.abierta {
-            color: var(--success-color);
+            color: #28a745; /* Verde para "Abierta" */
         }
-
         #estado-actual.cerrada {
-            color: var(--danger-color);
+            color: #dc3545; /* Rojo para "Cerrada" */
         }
-
+        /* Grupo de botones */
         .btn-group {
-            display: flex;
-            gap: 1rem; /* Espacio entre botones */
-            justify-content: center;
-            margin-top: 2rem;
+            display: flex; /* Para que los botones estén uno al lado del otro */
+            gap: 15px; /* Espacio entre botones */
+            justify-content: center; /* Centrar los botones */
+            margin-top: 30px;
         }
-
+        /* Estilo general para los botones */
         .btn {
-            padding: 0.8rem 1.8rem; /* Ajustar padding */
-            border-radius: 0.75rem; /* Bordes más redondeados para botones */
-            font-size: 1.05rem; /* Ajustar tamaño de fuente */
+            padding: 12px 25px;
+            border-radius: 10px; /* Botones más redondeados */
+            font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem; /* Espacio entre el icono y el texto del botón */
+            transition: all 0.3s ease; /* Transición suave en hover */
         }
-
+        /* Estilo específico para el botón de éxito (verde) */
         .btn-success {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
+            background-color: #28a745;
+            border-color: #28a745;
         }
-
+        /* Efecto hover para el botón de éxito */
         .btn-success:hover {
             background-color: #218838;
             border-color: #1e7e34;
-            transform: translateY(-3px); /* Efecto de elevación más notorio */
-            box-shadow: 0 0.6rem 1.5rem var(--shadow-success);
+            transform: translateY(-2px); /* Efecto de elevación */
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); /* Sombra al pasar el mouse */
         }
-
+        /* Estilo específico para el botón de peligro (rojo) */
         .btn-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
+            background-color: #dc3545;
+            border-color: #dc3545;
         }
-
+        /* Efecto hover para el botón de peligro */
         .btn-danger:hover {
             background-color: #c82333;
             border-color: #bd2130;
-            transform: translateY(-3px);
-            box-shadow: 0 0.6rem 1.5rem var(--shadow-danger);
+            transform: translateY(-2px); /* Efecto de elevación */
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3); /* Sombra al pasar el mouse */
         }
-
+        /* Estilo para los mensajes de alerta */
         .alert {
-            border-radius: 0.75rem; /* Bordes más redondeados para alertas */
-            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1rem;
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem 1.25rem; /* Ajustar padding de alerta */
         }
-
-        /* Indicador visual de carga para botones */
-        .btn.loading {
-            position: relative;
-            pointer-events: none; /* Deshabilitar clics mientras carga */
-            opacity: 0.8;
-        }
-        .btn.loading::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 1.2em;
-            height: 1.2em;
-            margin-left: -0.6em;
-            margin-top: -0.6em;
-            border: 2px solid rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-        .btn.loading .btn-text, .btn.loading .fas {
-            visibility: hidden; /* Ocultar texto e icono mientras carga */
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Media Queries para responsividad */
+        /* Media Queries para responsividad en pantallas pequeñas (max-width: 768px) */
         @media (max-width: 768px) {
-            .container.main-content {
-                margin-top: 2rem;
-            }
             .card {
-                padding: 1.5rem;
+                padding: 20px;
             }
             .card-title {
-                font-size: 1.6rem;
+                font-size: 1.5rem;
             }
             .card-subtitle {
                 font-size: 1rem;
             }
             .card-text {
-                font-size: 1.05rem;
+                font-size: 1.1rem;
             }
             .btn-group {
-                flex-direction: column;
-                gap: 0.75rem;
+                flex-direction: column; /* Botones apilados */
+                gap: 10px;
             }
             .btn {
-                width: 100%;
-                font-size: 1rem;
-                padding: 0.7rem 1.5rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .card {
-                padding: 1rem;
-            }
-            .card-title {
-                font-size: 1.4rem;
-            }
-            h1, h2 {
-                font-size: 1.8rem;
-                margin-bottom: 1.5rem;
+                width: 100%; /* Botones de ancho completo */
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container main-content">
+<div class="container main-content mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <h1>Control Inteligente de Válvulas</h1>
+            <h2>Control de Válvula</h2>
             <div class="card">
                 <div class="card-body">
                     <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger" role="alert" aria-live="assertive">
+                        <div class="alert alert-danger" role="alert">
                             <i class="fas fa-exclamation-triangle me-2"></i><?= esc($error_message) ?>
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
-                        <h2 class="card-title" id="nombre-dispositivo">
-                            <i class="fas fa-microchip me-2"></i>Dispositivo: <span class="fw-bold"><?= esc($dispositivo->nombre) ?></span>
-                        </h2>
-                        <h3 class="card-subtitle" id="ubicacion-dispositivo">
-                            <i class="fas fa-map-marker-alt me-2"></i>Ubicación: <span class="fw-normal"><?= esc($dispositivo->ubicacion) ?></span>
-                        </h3>
+                        <h5 class="card-title" id="nombre-dispositivo">
+                            <i class="fas fa-microchip me-2"></i>Dispositivo: <?= esc($dispositivo->nombre) ?>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">
+                            <i class="fas fa-map-marker-alt me-2"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
+                        </h6>
                         <p class="card-text">
-                            <i class="fas fa-lightbulb me-2"></i>Estado actual de la válvula: 
-                            <span id="estado-actual" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>" aria-live="polite">
+                            <i class="fas fa-lightbulb me-2"></i>Estado actual: 
+                            <span id="estado-actual" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>">
                                 <?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?>
                             </span>
                         </p>
                         
-                        <div class="btn-group" role="group" aria-label="Controles de la válvula">
-                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir Válvula">
-                                <i class="fas fa-solid fa-valve me-2"></i><span class="btn-text">Abrir Válvula</span>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" id="btn-abrir">
+                                <i class="fas fa-solid fa-valve me-2"></i>Abrir Válvula
                             </button>
-                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar Válvula">
-                                <i class="fas fa-solid fa-valve me-2"></i><span class="btn-text">Cerrar Válvula</span>
+                            <button type="button" class="btn btn-danger" id="btn-cerrar">
+                                <i class="fas fa-solid fa-valve me-2"></i>Cerrar Válvula
                             </button>
                         </div>
-                        <div id="status-message" class="mt-3 text-center" role="status" aria-live="polite"></div>
                     <?php else: ?>
-                        <div class="alert alert-info" role="alert" aria-live="assertive">
+                        <div class="alert alert-info" role="alert">
                             <i class="fas fa-info-circle me-2"></i>No se pudo cargar la información del dispositivo. Por favor, asegúrese de que la URL sea correcta o seleccione un dispositivo de su lista.
                         </div>
                     <?php endif; ?>
@@ -277,134 +192,91 @@
     </div>
 </div>
 
+<!-- Incluir jQuery antes de tu script personalizado -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+// Solo ejecutar el script si el dispositivo está definido, de lo contrario, no hay MAC para usar
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
+    // Escapar la MAC para seguridad en JS
     const mac = '<?= esc($dispositivo->MAC) ?>'; 
     const estadoActualSpan = $('#estado-actual');
-    const statusMessageDiv = $('#status-message');
-    const btnAbrir = $('#btn-abrir');
-    const btnCerrar = $('#btn-cerrar');
 
     // Obtener el nombre y valor del token CSRF
-    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>'; 
-    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>'; 
+    // CodeIgniter 4 usa un campo oculto por defecto con el nombre del token y el hash como valor
+    // Si usas meta tags, asegúrate de que CodeIgniter los esté generando en tu layout o vista principal.
+    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>'; // Fallback a función PHP
+    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>'; // Fallback a función PHP
 
-    function showStatusMessage(message, type = 'info') {
-        statusMessageDiv.html(`<div class="alert alert-${type}">${message}</div>`);
-        // Limpiar el mensaje después de 5 segundos
-        setTimeout(() => statusMessageDiv.empty(), 5000);
-    }
-
-    function toggleButtons(enable) {
-        btnAbrir.prop('disabled', !enable).toggleClass('loading', !enable);
-        btnCerrar.prop('disabled', !enable).toggleClass('loading', !enable);
-    }
 
     // Función para actualizar el estado mostrado en la UI
     function actualizarEstadoUI(estado) {
         estadoActualSpan.text(estado ? 'Abierta' : 'Cerrada');
-        estadoActualSpan.removeClass('abierta cerrada').addClass(estado ? 'abierta' : 'cerrada');
+        if (estado) {
+            estadoActualSpan.removeClass('cerrada').addClass('abierta');
+        } else {
+            estadoActualSpan.removeClass('abierta').addClass('cerrada');
+        }
     }
     
     // Obtener estado inicial del dispositivo al cargar la página
-    function getInitialState() {
-        $.ajax({
-            url: '/servo/obtenerEstado/' + mac,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (response.error) {
-                    console.error('Error al obtener estado inicial:', response.error);
-                    showStatusMessage(`Error al cargar el estado inicial: ${response.error}`, 'danger');
-                } else {
-                    actualizarEstadoUI(response.estado_valvula);
-                    showStatusMessage('Estado del dispositivo actualizado.');
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error de red o servidor al obtener estado inicial:', textStatus, errorThrown);
-                showStatusMessage('No se pudo conectar con el servidor para obtener el estado.', 'danger');
-            }
-        });
-    }
-
-    getInitialState(); // Llamar al cargar la página
-
-    // Event listener para el botón "Abrir Válvula"
-    btnAbrir.click(function() {
-        if (!$(this).hasClass('loading')) {
-            controlarServo(mac, 1); // 1 para abrir
+    $.get('/servo/obtenerEstado/' + mac, function(response) {
+        if (response.error) {
+            console.error('Error al obtener estado inicial:', response.error);
+        } else {
+            actualizarEstadoUI(response.estado_valvula);
         }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error('Error de red o servidor al obtener estado inicial:', textStatus, errorThrown);
+    });
+    
+    // Event listener para el botón "Abrir Válvula"
+    $('#btn-abrir').click(function() {
+        controlarServo(mac, 1); // 1 para abrir
     });
     
     // Event listener para el botón "Cerrar Válvula"
-    btnCerrar.click(function() {
-        if (!$(this).hasClass('loading')) {
-            controlarServo(mac, 0); // 0 para cerrar
-        }
+    $('#btn-cerrar').click(function() {
+        controlarServo(mac, 0); // 0 para cerrar
     });
     
     // Función para enviar la petición al controlador para controlar el servo
     function controlarServo(mac, estado) {
-        toggleButtons(false); // Deshabilitar botones y mostrar carga
-        showStatusMessage(`Enviando comando para ${estado ? 'abrir' : 'cerrar'} la válvula...`, 'info');
-
+        // Datos a enviar, incluyendo el token CSRF
         const postData = {
             mac: mac,
             estado: estado
         };
-        
+        // Añadir el token CSRF dinámicamente si los valores son válidos
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         } else {
             console.warn('CSRF token o hash no encontrados. La petición POST podría fallar.');
         }
 
-        $.ajax({
-            url: '/servo/actualizarEstado',
-            method: 'POST',
-            data: postData,
-            dataType: 'json',
-            success: function(response) {
-                if (response.error) {
-                    console.error('Error al controlar servo:', response.error);
-                    showStatusMessage(`Error: ${response.error}`, 'danger');
-                } else {
-                    actualizarEstadoUI(response.estado);
-                    showStatusMessage(`Válvula ${response.estado ? 'abierta' : 'cerrada'} exitosamente.`, 'success');
-                    // Si el servidor devuelve un nuevo token CSRF, actualízalo para la siguiente petición
-                    if (response.csrf_new_hash) {
-                         $('meta[name="csrf-token"]').attr('content', response.csrf_new_hash);
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
-                showStatusMessage('No se pudo conectar con el servidor para enviar el comando.', 'danger');
-            },
-            complete: function() {
-                toggleButtons(true); // Habilitar botones de nuevo
+
+        $.post('/servo/actualizarEstado', postData, function(response) {
+            if (response.error) {
+                console.error('Error al controlar servo:', response.error);
+            } else {
+                actualizarEstadoUI(response.estado);
+                // Si la actualización es exitosa, se puede recargar el token para la siguiente petición
+                // (Esto es importante si tu CSRF token cambia por cada petición)
+                // csrfHash = response.csrf_new_hash; // Si tu servidor devuelve un nuevo token en la respuesta
             }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
         });
     }
     
     // Actualizar el estado del dispositivo periódicamente
     setInterval(function() {
-        $.ajax({
-            url: '/servo/obtenerEstado/' + mac,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (!response.error) {
-                    actualizarEstadoUI(response.estado_valvula);
-                    // Opcional: showStatusMessage('Estado actualizado automáticamente.', 'secondary');
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error en actualización periódica:', textStatus, errorThrown);
+        $.get('/servo/obtenerEstado/' + mac, function(response) {
+            if (!response.error) {
+                actualizarEstadoUI(response.estado_valvula);
             }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Error en actualización periódica:', textStatus, errorThrown);
         });
     }, 5000); // Actualizar cada 5 segundos
 });
