@@ -1,3 +1,6 @@
+<?php
+$nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? htmlspecialchars($lecturas[0]['nivel_gas'], ENT_QUOTES, 'UTF-8') . ' PPM' : 'Sin datos';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
