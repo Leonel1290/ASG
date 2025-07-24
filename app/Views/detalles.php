@@ -271,93 +271,35 @@ if (!function_exists('esc')) {
             </div>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body text-center">
-                <h5 class="card-title text-center mb-3">Nivel de Gas Actual</h5>
-                <div class="gauge-container d-flex justify-content-center align-items-center" style="height: 250px;">
-                    <canvas id="gasGauge" data-type="radial-gauge"
-                            data-width="250" data-height="250"
-                            data-units="PPM"
-                            data-min-value="0"
-                            data-max-value="1000"
-                            data-major-ticks="0,100,200,300,400,500,600,700,800,900,1000"
-                            data-minor-ticks="5"
-                            data-stroke-ticks="true"
-                            data-highlights='[
-                                {"from": 0, "to": 199, "color": "rgba(0,128,0,0.5)"},      {"from": 200, "to": 499, "color": "rgba(255,165,0,0.5)"}, {"from": 500, "to": 1000, "color": "rgba(255,0,0,0.5)"}   ]'
-                            data-color-plate="transparent"
-                            data-border-inner-width="0"
-                            data-border-outer-width="0"
-                            data-value="<?= $nivelGasActualDisplay !== 'Sin datos' ? floatval(str_replace(' PPM', '', $nivelGasActualDisplay)) : 0; ?>"
-                            data-animation-rule="linear"
-                            data-animation-duration="500"
-                            data-title="Gas"
-                            data-value-box="true"
-                            data-font-value="bold 20px Arial"
-                            data-color-value-box="var(--bg-card)"
-                            data-color-value-box-rect="var(--bg-card)"
-                            data-color-value-box-border="transparent"
-                            data-animated-value="true"
-                            data-animation-target="value"
-                            data-color-major-ticks="var(--text-light)"
-                            data-color-minor-ticks="var(--text-light)"
-                            data-color-title="var(--text-lighter)"
-                            data-color-units="var(--text-light)"
-                            data-color-numbers="var(--text-light)"
-                            data-color-needle-shadow-down="transparent"
-                            data-color-needle-start="rgba(255, 100, 100, 1)"
-                            data-color-needle-end="rgba(255, 0, 0, 1)"
-                            data-color-needle-circle-inner="var(--text-light)"
-                            data-color-needle-circle-outer="var(--bg-card)"
-                            data-color-needle-circle-border="var(--text-light)"
-                            data-needle-start="20"
-                            data-needle-end="80"
-                            data-needle-type="line"
-                            data-needle-width="3"
-                            data-value-box-border-radius="5"
-                            data-value-box-stroke="0"
-                            data-value-box-shadow="false"
-                            data-font-units="bold 16px Arial"
-                            data-font-title="bold 24px Arial"
-                            data-font-tick-labels="14px Arial"
-                            data-font-major-ticks="14px Arial"
-                            data-font-minor-ticks="10px Arial"
-                            data-border-shadow-width="0"
-                            data-borders="false"
-                            data-shadow-items="0"
-                            data-shadow-inner="false"
-                            data-shadow-outer="false"
-                            data-shadow-from-level="false"
-                            data-glow="false"
-                            data-animation-delay="0"
-                            data-animation-rule="linear"
-                            data-animation-target="value"
-                    ></canvas>
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h2 class="card-title"><i class="fas fa-gas-pump"></i> Nivel de Gas Actual</h2>
+                        <!-- Gauge velocímetro -->
+                        <div style="width: 300px; height: 300px; margin: 0 auto;">
+                            <canvas id="gaugeChart"></canvas>
+                        </div>
+                        <p class="current-gas-value mt-3" id="currentGasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
+                    </div>
                 </div>
-                <?php if ($nivelGasActualDisplay === 'Sin datos'): ?>
-                    <p class="text-danger mt-3">No hay datos de nivel de gas recientes para mostrar.</p>
-                <?php endif; ?>
             </div>
-        </div>
-
-
-        <?php if ($message): ?>
-            <div class="alert alert-info shadow-sm mb-4" role="alert">
-                <?= esc($message) ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                Histórico de Nivel de Gas
-                <button type="button" class="btn btn-primary btn-sm" id="btnMostrarCalendario">
-                    <i class="fas fa-calendar-alt"></i> Filtrar por Fecha
-                </button>
-            </div>
-            <div class="card-body">
-                <canvas id="gasChart"></canvas>
-                <div id="noChartDataMessage" class="no-data-message" style="display: none;">
-                    No hay datos de gas para el rango de fechas seleccionado.
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        Histórico de Nivel de Gas
+                        <button type="button" class="btn btn-primary btn-sm" id="btnMostrarCalendario">
+                            <i class="fas fa-calendar-alt"></i> Filtrar por Fecha
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="max-width: 400px; height: 400px;">
+                            <canvas id="gasChart" width="400" height="400"></canvas>
+                        </div>
+                        <div id="noChartDataMessage" class="no-data-message" style="display: none;">
+                            No hay datos de gas para el rango de fechas seleccionado.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -463,6 +405,8 @@ if (!function_exists('esc')) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-gauge@0.4.2/dist/chartjs-gauge.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-gauges@2.1.7/gauge.min.js"></script>
@@ -519,54 +463,142 @@ if (!function_exists('esc')) {
         const data = <?= json_encode($data) ?>;
         const message = <?= json_encode($message) ?>;
 
-        if (data.length > 0 && !message) {
-            const ctx = document.getElementById('gasChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
+        // --- Gauge velocímetro para el valor actual ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const ultimoValor = data.length > 0 ? (parseFloat(data[data.length - 1]) || 0) : 0;
+            const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+            const gaugeChart = new Chart(gaugeCtx, {
+                type: 'gauge',
                 data: {
-                    labels: labels,
                     datasets: [{
-                        label: 'Nivel de Gas (PPM)',
-                        data: data,
-                        borderColor: 'var(--primary-color)',
-                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                        tension: 0.3,
-                        fill: true,
-                        pointRadius: 3,
-                        pointBackgroundColor: 'var(--primary-color)',
-                        pointBorderColor: 'var(--text-light)',
-                        pointHoverRadius: 5,
-                        pointHoverBackgroundColor: 'var(--text-light)',
-                        pointHoverBorderColor: 'var(--primary-color)'
+                        value: ultimoValor,
+                        minValue: 0,
+                        data: [200, 300, 500], // Rangos: seguro, precaución, peligro
+                        backgroundColor: [
+                            'rgba(72, 187, 120, 0.8)', // Seguro
+                            'rgba(246, 224, 94, 0.8)', // Precaución
+                            'rgba(229, 62, 62, 0.8)'   // Peligro
+                        ],
+                        borderWidth: 2
                     }]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false,
+                    title: {
+                        display: false
+                    },
+                    layout: {
+                        padding: 20
+                    },
+                    needle: {
+                        radiusPercentage: 2,
+                        widthPercentage: 3.2,
+                        lengthPercentage: 80,
+                        color: 'rgba(45,55,72,1)'
+                    },
+                    valueLabel: {
+                        display: true,
+                        formatter: (value) => value + ' PPM',
+                        color: '#fff',
+                        font: {
+                            size: 24,
+                            weight: 'bold'
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+            // Actualizar el valor del gauge si cambia el valor actual
+            // (puedes agregar lógica para actualizar en tiempo real si tienes WebSocket o AJAX)
+        });
+
+        // --- Gráfico de líneas cuadrado con zoom/drag ---
+        if (labels.length > 0 && data.length > 0) {
+            const ctx = document.getElementById('gasChart').getContext('2d');
+            const gasChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels, // Ya en orden ascendente
+                    datasets: [{
+                        label: 'Nivel de Gas (PPM)',
+                        data: data,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: false,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
+                            position: 'top',
                             labels: {
-                                color: 'var(--text-lighter)'
+                                color: 'var(--text-darker)',
+                                font: {
+                                    size: 14
+                                }
                             }
                         },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.raw + ' PPM';
+                                    return `Nivel de Gas: ${context.parsed.y} PPM`;
+                                },
+                                title: function(context) {
+                                    return `Fecha: ${context[0].label}`;
                                 }
+                            },
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleColor: 'var(--text-lighter)',
+                            bodyColor: 'var(--text-light)',
+                            borderColor: 'var(--primary-color)',
+                            borderWidth: 1
+                        },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                modifierKey: 'ctrl', // Arrastrar con Ctrl
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'x',
                             }
                         }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
-                                drawBorder: true
+                            title: {
+                                display: true,
+                                text: 'Fecha',
+                                color: 'var(--text-lighter)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
                             },
                             ticks: {
                                 color: 'var(--text-light)',
                                 maxRotation: 45,
-                                minRotation: 45
+                                minRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: {
+                                color: 'rgba(74, 85, 104, 0.3)',
+                                drawBorder: true
                             }
                         },
                         y: {
@@ -587,7 +619,7 @@ if (!function_exists('esc')) {
                                 }
                             },
                             grid: {
-                                color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
+                                color: 'rgba(74, 85, 104, 0.3)',
                                 drawBorder: true
                             }
                         }
@@ -595,14 +627,10 @@ if (!function_exists('esc')) {
                 }
             });
         } else {
-            // If no chart data, hide the canvas and display the message provided in HTML
+            // Si no hay datos, ocultar el canvas y mostrar el mensaje
             const chartCanvas = document.getElementById('gasChart');
-            const noDataMessage = document.getElementById('noChartDataMessage');
             if (chartCanvas) {
                 chartCanvas.style.display = 'none';
-            }
-            if (noDataMessage) {
-                noDataMessage.style.display = 'block'; // Show "No hay datos" message
             }
         }
 
