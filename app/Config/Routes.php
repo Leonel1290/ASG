@@ -102,7 +102,7 @@ $routes->group('perfil', function($routes) {
 
 // Receive data from ESP32:
 // POST /lecturas_gas/guardar
-$routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
+$routes->get('/lecturas_gas/guardar', 'LecturasController::guardar');
 
 // View to link devices (form to enter MAC)
 // GET /enlace
