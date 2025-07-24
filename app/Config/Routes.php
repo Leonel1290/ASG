@@ -42,31 +42,31 @@ $routes->post('/reset-password', 'Home::processResetPassword'); // Route to proc
 // --- USER PROFILE AND DEVICE MANAGEMENT ROUTES ---
 
 // Route to display the user profile (main dashboard after login)
-$routes->get('/perfil', 'PerfilController::index', ['filter' => 'auth']); // Apply auth filter if needed
+$routes->get('/perfil', 'PerfilController::index'); // Apply auth filter if needed
 
 // Route to handle device linking (POST request)
-$routes->post('/enlace/store', 'EnlaceController::store', ['filter' => 'auth']); // Apply auth filter
+$routes->post('/enlace/store', 'EnlaceController::store'); // Apply auth filter
 
 // Route to display the device linking form (GET request)
-$routes->get('/enlace', 'EnlaceController::index', ['filter' => 'auth']); // Apply auth filter
+$routes->get('/enlace', 'EnlaceController::index'); // Apply auth filter
 
 // Routes for editing and deleting devices from the profile
-$routes->get('/perfil/dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1', ['filter' => 'auth']);
-$routes->post('/perfil/dispositivo/actualizar/(:any)', 'PerfilController::actualizarDispositivo/$1', ['filter' => 'auth']);
-$routes->post('/perfil/eliminar-dispositivos', 'PerfilController::eliminarDispositivos', ['filter' => 'auth']);
+$routes->get('/perfil/dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
+$routes->post('/perfil/dispositivo/actualizar/(:any)', 'PerfilController::actualizarDispositivo/$1');
+$routes->post('/perfil/eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
 // Route for changing language
-$routes->post('/cambiar-idioma', 'PerfilController::cambiarIdioma', ['filter' => 'auth']);
+$routes->post('/cambiar-idioma', 'PerfilController::cambiarIdioma');
 
 
 // --- DEVICE DETAIL AND GAS RECORD ROUTES ---
 
 // Route for displaying device details with MAC (and optional date filters)
 // THIS IS THE MAIN ROUTE FOR THE 'detalles' VIEW
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1', ['filter' => 'auth']);
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 
 // NEW: Route to get the latest gas level for a MAC as JSON
-$routes->get('detalles/latest-gas/(:any)', 'DetalleController::getLatestGasLevel/$1', ['filter' => 'auth']);
+$routes->get('detalles/latest-gas/(:any)', 'DetalleController::getLatestGasLevel/$1');
 
 
 // --- DIRECT VIEW ROUTES ---
