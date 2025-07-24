@@ -288,8 +288,8 @@ if (!function_exists('esc')) {
                 <div class="card shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         Histórico de Nivel de Gas
-                        <button type="button" class="btn btn-primary btn-sm" id="btnMostrarCalendario">
-                            <i class="fas fa-calendar-alt"></i> Filtrar por Fecha
+                        <button class="btn btn-primary mb-3" id="btnMostrarCalendario" type="button">
+                            <i class="fas fa-calendar-alt me-2"></i> Filtrar por Fecha
                         </button>
                     </div>
                     <div class="card-body">
@@ -318,29 +318,28 @@ if (!function_exists('esc')) {
     </div>
 
     <div class="modal fade" id="modalCalendario" tabindex="-1" aria-labelledby="modalCalendarioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalCalendarioLabel">Seleccionar Rango de Fechas</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="/detalles/<?= esc($mac) ?>" method="GET">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="dateRangePicker" class="form-label">Rango de Fechas:</label>
-                            <input type="text" id="dateRangePicker" name="dateRange" class="form-control" readonly>
-                            <input type="hidden" id="fechaInicio" name="fechaInicio">
-                            <input type="hidden" id="fechaFin" name="fechaFin">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCalendarioLabel"><i class="fas fa-calendar-alt me-2"></i> Seleccionar periodo</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formRangoFechas" method="get">
+          <div class="mb-3">
+            <label for="fechaInicio" class="form-label">Fecha inicio</label>
+            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required value="<?= esc($_GET['fechaInicio'] ?? '') ?>">
+          </div>
+          <div class="mb-3">
+            <label for="fechaFin" class="form-label">Fecha fin</label>
+            <input type="date" class="form-control" id="fechaFin" name="fechaFin" required value="<?= esc($_GET['fechaFin'] ?? '') ?>">
+          </div>
+          <button type="submit" class="btn btn-success w-100">Filtrar</button>
+        </form>
+      </div>
     </div>
+  </div>
+</div>
 
     <div class="modal fade" id="modalLecturas" tabindex="-1" aria-labelledby="modalLecturasLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -641,6 +640,7 @@ if (!function_exists('esc')) {
             btnMostrarCalendario.addEventListener('click', function() {
                 modalCalendario.show();
             });
+        });
 
             // Código para el nuevo modal de lecturas
             const btnVerRegistros = document.getElementById('btnVerRegistros');
