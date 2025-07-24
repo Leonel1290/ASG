@@ -272,11 +272,11 @@ if (!function_exists('esc')) {
                     <form id="filtroFechaForm" method="GET" action="<?= base_url('detalles/' . esc($mac)) ?>">
                         <div class="mb-3">
                             <label for="fechaInicio" class="form-label">Fecha de Inicio:</label>
-                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="<?= esc($this->request->getGet('fechaInicio') ?? date('Y-m-01')) ?>">
+                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="<?= esc($request->getGet('fechaInicio') ?? date('Y-m-01')) ?>">
                         </div>
                         <div class="mb-3">
                             <label for="fechaFin" class="form-label">Fecha de Fin:</label>
-                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="<?= esc($this->request->getGet('fechaFin') ?? date('Y-m-d')) ?>">
+                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="<?= esc($request->getGet('fechaFin') ?? date('Y-m-d')) ?>">
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filtrar</button>
                     </form>

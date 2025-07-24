@@ -36,16 +36,25 @@ class DetalleController extends BaseController
         $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
         $ubicacionDispositivo = $dispositivo['ubicacion'] ?? 'Desconocida';
 
-        // Si no hay rango de fechas, no mostrar registros
+        // Inicializar $lecturas, $labels, $data y $message para evitar errores
+        $lecturas = [];
+        $labels = [];
+        $data = [];
+        $message = null;
+
+        // Si no hay rango de fechas, no mostrar registros y mostrar un mensaje
         if (empty($fechaInicio) || empty($fechaFin)) {
+            $message = 'Por favor, selecciona un rango de fechas para ver los registros.';
+            // Retornar la vista con los datos básicos y el mensaje
             return view('detalles', [
                 'mac' => $mac,
                 'nombreDispositivo' => $nombreDispositivo,
                 'ubicacionDispositivo' => $ubicacionDispositivo,
-                'lecturas' => [],
-                'labels' => [],
-                'data' => [],
-                'message' => 'Seleccione un rango de fechas para ver los registros.'
+                'lecturas' => [], // Vacío
+                'labels' => [],   // Vacío
+                'data' => [],     // Vacío
+                'message' => $message,
+                'request' => $this->request // ¡Importante: Pasar el objeto request!
             ]);
         }
 
@@ -53,26 +62,27 @@ class DetalleController extends BaseController
         $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
 
         if (empty($lecturas)) {
+            $message = 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.';
+            // Retornar la vista con los datos básicos y el mensaje
             return view('detalles', [
                 'mac' => $mac,
                 'nombreDispositivo' => $nombreDispositivo,
                 'ubicacionDispositivo' => $ubicacionDispositivo,
-                'lecturas' => [],
-                'labels' => [],
-                'data' => [],
-                'message' => 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.'
+                'lecturas' => [], // Vacío
+                'labels' => [],   // Vacío
+                'data' => [],     // Vacío
+                'message' => $message,
+                'request' => $this->request // ¡Importante: Pasar el objeto request!
             ]);
         }
 
         // Ordenar para el gráfico (más antiguo primero)
-        $lecturasAsc = $lecturas;
+        $lecturasAsc = $lecturas; // Haz una copia si $lecturas se usa en otro lugar y necesitas que mantenga su orden original
         usort($lecturasAsc, function ($a, $b) {
             return strtotime($a['fecha']) - strtotime($b['fecha']);
         });
 
         // Preparar datos para el gráfico
-        $labels = [];
-        $data = [];
         foreach ($lecturasAsc as $lectura) {
             $labels[] = $lectura['fecha'];
             $data[] = $lectura['nivel_gas'];
@@ -82,11 +92,11 @@ class DetalleController extends BaseController
             'mac' => $mac,
             'nombreDispositivo' => $nombreDispositivo,
             'ubicacionDispositivo' => $ubicacionDispositivo,
-            'lecturas' => $lecturas, // Ya están en DESC para la tabla
+            'lecturas' => $lecturas, // Las lecturas se envían en el orden original (DESC) para la tabla
             'labels' => $labels,
             'data' => $data,
-            'message' => null
+            'message' => $message, // El mensaje puede ser null si hay datos
+            'request' => $this->request // ¡Importante: Pasar el objeto request!
         ]);
     }
-
 }
