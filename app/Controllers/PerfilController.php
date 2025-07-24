@@ -67,7 +67,7 @@ class PerfilController extends BaseController
 
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
         // CAMBIO: Se ha corregido el nombre del método de LecturasGasModel
-        $allLecturas = $this->lecturasGasModel->getLatestLecturasPorUsuario($usuarioId);
+        $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
         // Procesar las lecturas para agruparlas por MAC
         $lecturasPorMac = [];
