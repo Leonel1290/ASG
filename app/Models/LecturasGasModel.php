@@ -18,61 +18,85 @@ class LecturasGasModel extends Model
      * @return array Array de lecturas.
      */
     public function getLecturasPorMac(string $mac, ?string $fechaInicio = null, ?string $fechaFin = null): array
-{
-    $builder = $this->db->table($this->table)
-        ->where('MAC', $mac);
-
-    if ($fechaInicio) {
-        $builder->where('fecha >=', $fechaInicio . ' 00:00:00');
-    }
-    if ($fechaFin) {
-        $builder->where('fecha <=', $fechaFin . ' 23:59:59');
-    }
-
-    return $builder
-        ->orderBy('fecha', 'DESC')
-        ->get()
-        ->getResultArray();
-}
-
-    /**
-     * Recupera las lecturas de gas asociadas a un usuario específico.
-     * Realiza un join con las tablas 'dispositivos' y 'enlace'.
-     *
-     * @param int $id_usuario El ID del usuario.
-     * @return array Array de lecturas con detalles del dispositivo.
-     */
-    public function getLecturasPorUsuario(int $id_usuario): array
     {
-        return $this->db->table($this->table)
-            ->select('lecturas_gas.*, dispositivos.MAC, dispositivos.nombre as dispositivo_nombre, dispositivos.ubicacion as dispositivo_ubicacion')
-            ->join('dispositivos', 'lecturas_gas.MAC = dispositivos.MAC', 'left')
-            ->join('enlace', 'dispositivos.MAC = enlace.MAC', 'inner')
-            ->where('enlace.id_usuario', $id_usuario)
-            ->where('lecturas_gas.MAC IS NOT NULL')
-            ->orderBy('lecturas_gas.fecha', 'DESC')
+        $builder = $this->db->table($this->table)
+            ->where('MAC', $mac);
+
+        if ($fechaInicio) {
+            $builder->where('fecha >=', $fechaInicio . ' 00:00:00');
+        }
+        if ($fechaFin) {
+            $builder->where('fecha <=', $fechaFin . ' 23:59:59');
+        }
+
+        $results = $builder
+            ->orderBy('fecha', 'DESC')
             ->get()
             ->getResultArray();
+
+        // **NUEVO CÓDIGO:** Añade el 'estado' a cada resultado
+        foreach ($results as &$row) { // Usar '&' para modificar el array directamente
+            $row['estado'] = $this->determinarEstado((float)$row['nivel_gas']);
+        }
+        unset($row); // Romper la referencia del último elemento
+
+        return $results;
     }
 
     /**
-     * Migra datos de 'lecturas_gas' a la nueva tabla 'registros_gas'.
-     * Este método solo es necesario si estás realizando una migración única.
-     * Después de la migración, se puede eliminar o comentar.
+     * Recupera las lecturas de gas más recientes para todos los dispositivos de un usuario.
      *
-     * @return int Número de registros migrados.
+     * @param int $userId ID del usuario.
+     * @return array Array asociativo [mac => ultima_lectura].
+     */
+    public function getLatestLecturasPorUsuario(int $userId): array
+    {
+        // Obtener todas las MACs asociadas a este usuario
+        $dispositivoModel = new DispositivoModel();
+        $dispositivos = $dispositivoModel->getDispositivosPorUsuario($userId);
+
+        $latestLecturas = [];
+        foreach ($dispositivos as $dispositivo) {
+            $mac = $dispositivo['MAC'];
+            $lectura = $this->db->table($this->table)
+                                ->where('MAC', $mac)
+                                ->orderBy('fecha', 'DESC')
+                                ->limit(1)
+                                ->get()
+                                ->getRowArray();
+
+            if ($lectura) {
+                // Agregar el estado a la última lectura obtenida
+                $lectura['estado'] = $this->determinarEstado((float)$lectura['nivel_gas']);
+                $latestLecturas[$mac] = $lectura;
+            } else {
+                $latestLecturas[$mac] = [
+                    'MAC' => $mac,
+                    'nivel_gas' => 'N/A',
+                    'fecha' => 'Sin datos',
+                    'estado' => 'sin_datos' // O un estado por defecto si no hay datos
+                ];
+            }
+        }
+        return $latestLecturas;
+    }
+
+
+    /**
+     * Migra datos de la tabla 'lecturas_gas' a la nueva tabla 'registros_gas'.
+     *
+     * @return int Cantidad de registros migrados.
      */
     public function migrarARegistrosGas(): int
     {
-        $db = \Config\Database::connect();
-        $builder = $db->table('registros_gas'); // Asegúrate de que esta tabla exista y tenga los campos adecuados
-
-        // Obtener todas las lecturas de la tabla original
-        $lecturas = $this->findAll();
+        $lecturasAntiguas = $this->findAll(); // Recuperar todos los registros de la tabla antigua
         $migrados = 0;
 
-        foreach ($lecturas as $lectura) {
-            // Verificar si ya existe en registros_gas para evitar duplicados
+        $db      = \Config\Database::connect();
+        $builder = $db->table('registros_gas'); // La nueva tabla
+
+        foreach ($lecturasAntiguas as $lectura) {
+            // Verificar si el registro ya existe para evitar duplicados
             $existe = $builder->where('dispositivo_id', $lectura['MAC'])
                               ->where('fecha', $lectura['fecha'])
                               ->countAllResults();
