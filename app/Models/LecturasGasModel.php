@@ -16,6 +16,8 @@ class LecturasGasModel extends Model
      * Ordena las lecturas de la más reciente a la más antigua (DESC).
      *
      * @param string $mac La dirección MAC del dispositivo.
+     * @param string|null $fechaInicio Fecha de inicio para el filtro (YYYY-MM-DD).
+     * @param string|null $fechaFin Fecha de fin para el filtro (YYYY-MM-DD).
      * @return array Array de lecturas.
      */
     public function getLecturasPorMac(string $mac, ?string $fechaInicio = null, ?string $fechaFin = null): array
@@ -31,13 +33,8 @@ class LecturasGasModel extends Model
         }
 
         // --- INICIO DE LOGGING PARA DEBUGGING ---
-        // Para obtener la consulta compilada, necesitas usar getCompiledSelect() antes de get()
-        // Nota: Una vez que llamas a getCompiledSelect(), el builder se resetea para el get() subsiguiente.
-        // Por eso, para debugging, es útil separarlo o reconstruir el builder.
-        // Para simplificar, te doy una forma de obtener la consulta.
-        $tempBuilder = clone $builder; // Clonamos el builder para que no afecte la consulta original
-        $query = $tempBuilder->orderBy('fecha', 'DESC')->getCompiledSelect();
-        log_message('debug', "LecturasGasModel: Consulta SQL para getLecturasPorMac: " . $query);
+        // Para obtener la consulta compilada, necesitas usar getCompiledSelect()
+        // log_message('debug', 'LecturasGasModel: getLecturasPorMac - Query: ' . $builder->getCompiledSelect());
         // --- FIN DE LOGGING ---
 
         $results = $builder
@@ -45,72 +42,77 @@ class LecturasGasModel extends Model
             ->get()
             ->getResultArray();
 
-        // --- INICIO DE LOGGING PARA DEBUGGING ---
-        log_message('debug', "LecturasGasModel: Resultados de getLecturasPorMac: " . count($results) . " registros.");
-        if (empty($results)) {
-            log_message('debug', "LecturasGasModel: No se encontraron lecturas en la base de datos para la MAC y el rango de fechas.");
+        // **NUEVO CÓDIGO:** Añadir el estado a cada lectura
+        foreach ($results as &$lectura) {
+            $lectura['estado'] = $this->determinarEstado((float)$lectura['nivel_gas']);
         }
-        // --- FIN DE LOGGING ---
-
-        // **NUEVO CÓDIGO (del cambio anterior):** Añadir el campo 'estado' a cada lectura
-        foreach ($results as $key => $lectura) {
-            // Asegúrate de que 'nivel_gas' sea un float antes de pasarlo a determinarEstado
-            $results[$key]['estado'] = $this->determinarEstado((float)$lectura['nivel_gas']);
-        }
+        unset($lectura); // Romper la referencia del último elemento
 
         return $results;
     }
 
     /**
-     * Recupera las últimas lecturas de gas para cada dispositivo enlazado a un usuario.
+     * Recupera la última lectura de gas para una MAC específica.
      *
-     * @param int $userId El ID del usuario.
-     * @return array Array de las últimas lecturas.
+     * @param string $mac La dirección MAC del dispositivo.
+     * @return array|null Un array con la última lectura o null si no se encuentra.
      */
-    public function getLatestLecturasPorUsuario(int $userId): array
+    public function getLatestLecturaPorMac(string $mac): ?array
     {
-        // Une la tabla 'lecturas_gas' con la tabla 'enlace' para filtrar por usuario
-        // Y luego con una subconsulta para obtener solo la lectura más reciente por MAC.
-        $subquery = $this->db->table('lecturas_gas')
-                            ->selectMax('fecha', 'max_fecha')
-                            ->select('MAC')
-                            ->groupBy('MAC')
-                            ->getCompiledSelect();
+        $lectura = $this->db->table($this->table)
+                    ->where('MAC', $mac)
+                    ->orderBy('fecha', 'DESC')
+                    ->limit(1)
+                    ->get()
+                    ->getRowArray(); // getRowArray() devuelve un solo registro como array
 
-        return $this->db->table('lecturas_gas AS lg')
-                        ->select('lg.*, e.id_usuario') // Selecciona todas las columnas de lecturas_gas y el id_usuario de enlace
-                        ->join('enlace AS e', 'lg.MAC = e.MAC')
-                        ->join("({$subquery}) AS latest_readings", 'lg.MAC = latest_readings.MAC AND lg.fecha = latest_readings.max_fecha')
-                        ->where('e.id_usuario', $userId)
-                        ->orderBy('lg.fecha', 'DESC')
-                        ->get()
-                        ->getResultArray();
+        // Añadir el estado si se encuentra una lectura
+        if ($lectura) {
+            $lectura['estado'] = $this->determinarEstado((float)$lectura['nivel_gas']);
+        }
+
+        return $lectura;
     }
 
 
     /**
-     * Determina el estado de seguridad basado en el nivel de gas.
+     * Recupera las lecturas de gas para un usuario específico.
+     * Útil para la vista de perfil donde se listan todas las lecturas de sus dispositivos.
      *
-     * @param float $nivelGas El nivel de gas en PPM.
-     * @return string El estado ('peligro', 'precaucion', 'seguro').
+     * @param int $usuarioId El ID del usuario.
+     * @return array Array de lecturas.
      */
-    protected function determinarEstado(float $nivelGas): string
+    public function getLecturasPorUsuario(int $usuarioId): array
     {
-        if ($nivelGas >= 500) return 'peligro';
-        if ($nivelGas >= 200) return 'precaucion';
-        return 'seguro';
+        // Une con la tabla 'dispositivos' y 'enlace' para obtener MACs asociadas al usuario
+        $results = $this->db->table('lecturas_gas AS lg')
+                            ->select('lg.*, d.nombre AS nombre_dispositivo, d.ubicacion')
+                            ->join('enlace AS e', 'lg.MAC = e.MAC')
+                            ->join('dispositivos AS d', 'lg.MAC = d.MAC', 'left') // LEFT JOIN para dispositivos, ya que MAC podría no tener nombre aún
+                            ->where('e.id_usuario', $usuarioId)
+                            ->orderBy('lg.fecha', 'DESC')
+                            ->get()
+                            ->getResultArray();
+
+        // Añadir el estado a cada lectura
+        foreach ($results as &$lectura) {
+            $lectura['estado'] = $this->determinarEstado((float)$lectura['nivel_gas']);
+        }
+        unset($lectura); // Romper la referencia del último elemento
+
+        return $results;
     }
 
     /**
-     * Método para migrar datos de 'lecturas_gas' a una nueva tabla 'registros_gas'.
+     * Migra datos de la tabla 'lecturas_gas' a la nueva tabla 'registros_gas'.
+     * Esta función asume que la nueva tabla 'registros_gas' ya existe y tiene la estructura adecuada.
+     * Incluye lógica para evitar duplicados y para obtener datos del dispositivo.
      *
      * @return int El número de registros migrados.
      */
     public function migrarARegistrosGas(): int
     {
-        // Este método asume que tienes una tabla 'registros_gas' con las columnas:
-        // 'dispositivo_id' (MAC), 'nombre_dispositivo', 'ubicacion', 'nivel_gas', 'fecha', 'estado'
-        // Y que 'fecha' es una clave compuesta junto con 'dispositivo_id' para evitar duplicados.
+        // Este método asume que 'fecha' es una clave compuesta junto con 'dispositivo_id' para evitar duplicados.
 
         $migrados = 0;
         $builder = $this->db->table('registros_gas'); // Asegúrate de que esta tabla exista.
@@ -144,5 +146,18 @@ class LecturasGasModel extends Model
         }
 
         return $migrados;
+    }
+
+    /**
+     * Determina el estado de seguridad basado en el nivel de gas.
+     *
+     * @param float $nivelGas El nivel de gas en PPM.
+     * @return string El estado ('peligro', 'precaucion', 'seguro').
+     */
+    protected function determinarEstado(float $nivelGas): string
+    {
+        if ($nivelGas >= 500) return 'peligro';
+        if ($nivelGas >= 200) return 'precaucion';
+        return 'seguro';
     }
 }

@@ -47,61 +47,38 @@ class DetalleController extends BaseController
         $lecturas = [];
         $labels = [];
         $data = [];
-        $message = null; // Reiniciar el mensaje para cada solicitud
+        $message = null;
 
-        // Si no hay rango de fechas, no mostrar registros
+        // Si no hay rango de fechas, mostrar un mensaje y no cargar registros inicialmente
+        // Permitir ver los registros aunque no haya un rango seleccionado para el gráfico
         if (empty($fechaInicio) || empty($fechaFin)) {
-            $message = 'Por favor, selecciona un rango de fechas para ver los registros.';
-            return view('detalles', [
-                'mac' => $mac,
-                'nombreDispositivo' => $nombreDispositivo,
-                'ubicacionDispositivo' => $ubicacionDispositivo,
-                'lecturas' => [], // Vacío
-                'labels' => [],   // Vacío
-                'data' => [],     // Vacío
-                'message' => $message,
-                'request' => $this->request // ¡Importante: Pasar el objeto request!
-            ]);
+            // Si quieres que el gráfico se cargue con datos por defecto (ej. últimos 30 días)
+            // puedes establecer fechaInicio y fechaFin aquí, si no, se mostrará "Sin datos"
+            $message = 'Selecciona un rango de fechas para ver los registros históricos.';
         }
 
-        // Obtener lecturas filtradas
+        // Obtener lecturas filtradas (siempre se intentan obtener, incluso sin un rango completo para el gráfico)
+        // Si fechaInicio o fechaFin son nulos, LecturasGasModel::getLecturasPorMac manejará eso para devolver todos los datos si es apropiado,
+        // o solo el último dato si se usa para el gauge. Para el gráfico, necesitaremos fechas.
         $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
-
-        // --- INICIO DE LOGGING PARA DEBUGGING ---
-        log_message('debug', "DetalleController: Lecturas obtenidas del modelo: " . count($lecturas) . " registros.");
-        if (empty($lecturas)) {
-            log_message('debug', "DetalleController: No se encontraron lecturas para el periodo seleccionado después de la consulta al modelo.");
-        } else {
-            // Logear solo los primeros 5 registros para no saturar el log si hay muchos
-            log_message('debug', "DetalleController: Primeras 5 lecturas: " . json_encode(array_slice($lecturas, 0, 5)));
-        }
-        // --- FIN DE LOGGING ---
-
 
         if (empty($lecturas)) {
             $message = 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.';
-            return view('detalles', [
-                'mac' => $mac,
-                'nombreDispositivo' => $nombreDispositivo,
-                'ubicacionDispositivo' => $ubicacionDispositivo,
-                'lecturas' => [], // Vacío
-                'labels' => [],   // Vacío
-                'data' => [],     // Vacío
-                'message' => $message,
-                'request' => $this->request // ¡Importante: Pasar el objeto request!
-            ]);
-        }
+            // Si no hay lecturas para el periodo, asegurarse de que las variables del gráfico estén vacías
+            $labels = [];
+            $data = [];
+        } else {
+            // Ordenar para el gráfico (más antiguo primero)
+            $lecturasAsc = $lecturas; // Haz una copia si $lecturas se usa en otro lugar y necesitas que mantenga su orden original
+            usort($lecturasAsc, function ($a, $b) {
+                return strtotime($a['fecha']) - strtotime($b['fecha']);
+            });
 
-        // Ordenar para el gráfico (más antiguo primero)
-        $lecturasAsc = $lecturas; // Haz una copia si $lecturas se usa en otro lugar y necesitas que mantenga su orden original
-        usort($lecturasAsc, function ($a, $b) {
-            return strtotime($a['fecha']) - strtotime($b['fecha']);
-        });
-
-        // Preparar datos para el gráfico
-        foreach ($lecturasAsc as $lectura) {
-            $labels[] = $lectura['fecha'];
-            $data[] = $lectura['nivel_gas'];
+            // Preparar datos para el gráfico
+            foreach ($lecturasAsc as $lectura) {
+                $labels[] = $lectura['fecha'];
+                $data[] = $lectura['nivel_gas'];
+            }
         }
 
         return view('detalles', [
@@ -112,7 +89,23 @@ class DetalleController extends BaseController
             'labels' => $labels,
             'data' => $data,
             'message' => $message, // El mensaje puede ser null aquí si se encontraron lecturas
-            'request' => $this->request // ¡Importante: Pasar el objeto request!
+            'request' => $this->request // ¡Importante: Pasar el objeto request para el date picker!
         ]);
+    }
+
+    /**
+     * Devuelve el último nivel de gas para una MAC específica en formato JSON.
+     *
+     * @param string $mac La dirección MAC del dispositivo.
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function getLatestGasLevel(string $mac)
+    {
+        $lectura = $this->lecturaModel->getLatestLecturaPorMac($mac);
+        if ($lectura) {
+            return $this->response->setJSON(['nivel_gas' => (float)$lectura['nivel_gas']]);
+        } else {
+            return $this->response->setJSON(['nivel_gas' => null])->setStatusCode(404, 'No latest data found');
+        }
     }
 }
