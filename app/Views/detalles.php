@@ -70,20 +70,21 @@ $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ?
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Obtener el último valor de gas (o 0 si no hay datos)
-        const ultimoValor = <?= isset($data) && count($data) > 0 ? floatval(end($data)) : 0 ?>;
+        // Obtener el último valor de gas (o 10 si no hay datos)
+        const ultimoValor = <?= isset($data) && count($data) > 0 ? max(10, floatval(end($data))) : 10 ?>;
         const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
         const gaugeChart = new Chart(gaugeCtx, {
             type: 'gauge',
             data: {
                 datasets: [{
                     value: ultimoValor,
-                    minValue: 0,
-                    data: [200, 500, 1000], // Cambia los cortes según tus rangos
+                    minValue: 10,
+                    data: [200, 500, 2000, 5000], // Rangos: seguro, precaución, peligro, muy peligroso
                     backgroundColor: [
-                        'rgba(72, 187, 120, 0.8)', // Seguro
-                        'rgba(246, 224, 94, 0.8)', // Precaución
-                        'rgba(229, 62, 62, 0.8)'   // Peligro
+                        'rgba(72, 187, 120, 0.8)',   // Seguro (10-200)
+                        'rgba(246, 224, 94, 0.8)',   // Precaución (201-500)
+                        'rgba(229, 62, 62, 0.8)',    // Peligro (501-2000)
+                        'rgba(128, 0, 0, 0.8)'       // Muy peligroso (2001-5000)
                     ],
                     borderWidth: 2
                 }]
