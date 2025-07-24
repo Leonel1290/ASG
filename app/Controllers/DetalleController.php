@@ -26,45 +26,53 @@ class DetalleController extends BaseController
 
     // Método actualizado para usar la nueva tabla
     public function detalles($mac)
-    {
-        // Obtener detalles del dispositivo
-        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
-        $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
-        $ubicacionDispositivo = $dispositivo['ubicacion'] ?? 'Desconocida';
+{
+    // Obtener fechas del GET
+    $fechaInicio = $this->request->getGet('fechaInicio');
+    $fechaFin = $this->request->getGet('fechaFin');
 
-        if (empty($lecturas)) {
-            return view('detalles', [
-                'mac' => $mac,
-                'nombreDispositivo' => $nombreDispositivo,
-                'ubicacionDispositivo' => $ubicacionDispositivo,
-                'lecturas' => [],
-                'labels' => [],
-                'data' => [],
-                'message' => 'No se encontraron lecturas para este dispositivo.'
-            ]);
-        }
+    // Obtener detalles del dispositivo
+    $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
+    $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
+    $ubicacionDispositivo = $dispositivo['ubicacion'] ?? 'Desconocida';
 
-        // Ordenar para el gráfico (más antiguo primero)
-        usort($lecturas, function ($a, $b) {
-            return strtotime($a['fecha']) - strtotime($b['fecha']);
-        });
+    // Obtener lecturas filtradas
+    $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
 
-        // Preparar datos para el gráfico
-        $labels = [];
-        $data = [];
-        foreach ($lecturas as $lectura) {
-            $labels[] = $lectura['fecha'];
-            $data[] = $lectura['nivel_gas'];
-        }
-
+    if (empty($lecturas)) {
         return view('detalles', [
             'mac' => $mac,
             'nombreDispositivo' => $nombreDispositivo,
             'ubicacionDispositivo' => $ubicacionDispositivo,
-            'lecturas' => array_reverse($lecturas), // Para mostrar más reciente primero en tabla
-            'labels' => $labels,
-            'data' => $data,
-            'message' => null
+            'lecturas' => [],
+            'labels' => [],
+            'data' => [],
+            'message' => 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.'
         ]);
     }
+
+    // Ordenar para el gráfico (más antiguo primero)
+    $lecturasAsc = $lecturas;
+    usort($lecturasAsc, function ($a, $b) {
+        return strtotime($a['fecha']) - strtotime($b['fecha']);
+    });
+
+    // Preparar datos para el gráfico
+    $labels = [];
+    $data = [];
+    foreach ($lecturasAsc as $lectura) {
+        $labels[] = $lectura['fecha'];
+        $data[] = $lectura['nivel_gas'];
+    }
+
+    return view('detalles', [
+        'mac' => $mac,
+        'nombreDispositivo' => $nombreDispositivo,
+        'ubicacionDispositivo' => $ubicacionDispositivo,
+        'lecturas' => $lecturas, // Ya están en DESC para la tabla
+        'labels' => $labels,
+        'data' => $data,
+        'message' => null
+    ]);
+}
 }

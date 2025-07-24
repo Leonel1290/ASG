@@ -17,14 +17,23 @@ class LecturasGasModel extends Model
      * @param string $mac La dirección MAC del dispositivo.
      * @return array Array de lecturas.
      */
-    public function getLecturasPorMac(string $mac): array
-    {
-        return $this->db->table($this->table)
-            ->where('MAC', $mac)
-            ->orderBy('fecha', 'DESC') // Lecturas más recientes primero para la tabla
-            ->get()
-            ->getResultArray();
+    public function getLecturasPorMac(string $mac, ?string $fechaInicio = null, ?string $fechaFin = null): array
+{
+    $builder = $this->db->table($this->table)
+        ->where('MAC', $mac);
+
+    if ($fechaInicio) {
+        $builder->where('fecha >=', $fechaInicio . ' 00:00:00');
     }
+    if ($fechaFin) {
+        $builder->where('fecha <=', $fechaFin . ' 23:59:59');
+    }
+
+    return $builder
+        ->orderBy('fecha', 'DESC')
+        ->get()
+        ->getResultArray();
+}
 
     /**
      * Recupera las lecturas de gas asociadas a un usuario específico.

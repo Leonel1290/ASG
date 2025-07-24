@@ -298,9 +298,38 @@ if (!function_exists('esc')) {
     </section>
 
     <section>
+        <!-- Botón para mostrar el modal de selección de fechas -->
+        <button class="btn btn-primary mb-3" id="btnMostrarCalendario" type="button">
+            <i class="fas fa-calendar-alt me-2"></i> Registros
+        </button>
+
+        <!-- Modal para seleccionar rango de fechas -->
+        <div class="modal fade" id="modalCalendario" tabindex="-1" aria-labelledby="modalCalendarioLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalCalendarioLabel"><i class="fas fa-calendar-alt me-2"></i> Seleccionar periodo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <form id="formRangoFechas" method="get">
+                  <div class="mb-3">
+                    <label for="fechaInicio" class="form-label">Fecha inicio</label>
+                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required value="<?= esc($_GET['fechaInicio'] ?? '') ?>">
+                  </div>
+                  <div class="mb-3">
+                    <label for="fechaFin" class="form-label">Fecha fin</label>
+                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" required value="<?= esc($_GET['fechaFin'] ?? '') ?>">
+                  </div>
+                  <button type="submit" class="btn btn-success w-100">Filtrar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
         <h2 class="section-title"><i class="fas fa-table"></i> Registros Detallados de Lecturas</h2>
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped" id="tablaLecturas">
                 <thead>
                     <tr>
                         <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
@@ -308,7 +337,7 @@ if (!function_exists('esc')) {
                         <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tbodyLecturas">
                     <?php if (empty($lecturas)): ?>
                         <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
                     <?php else: ?>
@@ -500,6 +529,15 @@ if (!function_exists('esc')) {
             chartCanvas.style.display = 'none';
         }
     }
+
+    // Solo mostrar el modal al hacer click en el botón
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnMostrarCalendario = document.getElementById('btnMostrarCalendario');
+        const modalCalendario = new bootstrap.Modal(document.getElementById('modalCalendario'));
+        btnMostrarCalendario.addEventListener('click', function() {
+            modalCalendario.show();
+        });
+    });
 </script>
 
 </body>
