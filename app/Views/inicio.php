@@ -6,13 +6,10 @@
     <title>ASG - Seguridad en tu Hogar</title>
 
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-
     <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -62,53 +59,50 @@
         .hero h1 {
             font-size: 3rem;
             font-weight: 700;
-            position: relative; /* Necesario para posicionar el pseudo-elemento */
-            display: inline-block; /* Para que el pseudo-elemento se ajuste al ancho del texto */
-            color: #fff; /* Color base del texto (las letras blancas fijas) */
-            line-height: 1.2; /* Ajusta si el efecto se ve cortado */
+            position: relative;
+            display: inline-block;
+            color: #fff;
+            line-height: 1.2;
         }
 
         /* --- ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
         .hero h1::before {
-            content: attr(data-text); /* Toma el texto del atributo data-text */
+            content: attr(data-text);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            color: transparent; /* Hace el texto del pseudo-elemento transparente */
-
-            /* --- AQUÍ CAMBIA LA IMAGEN Y POSIBLEMENTE EL TAMAÑO --- */
-            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>'); /* ¡Tu nueva imagen de humo verde! */
-            background-size: 100% 250%; /* Ajusta el tamaño de la imagen. El 250% permite que el humo suba desde bien abajo. */
+            color: transparent;
+            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>');
+            background-size: 100% 250%;
             background-repeat: no-repeat;
-            background-position: center bottom; /* Inicia la imagen desde abajo */
-            -webkit-background-clip: text; /* Recorta el fondo a la forma del texto */
+            background-position: center bottom;
+            -webkit-background-clip: text;
             background-clip: text;
-            filter: blur(1.5px); /* Un desenfoque para hacer el humo más etéreo. Ajusta a tu gusto. */
-            opacity: 0; /* Empieza invisible */
-            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out; /* Animación de subida y desvanecimiento más suave */
+            filter: blur(1.5px);
+            opacity: 0;
+            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out;
         }
 
         @keyframes greenSmokeTextEffect {
             0% {
-                background-position: center bottom; /* El humo empieza desde abajo del texto */
-                opacity: 0; /* Empieza invisible */
+                background-position: center bottom;
+                opacity: 0;
             }
             20% {
-                opacity: 0.8; /* Se vuelve visible rápidamente, pero no completamente opaco para un efecto de humo */
+                opacity: 0.8;
             }
             60% {
-                background-position: center top; /* El humo sube y se va por arriba del texto */
-                opacity: 0.6; /* Permanece visible pero empieza a desvanecerse */
+                background-position: center top;
+                opacity: 0.6;
             }
             100% {
-                background-position: center top; /* Asegura que termina en la parte superior */
-                opacity: 0; /* Desaparece completamente */
+                background-position: center top;
+                opacity: 0;
             }
         }
         /* --- FIN ESTILOS PARA EL EFECTO DE HUMO VERDE A TRAVÉS DEL TEXTO --- */
-
 
         .hero-line {
             width: 80px;
@@ -140,6 +134,52 @@
 
         .features h3 {
             color: #fff;
+        }
+
+        .product-card {
+            background-color: #1a3640; /* Un tono más oscuro para las tarjetas de producto */
+            border-radius: 10px;
+            padding: 2rem;
+            color: #AFB3B7;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+            height: 100%; /* Para que las tarjetas tengan la misma altura */
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card h4 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .product-card .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .product-card .btn-paypal {
+            background-color: #0070ba; /* Color oficial de PayPal */
+            border-color: #0070ba;
+            color: #fff;
+        }
+
+        .product-card .btn-paypal:hover {
+            background-color: #005ea6;
+            border-color: #005ea6;
+        }
+
+        .product-card .btn-credit-card {
+            background-color: #698180;
+            border-color: #698180;
+            color: #fff;
+        }
+
+        .product-card .btn-credit-card:hover {
+            background-color: #2D4A53;
+            border-color: #2D4A53;
         }
 
         .company-info {
@@ -192,13 +232,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#company">Contacto</a>
                     </li>
-                    <li class="nav-item ms-2">
-                        <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
+                    <li class="nav-item">
+                        <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
+                            <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
+                            <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/" target="_blank">Descargar App</a>
+                        </div>
                     </li>
-                    <li class="nav-item ms-2">
-                        <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/" target="_blank">Descargar App</a>
-                    </li>
-                    </ul>
+                </ul>
             </div>
         </div>
     </nav>
@@ -246,6 +286,61 @@
         </div>
     </section>
 
+    ---
+
+    <section class="products py-5">
+        <div class="container">
+            <h2 class="text-center text-white mb-5">Nuestros Productos</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-5 col-lg-4">
+                    <div class="card product-card text-center">
+                        <img src="https://via.placeholder.com/150/698180/FFFFFF?text=Detector+de+Gas" class="card-img-top mx-auto mt-3" alt="Detector de Gas ASG" style="max-width: 150px;">
+                        <div class="card-body">
+                            <h4 class="card-title">Detector de Gas ASG</h4>
+                            <p class="card-text">Mantén tu hogar seguro con detección de fugas de gas precisa y confiable.</p>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Detección de gas en tiempo real</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Alertas a tu smartphone</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Fácil instalación</li>
+                            </ul>
+                            <h5 class="text-white mb-3">$XX.XX USD</h5>
+                            <a href="<?= base_url('/comprar/detector-basico') ?>" class="btn btn-credit-card d-flex align-items-center justify-content-center mb-2">
+                                <i class="fas fa-credit-card me-2"></i> Comprar con Tarjeta
+                            </a>
+                            <a href="<?= base_url('/comprar/detector-basico-paypal') ?>" class="btn btn-paypal d-flex align-items-center justify-content-center">
+                                <i class="fab fa-paypal me-2"></i> Comprar con PayPal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 col-lg-4">
+                    <div class="card product-card text-center">
+                        <img src="https://via.placeholder.com/150/2D4A53/FFFFFF?text=ASG+Pro" class="card-img-top mx-auto mt-3" alt="ASG Pro con Válvula de Cierre" style="max-width: 150px;">
+                        <div class="card-body">
+                            <h4 class="card-title">ASG Pro con Válvula de Cierre</h4>
+                            <p class="card-text">La máxima seguridad para tu hogar. Detección y corte automático.</p>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Todas las funciones del detector básico</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> **Válvula de cierre automático**</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Control total desde la app</li>
+                            </ul>
+                            <h5 class="text-white mb-3">$YY.YY USD</h5>
+                            <a href="<?= base_url('/comprar/detector-pro') ?>" class="btn btn-credit-card d-flex align-items-center justify-content-center mb-2">
+                                <i class="fas fa-credit-card me-2"></i> Comprar con Tarjeta
+                            </a>
+                            <a href="<?= base_url('/comprar/detector-pro-paypal') ?>" class="btn btn-paypal d-flex align-items-center justify-content-center">
+                                <i class="fab fa-paypal me-2"></i> Comprar con PayPal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    ---
+
     <section class="py-5" id="company">
         <div class="container">
             <div class="company-info mx-auto text-center">
@@ -266,7 +361,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function(){
@@ -301,3 +395,4 @@
 </script>
 
 </body>
+</html>
