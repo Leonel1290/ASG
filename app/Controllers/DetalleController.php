@@ -49,18 +49,12 @@ class DetalleController extends BaseController
         $data = [];
         $message = null;
 
-        // Si no hay rango de fechas, mostrar un mensaje y no cargar registros inicialmente
-        // Permitir ver los registros aunque no haya un rango seleccionado para el gráfico
+        // Si no hay rango de fechas, mostrar todas las lecturas de la MAC
         if (empty($fechaInicio) || empty($fechaFin)) {
-            // Si quieres que el gráfico se cargue con datos por defecto (ej. últimos 30 días)
-            // puedes establecer fechaInicio y fechaFin aquí, si no, se mostrará "Sin datos"
-            $message = 'Selecciona un rango de fechas para ver los registros históricos.';
+            $lecturas = $this->lecturaModel->getLecturasPorMac($mac);
+        } else {
+            $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
         }
-
-        // Obtener lecturas filtradas (siempre se intentan obtener, incluso sin un rango completo para el gráfico)
-        // Si fechaInicio o fechaFin son nulos, LecturasGasModel::getLecturasPorMac manejará eso para devolver todos los datos si es apropiado,
-        // o solo el último dato si se usa para el gauge. Para el gráfico, necesitaremos fechas.
-        $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
 
         if (empty($lecturas)) {
             $message = 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.';
