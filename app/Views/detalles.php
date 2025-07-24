@@ -298,12 +298,10 @@ if (!function_exists('esc')) {
     </section>
 
     <section>
-        <!-- Botón para mostrar el modal de selección de fechas -->
         <button class="btn btn-primary mb-3" id="btnMostrarCalendario" type="button">
             <i class="fas fa-calendar-alt me-2"></i> Registros
         </button>
 
-        <!-- Modal para seleccionar rango de fechas -->
         <div class="modal fade" id="modalCalendario" tabindex="-1" aria-labelledby="modalCalendarioLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-light">

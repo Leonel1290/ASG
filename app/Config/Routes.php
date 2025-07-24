@@ -113,16 +113,14 @@ $routes->post('/enlace/store', 'EnlaceController::store');
 
 // --- DEVICE AND GAS RECORD ROUTES ---
 
-// Route for the new view that lists all devices (the "menu")
-// This route is typically for a list of devices. If you don't have a DeviceController,
-// this might need to point to a method in another controller that lists devices.
-// Commented out as per previous instructions if DeviceController is not in use.
-// $routes->get('/dispositivos', 'DeviceController::listDevices');
-
 // CRUCIAL ROUTE: Route for the detail view of a specific device (with chart and latest reading)
-// THIS ROUTE NOW POINTS TO LECTURASCONTROLLER::detalle
-// Example: http://yourdomain.com/dispositivo/AA:BB:CC:DD:EE:FF
-$routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
+// Esta ruta ahora apunta a DetalleController::detalles para manejar el filtrado de fechas.
+// Si tenías una ruta similar para LecturasController::detalle, asegúrate de que no haya conflictos.
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+
+// Ruta original comentada para evitar conflictos, ya que ahora 'detalles' la manejará
+// $routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
+
 
 // New route for the view of all gas records of a specific device
 // If you want a separate view just for historical records without the large chart,
@@ -146,12 +144,6 @@ $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
     $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
 });
-
-// IMPORTANT: These routes for 'detalles' are commented out to prevent conflicts.
-// If you absolutely need to use 'detalles/(:any)', you MUST decide which controller/method
-// will handle it (e.g., LecturasController::detalle) and uncomment only ONE.
-// $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
-// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
 
 // --- PREVIOUS ROUTES (COMMENTED FOR CLARITY AND TO AVOID DUPLICATES) ---
