@@ -30,417 +30,321 @@ if (!function_exists('esc')) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg-dark: #1a202c;
-            --text-light: #cbd5e0;
-            --text-lighter: #e2e8f0;
-            --text-darker: #f7fafc;
-            --primary-color: #667eea;
-            --secondary-color: #a0aec0;
-            --card-bg: #2d3748;
-            --border-color: #4a5568;
-            --success-color: #48bb78;
-            --warning-color: #f6e05e;
-            --danger-color: #e53e3e;
-        }
-
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            background-color: #1a202c;
+            color: #cbd5e0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
-
+        .navbar {
+            background-color: #2d3748 !important;
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #fff !important;
+        }
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+        }
         .container {
             flex: 1;
             padding: 2rem;
         }
-
-        .btn-outline-secondary {
-            color: var(--text-light);
-            border-color: var(--text-light);
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-outline-secondary:hover {
-            color: var(--bg-dark);
-            background-color: var(--text-light);
-            border-color: var(--text-light);
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .page-title {
-            color: var(--text-darker);
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        .page-title .text-primary {
-            color: var(--primary-color) !important;
-        }
-
-        .device-info {
-            color: var(--secondary-color);
-            font-size: 1.1rem;
-        }
-
         .card {
-            background-color: var(--card-bg);
-            color: var(--text-lighter);
+            background-color: #2d3748;
+            color: #fff;
             border: none;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        }
-        .card-body {
-            padding: 2rem;
+        .card-header {
+            background-color: #4a5568;
+            color: #edf2f7;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2d3748;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .card-title {
-            font-size: 1.75rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center; /* Center horizontally */
-        }
-        .card-title .fas {
-            margin-right: 0.75rem;
-        }
-
-        .current-gas-value {
-            font-size: 3rem;
-            font-weight: bold;
-            color: var(--warning-color);
-            margin-top: 1rem;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.03); opacity: 0.95; }
-        }
-
-        .section-title {
-            color: var(--text-darker);
-            font-size: 1.8rem;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-        .section-title .fas {
-            margin-right: 0.75rem;
-        }
-
-        .table-responsive {
-            margin-bottom: 2rem;
-            border-radius: 0.75rem;
-            overflow: hidden; /* Ensures rounded corners on table */
-        }
-
-        .table {
-            width: 100%;
-            color: var(--text-lighter);
-            border-collapse: collapse;
-            background-color: var(--card-bg);
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table th {
-            background-color: var(--border-color);
-            color: var(--text-darker);
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #374151; /* Slightly different shade for zebra striping */
-        }
-
-        .table tbody tr:hover {
-            background-color: #4a5568;
-            transition: background-color 0.2s ease;
-            cursor: default; /* Change cursor for clarity */
-        }
-
-        .badge {
-            padding: 0.5em 0.8em;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-        .badge.bg-success { background-color: var(--success-color) !important; color: var(--bg-dark); }
-        .badge.bg-warning { background-color: var(--warning-color) !important; color: var(--bg-dark); }
-        .badge.bg-danger { background-color: var(--danger-color) !important; color: var(--text-darker); }
-
-
-        .chart-container {
-            max-width: 800px;
-            height: 350px; /* Fixed height for consistency */
-            margin: 0 auto 2rem auto;
-            background-color: rgba(0,0,0,0.1); /* Subtle background for chart area */
-            border-radius: 0.5rem;
-            padding: 1rem;
-        }
-
-        .progress {
-            height: 1.25rem;
-            border-radius: 0.625rem;
-            background-color: var(--border-color);
-            margin-bottom: 1rem;
-        }
-
-        .progress-bar {
-            background-color: var(--success-color); /* Default color */
-            transition: width 0.6s ease-in-out; /* Smoother animation */
-            color: var(--text-darker);
-            font-weight: bold;
-            line-height: 1.25rem; /* Vertically center text */
-        }
-
-        .security-level-display {
             font-size: 1.25rem;
             font-weight: bold;
-            color: var(--text-darker);
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-bottom: 0;
         }
-        .security-level-display .fas {
-            margin-right: 0.5rem;
+        .card-body {
+            padding: 1.5rem;
+        }
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+        .alert-info {
+            background-color: #bee3f8;
+            color: #1a202c;
+            border-color: #90cdf4;
+        }
+        .alert-danger {
+            background-color: #fed7d7;
+            color: #1a202c;
+            border-color: #fbcbcb;
+        }
+        .btn-primary {
+            background-color: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+        }
+        .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #4a5568;
+            border-color: #4a5568;
+        }
+        .btn-success {
+            background-color: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #38a169;
+            border-color: #38a169;
+        }
+        .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+        }
+        .table-dark {
+            --bs-table-bg: #2d3748;
+            --bs-table-striped-bg: #2d3748; /* Same as background for a consistent dark look */
+            --bs-table-striped-color: #edf2f7;
+            --bs-table-active-bg: #4a5568;
+            --bs-table-active-color: #edf2f7;
+            --bs-table-hover-bg: #4a5568;
+            --bs-table-hover-color: #edf2f7;
+            color: #edf2f7;
+            border-color: #4a5568;
+        }
+        .table-dark th, .table-dark td {
+            border-color: #4a5568;
+        }
+        /* Custom scrollbar for table-responsive */
+        .table-responsive::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: #4a5568;
+            border-radius: 10px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #63b3ed;
+            border-radius: 10px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #4299e1;
         }
 
-        /* Chart.js overrides for dark theme */
-        .chartjs-render-monitor {
-            background-color: transparent !important; /* Ensure canvas background is transparent */
+        /* Modal specific styles for dark theme */
+        .modal-content {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .modal-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #2d3748;
+            color: #edf2f7;
+        }
+        .modal-footer {
+            border-top: 1px solid #2d3748;
+        }
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
         }
     </style>
 </head>
 <body>
 
-<div class="container my-5">
-    <a href="<?= base_url('/perfil') ?>" class="btn btn-outline-secondary mb-4">
-        <i class="fas fa-arrow-left me-2"></i> Volver al Perfil
-    </a>
-
-    <header class="page-header">
-        <h1 class="page-title"><i class="fas fa-microchip me-2"></i> Dispositivo: <span class="text-primary"><?= esc($nombreDispositivo) ?></span></h1>
-        <p class="device-info">
-            <i class="fas fa-network-wired me-1"></i> MAC: <?= esc($mac) ?> | <i class="fas fa-map-marker-alt me-1"></i> Ubicación: <?= esc($ubicacionDispositivo) ?>
-        </p>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil') ?>">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                        </li>
+                    </ul>
+                    <a href="<?= base_url('/logout') ?>" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <?php if ($message): ?>
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <?= esc($message) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <div class="container my-5">
+        <?php if (session('success')): ?>
+            <div class="alert alert-success"><?= session('success') ?></div>
+        <?php endif; ?>
+        <?php if (session('error')): ?>
+            <div class="alert alert-danger"><?= session('error') ?></div>
+        <?php endif; ?>
+        <?php if (session('info')): ?>
+            <div class="alert alert-info"><?= session('info') ?></div>
+        <?php endif; ?>
 
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h2 class="card-title"><i class="fas fa-gas-pump"></i> Nivel de Gas Actual</h2>
-                    <p class="current-gas-value" id="currentGasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-microchip me-2"></i> Detalles del Dispositivo: <?= esc($nombreDispositivo) ?>
+                </h5>
+                <span class="badge bg-primary">MAC: <?= esc($mac) ?></span>
+            </div>
+            <div class="card-body">
+                <p><strong>Ubicación:</strong> <?= esc($ubicacionDispositivo) ?></p>
+                <p><strong>Última Lectura:</strong> <span class="badge bg-info"><?= $nivelGasActualDisplay ?></span></p>
+
+                <div class="d-flex justify-content-start gap-2 mt-3">
+                    <button type="button" class="btn btn-primary" id="btnMostrarCalendario">
+                        <i class="fas fa-calendar-alt me-2"></i> Seleccionar Periodo
+                    </button>
+
+                    <button type="button" class="btn btn-info" id="btnVerRegistros">
+                        <i class="fas fa-list-alt me-2"></i> Ver Registros
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
+
+        <?php if ($message): ?>
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle me-2"></i> <?= esc($message) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($data)): ?>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title"><i class="fas fa-chart-line me-2"></i> Historial de Nivel de Gas</h5>
+                </div>
                 <div class="card-body">
-                    <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> Nivel de Seguridad</h2>
-                    <p class="security-level-display">
-                        <span id="securityLevelText">Cargando...</span>
-                    </p>
-                    <div class="progress mt-3">
-                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
+                    <canvas id="gasChart"></canvas>
+                </div>
+            </div>
+        <?php endif; ?>
+
+
+    </div>
+
+    <div class="modal fade" id="modalCalendario" tabindex="-1" aria-labelledby="modalCalendarioLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCalendarioLabel"><i class="fas fa-calendar-alt me-2"></i> Seleccionar Periodo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filtroFechaForm" method="GET" action="<?= base_url('detalles/' . esc($mac)) ?>">
+                        <div class="mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio:</label>
+                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="<?= esc($this->request->getGet('fechaInicio') ?? date('Y-m-01')) ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaFin" class="form-label">Fecha de Fin:</label>
+                            <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="<?= esc($this->request->getGet('fechaFin') ?? date('Y-m-d')) ?>">
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filtrar</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <section>
-        <h2 class="section-title"><i class="fas fa-chart-line"></i> Histórico de Niveles de Gas</h2>
-        <div class="card">
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="gasChart"></canvas>
+    <div class="modal fade" id="modalLecturas" tabindex="-1" aria-labelledby="modalLecturasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLecturasLabel"><i class="fas fa-list-alt me-2"></i> Registros de Lecturas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <?php if (empty($labels) || empty($data)): ?>
-                    <p class="text-center text-muted mt-3">No hay datos suficientes para mostrar el gráfico.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <button class="btn btn-primary mb-3" id="btnMostrarCalendario" type="button">
-            <i class="fas fa-calendar-alt me-2"></i> Registros
-        </button>
-
-        <div class="modal fade" id="modalCalendario" tabindex="-1" aria-labelledby="modalCalendarioLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-              <div class="modal-header">
-                <h5 class="modal-title" id="modalCalendarioLabel"><i class="fas fa-calendar-alt me-2"></i> Seleccionar periodo</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-              </div>
-              <div class="modal-body">
-                <form id="formRangoFechas" method="get">
-                  <div class="mb-3">
-                    <label for="fechaInicio" class="form-label">Fecha inicio</label>
-                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required value="<?= esc($_GET['fechaInicio'] ?? '') ?>">
-                  </div>
-                  <div class="mb-3">
-                    <label for="fechaFin" class="form-label">Fecha fin</label>
-                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" required value="<?= esc($_GET['fechaFin'] ?? '') ?>">
-                  </div>
-                  <button type="submit" class="btn btn-success w-100">Filtrar</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <h2 class="section-title"><i class="fas fa-table"></i> Registros Detallados de Lecturas</h2>
-        <div class="table-responsive">
-            <table class="table table-striped" id="tablaLecturas">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
-                        <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
-                        <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="tbodyLecturas">
-                    <?php if (empty($lecturas)): ?>
-                        <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
+                <div class="modal-body">
+                    <?php if (!empty($lecturas)): ?>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-dark table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha y Hora</th>
+                                        <th>Nivel de Gas (PPM)</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($lecturas as $lectura): ?>
+                                        <tr>
+                                            <td><?= esc($lectura['fecha']) ?></td>
+                                            <td><?= esc($lectura['nivel_gas']) ?></td>
+                                            <td><?= esc($lectura['estado']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     <?php else: ?>
-                        <?php foreach ($lecturas as $lectura): ?>
-                            <tr>
-                                <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
-                                <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
-                                <td class="text-center">
-                                    <?php
-                                        $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
-                                        $estado = 'Desconocido';
-                                        $class = '';
-
-                                        if ($nivel >= 500) {
-                                            $estado = 'Peligro';
-                                            $class = 'bg-danger';
-                                        } elseif ($nivel >= 200) {
-                                            $estado = 'Precaución';
-                                            $class = 'bg-warning';
-                                        } elseif ($nivel >= 0) {
-                                            $estado = 'Seguro';
-                                            $class = 'bg-success';
-                                        }
-                                    ?>
-                                    <span class="badge <?= $class ?>"><?= $estado ?></span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                        <p>No hay registros de lecturas para mostrar.</p>
                     <?php endif; ?>
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
-    </section>
-</div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Ensure $lecturas, $labels, and $data are correctly passed from PHP
-    const lecturas = <?= json_encode($lecturas ?? []) ?>; // For the table (expected DESC order)
-    const labels = <?= json_encode($labels ?? []) ?>;     // For the chart (expected ASC order)
-    const data = <?= json_encode($data ?? []) ?>;         // For the chart (expected ASC order)
 
-    // Get the last valid gas level for the "Nivel de Seguridad" card
-    // Chart data is ASC (oldest to newest), so the last element is the most recent.
-    const ultimoValor = data.length > 0 ? (parseFloat(data[data.length - 1]) || 0) : null;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Configuración global de Chart.js para el tema oscuro
+    Chart.defaults.color = 'var(--text-light)'; // Color por defecto del texto para las etiquetas del gráfico
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; // Fuente por defecto
 
-    // Update the "Nivel de Seguridad" card and progress bar
-    if (ultimoValor !== null) {
-        updateSecurityProgressBar(ultimoValor);
-    } else {
-        document.getElementById('securityLevelText').textContent = 'Sin datos';
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = '0%';
-        progressBar.className = 'progress-bar';
-        progressBar.setAttribute('aria-valuenow', 0);
-    }
+    const chartLabels = <?= json_encode($labels) ?>;
+    const chartData = <?= json_encode($data) ?>;
+    const hasChartData = chartLabels.length > 0 && chartData.length > 0;
 
-    function updateSecurityProgressBar(value) {
-        const progressBar = document.getElementById('progressBar');
-        const securityLevelText = document.getElementById('securityLevelText');
-        let width = 0;
-        let levelText = 'Sin datos';
-        let barClass = '';
-
-        const safeValue = Math.max(0, value); // Ensure value is not negative
-
-        if (safeValue < 200) {
-            width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
-            levelText = 'Seguro';
-            barClass = 'bg-success';
-        } else if (safeValue < 500) {
-            width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
-            levelText = 'Precaución';
-            barClass = 'bg-warning';
-        } else { // 500 PPM and above
-            width = 66 + ((safeValue - 500) / 500) * 34; // Scale 500+ PPM to 66-100%
-            levelText = 'Peligro';
-            barClass = 'bg-danger';
-        }
-
-        width = Math.min(100, Math.max(0, width)); // Cap width between 0 and 100
-
-        progressBar.style.width = `${width}%`;
-        progressBar.className = `progress-bar ${barClass}`;
-        progressBar.setAttribute('aria-valuenow', width);
-        securityLevelText.textContent = levelText;
-    }
-
-    // Chart.js configuration
-    if (labels.length > 0 && data.length > 0) {
+    if (hasChartData) {
         const ctx = document.getElementById('gasChart').getContext('2d');
         const gasChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels, // Already in ascending order (oldest to newest)
+                labels: chartLabels,
                 datasets: [{
                     label: 'Nivel de Gas (PPM)',
-                    data: data, // Already in ascending order
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 3,
-                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    data: chartData,
+                    borderColor: 'rgb(66, 153, 225)', // Blue color for the line
+                    backgroundColor: 'rgba(66, 153, 225, 0.2)', // Light blue fill
+                    tension: 0.1,
+                    fill: true
                 }]
             },
             options: {
@@ -448,35 +352,30 @@ if (!function_exists('esc')) {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'top',
                         labels: {
-                            color: 'var(--text-darker)',
-                            font: {
-                                size: 14
-                            }
+                            color: 'var(--text-lighter)', // Legend text color
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `Nivel de Gas: ${context.parsed.y} PPM`;
-                            },
-                            title: function(context) {
-                                return `Fecha: ${context[0].label}`;
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' PPM';
+                                }
+                                return label;
                             }
-                        },
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        titleColor: 'var(--text-lighter)',
-                        bodyColor: 'var(--text-light)',
-                        borderColor: 'var(--primary-color)',
-                        borderWidth: 1
+                        }
                     }
                 },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: 'Fecha',
+                            text: 'Fecha y Hora',
                             color: 'var(--text-lighter)',
                             font: {
                                 size: 14,
@@ -484,11 +383,7 @@ if (!function_exists('esc')) {
                             }
                         },
                         ticks: {
-                            color: 'var(--text-light)',
-                            maxRotation: 45,
-                            minRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 10 // Limit number of labels to avoid overlap
+                            color: 'var(--text-light)' // X-axis ticks color
                         },
                         grid: {
                             color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
@@ -535,6 +430,15 @@ if (!function_exists('esc')) {
         btnMostrarCalendario.addEventListener('click', function() {
             modalCalendario.show();
         });
+
+        // Código para el nuevo modal de lecturas
+        const btnVerRegistros = document.getElementById('btnVerRegistros');
+        const modalLecturas = new bootstrap.Modal(document.getElementById('modalLecturas'));
+        if (btnVerRegistros) { // Asegúrate de que el botón exista antes de añadir el listener
+            btnVerRegistros.addEventListener('click', function() {
+                modalLecturas.show();
+            });
+        }
     });
 </script>
 
