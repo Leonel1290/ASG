@@ -136,52 +136,6 @@
             color: #fff;
         }
 
-        .product-card {
-            background-color: #1a3640; /* Un tono más oscuro para las tarjetas de producto */
-            border-radius: 10px;
-            padding: 2rem;
-            color: #AFB3B7;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease-in-out;
-            height: 100%; /* Para que las tarjetas tengan la misma altura */
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-card h4 {
-            color: #fff;
-            margin-bottom: 1rem;
-        }
-
-        .product-card .btn {
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-        
-        .product-card .btn-paypal {
-            background-color: #0070ba; /* Color oficial de PayPal */
-            border-color: #0070ba;
-            color: #fff;
-        }
-
-        .product-card .btn-paypal:hover {
-            background-color: #005ea6;
-            border-color: #005ea6;
-        }
-
-        .product-card .btn-credit-card {
-            background-color: #698180;
-            border-color: #698180;
-            color: #fff;
-        }
-
-        .product-card .btn-credit-card:hover {
-            background-color: #2D4A53;
-            border-color: #2D4A53;
-        }
-
         .company-info {
             background-color: #2D4A53;
             border-radius: 10px;
@@ -285,61 +239,6 @@
             </div>
         </div>
     </section>
-
-    ---
-
-    <section class="products py-5">
-        <div class="container">
-            <h2 class="text-center text-white mb-5">Nuestros Productos</h2>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-5 col-lg-4">
-                    <div class="card product-card text-center">
-                        <img src="https://via.placeholder.com/150/698180/FFFFFF?text=Detector+de+Gas" class="card-img-top mx-auto mt-3" alt="Detector de Gas ASG" style="max-width: 150px;">
-                        <div class="card-body">
-                            <h4 class="card-title">Detector de Gas ASG</h4>
-                            <p class="card-text">Mantén tu hogar seguro con detección de fugas de gas precisa y confiable.</p>
-                            <ul class="list-unstyled text-start mb-4">
-                                <li><i class="fas fa-check-circle text-success me-2"></i> Detección de gas en tiempo real</li>
-                                <li><i class="fas fa-check-circle text-success me-2"></i> Alertas a tu smartphone</li>
-                                <li><i class="fas fa-check-circle text-success me-2"></i> Fácil instalación</li>
-                            </ul>
-                            <h5 class="text-white mb-3">$XX.XX USD</h5>
-                            <a href="<?= base_url('/comprar/detector-basico') ?>" class="btn btn-credit-card d-flex align-items-center justify-content-center mb-2">
-                                <i class="fas fa-credit-card me-2"></i> Comprar con Tarjeta
-                            </a>
-                            <a href="<?= base_url('/comprar/detector-basico-paypal') ?>" class="btn btn-paypal d-flex align-items-center justify-content-center">
-                                <i class="fab fa-paypal me-2"></i> Comprar con PayPal
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-5 col-lg-4">
-                    <div class="card product-card text-center">
-                        <img src="https://via.placeholder.com/150/2D4A53/FFFFFF?text=ASG+Pro" class="card-img-top mx-auto mt-3" alt="ASG Pro con Válvula de Cierre" style="max-width: 150px;">
-                        <div class="card-body">
-                            <h4 class="card-title">ASG Pro con Válvula de Cierre</h4>
-                            <p class="card-text">La máxima seguridad para tu hogar. Detección y corte automático.</p>
-                            <ul class="list-unstyled text-start mb-4">
-                                <li><i class="fas fa-check-circle text-success me-2"></i> Todas las funciones del detector básico</li>
-                                <li><i class="fas fa-check-circle text-success me-2"></i> **Válvula de cierre automático**</li>
-                                <li><i class="fas fa-check-circle text-success me-2"></i> Control total desde la app</li>
-                            </ul>
-                            <h5 class="text-white mb-3">$YY.YY USD</h5>
-                            <a href="<?= base_url('/comprar/detector-pro') ?>" class="btn btn-credit-card d-flex align-items-center justify-content-center mb-2">
-                                <i class="fas fa-credit-card me-2"></i> Comprar con Tarjeta
-                            </a>
-                            <a href="<?= base_url('/comprar/detector-pro-paypal') ?>" class="btn btn-paypal d-flex align-items-center justify-content-center">
-                                <i class="fab fa-paypal me-2"></i> Comprar con PayPal
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    ---
 
     <section class="py-5" id="company">
         <div class="container">
