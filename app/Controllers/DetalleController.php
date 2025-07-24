@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\LecturasGasModel;
 use App\Models\DispositivoModel;
+use CodeIgniter\I18n\Time; // Asegúrate de que esta línea esté presente si la necesitas
 
 class DetalleController extends BaseController
 {
@@ -31,6 +32,12 @@ class DetalleController extends BaseController
         $fechaInicio = $this->request->getGet('fechaInicio');
         $fechaFin = $this->request->getGet('fechaFin');
 
+        // --- INICIO DE LOGGING PARA DEBUGGING ---
+        log_message('debug', "DetalleController: Solicitud para MAC: " . $mac);
+        log_message('debug', "DetalleController: Fecha Inicio: " . ($fechaInicio ?? 'null'));
+        log_message('debug', "DetalleController: Fecha Fin: " . ($fechaFin ?? 'null'));
+        // --- FIN DE LOGGING ---
+
         // Obtener detalles del dispositivo
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
         $nombreDispositivo = $dispositivo['nombre'] ?? $mac;
@@ -40,12 +47,11 @@ class DetalleController extends BaseController
         $lecturas = [];
         $labels = [];
         $data = [];
-        $message = null;
+        $message = null; // Reiniciar el mensaje para cada solicitud
 
-        // Si no hay rango de fechas, no mostrar registros y mostrar un mensaje
+        // Si no hay rango de fechas, no mostrar registros
         if (empty($fechaInicio) || empty($fechaFin)) {
             $message = 'Por favor, selecciona un rango de fechas para ver los registros.';
-            // Retornar la vista con los datos básicos y el mensaje
             return view('detalles', [
                 'mac' => $mac,
                 'nombreDispositivo' => $nombreDispositivo,
@@ -61,9 +67,19 @@ class DetalleController extends BaseController
         // Obtener lecturas filtradas
         $lecturas = $this->lecturaModel->getLecturasPorMac($mac, $fechaInicio, $fechaFin);
 
+        // --- INICIO DE LOGGING PARA DEBUGGING ---
+        log_message('debug', "DetalleController: Lecturas obtenidas del modelo: " . count($lecturas) . " registros.");
+        if (empty($lecturas)) {
+            log_message('debug', "DetalleController: No se encontraron lecturas para el periodo seleccionado después de la consulta al modelo.");
+        } else {
+            // Logear solo los primeros 5 registros para no saturar el log si hay muchos
+            log_message('debug', "DetalleController: Primeras 5 lecturas: " . json_encode(array_slice($lecturas, 0, 5)));
+        }
+        // --- FIN DE LOGGING ---
+
+
         if (empty($lecturas)) {
             $message = 'No se encontraron lecturas para este dispositivo en el periodo seleccionado.';
-            // Retornar la vista con los datos básicos y el mensaje
             return view('detalles', [
                 'mac' => $mac,
                 'nombreDispositivo' => $nombreDispositivo,
@@ -95,7 +111,7 @@ class DetalleController extends BaseController
             'lecturas' => $lecturas, // Las lecturas se envían en el orden original (DESC) para la tabla
             'labels' => $labels,
             'data' => $data,
-            'message' => $message, // El mensaje puede ser null si hay datos
+            'message' => $message, // El mensaje puede ser null aquí si se encontraron lecturas
             'request' => $this->request // ¡Importante: Pasar el objeto request!
         ]);
     }
