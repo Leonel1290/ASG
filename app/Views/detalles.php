@@ -11,6 +11,7 @@ $message = $message ?? null; // Optional messages
 // Get the latest gas level to display in the simple card
 // It's assumed that the $lecturas array is ordered in DESCENDING order (most recent first)
 $nivelGasActualDisplay = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? esc($lecturas[0]['nivel_gas']) . ' PPM' : 'Sin datos';
+$nivelGasActualValue = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? (float)$lecturas[0]['nivel_gas'] : 0; // Default to 0 if no data
 
 // Helper function to escape HTML data (similar to CodeIgniter's esc())
 if (!function_exists('esc')) {
@@ -29,6 +30,7 @@ if (!function_exists('esc')) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         :root {
             --bg-dark: #1a202c;
@@ -196,7 +198,7 @@ if (!function_exists('esc')) {
 
 
         .chart-container {
-            max-width: 800px;
+            max-width: 100%; /* Changed from 800px to 100% for responsiveness */
             height: 350px; /* Fixed height for consistency */
             margin: 0 auto 2rem auto;
             background-color: rgba(0,0,0,0.1); /* Subtle background for chart area */
@@ -283,15 +285,48 @@ if (!function_exists('esc')) {
         </div>
     </div>
 
+    <div class="card mb-4">
+        <div class="card-header">
+            Filtrar Lecturas por Período
+        </div>
+        <div class="card-body">
+            <form action="<?= base_url('detalles/' . esc($mac)) ?>" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="fechaInicio" class="form-label">Fecha Inicio:</label>
+                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="<?= $request->getGet('fechaInicio') ?? '' ?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="fechaFin" class="form-label">Fecha Fin:</label>
+                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="<?= $request->getGet('fechaFin') ?? '' ?>">
+                </div>
+                <div class="col-md-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">Aplicar Filtro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <section>
         <h2 class="section-title"><i class="fas fa-chart-line"></i> Histórico de Niveles de Gas</h2>
         <div class="card">
             <div class="card-body">
                 <div class="chart-container">
-                    <canvas id="gasChart"></canvas>
+                    <canvas id="gasLineChart"></canvas> <!-- Changed ID to gasLineChart for clarity -->
                 </div>
                 <?php if (empty($labels) || empty($data)): ?>
-                    <p class="text-center text-muted mt-3">No hay datos suficientes para mostrar el gráfico.</p>
+                    <p class="text-center text-muted mt-3">No hay datos suficientes para mostrar el gráfico de línea.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Nivel de Gas (Última Lectura del Período Seleccionado)</h2>
+        <div class="card">
+            <div class="card-body">
+                <div id="gasGaugeChart" class="chart-container"></div> <!-- ECharts Gauge Chart -->
+                <?php if ($nivelGasActualValue === 0 && empty($lecturas)): ?>
+                    <p class="text-center text-muted mt-3">No hay datos para mostrar el medidor.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -299,208 +334,290 @@ if (!function_exists('esc')) {
 
     <section>
         <h2 class="section-title"><i class="fas fa-table"></i> Registros Detallados de Lecturas</h2>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
-                        <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
-                        <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($lecturas)): ?>
-                        <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
-                    <?php else: ?>
-                        <?php foreach ($lecturas as $lectura): ?>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-striped table-hover">
+                        <thead>
                             <tr>
-                                <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
-                                <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
-                                <td class="text-center">
-                                    <?php
-                                        $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
-                                        $estado = 'Desconocido';
-                                        $class = '';
-
-                                        if ($nivel >= 500) {
-                                            $estado = 'Peligro';
-                                            $class = 'bg-danger';
-                                        } elseif ($nivel >= 200) {
-                                            $estado = 'Precaución';
-                                            $class = 'bg-warning';
-                                        } elseif ($nivel >= 0) {
-                                            $estado = 'Seguro';
-                                            $class = 'bg-success';
-                                        }
-                                    ?>
-                                    <span class="badge <?= $class ?>"><?= $estado ?></span>
-                                </td>
+                                <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
+                                <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
+                                <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($lecturas)): ?>
+                                <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($lecturas as $lectura): ?>
+                                    <tr>
+                                        <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
+                                        <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
+                                        <td class="text-center">
+                                            <?php
+                                                $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
+                                                $estado = 'Desconocido';
+                                                $class = '';
+
+                                                if ($nivel >= 500) {
+                                                    $estado = 'Peligro';
+                                                    $class = 'bg-danger';
+                                                } elseif ($nivel >= 200) {
+                                                    $estado = 'Precaución';
+                                                    $class = 'bg-warning text-dark'; // Added text-dark for visibility
+                                                } elseif ($nivel >= 0) {
+                                                    $estado = 'Seguro';
+                                                    $class = 'bg-success';
+                                                }
+                                            ?>
+                                            <span class="badge <?= $class ?>"><?= $estado ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Ensure $lecturas, $labels, and $data are correctly passed from PHP
-    const lecturas = <?= json_encode($lecturas ?? []) ?>; // For the table (expected DESC order)
-    const labels = <?= json_encode($labels ?? []) ?>;     // For the chart (expected ASC order)
-    const data = <?= json_encode($data ?? []) ?>;         // For the chart (expected ASC order)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure $lecturas, $labels, and $data are correctly passed from PHP
+        const lecturas = <?= json_encode($lecturas ?? []) ?>; // For the table (expected DESC order)
+        const labels = <?= json_encode($labels ?? []) ?>;     // For the chart (expected ASC order)
+        const data = <?= json_encode($data ?? []) ?>;         // For the chart (expected ASC order)
 
-    // Get the last valid gas level for the "Nivel de Seguridad" card
-    // Chart data is ASC (oldest to newest), so the last element is the most recent.
-    const ultimoValor = data.length > 0 ? (parseFloat(data[data.length - 1]) || 0) : null;
+        // Get the last valid gas level for the "Nivel de Seguridad" card
+        // Chart data is ASC (oldest to newest), so the last element is the most recent.
+        const ultimoValor = data.length > 0 ? (parseFloat(data[data.length - 1]) || 0) : null;
 
-    // Update the "Nivel de Seguridad" card and progress bar
-    if (ultimoValor !== null) {
-        updateSecurityProgressBar(ultimoValor);
-    } else {
-        document.getElementById('securityLevelText').textContent = 'Sin datos';
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = '0%';
-        progressBar.className = 'progress-bar';
-        progressBar.setAttribute('aria-valuenow', 0);
-    }
-
-    function updateSecurityProgressBar(value) {
-        const progressBar = document.getElementById('progressBar');
-        const securityLevelText = document.getElementById('securityLevelText');
-        let width = 0;
-        let levelText = 'Sin datos';
-        let barClass = '';
-
-        const safeValue = Math.max(0, value); // Ensure value is not negative
-
-        if (safeValue < 200) {
-            width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
-            levelText = 'Seguro';
-            barClass = 'bg-success';
-        } else if (safeValue < 500) {
-            width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
-            levelText = 'Precaución';
-            barClass = 'bg-warning';
-        } else { // 500 PPM and above
-            width = 66 + ((safeValue - 500) / 500) * 34; // Scale 500+ PPM to 66-100%
-            levelText = 'Peligro';
-            barClass = 'bg-danger';
+        // Update the "Nivel de Seguridad" card and progress bar
+        if (ultimoValor !== null) {
+            updateSecurityProgressBar(ultimoValor);
+        } else {
+            document.getElementById('securityLevelText').textContent = 'Sin datos';
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+            progressBar.className = 'progress-bar';
+            progressBar.setAttribute('aria-valuenow', 0);
         }
 
-        width = Math.min(100, Math.max(0, width)); // Cap width between 0 and 100
+        function updateSecurityProgressBar(value) {
+            const progressBar = document.getElementById('progressBar');
+            const securityLevelText = document.getElementById('securityLevelText');
+            let width = 0;
+            let levelText = 'Sin datos';
+            let barClass = '';
 
-        progressBar.style.width = `${width}%`;
-        progressBar.className = `progress-bar ${barClass}`;
-        progressBar.setAttribute('aria-valuenow', width);
-        securityLevelText.textContent = levelText;
-    }
+            const safeValue = Math.max(0, value); // Ensure value is not negative
 
-    // Chart.js configuration
-    if (labels.length > 0 && data.length > 0) {
-        const ctx = document.getElementById('gasChart').getContext('2d');
-        const gasChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels, // Already in ascending order (oldest to newest)
-                datasets: [{
-                    label: 'Nivel de Gas (PPM)',
-                    data: data, // Already in ascending order
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 3,
-                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: 'var(--text-darker)',
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Nivel de Gas: ${context.parsed.y} PPM`;
-                            },
-                            title: function(context) {
-                                return `Fecha: ${context[0].label}`;
-                            }
-                        },
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        titleColor: 'var(--text-lighter)',
-                        bodyColor: 'var(--text-light)',
-                        borderColor: 'var(--primary-color)',
-                        borderWidth: 1
-                    }
+            if (safeValue < 200) {
+                width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
+                levelText = 'Seguro';
+                barClass = 'bg-success';
+            } else if (safeValue < 500) {
+                width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
+                levelText = 'Precaución';
+                barClass = 'bg-warning text-dark'; // Added text-dark for visibility
+            } else { // 500 PPM and above
+                width = 66 + ((safeValue - 500) / 500) * 34; // Scale 500+ PPM to 66-100%
+                levelText = 'Peligro';
+                barClass = 'bg-danger';
+            }
+
+            width = Math.min(100, Math.max(0, width)); // Cap width between 0 and 100
+
+            progressBar.style.width = `${width}%`;
+            progressBar.className = `progress-bar ${barClass}`;
+            progressBar.setAttribute('aria-valuenow', width);
+            securityLevelText.textContent = levelText;
+        }
+
+        // Chart.js Line Chart configuration
+        const lineChartDom = document.getElementById('gasLineChart'); // Corrected ID
+        if (lineChartDom && labels.length > 0 && data.length > 0) {
+            const ctx = lineChartDom.getContext('2d');
+            const gasLineChart = new Chart(ctx, { // Renamed variable for clarity
+                type: 'line',
+                data: {
+                    labels: labels, // Already in ascending order (oldest to newest)
+                    datasets: [{
+                        label: 'Nivel de Gas (PPM)',
+                        data: data, // Already in ascending order
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Fecha',
-                            color: 'var(--text-lighter)',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'var(--text-darker)',
+                                font: {
+                                    size: 14
+                                }
                             }
                         },
-                        ticks: {
-                            color: 'var(--text-light)',
-                            maxRotation: 45,
-                            minRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 10 // Limit number of labels to avoid overlap
-                        },
-                        grid: {
-                            color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
-                            drawBorder: true
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Nivel de Gas: ${context.parsed.y} PPM`;
+                                },
+                                title: function(context) {
+                                    return `Fecha: ${context[0].label}`;
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleColor: 'var(--text-lighter)',
+                            bodyColor: 'var(--text-light)',
+                            borderColor: 'var(--primary-color)',
+                            borderWidth: 1
                         }
                     },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Nivel de Gas (PPM)',
-                            color: 'var(--text-lighter)',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fecha',
+                                color: 'var(--text-lighter)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                color: 'var(--text-light)',
+                                maxRotation: 45,
+                                minRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: {
+                                color: 'rgba(74, 85, 104, 0.3)',
+                                drawBorder: true
                             }
                         },
-                        beginAtZero: true,
-                        ticks: {
-                            color: 'var(--text-light)',
-                            callback: function(value) {
-                                return value + ' PPM';
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Nivel de Gas (PPM)',
+                                color: 'var(--text-lighter)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'var(--text-light)',
+                                callback: function(value) {
+                                    return value + ' PPM';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(74, 85, 104, 0.3)',
+                                drawBorder: true
                             }
-                        },
-                        grid: {
-                            color: 'rgba(74, 85, 104, 0.3)', // Lighter grid lines
-                            drawBorder: true
                         }
                     }
                 }
+            });
+        } else {
+            const chartCanvas = document.getElementById('gasLineChart');
+            if (chartCanvas) {
+                chartCanvas.style.display = 'none';
+                // Display a message if no data for the line chart
+                const parentCardBody = chartCanvas.closest('.card-body');
+                if (parentCardBody && !parentCardBody.querySelector('.no-data-message')) {
+                    const messageElement = document.createElement('p');
+                    messageElement.className = 'text-center text-muted mt-3 no-data-message';
+                    messageElement.textContent = 'No hay datos suficientes para mostrar el gráfico de línea.';
+                    parentCardBody.appendChild(messageElement);
+                }
             }
-        });
-    } else {
-        // If no chart data, hide the canvas and display the message provided in HTML
-        const chartCanvas = document.getElementById('gasChart');
-        if (chartCanvas) {
-            chartCanvas.style.display = 'none';
         }
-    }
-</script>
 
+        // ECharts Gauge Chart
+        const gaugeChartDom = document.getElementById('gasGaugeChart');
+        if (gaugeChartDom) {
+            const myGaugeChart = echarts.init(gaugeChartDom, 'dark'); // Initialize with 'dark' theme
+            const nivelGasActual = <?= json_encode($nivelGasActualValue) ?>;
+
+            const gaugeOption = {
+                series: [
+                    {
+                        type: 'gauge',
+                        min: 0,
+                        max: 1000, // Max value for the gauge (e.g., 1000 PPM for gas sensor)
+                        axisLine: {
+                            lineStyle: {
+                                width: 30,
+                                color: [
+                                    [0.3, '#48bb78'], // 0-300 PPM (safe - green)
+                                    [0.7, '#f6e05e'], // 300-700 PPM (caution - yellow)
+                                    [1, '#e53e3e']    // 700-1000 PPM (danger - red)
+                                ]
+                            }
+                        },
+                        pointer: {
+                            itemStyle: {
+                                color: 'auto'
+                            }
+                        },
+                        axisTick: {
+                            distance: -30,
+                            length: 8,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 2
+                            }
+                        },
+                        splitLine: {
+                            distance: -30,
+                            length: 30,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 4
+                            }
+                        },
+                        axisLabel: {
+                            color: 'inherit',
+                            distance: 40,
+                            fontSize: 20
+                        },
+                        detail: {
+                            valueAnimation: true,
+                            formatter: '{value} PPM',
+                            color: 'inherit'
+                        },
+                        data: [
+                            {
+                                value: nivelGasActual
+                            }
+                        ]
+                    }
+                ]
+            };
+            myGaugeChart.setOption(gaugeOption);
+
+            // Handle chart resizing
+            window.addEventListener('resize', function() {
+                myGaugeChart.resize();
+            });
+        }
+    });
+</script>
 </body>
 </html>
