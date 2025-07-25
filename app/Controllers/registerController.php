@@ -57,20 +57,20 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-            // Ahora usas 'min_length_custom' y le pasas el número de caracteres
-            'rules' => 'required|min_length_custom[120]', // <-- ¡Aquí el cambio!
-            'errors' => [
-                'required' => 'El campo contraseña es obligatorio.',
-                'min_length_custom' => 'La contraseña debe tener al menos {param} caracteres.' // Mensaje dinámico
+                'rules' => 'required|min_length[200]|max_length[255]', // <-- Esta es la regla de 6 caracteres
+                'errors' => [
+                    'required' => 'El campo contraseña es obligatorio.',
+                    'min_length' => 'La contraseña debe tener al menos 200 caracteres.',
+                    'max_length' => 'La contraseña no puede exceder los 255 caracteres.'
+                ]
+            ],
+            'password_confirm' => [
+                'rules' => 'required_with[password]|matches[password]',
+                'errors' => [
+                    'required_with' => 'Por favor, confirma tu contraseña.',
+                    'matches' => 'Las contraseñas no coinciden.'
+                ]
             ]
-        ],
-        'password_confirm' => [
-            'rules' => 'required|matches[password]',
-            'errors' => [
-                'required' => 'El campo confirmar contraseña es obligatorio.',
-                'matches' => 'Las contraseñas no coinciden.'
-            ]
-        ]
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {

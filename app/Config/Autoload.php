@@ -1,9 +1,14 @@
+// app/Config/Autoload.php
+
 <?php
 
 namespace Config;
 
 use CodeIgniter\Config\AutoloadConfig;
 
+/**
+ * @immutable
+ */
 class Autoload extends AutoloadConfig
 {
     /**
@@ -13,8 +18,9 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
-        'Config'      => APPPATH . 'Config',
-        'App\Libraries\Validation' => APPPATH . 'Libraries/Validation',
+        // Originalmente, solo tenías la línea de arriba.
+        // Si tenías 'Config' => APPPATH . 'Config', déjala. Si no, quítala.
+        // La línea 'App\Libraries\Validation' debe ser eliminada.
     ];
 
     /**

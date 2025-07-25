@@ -1,3 +1,5 @@
+// app/Config/Validation.php
+
 <?php
 
 namespace Config;
@@ -10,36 +12,26 @@ use CodeIgniter\Validation\StrictRules\Rules;
 
 class Validation extends BaseConfig
 {
-    // --------------------------------------------------------------------
-    // Setup
-    // --------------------------------------------------------------------
-
     /**
      * Stores the classes that contain the
      * rules that are available.
-     *
-     * @var list<string>
      */
     public array $ruleSets = [
         Rules::class,
         FormatRules::class,
         FileRules::class,
         CreditCardRules::class,
-        \App\Libraries\Validation\MyCustomRules::class, // <-- ¡Asegúrate de que esta línea esté presente!
+        // La línea \App\Libraries\Validation\MyCustomRules::class, DEBE SER ELIMINADA.
     ];
 
     /**
      * Specifies the views that are used to display the
      * errors.
-     *
-     * @var array<string, string>
      */
     public array $templates = [
         'list'   => 'CodeIgniter\Validation\Views\list',
         'single' => 'CodeIgniter\Validation\Views\single',
     ];
 
-    // --------------------------------------------------------------------
-    // Rules
-    // --------------------------------------------------------------------
+    // ... El resto del archivo permanece igual ...
 }
