@@ -1,5 +1,3 @@
-// app/Config/Validation.php
-
 <?php
 
 namespace Config;
