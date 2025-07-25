@@ -31,23 +31,21 @@ class DispositivoModel extends Model
     // Habilitamos el uso de timestamps si quieres manejar la fecha de creación o actualización de registros
     // Tu tabla `dispositivos` en el script SQL tiene `created_at` y `updated_at`.
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime'; // O 'int' si guardas timestamps como enteros
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    // protected $deletedField  = 'deleted_at'; // Solo si useSoftDeletes es true
+    protected $dateFormat    = 'datetime'; // O 'int' si usas UNIX timestamps
 
-    // Validación (opcional, puedes añadir reglas si es necesario)
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false; // Cambia a true para omitir la validación del modelo
-    protected $cleanValidationRules = true;
 
-    // Callbacks (si necesitas, por ejemplo, formatear la MAC antes de guardar)
-    protected $allowCallbacks = true;
-    // protected $beforeInsert   = ['formatMac']; // Ejemplo de callback
-    // protected $beforeUpdate   = ['formatMac']; // Ejemplo de callback
+    // Callbacks para eventos del modelo (opcional)
+    // protected $allowCallbacks = true;
+    // protected $beforeInsert   = [];
+    // protected $afterInsert    = [];
+    // protected $beforeUpdate   = [];
+    // protected $afterUpdate    = [];
+    // protected $beforeFind     = [];
+    // protected $afterFind      = [];
+    // protected $beforeDelete   = [];
+    // protected $afterDelete    = [];
 
-    // Método para obtener dispositivo por su id
+    // Método para obtener un dispositivo por su ID
     public function getDispositivoById($id)
     {
         return $this->find($id);
@@ -66,24 +64,20 @@ class DispositivoModel extends Model
         return $this->where('MAC', $mac)->set($data)->update();
     }
 
-    // Método para actualizar un dispositivo por su ID (ya existe en el modelo base find/update)
-    // public function updateDispositivo($id, $data)
-    // {
-    //     return $this->update($id, $data);
-    // }
-
-    // Ejemplo de callback para formatear MAC si fuera necesario
-    // protected function formatMac(array $data)
-    // {
-    //     if (isset($data['data']['MAC'])) {
-    //         // Ejemplo: convertir a mayúsculas y formato con guiones
-    //         $mac = strtoupper(str_replace([':', '-'], '', $data['data']['MAC']));
-    //         $data['data']['MAC'] = implode(':', str_split($mac, 2));
-    //     }
-    //     return $data;
-    // }
-
-    // NOTA: Tienes otro modelo llamado DispositivosModel.php que parece apuntar a la misma tabla 'dispositivos'.
-    // Es recomendable usar UN SOLO modelo (DispositivoModel) para interactuar con la tabla de dispositivos
-    // y eliminar el modelo DispositivosModel.php para evitar confusión y redundancia.
+    /**
+     * Recupera todos los dispositivos enlazados a un usuario específico.
+     * Realiza un join con la tabla 'enlace' para filtrar por id_usuario.
+     *
+     * @param int $userId El ID del usuario.
+     * @return array Array de dispositivos.
+     */
+    public function getDispositivosPorUsuario(int $userId): array
+    {
+        // Une la tabla 'dispositivos' con la tabla 'enlace'
+        // donde la MAC del dispositivo coincide con la MAC enlazada al usuario.
+        return $this->select('dispositivos.*') // Selecciona todas las columnas de la tabla dispositivos
+                    ->join('enlace', 'enlace.MAC = dispositivos.MAC')
+                    ->where('enlace.id_usuario', $userId)
+                    ->findAll();
+    }
 }
