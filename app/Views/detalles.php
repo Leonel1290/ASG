@@ -563,8 +563,6 @@ if (!function_exists('esc')) {
                 }
             }
         }
-        // ECharts Gauge Chart: REMOVED
-        // The ECharts script tag was also removed from the <head> section.
     });
 </script>
 </body>
