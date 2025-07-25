@@ -8,125 +8,217 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Enlace al archivo CSS externo (si lo tienes) -->
-    <!-- <link rel="stylesheet" href="<?= base_url('css/detalle_dispositivo.css'); ?>"> -->
-
-    <!-- Configuración PWA -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ASG">
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-    <meta name="mobile-web-app-capable" content="yes"> <!-- Nueva meta tag añadida aquí -->
+    <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- Meta tags para CSRF token. CodeIgniter usa csrf_token() para el nombre y csrf_hash() para el valor. -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
-        /* Estilos generales para el cuerpo de la página */
         body {
-            background-color: #f8f9fa; /* Fondo gris claro */
-            font-family: 'Inter', sans-serif; /* Fuente moderna */
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
         }
-        /* Contenedor principal de la página */
         .container.main-content {
-            margin-top: 50px;
-            padding-bottom: 50px;
+            margin-top: 20px;
+            padding-bottom: 20px;
         }
-        /* Estilo para las tarjetas (cards) */
         .card {
-            border-radius: 15px; /* Bordes redondeados */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             background-color: #ffffff;
-            padding: 30px; /* Más padding interno */
+            padding: 30px;
+            border: none;
+            overflow: hidden; /* Para asegurar que el velocímetro no se desborde */
         }
-        /* Estilo para el título principal */
         h2 {
-            color: #343a40; /* Color oscuro */
-            font-weight: 700; /* Negrita */
+            color: #343a40;
+            font-weight: 700;
             margin-bottom: 30px;
             text-align: center;
+            font-size: 2.2rem;
+            position: relative;
         }
-        /* Estilo para el título de la tarjeta (nombre del dispositivo) */
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: #007bff;
+            border-radius: 2px;
+        }
         .card-title {
-            color: #007bff; /* Color primario de Bootstrap */
+            color: #007bff;
             font-size: 1.8rem;
             font-weight: 600;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
         }
-        /* Estilo para el subtítulo de la tarjeta (ubicación) */
+        .card-title i {
+            margin-right: 10px;
+            color: #0056b3;
+        }
         .card-subtitle {
-            color: #6c757d; /* Gris para subtítulos */
+            color: #6c757d;
             font-size: 1.1rem;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
         }
-        /* Estilo para el texto general de la tarjeta */
+        .card-subtitle i {
+            margin-right: 10px;
+            color: #5a6268;
+        }
         .card-text {
             font-size: 1.2rem;
             margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centrar el texto del estado de la válvula */
+            text-align: center;
         }
-        /* Estilo para el span que muestra el estado actual de la válvula */
+        .card-text i {
+            margin-right: 10px;
+            color: #6f42c1; /* Un color distintivo para el estado */
+        }
         #estado-actual {
             font-weight: 700;
         }
-        /* Clases para colorear el estado de la válvula */
         #estado-actual.abierta {
-            color: #28a745; /* Verde para "Abierta" */
+            color: #28a745;
         }
         #estado-actual.cerrada {
-            color: #dc3545; /* Rojo para "Cerrada" */
+            color: #dc3545;
         }
-        /* Grupo de botones */
         .btn-group {
-            display: flex; /* Para que los botones estén uno al lado del otro */
-            gap: 15px; /* Espacio entre botones */
-            justify-content: center; /* Centrar los botones */
+            display: flex;
+            gap: 15px;
+            justify-content: center;
             margin-top: 30px;
         }
-        /* Estilo general para los botones */
         .btn {
             padding: 12px 25px;
-            border-radius: 10px; /* Botones más redondeados */
+            border-radius: 10px;
             font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.3s ease; /* Transición suave en hover */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        /* Estilo específico para el botón de éxito (verde) */
+        .btn i {
+            margin-right: 8px;
+        }
         .btn-success {
             background-color: #28a745;
             border-color: #28a745;
         }
-        /* Efecto hover para el botón de éxito */
         .btn-success:hover {
             background-color: #218838;
             border-color: #1e7e34;
-            transform: translateY(-2px); /* Efecto de elevación */
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); /* Sombra al pasar el mouse */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
-        /* Estilo específico para el botón de peligro (rojo) */
         .btn-danger {
             background-color: #dc3545;
             border-color: #dc3545;
         }
-        /* Efecto hover para el botón de peligro */
         .btn-danger:hover {
             background-color: #c82333;
             border-color: #bd2130;
-            transform: translateY(-2px); /* Efecto de elevación */
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3); /* Sombra al pasar el mouse */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
         }
-        /* Estilo para los mensajes de alerta */
         .alert {
             border-radius: 10px;
             margin-bottom: 20px;
             font-size: 1rem;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        /* Media Queries para responsividad en pantallas pequeñas (max-width: 768px) */
+        .alert i {
+            margin-right: 8px;
+        }
+
+        /* Estilos del Velocímetro */
+        .gauge-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column; /* Para alinear el velocímetro y su etiqueta */
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .gauge {
+            width: 180px;
+            height: 90px;
+            overflow: hidden;
+            position: relative;
+            background: #e0e0e0;
+            border-radius: 90px 90px 0 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        .gauge-fill {
+            height: 100%;
+            width: 100%;
+            transform-origin: bottom center;
+            transition: transform 0.6s ease-out;
+            background: linear-gradient(to right, #28a745 0%, #ffc107 50%, #dc3545 100%);
+            border-radius: 90px 90px 0 0;
+            position: absolute;
+            bottom: 0;
+        }
+        .gauge-cover {
+            width: 140px;
+            height: 70px;
+            background: #ffffff;
+            border-radius: 70px 70px 0 0;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #343a40;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
+            z-index: 1; /* Asegura que la cubierta esté sobre el relleno */
+        }
+        .gauge-label {
+            margin-top: 10px; /* Espacio entre el velocímetro y su etiqueta */
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .gauge-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* Media Queries */
         @media (max-width: 768px) {
             .card {
                 padding: 20px;
+            }
+            h2 {
+                font-size: 1.8rem;
             }
             .card-title {
                 font-size: 1.5rem;
@@ -138,36 +230,55 @@
                 font-size: 1.1rem;
             }
             .btn-group {
-                flex-direction: column; /* Botones apilados */
+                flex-direction: column;
                 gap: 10px;
             }
             .btn {
-                width: 100%; /* Botones de ancho completo */
+                width: 100%;
+            }
+            .gauge {
+                width: 150px;
+                height: 75px;
+            }
+            .gauge-cover {
+                width: 110px;
+                height: 55px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container main-content mt-4">
+<div class="container main-content">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <h2>Control de Válvula</h2>
+            <h2>Control de Válvula de Gas</h2>
             <div class="card">
                 <div class="card-body">
                     <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i><?= esc($error_message) ?>
+                            <i class="fas fa-exclamation-triangle"></i><?= esc($error_message) ?>
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
                         <h5 class="card-title" id="nombre-dispositivo">
-                            <i class="fas fa-microchip me-2"></i>Dispositivo: <?= esc($dispositivo->nombre) ?>
+                            <i class="fas fa-microchip"></i>Dispositivo: <?= esc($dispositivo->nombre) ?>
                         </h5>
                         <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">
-                            <i class="fas fa-map-marker-alt me-2"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
+                            <i class="fas fa-map-marker-alt"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
                         </h6>
+                        
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-fill" id="gaugeFill"></div>
+                                <div class="gauge-cover">
+                                    <span id="gasLevel">0%</span>
+                                </div>
+                            </div>
+                            <div class="gauge-label">Nivel de Gas en Ambiente</div>
+                        </div>
+
                         <p class="card-text">
-                            <i class="fas fa-lightbulb me-2"></i>Estado actual: 
+                            <i class="fas fa-toggle-on"></i>Estado actual de la válvula: 
                             <span id="estado-actual" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>">
                                 <?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?>
                             </span>
@@ -175,15 +286,15 @@
                         
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-success" id="btn-abrir">
-                                <i class="fas fa-solid fa-valve me-2"></i>Abrir Válvula
+                                <i class="fas fa-valve"></i>Abrir Válvula
                             </button>
                             <button type="button" class="btn btn-danger" id="btn-cerrar">
-                                <i class="fas fa-solid fa-valve me-2"></i>Cerrar Válvula
+                                <i class="fas fa-valve-slash"></i>Cerrar Válvula
                             </button>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>No se pudo cargar la información del dispositivo. Por favor, asegúrese de que la URL sea correcta o seleccione un dispositivo de su lista.
+                            <i class="fas fa-info-circle"></i>No se pudo cargar la información del dispositivo. Por favor, asegúrese de que la URL sea correcta o seleccione un dispositivo de su lista.
                         </div>
                     <?php endif; ?>
                 </div>
@@ -192,30 +303,38 @@
     </div>
 </div>
 
-<!-- Incluir jQuery antes de tu script personalizado -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-// Solo ejecutar el script si el dispositivo está definido, de lo contrario, no hay MAC para usar
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
-    // Escapar la MAC para seguridad en JS
     const mac = '<?= esc($dispositivo->MAC) ?>'; 
     const estadoActualSpan = $('#estado-actual');
+    const gaugeFill = $('#gaugeFill');
+    const gasLevelSpan = $('#gasLevel');
 
-    // Obtener el nombre y valor del token CSRF
-    // CodeIgniter 4 usa un campo oculto por defecto con el nombre del token y el hash como valor
-    // Si usas meta tags, asegúrate de que CodeIgniter los esté generando en tu layout o vista principal.
-    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>'; // Fallback a función PHP
-    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>'; // Fallback a función PHP
+    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
+    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-
-    // Función para actualizar el estado mostrado en la UI
     function actualizarEstadoUI(estado) {
         estadoActualSpan.text(estado ? 'Abierta' : 'Cerrada');
         if (estado) {
             estadoActualSpan.removeClass('cerrada').addClass('abierta');
         } else {
             estadoActualSpan.removeClass('abierta').addClass('cerrada');
+        }
+    }
+
+    function updateGauge(level) {
+        const rotation = (level / 100) * 180;
+        gaugeFill.css('transform', `rotate(${rotation}deg)`);
+        gasLevelSpan.text(`${level}%`);
+
+        if (level < 30) {
+            gasLevelSpan.css('color', '#28a745');
+        } else if (level < 70) {
+            gasLevelSpan.css('color', '#ffc107');
+        } else {
+            gasLevelSpan.css('color', '#dc3545');
         }
     }
     
@@ -225,35 +344,32 @@ $(document).ready(function() {
             console.error('Error al obtener estado inicial:', response.error);
         } else {
             actualizarEstadoUI(response.estado_valvula);
+            // Generar un valor aleatorio para el nivel de gas al inicio
+            const randomGasLevel = Math.floor(Math.random() * 101); // 0-100
+            updateGauge(randomGasLevel);
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         console.error('Error de red o servidor al obtener estado inicial:', textStatus, errorThrown);
     });
     
-    // Event listener para el botón "Abrir Válvula"
     $('#btn-abrir').click(function() {
-        controlarServo(mac, 1); // 1 para abrir
+        controlarServo(mac, 1);
     });
     
-    // Event listener para el botón "Cerrar Válvula"
     $('#btn-cerrar').click(function() {
-        controlarServo(mac, 0); // 0 para cerrar
+        controlarServo(mac, 0);
     });
     
-    // Función para enviar la petición al controlador para controlar el servo
     function controlarServo(mac, estado) {
-        // Datos a enviar, incluyendo el token CSRF
         const postData = {
             mac: mac,
             estado: estado
         };
-        // Añadir el token CSRF dinámicamente si los valores son válidos
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         } else {
             console.warn('CSRF token o hash no encontrados. La petición POST podría fallar.');
         }
-
 
         $.post('/servo/actualizarEstado', postData, function(response) {
             if (response.error) {
@@ -261,15 +377,14 @@ $(document).ready(function() {
             } else {
                 actualizarEstadoUI(response.estado);
                 // Si la actualización es exitosa, se puede recargar el token para la siguiente petición
-                // (Esto es importante si tu CSRF token cambia por cada petición)
-                // csrfHash = response.csrf_new_hash; // Si tu servidor devuelve un nuevo token en la respuesta
+                // csrfHash = response.csrf_new_hash; 
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
         });
     }
     
-    // Actualizar el estado del dispositivo periódicamente
+    // Actualizar el estado del dispositivo y el nivel de gas periódicamente
     setInterval(function() {
         $.get('/servo/obtenerEstado/' + mac, function(response) {
             if (!response.error) {
@@ -278,6 +393,11 @@ $(document).ready(function() {
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error en actualización periódica:', textStatus, errorThrown);
         });
+
+        // Actualizar el velocímetro con un valor aleatorio en cada intervalo
+        const randomGasLevel = Math.floor(Math.random() * 101); // 0-100
+        updateGauge(randomGasLevel);
+
     }, 5000); // Actualizar cada 5 segundos
 });
 <?php endif; ?>
