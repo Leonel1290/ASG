@@ -81,7 +81,7 @@ $routes->group('perfil', function($routes) {
 
 
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
-a
+
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
 
