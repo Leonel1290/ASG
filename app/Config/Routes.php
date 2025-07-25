@@ -35,37 +35,111 @@ $routes->post('/logout', 'Home::logout');
 // PASSWORD RECOVERY
 $routes->get('/forgotpassword', 'Home::forgotpassword');
 $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
-$routes->get('/reset-password/(:any)', 'Home::resetPassword/$1');
-$routes->post('/reset-password', 'Home::processResetPassword'); // Route to process the password reset form
+$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
+$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
 
+// --- END REGISTRATION AND LOGIN ROUTES ---
+
+<<<<<<< HEAD
 // --- USER PROFILE AND DEVICE MANAGEMENT ROUTES ---
+=======
 
-// Route to display the user profile (main dashboard after login)
-$routes->get('/perfil', 'PerfilController::index'); // Apply auth filter if needed
+// Profile (Group routes related to PerfilController)
+$routes->group('perfil', function($routes) {
+    // Route for the main profile page
+    // GET /perfil
+    $routes->get('/', 'PerfilController::index');
+>>>>>>> 0a6c87792d1e09a2e9b085e5d0816f75f890a553
 
-// Route to handle device linking (POST request)
-$routes->post('/enlace/store', 'EnlaceController::store'); // Apply auth filter
+    // --- ROUTES FOR PROFILE VERIFICATION AND CONFIGURATION FLOW ---
 
-// Route to display the device linking form (GET request)
-$routes->get('/enlace', 'EnlaceController::index'); // Apply auth filter
+    // Route to display the INITIAL configuration page (asks to verify email)
+    // GET /perfil/configuracion
+    $routes->get('configuracion', 'PerfilController::configuracion');
 
-// Routes for editing and deleting devices from the profile
-$routes->get('/perfil/dispositivo/editar/(:any)', 'PerfilController::editarDispositivo/$1');
-$routes->post('/perfil/dispositivo/actualizar/(:any)', 'PerfilController::actualizarDispositivo/$1');
-$routes->post('/perfil/eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
+    // Route to process sending the verification email for CONFIGURATION
+    // POST /perfil/enviar-verificacion
+    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
 
-// Route for changing language
-$routes->post('/cambiar-idioma', 'PerfilController::cambiarIdioma');
+    // Route to verify the token received by email for CONFIGURATION
+    // GET /perfil/verificar-email/THE_GENERATED_TOKEN
+    $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
+
+    // Route to display the REAL configuration form (accessible after email verification)
+    // GET /perfil/config_form
+    $routes->get('config_form', 'PerfilController::configForm');
+
+    // Route to process profile update (name/email)
+    // POST /perfil/actualizar
+    $routes->post('actualizar', 'PerfilController::actualizar');
+
+    // Route for the success page after profile update
+    // GET /perfil/cambio-exitoso
+    $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
+
+    // Route to change language
+    $routes->match(['get', 'post'], 'cambiar-idioma', 'PerfilController::cambiarIdioma');
+
+    // --- END PROFILE VERIFICATION AND CONFIGURATION ROUTES ---
 
 
-// --- DEVICE DETAIL AND GAS RECORD ROUTES ---
+    // --- ROUTES FOR DEVICE MANAGEMENT FROM PROFILE ---
 
-// Route for displaying device details with MAC (and optional date filters)
-// THIS IS THE MAIN ROUTE FOR THE 'detalles' VIEW
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+    // Route to display the device editing form
+    // GET /perfil/dispositivo/editar/DEVICE_MAC
+    // (:segment) captures the MAC from the URL
+    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
 
+<<<<<<< HEAD
 // NEW: Route to get the latest gas level for a MAC as JSON
 
+=======
+    // Route to process the device editing form
+    // POST /perfil/dispositivo/actualizar
+    $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
+
+    // Route to delete selected devices (unlink from user)
+    // POST /perfil/eliminar-dispositivos
+    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
+
+
+    // --- END DEVICE MANAGEMENT ROUTES FROM PROFILE ---
+
+});
+
+
+// Receive data from ESP32:
+// POST /lecturas_gas/guardar
+$routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
+
+// View to link devices (form to enter MAC)
+// GET /enlace
+$routes->get('/enlace', 'EnlaceController::index');
+// Action to link MACs (processes the /enlace form)
+// POST /enlace/store
+$routes->post('/enlace/store', 'EnlaceController::store');
+
+// --- DEVICE AND GAS RECORD ROUTES ---
+
+// Route for the new view that lists all devices (the "menu")
+// This route is typically for a list of devices. If you don't have a DeviceController,
+// this might need to point to a method in another controller that lists devices.
+// Commented out as per previous instructions if DeviceController is not in use.
+// $routes->get('/dispositivos', 'DeviceController::listDevices');
+
+// CRUCIAL ROUTE: Route for the detail view of a specific device (with chart and latest reading)
+// THIS ROUTE NOW POINTS TO LECTURASCONTROLLER::detalle
+// Example: http://yourdomain.com/dispositivo/AA:BB:CC:DD:EE:FF
+$routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
+
+// New route for the view of all gas records of a specific device
+// If you want a separate view just for historical records without the large chart,
+// you can point this to another method in LecturasController or a new controller.
+// Commented out to avoid potential conflicts with the /dispositivo route if not distinct.
+// $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1');
+
+// --- END DEVICE AND GAS RECORD ROUTES ---
+>>>>>>> 0a6c87792d1e09a2e9b085e5d0816f75f890a553
 
 
 // --- DIRECT VIEW ROUTES ---
@@ -82,6 +156,12 @@ $routes->group('registros-gas', function($routes) {
     $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
 });
 
+// IMPORTANT: These routes for 'detalles' are commented out to prevent conflicts.
+// If you absolutely need to use 'detalles/(:any)', you MUST decide which controller/method
+// will handle it (e.g., LecturasController::detalle) and uncomment only ONE.
+// $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+// $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+
 
 // --- PREVIOUS ROUTES (COMMENTED FOR CLARITY AND TO AVOID DUPLICATES) ---
 // The following routes are commented because they are likely redundant or do not correspond
@@ -93,7 +173,9 @@ $routes->group('registros-gas', function($routes) {
 // $routes->get('/obtenerperfil', 'Home::obtenerperfil');
 // $routes->get('/mac/(:segment)', 'Home::verLecturas/$1');
 // $routes->post('/actualizar-dispositivo', 'DispositivoController::actualizarDispositivo');
-// If Home::perfil() and EnlaceController::store() duplicate PerfilController::index() and EnlaceController::store(), remove the duplicates.
+// If Home::perfil() and EnlaceController::store() duplicate PerfilController::index() and EnlaceController::store(),
+// remove the duplicate methods in Home.php.
 
-// Example of a route to receive sensor data (if not already handled by LecturasController::guardar)
-// $routes->post('/api/gas-reading', 'LecturasController::guardar');
+$routes->get('prueba', function() {
+    return '¡Ruta de prueba funcionando!';
+});
