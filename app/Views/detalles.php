@@ -30,7 +30,7 @@ if (!function_exists('esc')) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- ECharts is no longer needed, removing script tag -->
     <style>
         :root {
             --bg-dark: #1a202c;
@@ -198,7 +198,7 @@ if (!function_exists('esc')) {
 
 
         .chart-container {
-            max-width: 100%; /* Changed from 800px to 100% for responsiveness */
+            max-width: 100%;
             height: 350px; /* Fixed height for consistency */
             margin: 0 auto 2rem auto;
             background-color: rgba(0,0,0,0.1); /* Subtle background for chart area */
@@ -237,6 +237,22 @@ if (!function_exists('esc')) {
         /* Chart.js overrides for dark theme */
         .chartjs-render-monitor {
             background-color: transparent !important; /* Ensure canvas background is transparent */
+        }
+        /* Modal specific styles */
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-lighter);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+        }
+        .modal-header, .modal-footer {
+            border-color: var(--border-color);
+        }
+        .modal-title {
+            color: var(--text-darker);
+        }
+        .btn-close {
+            filter: invert(1); /* Makes the close button white for dark background */
         }
     </style>
 </head>
@@ -301,6 +317,8 @@ if (!function_exists('esc')) {
                 </div>
                 <div class="col-md-4 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary me-2">Aplicar Filtro</button>
+                    <!-- Button to trigger the modal for detailed records -->
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalLecturas">Ver Registros</button>
                 </div>
             </form>
         </div>
@@ -311,7 +329,7 @@ if (!function_exists('esc')) {
         <div class="card">
             <div class="card-body">
                 <div class="chart-container">
-                    <canvas id="gasLineChart"></canvas> <!-- Changed ID to gasLineChart for clarity -->
+                    <canvas id="gasLineChart"></canvas>
                 </div>
                 <?php if (empty($labels) || empty($data)): ?>
                     <p class="text-center text-muted mt-3">No hay datos suficientes para mostrar el gráfico de línea.</p>
@@ -320,67 +338,65 @@ if (!function_exists('esc')) {
         </div>
     </section>
 
-    <section>
-        <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Nivel de Gas (Última Lectura del Período Seleccionado)</h2>
-        <div class="card">
-            <div class="card-body">
-                <div id="gasGaugeChart" class="chart-container"></div> <!-- ECharts Gauge Chart -->
-                <?php if ($nivelGasActualValue === 0 && empty($lecturas)): ?>
-                    <p class="text-center text-muted mt-3">No hay datos para mostrar el medidor.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <h2 class="section-title"><i class="fas fa-table"></i> Registros Detallados de Lecturas</h2>
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
-                                <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
-                                <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($lecturas)): ?>
-                                <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo.</td></tr>
-                            <?php else: ?>
-                                <?php foreach ($lecturas as $lectura): ?>
+    <!-- Modal para Registros Detallados de Lecturas -->
+    <div class="modal fade" id="modalLecturas" tabindex="-1" aria-labelledby="modalLecturasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLecturasLabel">Registros Detallados de Lecturas del Período</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <?php if (!empty($lecturas)): ?>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-striped table-hover">
+                                <thead>
                                     <tr>
-                                        <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
-                                        <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
-                                        <td class="text-center">
-                                            <?php
-                                                $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
-                                                $estado = 'Desconocido';
-                                                $class = '';
-
-                                                if ($nivel >= 500) {
-                                                    $estado = 'Peligro';
-                                                    $class = 'bg-danger';
-                                                } elseif ($nivel >= 200) {
-                                                    $estado = 'Precaución';
-                                                    $class = 'bg-warning text-dark'; // Added text-dark for visibility
-                                                } elseif ($nivel >= 0) {
-                                                    $estado = 'Seguro';
-                                                    $class = 'bg-success';
-                                                }
-                                            ?>
-                                            <span class="badge <?= $class ?>"><?= $estado ?></span>
-                                        </td>
+                                        <th><i class="fas fa-calendar-alt me-2"></i> Fecha y Hora</th>
+                                        <th><i class="fas fa-thermometer-half me-2"></i> Nivel de Gas (PPM)</th>
+                                        <th class="text-center"><i class="fas fa-exclamation-triangle me-2"></i> Estado</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($lecturas as $lectura): ?>
+                                        <tr>
+                                            <td><?= esc($lectura['fecha'] ?? 'Fecha desconocida') ?></td>
+                                            <td><?= esc($lectura['nivel_gas'] ?? 'N/D') ?></td>
+                                            <td class="text-center">
+                                                <?php
+                                                    $nivel = isset($lectura['nivel_gas']) ? (float) $lectura['nivel_gas'] : -1;
+                                                    $estado = 'Desconocido';
+                                                    $class = '';
+
+                                                    if ($nivel >= 500) {
+                                                        $estado = 'Peligro';
+                                                        $class = 'bg-danger';
+                                                    } elseif ($nivel >= 200) {
+                                                        $estado = 'Precaución';
+                                                        $class = 'bg-warning text-dark';
+                                                    } elseif ($nivel >= 0) {
+                                                        $estado = 'Seguro';
+                                                        $class = 'bg-success';
+                                                    }
+                                                ?>
+                                                <span class="badge <?= $class ?>"><?= $estado ?></span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr><td colspan="3" class="text-center py-4">No hay lecturas registradas para este dispositivo en el período seleccionado.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -438,10 +454,10 @@ if (!function_exists('esc')) {
         }
 
         // Chart.js Line Chart configuration
-        const lineChartDom = document.getElementById('gasLineChart'); // Corrected ID
+        const lineChartDom = document.getElementById('gasLineChart');
         if (lineChartDom && labels.length > 0 && data.length > 0) {
             const ctx = lineChartDom.getContext('2d');
-            const gasLineChart = new Chart(ctx, { // Renamed variable for clarity
+            const gasLineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels, // Already in ascending order (oldest to newest)
@@ -538,7 +554,6 @@ if (!function_exists('esc')) {
             const chartCanvas = document.getElementById('gasLineChart');
             if (chartCanvas) {
                 chartCanvas.style.display = 'none';
-                // Display a message if no data for the line chart
                 const parentCardBody = chartCanvas.closest('.card-body');
                 if (parentCardBody && !parentCardBody.querySelector('.no-data-message')) {
                     const messageElement = document.createElement('p');
@@ -547,75 +562,6 @@ if (!function_exists('esc')) {
                     parentCardBody.appendChild(messageElement);
                 }
             }
-        }
-
-        // ECharts Gauge Chart
-        const gaugeChartDom = document.getElementById('gasGaugeChart');
-        if (gaugeChartDom) {
-            const myGaugeChart = echarts.init(gaugeChartDom, 'dark'); // Initialize with 'dark' theme
-            const nivelGasActual = <?= json_encode($nivelGasActualValue) ?>;
-
-            const gaugeOption = {
-                series: [
-                    {
-                        type: 'gauge',
-                        min: 0,
-                        max: 1000, // Max value for the gauge (e.g., 1000 PPM for gas sensor)
-                        axisLine: {
-                            lineStyle: {
-                                width: 30,
-                                color: [
-                                    [0.3, '#48bb78'], // 0-300 PPM (safe - green)
-                                    [0.7, '#f6e05e'], // 300-700 PPM (caution - yellow)
-                                    [1, '#e53e3e']    // 700-1000 PPM (danger - red)
-                                ]
-                            }
-                        },
-                        pointer: {
-                            itemStyle: {
-                                color: 'auto'
-                            }
-                        },
-                        axisTick: {
-                            distance: -30,
-                            length: 8,
-                            lineStyle: {
-                                color: '#fff',
-                                width: 2
-                            }
-                        },
-                        splitLine: {
-                            distance: -30,
-                            length: 30,
-                            lineStyle: {
-                                color: '#fff',
-                                width: 4
-                            }
-                        },
-                        axisLabel: {
-                            color: 'inherit',
-                            distance: 40,
-                            fontSize: 20
-                        },
-                        detail: {
-                            valueAnimation: true,
-                            formatter: '{value} PPM',
-                            color: 'inherit'
-                        },
-                        data: [
-                            {
-                                value: nivelGasActual
-                            }
-                        ]
-                    }
-                ]
-            };
-            myGaugeChart.setOption(gaugeOption);
-
-            // Handle chart resizing
-            window.addEventListener('resize', function() {
-                myGaugeChart.resize();
-            });
         }
     });
 </script>
