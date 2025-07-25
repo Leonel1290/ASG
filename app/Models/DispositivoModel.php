@@ -6,44 +6,31 @@ use CodeIgniter\Model;
 
 class DispositivoModel extends Model
 {
-    protected $table      = 'dispositivos'; // Tabla 'dispositivos'
+    protected $table        = 'dispositivos'; // Tabla 'dispositivos'
     protected $primaryKey = 'id';         // Llave primaria 'id'
     protected $useAutoIncrement = true; // Asumo que el ID es auto-incremental
     protected $returnType       = 'array'; // Usaremos 'array'
     protected $useSoftDeletes   = false; // No usas soft deletes
 
-
     // Campos permitidos para insertar o actualizar.
-    // Asegúrate de incluir 'MAC', 'nombre', y 'ubicacion'.
-    // Si tu tabla tiene 'usuario_id', 'numero_serie', 'estado', 'ultima_conexion', inclúyelos si los gestionas aquí.
+    // ¡IMPORTANTE! Asegúrate de incluir 'MAC', 'nombre', y 'ubicacion',
+    // y también 'estado_valvula', 'ultimo_nivel_gas', 'ultima_actualizacion'.
     protected $allowedFields = [
         'MAC',
         'nombre',
         'ubicacion',
-        // Si existen y se gestionan:
-        // 'usuario_id',
-        // 'numero_serie',
-        // 'estado',
-        // 'ultima_conexion',
-        // 'created_at' y 'updated_at' se manejan automáticamente si useTimestamps es true
+        'estado_dispositivo', // Este campo también está en tu tabla 'dispositivos'
+        'estado_valvula',
+        'ultimo_nivel_gas',
+        'ultima_actualizacion'
     ];
 
     // Habilitamos el uso de timestamps si quieres manejar la fecha de creación o actualización de registros
     // Tu tabla `dispositivos` en el script SQL tiene `created_at` y `updated_at`.
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
     protected $dateFormat    = 'datetime'; // O 'int' si usas UNIX timestamps
-
-
-    // Callbacks para eventos del modelo (opcional)
-    // protected $allowCallbacks = true;
-    // protected $beforeInsert   = [];
-    // protected $afterInsert    = [];
-    // protected $beforeUpdate   = [];
-    // protected $afterUpdate    = [];
-    // protected $beforeFind     = [];
-    // protected $afterFind      = [];
-    // protected $beforeDelete   = [];
-    // protected $afterDelete    = [];
 
     // Método para obtener un dispositivo por su ID
     public function getDispositivoById($id)
