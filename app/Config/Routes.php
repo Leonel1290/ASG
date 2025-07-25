@@ -85,10 +85,10 @@ $routes->group('perfil', function($routes) {
     // (:segment) captures the MAC from the URL
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
 
-<<<<<<< HEAD
+
 // NEW: Route to get the latest gas level for a MAC as JSON
 
-=======
+
     // Route to process the device editing form
     // POST /perfil/dispositivo/actualizar
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
