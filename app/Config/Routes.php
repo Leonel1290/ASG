@@ -38,18 +38,13 @@ $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is th
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
 
-// --- END REGISTRATION AND LOGIN ROUTES ---
 
-<<<<<<< HEAD
-// --- USER PROFILE AND DEVICE MANAGEMENT ROUTES ---
-=======
 
 // Profile (Group routes related to PerfilController)
 $routes->group('perfil', function($routes) {
     // Route for the main profile page
     // GET /perfil
     $routes->get('/', 'PerfilController::index');
->>>>>>> 0a6c87792d1e09a2e9b085e5d0816f75f890a553
 
     // --- ROUTES FOR PROFILE VERIFICATION AND CONFIGURATION FLOW ---
 
