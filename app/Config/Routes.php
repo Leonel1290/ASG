@@ -37,7 +37,7 @@ $routes->get('/forgotpassword', 'Home::forgotpassword');
 $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
-
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 
 
 // Profile (Group routes related to PerfilController)
