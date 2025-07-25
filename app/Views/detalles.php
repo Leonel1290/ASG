@@ -98,6 +98,20 @@ if (!function_exists('esc')) {
         .alert {
             margin-top: 20px;
         }
+        .modal-content {
+            background-color: #2d3748;
+            color: #cbd5e0;
+            border: 1px solid #4a5568;
+        }
+        .modal-header, .modal-footer {
+            border-color: #4a5568;
+        }
+        .modal-title {
+            color: #ffffff;
+        }
+        .btn-close {
+            filter: invert(1); /* Makes the close button white for dark background */
+        }
     </style>
 </head>
 <body>
@@ -171,16 +185,17 @@ if (!function_exists('esc')) {
             </div>
             <div class="card-body">
                 <form action="<?= base_url('detalles/' . esc($mac)) ?>" method="get" class="row g-3 align-items-end">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="fechaInicio" class="form-label">Fecha Inicio:</label>
                         <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="<?= $request->getGet('fechaInicio') ?? '' ?>">
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="fechaFin" class="form-label">Fecha Fin:</label>
                         <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="<?= $request->getGet('fechaFin') ?? '' ?>">
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Aplicar Filtro</button>
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-2">Aplicar Filtro</button>
+                        <button type="button" class="btn btn-info" id="btnVerRegistros">Ver Registros</button>
                     </div>
                 </form>
             </div>
@@ -195,64 +210,72 @@ if (!function_exists('esc')) {
             </div>
         </div>
 
-
-        <div class="card mt-4">
-            <div class="card-header">
-                Historial de Lecturas
-            </div>
-            <div class="card-body">
-                <?php if (empty($lecturas)): ?>
-                    <p class="text-center">No hay lecturas disponibles para el período seleccionado.</p>
-                <?php else: ?>
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Fecha y Hora</th>
-                                    <th>Nivel de Gas (PPM)</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($lecturas as $lectura): ?>
-                                    <tr>
-                                        <td><?= esc($lectura['fecha']) ?></td>
-                                        <td><?= esc($lectura['nivel_gas']) ?></td>
-                                        <td>
-                                            <?php
-                                                $estado = '';
-                                                $clase_badge = '';
-                                                if (isset($lectura['estado'])) {
-                                                    $estado = esc($lectura['estado']);
-                                                    switch ($estado) {
-                                                        case 'seguro':
-                                                            $clase_badge = 'bg-success';
-                                                            break;
-                                                        case 'precaucion':
-                                                            $clase_badge = 'bg-warning text-dark';
-                                                            break;
-                                                        case 'peligro':
-                                                            $clase_badge = 'bg-danger';
-                                                            break;
-                                                        default:
-                                                            $clase_badge = 'bg-secondary';
-                                                            break;
-                                                    }
-                                                } else {
-                                                    $estado = 'Desconocido';
-                                                    $clase_badge = 'bg-secondary';
-                                                }
-                                            ?>
-                                            <span class="badge <?= $clase_badge ?>"><?= $estado ?></span>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+        <div class="modal fade" id="modalLecturas" tabindex="-1" aria-labelledby="modalLecturasLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLecturasLabel">Registros de Lecturas del Período</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                <?php endif; ?>
+                    <div class="modal-body">
+                        <?php if (!empty($lecturas)): ?>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha y Hora</th>
+                                            <th>Nivel de Gas (PPM)</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($lecturas as $lectura): ?>
+                                            <tr>
+                                                <td><?= esc($lectura['fecha']) ?></td>
+                                                <td><?= esc($lectura['nivel_gas']) ?></td>
+                                                <td>
+                                                    <?php
+                                                        $estado = '';
+                                                        $clase_badge = '';
+                                                        if (isset($lectura['estado'])) {
+                                                            $estado = esc($lectura['estado']);
+                                                            switch ($estado) {
+                                                                case 'seguro':
+                                                                    $clase_badge = 'bg-success';
+                                                                    break;
+                                                                case 'precaucion':
+                                                                    $clase_badge = 'bg-warning text-dark';
+                                                                    break;
+                                                                case 'peligro':
+                                                                    $clase_badge = 'bg-danger';
+                                                                    break;
+                                                                default:
+                                                                    $clase_badge = 'bg-secondary';
+                                                                    break;
+                                                            }
+                                                        } else {
+                                                            $estado = 'Desconocido';
+                                                            $clase_badge = 'bg-secondary';
+                                                        }
+                                                    ?>
+                                                    <span class="badge <?= $clase_badge ?>"><?= $estado ?></span>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-center">No hay lecturas disponibles para el período seleccionado.</p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -327,26 +350,10 @@ if (!function_exists('esc')) {
                 });
             }
 
-            // If no chart data, hide the canvas and display the message provided in HTML
-            // Note: The previous chart (gasChart) is now replaced by gasGaugeChart
-            // const chartCanvas = document.getElementById('gasChart');
-            // if (chartCanvas) {
-            //     chartCanvas.style.display = 'none';
-            // }
-
-            // Solo mostrar el modal al hacer click en el botón (Original logic, kept for other modals if any)
-            const btnMostrarCalendario = document.getElementById('btnMostrarCalendario');
-            const modalCalendario = new bootstrap.Modal(document.getElementById('modalCalendario'));
-            if (btnMostrarCalendario) {
-                btnMostrarCalendario.addEventListener('click', function() {
-                    modalCalendario.show();
-                });
-            }
-
-            // Código para el nuevo modal de lecturas (Original logic, kept for other modals if any)
+            // Handle 'Ver Registros' button to show the modal
             const btnVerRegistros = document.getElementById('btnVerRegistros');
             const modalLecturas = new bootstrap.Modal(document.getElementById('modalLecturas'));
-            if (btnVerRegistros) { // Asegúrate de que el botón exista antes de añadir el listener
+            if (btnVerRegistros) {
                 btnVerRegistros.addEventListener('click', function() {
                     modalLecturas.show();
                 });
