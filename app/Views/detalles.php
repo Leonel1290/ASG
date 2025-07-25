@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- Configuración PWA -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,6 +16,7 @@
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
     <meta name="mobile-web-app-capable" content="yes">
 
+    <!-- Meta tags para CSRF token. -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
@@ -267,6 +269,7 @@
                             <i class="fas fa-map-marker-alt"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
                         </h6>
                         
+                        <!-- Velocímetro de Nivel de Gas -->
                         <div class="gauge-container">
                             <div class="gauge">
                                 <div class="gauge-fill" id="gaugeFill"></div>
@@ -325,32 +328,44 @@ $(document).ready(function() {
     }
 
     function updateGauge(level) {
+        // Asegurarse de que el nivel esté entre 0 y 100
+        level = Math.max(0, Math.min(100, level)); 
         const rotation = (level / 100) * 180;
         gaugeFill.css('transform', `rotate(${rotation}deg)`);
-        gasLevelSpan.text(`${level}%`);
+        gasLevelSpan.text(`${level.toFixed(1)}%`); // Mostrar un decimal para mayor precisión
 
         if (level < 30) {
-            gasLevelSpan.css('color', '#28a745');
+            gasLevelSpan.css('color', '#28a745'); // Verde (Seguro)
         } else if (level < 70) {
-            gasLevelSpan.css('color', '#ffc107');
+            gasLevelSpan.css('color', '#ffc107'); // Amarillo (Precaución)
         } else {
-            gasLevelSpan.css('color', '#dc3545');
+            gasLevelSpan.css('color', '#dc3545'); // Rojo (Peligro)
         }
     }
     
+    // Función para obtener el estado del dispositivo (válvula y gas)
+    function fetchDeviceState() {
+        $.get('/servo/obtenerEstado/' + mac, function(response) {
+            console.log('Respuesta del backend (obtenerEstado):', response); // Para depuración
+            if (response.status === 'success') { // Usar el campo 'status' de la respuesta
+                actualizarEstadoUI(response.estado_valvula);
+                if (response.nivel_gas !== undefined && response.nivel_gas !== null) {
+                    updateGauge(response.nivel_gas);
+                } else {
+                    console.warn('Nivel de gas no definido o nulo en la respuesta.');
+                    updateGauge(0); // Opcional: poner a 0 si no hay datos
+                }
+            } else {
+                console.error('Error al obtener estado del dispositivo:', response.message);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Error de red o servidor al obtener estado:', textStatus, errorThrown);
+            console.error('Detalles del error:', jqXHR.responseText); // Mostrar respuesta del servidor
+        });
+    }
+
     // Obtener estado inicial del dispositivo al cargar la página
-    $.get('/servo/obtenerEstado/' + mac, function(response) {
-        if (response.error) {
-            console.error('Error al obtener estado inicial:', response.error);
-        } else {
-            actualizarEstadoUI(response.estado_valvula);
-            // Generar un valor aleatorio para el nivel de gas al inicio
-            const randomGasLevel = Math.floor(Math.random() * 101); // 0-100
-            updateGauge(randomGasLevel);
-        }
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.error('Error de red o servidor al obtener estado inicial:', textStatus, errorThrown);
-    });
+    fetchDeviceState();
     
     $('#btn-abrir').click(function() {
         controlarServo(mac, 1);
@@ -365,6 +380,7 @@ $(document).ready(function() {
             mac: mac,
             estado: estado
         };
+        // Añadir el token CSRF dinámicamente
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         } else {
@@ -372,33 +388,22 @@ $(document).ready(function() {
         }
 
         $.post('/servo/actualizarEstado', postData, function(response) {
-            if (response.error) {
-                console.error('Error al controlar servo:', response.error);
-            } else {
+            console.log('Respuesta del backend (actualizarEstado):', response); // Para depuración
+            if (response.status === 'success') { // Usar el campo 'status' de la respuesta
                 actualizarEstadoUI(response.estado);
-                // Si la actualización es exitosa, se puede recargar el token para la siguiente petición
-                // csrfHash = response.csrf_new_hash; 
+                // Después de controlar el servo, volvemos a obtener el estado para asegurar la sincronización
+                fetchDeviceState(); 
+            } else {
+                console.error('Error al controlar servo:', response.message);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
+            console.error('Detalles del error:', jqXHR.responseText); // Mostrar respuesta del servidor
         });
     }
     
     // Actualizar el estado del dispositivo y el nivel de gas periódicamente
-    setInterval(function() {
-        $.get('/servo/obtenerEstado/' + mac, function(response) {
-            if (!response.error) {
-                actualizarEstadoUI(response.estado_valvula);
-            }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            console.error('Error en actualización periódica:', textStatus, errorThrown);
-        });
-
-        // Actualizar el velocímetro con un valor aleatorio en cada intervalo
-        const randomGasLevel = Math.floor(Math.random() * 101); // 0-100
-        updateGauge(randomGasLevel);
-
-    }, 5000); // Actualizar cada 5 segundos
+    setInterval(fetchDeviceState, 5000); // Llamar a la función de obtención de estado cada 5 segundos
 });
 <?php endif; ?>
 </script>
