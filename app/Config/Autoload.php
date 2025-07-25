@@ -1,5 +1,3 @@
-// app/Config/Autoload.php
-
 <?php
 
 namespace Config;
@@ -18,9 +16,7 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
-        // Originalmente, solo tenías la línea de arriba.
-        // Si tenías 'Config' => APPPATH . 'Config', déjala. Si no, quítala.
-        // La línea 'App\Libraries\Validation' debe ser eliminada.
+        'Config'      => APPPATH . 'Config',
     ];
 
     /**
