@@ -47,7 +47,7 @@ class registerController extends Controller
                     'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
                 ]
             ],
-            'email'   => [
+            'email'    => [
                 'rules' => 'required|valid_email|is_unique[usuarios.email]|max_length[100]',
                 'errors' => [
                     'required' => 'El campo email es obligatorio.',
@@ -57,14 +57,24 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[6]|regex_match[/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\,.?<>\/?~`])/',
+                // Usamos la nueva regla personalizada 'strong_password'
+                // La longitud mínima de 8 caracteres se valida dentro de 'strong_password'
+                'rules' => 'required|strong_password',
                 'errors' => [
                     'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
-                    'regex_match' => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial (ej. !@#$).'
-                    ]
+                    // El mensaje para 'strong_password' se define en la regla personalizada
+                    // o puedes añadirlo aquí si quieres anular el mensaje por defecto de la regla.
+                    'strong_password' => 'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, una minúscula, un número y un símbolo.'
+                ]
+            ],
+            'password_confirm' => [
+                'rules' => 'required|matches[password]',
+                'errors' => [
+                    'required' => 'El campo confirmar contraseña es obligatorio.',
+                    'matches' => 'Las contraseñas no coinciden.'
+                ]
             ]
-            ]);
+        ]);
 
         if (!$validation->withRequest($this->request)->run()) {
             // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
