@@ -57,14 +57,14 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[120]|regex_match[/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~`])/',
+                'rules' => 'required|min_length[6]|regex_match[/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\,.?<>\/?~`])/',
                 'errors' => [
                     'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 120 caracteres.',
+                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
                     'regex_match' => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial (ej. !@#$).'
-                ]
+                    ]
             ]
-        ]);
+            ]);
 
         if (!$validation->withRequest($this->request)->run()) {
             // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
