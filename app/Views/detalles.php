@@ -88,7 +88,7 @@ if (!function_exists('esc')) {
             box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
         }
         /* Style for the chart container */
-        #gasChart, #gasGaugeChart {
+        #gasGaugeChart, #gasLineChart { /* Added gasLineChart ID for Chart.js */
             width: 100%;
             height: 400px;
             background-color: #2d3748; /* Dark background for the chart area */
@@ -98,7 +98,7 @@ if (!function_exists('esc')) {
         .alert {
             margin-top: 20px;
         }
-        .modal-content {
+        .modal-content { /* Kept for general modal styling, though specific modal is removed */
             background-color: #2d3748;
             color: #cbd5e0;
             border: 1px solid #4a5568;
@@ -195,84 +195,85 @@ if (!function_exists('esc')) {
                     </div>
                     <div class="col-md-4 d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary me-2">Aplicar Filtro</button>
-                        <button type="button" class="btn btn-info" id="btnVerRegistros">Ver Registros</button>
+                        <!-- El botón "Ver Registros" y el modal han sido eliminados, la tabla se muestra directamente -->
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card mb-4">
+            <div class="card-header">
+                Gráfico de Historial de Nivel de Gas
+            </div>
+            <div class="card-body">
+                <canvas id="gasLineChart"></canvas> <!-- Chart.js line chart -->
+            </div>
+        </div>
+
+        <div class="card mb-4">
             <div class="card-header">
                 Nivel de Gas (Última Lectura del Período Seleccionado)
             </div>
             <div class="card-body">
-                <div id="gasGaugeChart" style="width: 100%; height: 400px;"></div>
+                <div id="gasGaugeChart"></div> <!-- ECharts Gauge Chart -->
             </div>
         </div>
 
-        <div class="modal fade" id="modalLecturas" tabindex="-1" aria-labelledby="modalLecturasLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalLecturasLabel">Registros de Lecturas del Período</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <?php if (!empty($lecturas)): ?>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha y Hora</th>
-                                            <th>Nivel de Gas (PPM)</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($lecturas as $lectura): ?>
-                                            <tr>
-                                                <td><?= esc($lectura['fecha']) ?></td>
-                                                <td><?= esc($lectura['nivel_gas']) ?></td>
-                                                <td>
-                                                    <?php
-                                                        $estado = '';
-                                                        $clase_badge = '';
-                                                        if (isset($lectura['estado'])) {
-                                                            $estado = esc($lectura['estado']);
-                                                            switch ($estado) {
-                                                                case 'seguro':
-                                                                    $clase_badge = 'bg-success';
-                                                                    break;
-                                                                case 'precaucion':
-                                                                    $clase_badge = 'bg-warning text-dark';
-                                                                    break;
-                                                                case 'peligro':
-                                                                    $clase_badge = 'bg-danger';
-                                                                    break;
-                                                                default:
-                                                                    $clase_badge = 'bg-secondary';
-                                                                    break;
-                                                            }
-                                                        } else {
-                                                            $estado = 'Desconocido';
+        <div class="card mb-4">
+            <div class="card-header">
+                Registros de Lecturas del Período
+            </div>
+            <div class="card-body">
+                <?php if (!empty($lecturas)): ?>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Nivel de Gas (PPM)</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($lecturas as $lectura): ?>
+                                    <tr>
+                                        <td><?= esc($lectura['fecha']) ?></td>
+                                        <td><?= esc($lectura['nivel_gas']) ?></td>
+                                        <td>
+                                            <?php
+                                                $estado = '';
+                                                $clase_badge = '';
+                                                if (isset($lectura['estado'])) {
+                                                    $estado = esc($lectura['estado']);
+                                                    switch ($estado) {
+                                                        case 'seguro':
+                                                            $clase_badge = 'bg-success';
+                                                            break;
+                                                        case 'precaucion':
+                                                            $clase_badge = 'bg-warning text-dark';
+                                                            break;
+                                                        case 'peligro':
+                                                            $clase_badge = 'bg-danger';
+                                                            break;
+                                                        default:
                                                             $clase_badge = 'bg-secondary';
-                                                        }
-                                                    ?>
-                                                    <span class="badge <?= $clase_badge ?>"><?= $estado ?></span>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-center">No hay lecturas disponibles para el período seleccionado.</p>
-                        <?php endif; ?>
+                                                            break;
+                                                    }
+                                                } else {
+                                                    $estado = 'Desconocido';
+                                                    $clase_badge = 'bg-secondary';
+                                                }
+                                            ?>
+                                            <span class="badge <?= $clase_badge ?>"><?= $estado ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
+                <?php else: ?>
+                    <p class="text-center">No hay lecturas disponibles para el período seleccionado.</p>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -291,15 +292,15 @@ if (!function_exists('esc')) {
                     series: [
                         {
                             type: 'gauge',
-                            min: 0, // Minimum value for the gauge
-                            max: 1000, // Maximum value (e.g., 1000 PPM for gas sensor)
+                            min: 0,
+                            max: 1000, // Max value for the gauge (adjust as needed for your sensor's range)
                             axisLine: {
                                 lineStyle: {
                                     width: 30,
                                     color: [
-                                        [0.3, '#67e0e3'], // 0-30% (e.g., safe)
-                                        [0.7, '#37a2da'], // 30-70% (e.g., caution)
-                                        [1, '#fd666d']    // 70-100% (e.g., danger)
+                                        [0.3, '#67e0e3'], // 0-300 PPM (safe)
+                                        [0.7, '#37a2da'], // 300-700 PPM (caution)
+                                        [1, '#fd666d']    // 700-1000 PPM (danger)
                                     ]
                                 }
                             },
@@ -331,12 +332,12 @@ if (!function_exists('esc')) {
                             },
                             detail: {
                                 valueAnimation: true,
-                                formatter: '{value} PPM', // Changed to PPM
+                                formatter: '{value} PPM',
                                 color: 'inherit'
                             },
                             data: [
                                 {
-                                    value: nivelGasActual // Use the actual gas level
+                                    value: nivelGasActual
                                 }
                             ]
                         }
@@ -350,12 +351,71 @@ if (!function_exists('esc')) {
                 });
             }
 
-            // Handle 'Ver Registros' button to show the modal
-            const btnVerRegistros = document.getElementById('btnVerRegistros');
-            const modalLecturas = new bootstrap.Modal(document.getElementById('modalLecturas'));
-            if (btnVerRegistros) {
-                btnVerRegistros.addEventListener('click', function() {
-                    modalLecturas.show();
+            // Chart.js Line Chart (Historial de Lecturas)
+            const lineChartDom = document.getElementById('gasLineChart');
+            if (lineChartDom) {
+                const labels = <?= json_encode($labels) ?>;
+                const data = <?= json_encode($data) ?>;
+
+                const ctx = lineChartDom.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Nivel de Gas (PPM)',
+                            data: data,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4, // Smooths the line
+                            fill: true, // Fills the area under the line
+                            pointRadius: 3, // Size of data points
+                            pointBackgroundColor: 'rgb(75, 192, 192)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // Allows height to be set by CSS
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#cbd5e0' // X-axis label color
+                                },
+                                grid: {
+                                    color: 'rgba(203, 213, 224, 0.1)' // X-axis grid line color
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#cbd5e0' // Y-axis label color
+                                },
+                                grid: {
+                                    color: 'rgba(203, 213, 224, 0.1)' // Y-axis grid line color
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#cbd5e0' // Legend label color
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + ' PPM';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Handle chart resizing for Chart.js
+                window.addEventListener('resize', function() {
+                    // Chart.js handles responsiveness automatically with responsive: true and maintainAspectRatio: false
+                    // No manual resize call needed for Chart.js usually.
                 });
             }
         });
