@@ -3,19 +3,21 @@
 namespace App\Controllers;
 
 use App\Models\LecturasGasModel;
-use App\Models\DispositivoModel; // Asegúrate de tener este modelo para obtener el nombre y ubicación
+use App\Models\DispositivoModel;
+use App\Models\EnlaceModel; // Importar el EnlaceModel
 use CodeIgniter\RESTful\ResourceController;
 
 class LecturasController extends ResourceController
 {
     protected $lecturasGasModel;
-    protected $dispositivoModel; // Declarar la propiedad para el modelo de dispositivos
+    protected $dispositivoModel;
+    protected $enlaceModel; // Declarar la propiedad para el modelo de enlace
 
     public function __construct()
     {
-        // Instancia los modelos necesarios
         $this->lecturasGasModel = new LecturasGasModel();
-        $this->dispositivoModel = new DispositivoModel(); // Instanciar el modelo de dispositivos
+        $this->dispositivoModel = new DispositivoModel();
+        $this->enlaceModel = new EnlaceModel(); // Instanciar el modelo de enlace
     }
 
     /**
@@ -25,33 +27,47 @@ class LecturasController extends ResourceController
      */
     public function guardar()
     {
-        // Obtener los datos enviados en la solicitud POST (asumo JSON o form-data)
         $mac = $this->request->getVar('MAC');
         $nivel_gas = $this->request->getVar('nivel_gas');
 
-        // Verificar que se recibieron los datos necesarios
         if ($mac && $nivel_gas !== null) {
-            // Preparar los datos para insertar en la base de datos
+            // Obtener el usuario_id a partir de la MAC
+            $usuario_id = $this->enlaceModel->getUserIdByMac($mac);
+
+            if ($usuario_id === null) {
+                // Si la MAC no está vinculada a ningún usuario, puedes:
+                // 1. Devolver un error (recomendado si cada lectura debe estar asociada a un usuario)
+                log_message('error', 'Error al guardar lectura: MAC no vinculada a ningún usuario. MAC: ' . $mac);
+                return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'MAC no vinculada a ningún usuario.']);
+
+                // 2. Opcional: Usar un ID de usuario por defecto (si tienes un usuario "genérico" para lecturas no asignadas)
+                // $usuario_id = 1; // Reemplaza '1' con el ID de tu usuario por defecto
+                // log_message('warning', 'MAC no vinculada a usuario, usando ID por defecto para MAC: ' . $mac);
+            }
+
             $data = [
                 'MAC' => $mac,
                 'nivel_gas' => $nivel_gas,
-                'fecha' => date('Y-m-d H:i:s') // Captura la fecha y hora actual
+                'fecha' => date('Y-m-d H:i:s'),
+                'usuario_id' => $usuario_id // ¡Ahora incluimos el usuario_id!
             ];
 
-            // Insertar los datos en la tabla 'lecturas_gas'
             $inserted = $this->lecturasGasModel->insert($data);
 
-            // Verificar si la inserción fue exitosa
             if ($inserted) {
-                // Si fue exitosa, retornar una respuesta JSON de éxito
+                // Opcional: Actualizar el último_nivel_gas y ultima_actualizacion en la tabla 'dispositivos'
+                // Esto es útil para tener el estado más reciente del dispositivo en la tabla principal
+                $this->dispositivoModel->set('ultimo_nivel_gas', $nivel_gas)
+                                       ->set('ultima_actualizacion', date('Y-m-d H:i:s'))
+                                       ->where('MAC', $mac)
+                                       ->update();
+
                 return $this->response->setJSON(['status' => 'success', 'message' => 'Lectura guardada correctamente', 'id' => $inserted]);
             } else {
-                // Si hubo un error en la inserción, loguearlo y retornar una respuesta JSON de error
                 log_message('error', 'Error al guardar lectura de gas para MAC: ' . $mac . ' - Datos: ' . json_encode($data) . ' - Error DB: ' . $this->lecturasGasModel->errors());
                 return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Error al guardar la lectura en la base de datos']);
             }
         } else {
-            // Si faltan datos, retornar una respuesta JSON de error
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Faltan datos (MAC o nivel_gas)']);
         }
     }
@@ -65,41 +81,31 @@ class LecturasController extends ResourceController
      */
     public function detalle($mac)
     {
-        // Obtener los detalles del dispositivo (nombre y ubicación)
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
-
-        // Obtener las lecturas de gas para esta MAC.
-        // El método getLecturasPorMac() del modelo devuelve las lecturas en orden DESC (más recientes primero).
         $lecturasCrude = $this->lecturasGasModel->getLecturasPorMac($mac);
 
-        // Para el gráfico (Chart.js), necesitamos que los datos estén en orden ascendente (más antiguos primero).
         $lecturasParaGrafico = array_reverse($lecturasCrude);
 
-        // Preparar los datos para el gráfico
         $labels = [];
         $data = [];
         foreach ($lecturasParaGrafico as $lectura) {
-            // Formatear la fecha para que sea legible en el eje X del gráfico
             $labels[] = date('Y-m-d H:i', strtotime($lectura['fecha']));
-            $data[] = (float) $lectura['nivel_gas']; // Asegurarse de que el nivel de gas sea un número
+            $data[] = (float) $lectura['nivel_gas'];
         }
 
-        // Obtener el último nivel de gas para la tarjeta simple superior.
-        // Dado que $lecturasCrude está ordenado DESC (más reciente primero), el último valor es el primer elemento.
         $nivelGasActualDisplay = 'Sin datos';
         if (!empty($lecturasCrude) && isset($lecturasCrude[0]['nivel_gas'])) {
             $nivelGasActualDisplay = esc($lecturasCrude[0]['nivel_gas']) . ' PPM';
         }
 
-        // Pasar los datos a la vista
         $dataForView = [
-            'mac'                   => esc($mac), // Sanitizar la MAC
-            'nombreDispositivo'     => esc($dispositivo['nombre'] ?? $mac), // Usar MAC si no hay nombre, y sanitizar
-            'ubicacionDispositivo' => esc($dispositivo['ubicacion'] ?? 'Desconocida'), // Sanitizar
-            'lecturas'              => $lecturasCrude,     // Las lecturas para la tabla (más recientes primero)
-            'labels'                => $labels,            // Las etiquetas de fecha para el gráfico (orden ascendente)
-            'data'                  => $data,              // Los datos de nivel de gas para el gráfico (orden ascendente)
-            'nivelGasActualDisplay' => $nivelGasActualDisplay // El último nivel de gas para la tarjeta superior
+            'mac'                   => esc($mac),
+            'nombreDispositivo'     => esc($dispositivo['nombre'] ?? $mac),
+            'ubicacionDispositivo' => esc($dispositivo['ubicacion'] ?? 'Desconocida'),
+            'lecturas'              => $lecturasCrude,
+            'labels'                => $labels,
+            'data'                  => $data,
+            'nivelGasActualDisplay' => $nivelGasActualDisplay
         ];
 
         return view('detalles', $dataForView);
