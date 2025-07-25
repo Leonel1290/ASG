@@ -57,23 +57,20 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                // Usamos la nueva regla personalizada 'strong_password'
-                // La longitud mínima de 8 caracteres se valida dentro de 'strong_password'
-                'rules' => 'required|strong_password',
-                'errors' => [
-                    'required' => 'El campo contraseña es obligatorio.',
-                    // El mensaje para 'strong_password' se define en la regla personalizada
-                    // o puedes añadirlo aquí si quieres anular el mensaje por defecto de la regla.
-                    'strong_password' => 'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, una minúscula, un número y un símbolo.'
-                ]
-            ],
-            'password_confirm' => [
-                'rules' => 'required|matches[password]',
-                'errors' => [
-                    'required' => 'El campo confirmar contraseña es obligatorio.',
-                    'matches' => 'Las contraseñas no coinciden.'
-                ]
+            // Ahora usas 'min_length_custom' y le pasas el número de caracteres
+            'rules' => 'required|min_length_custom[120]', // <-- ¡Aquí el cambio!
+            'errors' => [
+                'required' => 'El campo contraseña es obligatorio.',
+                'min_length_custom' => 'La contraseña debe tener al menos {param} caracteres.' // Mensaje dinámico
             ]
+        ],
+        'password_confirm' => [
+            'rules' => 'required|matches[password]',
+            'errors' => [
+                'required' => 'El campo confirmar contraseña es obligatorio.',
+                'matches' => 'Las contraseñas no coinciden.'
+            ]
+        ]
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
