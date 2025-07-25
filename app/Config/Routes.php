@@ -38,7 +38,6 @@ $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is th
 $routes->get('/reset-password/(:any)', 'Home::resetPassword/$1');
 $routes->post('/reset-password', 'Home::processResetPassword'); // Route to process the password reset form
 
-
 // --- USER PROFILE AND DEVICE MANAGEMENT ROUTES ---
 
 // Route to display the user profile (main dashboard after login)
@@ -66,7 +65,7 @@ $routes->post('/cambiar-idioma', 'PerfilController::cambiarIdioma');
 $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 
 // NEW: Route to get the latest gas level for a MAC as JSON
-$routes->get('detalles/latest-gas/(:any)', 'DetalleController::getLatestGasLevel/$1');
+
 
 
 // --- DIRECT VIEW ROUTES ---
