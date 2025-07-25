@@ -38,7 +38,6 @@ $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is th
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
 
-// --- END REGISTRATION AND LOGIN ROUTES ---
 
 
 // Profile (Group routes related to PerfilController)
@@ -86,6 +85,10 @@ $routes->group('perfil', function($routes) {
     // (:segment) captures the MAC from the URL
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
 
+
+// NEW: Route to get the latest gas level for a MAC as JSON
+
+
     // Route to process the device editing form
     // POST /perfil/dispositivo/actualizar
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
@@ -131,6 +134,7 @@ $routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
 // $routes->get('/registros-gas/(:segment)', 'DeviceController::showGasRecords/$1');
 
 // --- END DEVICE AND GAS RECORD ROUTES ---
+>>>>>>> 0a6c87792d1e09a2e9b085e5d0816f75f890a553
 
 
 // --- DIRECT VIEW ROUTES ---
