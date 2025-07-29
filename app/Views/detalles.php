@@ -248,23 +248,6 @@
             box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
         }
 
-        .alert {
-            border-radius: var(--border-radius);
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            gap: 0.75rem;
-            border: none;
-        }
-
-        .alert i {
-            font-size: 1.2rem;
-        }
-
         /* Estilos del Velocímetro Mejorado */
         .gauge-container {
             width: 100%;
@@ -612,44 +595,6 @@ $(document).ready(function() {
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de conexión:', textStatus, errorThrown);
             showErrorToast('Error de conexión con el servidor');
-        });
-    }
-
-    function showErrorToast(message) {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-        
-        Toast.fire({
-            icon: 'error',
-            title: message
-        });
-    }
-    
-    function showSuccessToast(message) {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-        
-        Toast.fire({
-            icon: 'success',
-            title: message
         });
     }
 
