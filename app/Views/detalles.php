@@ -232,7 +232,7 @@
         }
 
         .btn-danger:hover {
-            background-color: #c21821ff;
+            background-color: #e51721ff;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(247, 37, 133, 0.3);
         }
