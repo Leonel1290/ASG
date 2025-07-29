@@ -14,13 +14,19 @@ class LanguageController extends Controller
         if (in_array($idioma, $idiomasPermitidos)) {
             session()->set('lang', $idioma);
             
-            // Opcional: Guardar preferencia en DB si el usuario está logueado
+            // Guardar preferencia en DB si el usuario está logueado
             if (session()->has('id')) {
                 $userModel = new \App\Models\UserModel();
                 $userModel->update(session()->get('id'), ['idioma' => $idioma]);
             }
+            
+            // Establecer el locale para la aplicación
+            $this->language = \Config\Services::language();
+            $this->language->setLocale($idioma);
+            
+            return redirect()->back()->with('success', lang('Perfil.idioma_cambiado'));
         }
         
-        return redirect()->back()->with('success', 'Idioma actualizado');
+        return redirect()->back()->with('error', lang('Perfil.idioma_no_valido'));
     }
 }

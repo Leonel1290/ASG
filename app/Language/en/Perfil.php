@@ -21,4 +21,6 @@ return [
     'seguro_desea_eliminar' => 'Are you sure you want to unlink the selected devices?',
     'cancelar' => 'Cancel',
     'eliminar' => 'Delete',
+    'idioma_cambiado' => 'Language changed successfully',
+'idioma_no_valido' => 'Invalid language',
 ];

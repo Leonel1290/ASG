@@ -73,7 +73,6 @@ $routes->group('perfil', function($routes) {
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
 
 
-    $routes->match(['get', 'post'], 'cambiar-idioma', 'PerfilController::cambiarIdioma');
 
 
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');

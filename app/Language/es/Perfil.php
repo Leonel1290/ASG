@@ -21,4 +21,6 @@ return [
     'seguro_desea_eliminar' => '¿Estás seguro de que deseas desenlazar los dispositivos seleccionados?',
     'cancelar' => 'Cancelar',
     'eliminar' => 'Eliminar',
+    'idioma_cambiado' => 'Idioma cambiado correctamente', // Español
+'idioma_no_valido' => 'Idioma no válido', // Español
 ];
