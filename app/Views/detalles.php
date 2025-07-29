@@ -26,11 +26,11 @@
         :root {
             --primary-color: #4361ee;
             --success-color: #4cc9f0;
-            --danger-color: #f72585;
+            --danger-color: #911b21ff;
             --warning-color: #f8961e;
             --dark-color: #212529;
             --light-color: #f8f9fa;
-            --gray-color: #2c5981ff;
+            --gray-color: #ffffffff;
             --border-radius: 16px;
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -232,7 +232,7 @@
         }
 
         .btn-danger:hover {
-            background-color: #e5177b;
+            background-color: #c21821ff;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(247, 37, 133, 0.3);
         }
