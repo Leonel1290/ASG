@@ -47,8 +47,30 @@ class DispositivoModel extends Model
     // Método para actualizar dispositivo por su MAC
     public function updateDispositivoByMac($mac, $data)
     {
-        // Usa where() para encontrar el registro por MAC y luego update()
-        return $this->where('MAC', $mac)->set($data)->update();
+        // Verifica si el array de datos está vacío
+        if (empty($data)) {
+            throw new \RuntimeException('No se proporcionaron datos para actualizar el dispositivo.');
+        }
+    
+        // Filtra solo los campos permitidos en $allowedFields
+        $filteredData = array_intersect_key($data, array_flip($this->allowedFields));
+    
+        // Si después del filtrado no hay datos válidos, lanza excepción
+        if (empty($filteredData)) {
+            throw new \RuntimeException('Los datos proporcionados no contienen campos permitidos para actualización.');
+        }
+    
+        // Intenta realizar la actualización
+        $result = $this->where('MAC', $mac)
+                       ->set($filteredData)
+                       ->update();
+    
+        if (!$result) {
+            log_message('error', 'Falló la actualización del dispositivo con MAC: ' . $mac);
+            return false;
+        }
+    
+        return true;
     }
 
     /**
