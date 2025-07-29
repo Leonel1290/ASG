@@ -84,7 +84,7 @@ $routes->group('perfil', function($routes) {
 
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 
-
+    $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 
 
 });

@@ -199,4 +199,6 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+    public $defaultLocale = 'es'; // Idioma por defecto
+    public $supportedLocales = ['es', 'en']; // Idiomas soportados
 }
