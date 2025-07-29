@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Configuración PWA -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,88 +15,102 @@
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- Meta tags para CSRF token. -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #4facfe, #00f2fe); /* Degradado de fondo */
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            color: #343a40;
         }
         .container.main-content {
             margin-top: 20px;
             padding-bottom: 20px;
         }
         .card {
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 20px; /* Bordes más redondeados */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
             background-color: #ffffff;
             padding: 30px;
             border: none;
-            overflow: hidden; /* Para asegurar que el velocímetro no se desborde */
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out; /* Transición para el hover */
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Efecto hover */
         }
         h2 {
-            color: #343a40;
+            color: #ffffff; /* Color de título blanco para el fondo */
             font-weight: 700;
-            margin-bottom: 30px;
+            margin-bottom: 40px; /* Más espacio inferior */
             text-align: center;
-            font-size: 2.2rem;
+            font-size: 2.5rem; /* Título más grande */
             position: relative;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra de texto para el título */
         }
         h2::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -15px; /* Más abajo */
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background-color: #007bff;
-            border-radius: 2px;
+            width: 80px; /* Más ancho */
+            height: 5px; /* Más grueso */
+            background-color: #ffffff; /* Línea blanca */
+            border-radius: 3px;
         }
         .card-title {
             color: #007bff;
-            font-size: 1.8rem;
+            font-size: 2rem; /* Título de tarjeta más grande */
             font-weight: 600;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center; /* Centrar título de la tarjeta */
         }
         .card-title i {
-            margin-right: 10px;
+            margin-right: 12px; /* Más espacio para el ícono */
             color: #0056b3;
+            font-size: 1.8rem; /* Ícono más grande */
         }
         .card-subtitle {
             color: #6c757d;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
+            font-size: 1.2rem; /* Subtítulo más grande */
+            margin-bottom: 25px; /* Más espacio inferior */
             display: flex;
             align-items: center;
+            justify-content: center; /* Centrar subtítulo de la tarjeta */
         }
         .card-subtitle i {
-            margin-right: 10px;
+            margin-right: 12px;
             color: #5a6268;
+            font-size: 1.1rem;
         }
         .card-text {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
+            font-size: 1.3rem; /* Texto más grande */
+            margin-bottom: 30px; /* Más espacio inferior */
             display: flex;
             align-items: center;
-            justify-content: center; /* Centrar el texto del estado de la válvula */
+            justify-content: center;
             text-align: center;
+            padding: 0 15px; /* Añadir padding horizontal */
         }
         .card-text i {
             margin-right: 10px;
-            color: #6f42c1; /* Un color distintivo para el estado */
+            color: #6f42c1;
+            font-size: 1.4rem;
         }
         #estado-actual {
             font-weight: 700;
+            transition: color 0.3s ease-in-out; /* Transición de color para el estado */
         }
         #estado-actual.abierta {
             color: #28a745;
@@ -107,22 +120,25 @@
         }
         .btn-group {
             display: flex;
-            gap: 15px;
+            gap: 20px; /* Más espacio entre botones */
             justify-content: center;
             margin-top: 30px;
+            flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
         }
         .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            padding: 15px 30px; /* Más padding para botones */
+            border-radius: 30px; /* Botones más redondeados */
+            font-size: 1.2rem; /* Fuente más grande */
             font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 180px; /* Ancho mínimo para mantener uniformidad */
         }
         .btn i {
-            margin-right: 8px;
+            margin-right: 10px; /* Más espacio para el ícono */
+            font-size: 1.3rem;
         }
         .btn-success {
             background-color: #28a745;
@@ -131,8 +147,8 @@
         .btn-success:hover {
             background-color: #218838;
             border-color: #1e7e34;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            transform: translateY(-3px); /* Efecto 3D al pasar el mouse */
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
         }
         .btn-danger {
             background-color: #dc3545;
@@ -141,54 +157,68 @@
         .btn-danger:hover {
             background-color: #c82333;
             border-color: #bd2130;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+        .btn-primary-custom { /* Nuevo estilo para el botón de perfil */
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #ffffff;
+        }
+        .btn-primary-custom:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
         }
         .alert {
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 1rem;
+            border-radius: 15px; /* Bordes más redondeados */
+            margin-bottom: 25px;
+            font-size: 1.1rem;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 15px;
         }
         .alert i {
-            margin-right: 8px;
+            margin-right: 10px;
+            font-size: 1.2rem;
         }
 
-        /* Estilos del Velocímetro */
+        /* Estilos del Velocímetro Mejorado */
         .gauge-container {
             width: 100%;
             display: flex;
-            flex-direction: column; /* Para alinear el velocímetro y su etiqueta */
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px; /* Más espacio inferior */
+            position: relative;
         }
         .gauge {
-            width: 180px;
-            height: 90px;
+            width: 220px; /* Velocímetro más grande */
+            height: 110px;
             overflow: hidden;
             position: relative;
             background: #e0e0e0;
-            border-radius: 90px 90px 0 0;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 110px 110px 0 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.15); /* Sombra interna más suave */
         }
         .gauge-fill {
             height: 100%;
             width: 100%;
             transform-origin: bottom center;
-            transition: transform 0.6s ease-out;
+            transition: transform 0.8s ease-out; /* Transición más suave */
             background: linear-gradient(to right, #28a745 0%, #ffc107 50%, #dc3545 100%);
-            border-radius: 90px 90px 0 0;
+            border-radius: 110px 110px 0 0;
             position: absolute;
             bottom: 0;
         }
         .gauge-cover {
-            width: 140px;
-            height: 70px;
+            width: 180px; /* Cubierta más grande */
+            height: 90px;
             background: #ffffff;
-            border-radius: 70px 70px 0 0;
+            border-radius: 90px 90px 0 0;
             position: absolute;
             bottom: 0;
             left: 50%;
@@ -198,53 +228,80 @@
             align-items: center;
             color: #343a40;
             font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
-            z-index: 1; /* Asegura que la cubierta esté sobre el relleno */
+            font-size: 1.8rem; /* Número de nivel más grande */
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.15); /* Sombra de la cubierta más pronunciada */
+            z-index: 1;
         }
         .gauge-label {
-            margin-top: 10px; /* Espacio entre el velocímetro y su etiqueta */
+            margin-top: 15px; /* Más espacio */
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 1rem; /* Etiqueta más legible */
             color: #6c757d;
         }
         .gauge-level {
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* Se ajusta con .gauge-cover font-size */
             font-weight: bold;
-            color: #007bff;
+            color: #007bff; /* Color inicial, será sobrescrito por JS */
         }
 
         /* Media Queries */
         @media (max-width: 768px) {
             .card {
-                padding: 20px;
+                padding: 25px;
             }
             h2 {
-                font-size: 1.8rem;
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            h2::after {
+                width: 70px;
+                height: 4px;
+                bottom: -10px;
             }
             .card-title {
+                font-size: 1.7rem;
+            }
+            .card-title i {
                 font-size: 1.5rem;
             }
             .card-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+            .card-subtitle i {
                 font-size: 1rem;
             }
             .card-text {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
+                margin-bottom: 25px;
+            }
+            .card-text i {
+                font-size: 1.3rem;
             }
             .btn-group {
                 flex-direction: column;
-                gap: 10px;
+                gap: 15px;
             }
             .btn {
                 width: 100%;
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+            .btn i {
+                font-size: 1.2rem;
             }
             .gauge {
-                width: 150px;
-                height: 75px;
+                width: 180px;
+                height: 90px;
             }
             .gauge-cover {
-                width: 110px;
-                height: 55px;
+                width: 140px;
+                height: 70px;
+                font-size: 1.5rem;
+            }
+            .gauge-label {
+                margin-top: 10px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -269,7 +326,6 @@
                             <i class="fas fa-map-marker-alt"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
                         </h6>
                         
-                        <!-- Velocímetro de Nivel de Gas -->
                         <div class="gauge-container">
                             <div class="gauge">
                                 <div class="gauge-fill" id="gaugeFill"></div>
@@ -293,6 +349,9 @@
                             </button>
                             <button type="button" class="btn btn-danger" id="btn-cerrar">
                                 <i class="fas fa-valve-slash"></i>Cerrar Válvula
+                            </button>
+                            <button type="button" class="btn btn-primary-custom" id="btn-perfil">
+                                <i class="fas fa-user-circle"></i>Ir al Perfil
                             </button>
                         </div>
                     <?php else: ?>
@@ -328,12 +387,12 @@ $(document).ready(function() {
     }
 
     function updateGauge(level) {
-        // Asegurarse de que el nivel esté entre 0 y 100
         level = Math.max(0, Math.min(100, level)); 
         const rotation = (level / 100) * 180;
         gaugeFill.css('transform', `rotate(${rotation}deg)`);
-        gasLevelSpan.text(`${level.toFixed(1)}%`); // Mostrar un decimal para mayor precisión
+        gasLevelSpan.text(`${level.toFixed(1)}%`); 
 
+        // Colores del texto del nivel de gas dentro del velocímetro
         if (level < 30) {
             gasLevelSpan.css('color', '#28a745'); // Verde (Seguro)
         } else if (level < 70) {
@@ -343,28 +402,26 @@ $(document).ready(function() {
         }
     }
     
-    // Función para obtener el estado del dispositivo (válvula y gas)
     function fetchDeviceState() {
         $.get('/servo/obtenerEstado/' + mac, function(response) {
-            console.log('Respuesta del backend (obtenerEstado):', response); // Para depuración
-            if (response.status === 'success') { // Usar el campo 'status' de la respuesta
+            console.log('Respuesta del backend (obtenerEstado):', response);
+            if (response.status === 'success') {
                 actualizarEstadoUI(response.estado_valvula);
                 if (response.nivel_gas !== undefined && response.nivel_gas !== null) {
                     updateGauge(response.nivel_gas);
                 } else {
-                    console.warn('Nivel de gas no definido o nulo en la respuesta.');
-                    updateGauge(0); // Opcional: poner a 0 si no hay datos
+                    console.warn('Nivel de gas no definido o nulo en la respuesta. Estableciendo a 0.');
+                    updateGauge(0);
                 }
             } else {
                 console.error('Error al obtener estado del dispositivo:', response.message);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de red o servidor al obtener estado:', textStatus, errorThrown);
-            console.error('Detalles del error:', jqXHR.responseText); // Mostrar respuesta del servidor
+            console.error('Detalles del error:', jqXHR.responseText);
         });
     }
 
-    // Obtener estado inicial del dispositivo al cargar la página
     fetchDeviceState();
     
     $('#btn-abrir').click(function() {
@@ -374,13 +431,17 @@ $(document).ready(function() {
     $('#btn-cerrar').click(function() {
         controlarServo(mac, 0);
     });
+
+    // Evento click para el nuevo botón de perfil
+    $('#btn-perfil').click(function() {
+        window.location.href = '<?= base_url('perfil') ?>'; // Redirige a la ruta del perfil
+    });
     
     function controlarServo(mac, estado) {
         const postData = {
             mac: mac,
             estado: estado
         };
-        // Añadir el token CSRF dinámicamente
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         } else {
@@ -388,22 +449,20 @@ $(document).ready(function() {
         }
 
         $.post('/servo/actualizarEstado', postData, function(response) {
-            console.log('Respuesta del backend (actualizarEstado):', response); // Para depuración
-            if (response.status === 'success') { // Usar el campo 'status' de la respuesta
+            console.log('Respuesta del backend (actualizarEstado):', response);
+            if (response.status === 'success') {
                 actualizarEstadoUI(response.estado);
-                // Después de controlar el servo, volvemos a obtener el estado para asegurar la sincronización
                 fetchDeviceState(); 
             } else {
                 console.error('Error al controlar servo:', response.message);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de red o servidor al enviar comando:', textStatus, errorThrown);
-            console.error('Detalles del error:', jqXHR.responseText); // Mostrar respuesta del servidor
+            console.error('Detalles del error:', jqXHR.responseText);
         });
     }
     
-    // Actualizar el estado del dispositivo y el nivel de gas periódicamente
-    setInterval(fetchDeviceState, 5000); // Llamar a la función de obtención de estado cada 5 segundos
+    setInterval(fetchDeviceState, 5000);
 });
 <?php endif; ?>
 </script>

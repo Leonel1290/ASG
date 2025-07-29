@@ -24,7 +24,7 @@ $routes->post('/reset-password', 'Home::resetPassword');
 
 // Perfil (Agrupamos rutas relacionadas con PerfilController)
 $routes->group('perfil', function($routes) {
-    $routes->get('/', 'PerfilController::index');
+    $routes->get('/', 'PerfilController::index'); // Esta es la ruta principal para el perfil
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
