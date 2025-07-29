@@ -30,7 +30,7 @@
             --warning-color: #f8961e;
             --dark-color: #212529;
             --light-color: #f8f9fa;
-            --gray-color: #6c757d;
+            --gray-color: #2c5981ff;
             --border-radius: 16px;
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
