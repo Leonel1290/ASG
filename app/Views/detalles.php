@@ -22,14 +22,15 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
         body {
-            background: linear-gradient(to right, #4facfe, #00f2fe); /* Degradado de fondo */
+            /* Degradado de fondo de gris claro a gris oscuro */
+            background: linear-gradient(to bottom, #f0f0f0, #cccccc); 
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            color: #343a40;
+            color: #343a40; /* Color de texto principal */
         }
         .container.main-content {
             margin-top: 20px;
@@ -48,13 +49,13 @@
             transform: translateY(-5px); /* Efecto hover */
         }
         h2 {
-            color: #ffffff; /* Color de título blanco para el fondo */
+            color: #343a40; /* Color de título oscuro para contrastar con el fondo gris */
             font-weight: 700;
             margin-bottom: 40px; /* Más espacio inferior */
             text-align: center;
             font-size: 2.5rem; /* Título más grande */
             position: relative;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra de texto para el título */
+            text-shadow: none; /* Quitamos la sombra de texto */
         }
         h2::after {
             content: '';
@@ -64,7 +65,7 @@
             transform: translateX(-50%);
             width: 80px; /* Más ancho */
             height: 5px; /* Más grueso */
-            background-color: #ffffff; /* Línea blanca */
+            background-color: #6c757d; /* Línea gris para combinar con el fondo */
             border-radius: 3px;
         }
         .card-title {
