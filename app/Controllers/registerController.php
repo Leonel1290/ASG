@@ -59,7 +59,7 @@ class registerController extends Controller
             'password' => [
                 'rules' => [
                     'required',
-                    'min_length[12]',
+                    'min_length[6]',
                     'max_length[255]',
                     'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
                     function ($password) {
@@ -68,7 +68,7 @@ class registerController extends Controller
             ],
             'errors' => [
                 'required' => 'El campo contraseña es obligatorio.',
-                'min_length' => 'La contraseña debe tener al menos 12 caracteres.',
+                'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
                 'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
         'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
         'La contraseña es demasiado común. Elige una más segura.'
