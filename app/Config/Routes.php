@@ -42,53 +42,20 @@ $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 
 // Profile (Group routes related to PerfilController)
 $routes->group('perfil', function($routes) {
-    // Route for the main profile page
-    // GET /perfil
     $routes->get('/', 'PerfilController::index');
-
-    // --- ROUTES FOR PROFILE VERIFICATION AND CONFIGURATION FLOW ---
-
-    // Route to display the INITIAL configuration page (asks to verify email)
-    // GET /perfil/configuracion
     $routes->get('configuracion', 'PerfilController::configuracion');
-
-    // Route to process sending the verification email for CONFIGURATION
-    // POST /perfil/enviar-verificacion
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
-
-    // Route to verify the token received by email for CONFIGURATION
-    // GET /perfil/verificar-email/THE_GENERATED_TOKEN
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
-
-    // Route to display the REAL configuration form (accessible after email verification)
-    // GET /perfil/config_form
     $routes->get('config_form', 'PerfilController::configForm');
-
-    // Route to process profile update (name/email)
-    // POST /perfil/actualizar
     $routes->post('actualizar', 'PerfilController::actualizar');
-
-    // Route for the success page after profile update
-    // GET /perfil/cambio-exitoso
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
-
-
-
-
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
-
-
-
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
-
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
-
-    $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
-
 
 });
 
-
+$routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
