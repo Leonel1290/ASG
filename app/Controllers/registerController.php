@@ -57,19 +57,22 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[200]|max_length[255]', // <-- Esta es la regla de 6 caracteres
-                'errors' => [
-                    'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 200 caracteres.',
-                    'max_length' => 'La contraseña no puede exceder los 255 caracteres.'
-                ]
+                'rules' => [
+                    'required',
+                    'min_length[12]',
+                    'max_length[255]',
+                    'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
+                    function ($password) {
+                        return !$this->userModel->isCommonPassword($password);
+                    }
             ],
-            'password_confirm' => [
-                'rules' => 'required_with[password]|matches[password]',
-                'errors' => [
-                    'required_with' => 'Por favor, confirma tu contraseña.',
-                    'matches' => 'Las contraseñas no coinciden.'
-                ]
+            'errors' => [
+                'required' => 'El campo contraseña es obligatorio.',
+                'min_length' => 'La contraseña debe tener al menos 12 caracteres.',
+                'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
+        'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
+        'La contraseña es demasiado común. Elige una más segura.'
+    ]
             ]
         ]);
 
