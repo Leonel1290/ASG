@@ -409,11 +409,11 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                         </li>
                     </ul>
 
-                    <form method="post" action="<?= base_url('/cambiar-idioma') ?>"class="d-flex me-3">
+                    <form method="post" action="<?= base_url('/cambiar-idioma') ?>">
                         <?= csrf_field() ?>
-                        <select name="idioma" onchange="this.form.submit()" class="form-select form-select-sm">
-                            <option value="es" <?= $idioma == 'es' ? 'selected' : '' ?>>Español</option>
-                            <option value="en" <?= $idioma == 'en' ? 'selected' : '' ?>>English</option>
+                        <select name="idioma" onchange="this.form.submit()" class="form-select form-select-sm" style="width: auto; margin-right: 10px;">
+                            <option value="es" <?= session('lang') == 'es' ? 'selected' : '' ?>>Español</option>
+                            <option value="en" <?= session('lang') == 'en' ? 'selected' : '' ?>>English</option>
                         </select>
                     </form>
 

@@ -47,7 +47,7 @@ class registerController extends Controller
                     'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
                 ]
             ],
-            'email'   => [
+            'email'    => [
                 'rules' => 'required|valid_email|is_unique[usuarios.email]|max_length[100]',
                 'errors' => [
                     'required' => 'El campo email es obligatorio.',
@@ -57,12 +57,22 @@ class registerController extends Controller
                 ]
             ],
             'password' => [
-                'rules' => 'required|min_length[120]|regex_match[/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~`])/',
-                'errors' => [
-                    'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 120 caracteres.',
-                    'regex_match' => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial (ej. !@#$).'
-                ]
+                'rules' => [
+                    'required',
+                    'min_length[6]',
+                    'max_length[255]',
+                    'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
+                    function ($password) {
+                        return !$this->userModel->isCommonPassword($password);
+                    }
+            ],
+            'errors' => [
+                'required' => 'El campo contraseña es obligatorio.',
+                'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
+                'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
+        'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
+        'La contraseña es demasiado común. Elige una más segura.'
+    ]
             ]
         ]);
 

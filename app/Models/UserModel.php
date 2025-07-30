@@ -57,19 +57,17 @@ class UserModel extends Model
     {
         return $this->where('reset_token', $token)->first();
     }
-
-    // NOTA: Tienes otro modelo llamado Userlogin.php que parece apuntar a la misma tabla 'usuarios'.
-    // Es recomendable usar UN SOLO modelo (UserModel) para interactuar con la tabla de usuarios
-    // y eliminar el modelo Userlogin.php para evitar confusión y redundancia.
-
-    // NOTA ADICIONAL: La migración 2024-09-11-023010_TUsuarios.php crea una tabla llamada 't_usuario'
-    // con columnas 'id_usuario', 'usuario', 'password', 'type'.
-    // Esto NO coincide con la tabla 'usuarios' y las columnas ('id', 'nombre', 'apellido', 'email', 'is_active', etc.)
-    // que tus controladores y este modelo (UserModel) parecen estar utilizando.
-    // Debes asegurarte de que la base de datos en Clever Cloud tenga la tabla 'usuarios' con la estructura correcta
-    // que tus controladores y UserModel esperan, o ajustar tus controladores/Modelos/Migración
-    // para que sean consistentes.
-    // Si la migración TUsuarios es antigua o incorrecta, ignórala. Si es la correcta,
-    // deberías ajustar tus modelos y controladores para usar 't_usuario', 'id_usuario', 'usuario', etc.
-    // Basado en el uso en tus controladores, parece que la tabla 'usuarios' es la que estás usando activamente.
+    
+public function isCommonPassword($password)
+{
+    $commonPasswords = [
+        'password', '123456', '123456789', 'qwerty', 'password1', 
+        '12345678', '111111', '123123', '1234567890', '1234567',
+        'letmein', 'admin', 'welcome', 'monkey', 'sunshine',
+        'football', 'iloveyou', 'starwars', 'dragon', 'trustno1'
+        // Puedes agregar más contraseñas comunes según sea necesario
+    ];
+    
+    return in_array(strtolower($password), $commonPasswords);
+}
 }

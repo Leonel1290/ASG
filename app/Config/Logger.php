@@ -101,7 +101,7 @@ class Logger extends BaseConfig
              *
              * NOTE: Leaving it blank will default to 'log'.
              */
-            'fileExtension' => '',
+            'fileExtension' => 'log',
 
             /*
              * The file system permissions to be applied on newly created log files.
@@ -117,7 +117,7 @@ class Logger extends BaseConfig
              * By default, logs are written to WRITEPATH . 'logs/'
              * Specify a different destination here, if desired.
              */
-            'path' => '',
+            'path' => WRITEPATH . 'logs/',
         ],
 
         /*
