@@ -40,6 +40,21 @@ class DispositivoModel extends Model
         return $this->where('MAC', $mac)->set($filteredData)->update();
     }
 
-    // Resto de tus métodos (getDispositivoById, getDispositivoByMac, etc.)
-    // ... 
+    ---
+
+    ## Método `getDispositivoByMac`
+
+    Este método te permitirá buscar y obtener la información de un dispositivo usando su **dirección MAC**. Es crucial que la columna en tu base de datos que almacena las direcciones MAC se llame **`MAC`**, tal como está definida en tu `$allowedFields`.
+
+    ```php
+    /**
+     * Recupera un dispositivo por su dirección MAC.
+     *
+     * @param string $macAddress La dirección MAC del dispositivo a recuperar.
+     * @return array|null Retorna los datos del dispositivo como un array, o null si no se encuentra.
+     */
+    public function getDispositivoByMac(string $macAddress)
+    {
+        return $this->where('MAC', $macAddress)->first();
+    }
 }
