@@ -81,3 +81,4 @@ $routes->get('prueba', function() {
 });
 
 $routes->post('guardar_compra', 'Compras::guardarCompra');
+$routes->get('mis-compras', 'Compras::misCompras');

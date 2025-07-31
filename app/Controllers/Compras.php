@@ -1,31 +1,25 @@
 <?php namespace App\Controllers;
 
+use App\Models\CompraModel;
 use CodeIgniter\API\ResponseTrait;
-use App\Models\ComprasModel;
 
 class Compras extends BaseController
 {
     use ResponseTrait;
 
-    class Compras extends CI_Controller {
-
-    public function guardar_compra() {
+    public function guardarCompra()
+    {
         // Verificar si es una solicitud AJAX y POST
-        if (!$this->input->is_ajax_request() || $this->input->method() !== 'post') {
-            $this->output->set_status_header(400);
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
-            return;
+        if (!$this->request->isAJAX() || !$this->request->is('post')) {
+            return $this->fail('Método no permitido', 400);
         }
-    }
 
         // Obtener datos del POST
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = $this->request->getJSON(true);
         
         // Validar datos
         if (empty($data['id_usuario']) || empty($data['monto']) || empty($data['direccion'])) {
-            $this->output->set_status_header(400);
-            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
-            return;
+            return $this->fail('Datos incompletos', 400);
         }
 
         // Preparar datos para la inserción
@@ -35,43 +29,37 @@ class Compras extends BaseController
             'moneda' => $data['moneda'] ?? 'USD',
             'direccion_envio' => $data['direccion'],
             'paypal_order_id' => $data['paypal_order_id'] ?? null,
-            'estado_pago' => $data['estado_pago'] ?? 'pendiente'
+            'estado_pago' => $data['estado_pago'] ?? 'completado',
+            'fecha_compra' => date('Y-m-d H:i:s')
         ];
 
         // Insertar en la base de datos
-        $this->load->database();
-        $this->db->insert('compras', $compra_data);
+        $model = new CompraModel();
+        $compra_id = $model->crearCompra($compra_data);
         
-        if ($this->db->affected_rows() > 0) {
-            $compra_id = $this->db->insert_id();
-            
-            // Aquí podrías agregar lógica adicional como enviar un email de confirmación
-            
-            echo json_encode([
+        if ($compra_id) {
+            return $this->respond([
                 'success' => true,
                 'message' => 'Compra registrada correctamente',
                 'compra_id' => $compra_id
             ]);
         } else {
-            $this->output->set_status_header(500);
-            echo json_encode(['success' => false, 'message' => 'Error al guardar la compra']);
+            return $this->fail('Error al guardar la compra', 500);
         }
     }
 
-    // Método para mostrar las compras del usuario
-    public function mis_compras() {
+    public function misCompras()
+    {
         // Verificar sesión
-        if (!isset($_SESSION['user_id'])) {
-            redirect('login');
+        if (!session()->has('user_id')) {
+            return redirect()->to('login');
         }
 
-        $this->load->database();
-        $this->load->model('Compra_model');
+        $model = new CompraModel();
+        $data['compras'] = $model->obtenerComprasUsuario(session('user_id'));
         
-        $data['compras'] = $this->Compra_model->obtener_compras_usuario($_SESSION['user_id']);
-        
-        $this->load->view('header');
-        $this->load->view('mis_compras', $data);
-        $this->load->view('footer');
+        return view('header') . 
+               view('mis_compras', $data) . 
+               view('footer');
     }
 }

@@ -168,46 +168,57 @@
       errorDiv.innerText = message;
     }
 
-    paypal.Buttons({
-      createOrder: (data, actions) => {
+paypal.Buttons({
+    createOrder: (data, actions) => {
         return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '100.00'
-            }
-          }]
+            purchase_units: [{
+                amount: {
+                    value: '100.00'
+                }
+            }]
         });
-      },
-      onApprove: (data, actions) => {
-        return actions.order.capture().then((details) => {
-          successModal.show();
-          setTimeout(() => {
-            const modal = document.getElementById('successModal');
-            if (modal && modal.classList.contains('show')) {
-              window.location.href = '<?= base_url("loginobtener") ?>';
+    },
+    onApprove: (data, actions) => {
+        return actions.order.capture().then(async (details) => {
+            // Enviar datos al servidor
+            try {
+                const response = await fetch('<?= base_url('guardar_compra') ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        id_usuario: '<?= session()->get('user_id') ?? 0 ?>',
+                        monto: '100.00',
+                        moneda: 'USD',
+                        direccion: 'Dirección de envío del usuario', // Debes obtener esto de un formulario
+                        paypal_order_id: details.id,
+                        estado_pago: 'completado'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successModal.show();
+                    setTimeout(() => {
+                        window.location.href = '<?= base_url("mis-compras") ?>';
+                    }, 3000);
+                } else {
+                    showErrorMessage('Error al guardar la compra: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorMessage('Error al comunicarse con el servidor');
             }
-          }, 3000);
         });
-      },
-      onCancel: () => {
+    },
+    onCancel: () => {
         showErrorMessage('❌ El pago fue cancelado.');
-      },
-      onError: (err) => {
+    },
+    onError: (err) => {
         console.error('Error en la transacción:', err);
         showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
-      }
-    }).render('#paypal-button-container');
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
-          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
-      });
     }
-  </script>
-
-</body>
-</html>
+}).render('#paypal-button-container');
