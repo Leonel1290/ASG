@@ -12,8 +12,8 @@
   <!-- Icono -->
   <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
-  <!-- PayPal -->
-  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
+  <!-- PayPal SDK - IMPORTANTE: Verifica tu client-id -->
+  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD&components=buttons"></script>
 
   <!-- PWA -->
   <link rel="manifest" href="<?= base_url('manifest.json') ?>">
@@ -76,6 +76,11 @@
 
     #paypal-button-container {
       margin-bottom: 1.5rem;
+      min-height: 45px; /* Asegura espacio para el botón */
+    }
+
+    .paypal-button {
+      border-radius: 4px !important;
     }
 
     .error-message {
@@ -128,6 +133,12 @@
       <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
       <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
       
+      <!-- Formulario para dirección de envío -->
+      <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección de envío</label>
+        <textarea class="form-control bg-dark text-light" id="direccion" rows="3" required></textarea>
+      </div>
+      
       <div id="paypal-button-container"></div>
       <div id="error-message" class="error-message"></div>
 
@@ -149,7 +160,7 @@
           Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
         </div>
         <div class="modal-footer">
-          <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
+          <a href="<?= base_url('mis-compras') ?>" class="btn btn-primary">Ver mis compras</a>
         </div>
       </div>
     </div>
@@ -157,6 +168,7 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script>
     const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
@@ -166,59 +178,93 @@
     function showErrorMessage(message) {
       const errorDiv = document.getElementById('error-message');
       errorDiv.innerText = message;
+      setTimeout(() => errorDiv.innerText = '', 5000);
     }
 
-paypal.Buttons({
-    createOrder: (data, actions) => {
-        return actions.order.create({
+    // Verificar si PayPal SDK se cargó correctamente
+    if (typeof paypal === 'undefined') {
+      showErrorMessage('Error al cargar PayPal. Por favor recarga la página.');
+    } else {
+      paypal.Buttons({
+        style: {
+          layout: 'vertical',
+          color: 'gold',
+          shape: 'rect',
+          label: 'paypal'
+        },
+        createOrder: function(data, actions) {
+          // Validar dirección antes de proceder
+          const direccion = document.getElementById('direccion').value.trim();
+          if (!direccion) {
+            showErrorMessage('Por favor ingresa tu dirección de envío');
+            return false;
+          }
+
+          return actions.order.create({
             purchase_units: [{
-                amount: {
-                    value: '100.00'
-                }
+              amount: {
+                value: '100.00',
+                currency_code: 'USD'
+              },
+              description: 'Dispositivo AgainSafeGas'
             }]
-        });
-    },
-    onApprove: (data, actions) => {
-        return actions.order.capture().then(async (details) => {
-            // Enviar datos al servidor
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(async function(details) {
+            // Obtener datos del usuario y dirección
+            const direccion = document.getElementById('direccion').value.trim();
+            const userId = '<?= session()->get('user_id') ?? 0 ?>'; // Asegúrate de tener el ID de usuario
+            
             try {
-                const response = await fetch('<?= base_url('guardar_compra') ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        id_usuario: '<?= session()->get('user_id') ?? 0 ?>',
-                        monto: '100.00',
-                        moneda: 'USD',
-                        direccion: 'Dirección de envío del usuario', // Debes obtener esto de un formulario
-                        paypal_order_id: details.id,
-                        estado_pago: 'completado'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    successModal.show();
-                    setTimeout(() => {
-                        window.location.href = '<?= base_url("mis-compras") ?>';
-                    }, 3000);
-                } else {
-                    showErrorMessage('Error al guardar la compra: ' + result.message);
-                }
+              // Enviar datos al servidor para guardar la compra
+              const response = await fetch('<?= base_url('guardar_compra') ?>', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                  id_usuario: userId,
+                  monto: '100.00',
+                  moneda: 'USD',
+                  direccion: direccion,
+                  paypal_order_id: details.id,
+                  estado_pago: 'completado'
+                })
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                successModal.show();
+              } else {
+                showErrorMessage('Error al registrar la compra: ' + (result.message || 'Error desconocido'));
+              }
             } catch (error) {
-                console.error('Error:', error);
-                showErrorMessage('Error al comunicarse con el servidor');
+              console.error('Error:', error);
+              showErrorMessage('Error al comunicarse con el servidor');
             }
-        });
-    },
-    onCancel: () => {
-        showErrorMessage('❌ El pago fue cancelado.');
-    },
-    onError: (err) => {
-        console.error('Error en la transacción:', err);
-        showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+          });
+        },
+        onCancel: function(data) {
+          showErrorMessage('❌ El pago fue cancelado.');
+        },
+        onError: function(err) {
+          console.error('Error en PayPal:', err);
+          showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+        }
+      }).render('#paypal-button-container');
     }
-}).render('#paypal-button-container');
+
+    // Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
+          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
+      });
+    }
+  </script>
+</body>
+</html>
