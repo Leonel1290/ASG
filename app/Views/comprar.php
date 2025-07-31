@@ -5,23 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Confirmar Compra | AgainSafeGas</title>
 
-  <!-- Bootstrap & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- Icono -->
   <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
-  <!-- PayPal -->
   <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
 
-  <!-- PWA -->
   <link rel="manifest" href="<?= base_url('manifest.json') ?>">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ASG">
 
-  <!-- Estilos personalizados -->
   <style>
     body {
       background-color: #0d1117;
@@ -137,7 +132,6 @@
     </div>
   </div>
 
-  <!-- Modal Éxito -->
   <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content border-0">
@@ -155,7 +149,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
@@ -173,20 +166,49 @@
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: '100.00'
+              value: '100.00' // Este valor debe ser validado y, idealmente, venir del servidor
             }
           }]
         });
       },
       onApprove: (data, actions) => {
         return actions.order.capture().then((details) => {
-          successModal.show();
-          setTimeout(() => {
-            const modal = document.getElementById('successModal');
-            if (modal && modal.classList.contains('show')) {
-              window.location.href = '<?= base_url("loginobtener") ?>';
+          // Envía los detalles de la compra a tu servidor para la inserción en la base de datos
+          fetch('<?= base_url("guardar_compra") ?>', { // Endpoint en tu servidor
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              // id_usuario debe ser obtenido de forma segura desde el servidor (ej. sesión PHP)
+              // Por ejemplo, si usas PHP y tienes una sesión, podrías hacer esto:
+              id_usuario: <?php echo $_SESSION['user_id'] ?? 'null'; ?>, 
+              MAC_dispositivo: null, // Si es un nuevo dispositivo, o no se asigna al momento de la compra
+              monto: details.purchase_units[0].amount.value,
+              moneda: details.purchase_units[0].amount.currency_code,
+              paypal_order_id: details.id,
+              estado_pago: details.status === 'COMPLETED' ? 'completado' : 'fallido'
+            })
+          })
+          .then(response => response.json())
+          .then(serverData => {
+            if (serverData.success) {
+              successModal.show();
+              setTimeout(() => {
+                const modal = document.getElementById('successModal');
+                if (modal && modal.classList.contains('show')) {
+                  window.location.href = '<?= base_url("loginobtener") ?>';
+                }
+              }, 3000);
+            } else {
+              showErrorMessage('Error al guardar la compra en la base de datos.');
+              console.error('Server error:', serverData.message);
             }
-          }, 3000);
+          })
+          .catch(error => {
+            console.error('Error al enviar los datos de la compra al servidor:', error);
+            showErrorMessage('Error de conexión al servidor al guardar la compra.');
+          });
         });
       },
       onCancel: () => {
