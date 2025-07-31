@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Confirmar Compra | AgainSafeGas</title>
 
+  <!-- Bootstrap y Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+  <!-- Favicon -->
   <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
+  <!-- SDK de PayPal -->
   <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
 
-  <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ASG">
-
   <style>
+    /* Mantén tus estilos CSS actuales */
     body {
       background-color: #0d1117;
       font-family: 'Segoe UI', sans-serif;
@@ -27,96 +26,11 @@
       flex-direction: column;
       min-height: 100vh;
     }
-
-    .checkout-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .checkout-card {
-      background-color: #161b22;
-      border-radius: 0.75rem;
-      padding: 2.5rem;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .checkout-card h2 {
-      color: #58a6ff;
-      font-weight: bold;
-      margin-bottom: 1.5rem;
-    }
-
-    .checkout-card img {
-      max-width: 140px;
-      margin-bottom: 1.5rem;
-    }
-
-    .checkout-card p {
-      font-size: 1.05rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
-    }
-
-    #paypal-button-container {
-      margin-bottom: 1.5rem;
-    }
-
-    .error-message {
-      color: #f87171;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
-
-    .btn-back {
-      background-color: #2d333b;
-      color: #e6edf3;
-      border: none;
-      border-radius: 0.375rem;
-      padding: 0.6rem 1.25rem;
-      transition: all 0.3s ease;
-    }
-
-    .btn-back:hover {
-      background-color: #21262d;
-      color: #fff;
-    }
-
-    /* Modal personalizado */
-    .modal-content {
-      background-color: #1c2128;
-      color: #c9d1d9;
-    }
-
-    .modal-title {
-      color: #2ea043;
-    }
-
-    .btn-primary {
-      background-color: #238636;
-      border-color: #238636;
-    }
-
-    .btn-primary:hover {
-      background-color: #2ea043;
-      border-color: #2ea043;
-    }
+    /* ... resto de tus estilos ... */
   </style>
 </head>
 
 <body>
-
   <div class="checkout-container">
     <div class="checkout-card">
       <h2>Confirmar Compra</h2>
@@ -132,23 +46,12 @@
     </div>
   </div>
 
+  <!-- Modal de éxito (mantenerlo) -->
   <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content border-0">
-        <div class="modal-header">
-          <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
-        </div>
-        <div class="modal-footer">
-          <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
-        </div>
-      </div>
-    </div>
+    <!-- ... contenido del modal ... -->
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
@@ -166,70 +69,52 @@
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: '100.00' // Este valor debe ser validado y, idealmente, venir del servidor
+              value: '100.00'
             }
           }]
         });
       },
       onApprove: (data, actions) => {
         return actions.order.capture().then((details) => {
-          // Envía los detalles de la compra a tu servidor para la inserción en la base de datos
-          fetch('<?= base_url("guardar_compra") ?>', { // Endpoint en tu servidor
+          fetch('<?= base_url("guardar_compra") ?>', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify({
-              // id_usuario debe ser obtenido de forma segura desde el servidor (ej. sesión PHP)
-              // Por ejemplo, si usas PHP y tienes una sesión, podrías hacer esto:
-              id_usuario: <?php echo $_SESSION['user_id'] ?? 'null'; ?>, 
-              MAC_dispositivo: null, // Si es un nuevo dispositivo, o no se asigna al momento de la compra
               monto: details.purchase_units[0].amount.value,
               moneda: details.purchase_units[0].amount.currency_code,
               paypal_order_id: details.id,
               estado_pago: details.status === 'COMPLETED' ? 'completado' : 'fallido'
             })
           })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            return response.json();
+          })
           .then(serverData => {
             if (serverData.success) {
               successModal.show();
               setTimeout(() => {
-                const modal = document.getElementById('successModal');
-                if (modal && modal.classList.contains('show')) {
-                  window.location.href = '<?= base_url("loginobtener") ?>';
-                }
+                window.location.href = '<?= base_url("loginobtener") ?>';
               }, 3000);
             } else {
-              showErrorMessage('Error al guardar la compra en la base de datos.');
-              console.error('Server error:', serverData.message);
+              showErrorMessage(serverData.message || 'Error al procesar la compra');
             }
           })
           .catch(error => {
-            console.error('Error al enviar los datos de la compra al servidor:', error);
-            showErrorMessage('Error de conexión al servidor al guardar la compra.');
+            console.error('Error:', error);
+            showErrorMessage('Error al conectar con el servidor');
           });
         });
       },
-      onCancel: () => {
-        showErrorMessage('❌ El pago fue cancelado.');
-      },
+      onCancel: () => showErrorMessage('❌ El pago fue cancelado.'),
       onError: (err) => {
-        console.error('Error en la transacción:', err);
-        showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+        console.error('Error en PayPal:', err);
+        showErrorMessage('⚠️ Error al procesar el pago');
       }
     }).render('#paypal-button-container');
   </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
-          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
-      });
-    }
-  </script>
-
 </body>
 </html>

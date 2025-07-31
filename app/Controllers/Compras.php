@@ -8,30 +8,38 @@ class Compras extends BaseController
     use ResponseTrait;
 
     public function guardarCompra()
-    {
-        $input = $this->request->getJSON();
 
-        if (empty($input->id_usuario) || empty($input->monto) || empty($input->moneda) || empty($input->paypal_order_id)) {
-            return $this->fail('Datos incompletos para registrar la compra.', 400);
-        }
+    // Verificar si el usuario está logueado
+    if (!session()->has('user_id')) {
+        return $this->failUnauthorized('Debe iniciar sesión para realizar una compra');
+    }
 
-        $comprasModel = new ComprasModel();
+    $input = $this->request->getJSON();
 
-        $data = [
-            'id_usuario' => $input->id_usuario,
-            'MAC_dispositivo' => $input->MAC_dispositivo, // Puede ser nulo
-            'monto' => $input->monto,
-            'moneda' => $input->moneda,
-            'paypal_order_id' => $input->paypal_order_id,
-            'estado_pago' => $input->estado_pago // 'completado' o 'fallido' desde el frontend
-        ];
+    // Validación básica
+    if (empty($input->paypal_order_id) {
+        return $this->fail('Datos de compra incompletos', 400);
+    }
 
-        try {
-            $comprasModel->insert($data);
-            return $this->respondCreated(['success' => true, 'message' => 'Compra registrada exitosamente.']);
-        } catch (\Exception $e) {
-            log_message('error', 'Error al insertar compra: ' . $e->getMessage());
-            return $this->failServerError('Error al registrar la compra: ' . $e->getMessage());
-        }
+    $data = [
+        'id_usuario' => session()->get('user_id'), // Obtenido de la sesión
+        'monto' => $input->monto ?? 0,
+        'moneda' => $input->moneda ?? 'USD',
+        'paypal_order_id' => $input->paypal_order_id,
+        'estado_pago' => $input->estado_pago ?? 'completado',
+        'MAC_dispositivo' => null // Puedes asignarlo después
+    ];
+
+    $comprasModel = new ComprasModel();
+    
+    try {
+        $comprasModel->insert($data);
+        return $this->respondCreated([
+            'success' => true,
+            'message' => 'Compra registrada exitosamente'
+        ]);
+    } catch (\Exception $e) {
+        log_message('error', 'Error al guardar compra: '.$e->getMessage());
+        return $this->failServerError('Error al procesar la compra');
     }
 }
