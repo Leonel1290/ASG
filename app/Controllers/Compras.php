@@ -7,39 +7,71 @@ class Compras extends BaseController
 {
     use ResponseTrait;
 
-    public function guardarCompra()
+    class Compras extends CI_Controller {
 
-    // Verificar si el usuario está logueado
-    if (!session()->has('user_id')) {
-        return $this->failUnauthorized('Debe iniciar sesión para realizar una compra');
+    public function guardar_compra() {
+        // Verificar si es una solicitud AJAX y POST
+        if (!$this->input->is_ajax_request() || $this->input->method() !== 'post') {
+            $this->output->set_status_header(400);
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
     }
 
-    $input = $this->request->getJSON();
+        // Obtener datos del POST
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Validar datos
+        if (empty($data['id_usuario']) || empty($data['monto']) || empty($data['direccion'])) {
+            $this->output->set_status_header(400);
+            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+            return;
+        }
 
-    // Validación básica
-    if (empty($input->paypal_order_id) {
-        return $this->fail('Datos de compra incompletos', 400);
+        // Preparar datos para la inserción
+        $compra_data = [
+            'id_usuario' => $data['id_usuario'],
+            'monto' => $data['monto'],
+            'moneda' => $data['moneda'] ?? 'USD',
+            'direccion_envio' => $data['direccion'],
+            'paypal_order_id' => $data['paypal_order_id'] ?? null,
+            'estado_pago' => $data['estado_pago'] ?? 'pendiente'
+        ];
+
+        // Insertar en la base de datos
+        $this->load->database();
+        $this->db->insert('compras', $compra_data);
+        
+        if ($this->db->affected_rows() > 0) {
+            $compra_id = $this->db->insert_id();
+            
+            // Aquí podrías agregar lógica adicional como enviar un email de confirmación
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Compra registrada correctamente',
+                'compra_id' => $compra_id
+            ]);
+        } else {
+            $this->output->set_status_header(500);
+            echo json_encode(['success' => false, 'message' => 'Error al guardar la compra']);
+        }
     }
 
-    $data = [
-        'id_usuario' => session()->get('user_id'), // Obtenido de la sesión
-        'monto' => $input->monto ?? 0,
-        'moneda' => $input->moneda ?? 'USD',
-        'paypal_order_id' => $input->paypal_order_id,
-        'estado_pago' => $input->estado_pago ?? 'completado',
-        'MAC_dispositivo' => null // Puedes asignarlo después
-    ];
+    // Método para mostrar las compras del usuario
+    public function mis_compras() {
+        // Verificar sesión
+        if (!isset($_SESSION['user_id'])) {
+            redirect('login');
+        }
 
-    $comprasModel = new ComprasModel();
-    
-    try {
-        $comprasModel->insert($data);
-        return $this->respondCreated([
-            'success' => true,
-            'message' => 'Compra registrada exitosamente'
-        ]);
-    } catch (\Exception $e) {
-        log_message('error', 'Error al guardar compra: '.$e->getMessage());
-        return $this->failServerError('Error al procesar la compra');
+        $this->load->database();
+        $this->load->model('Compra_model');
+        
+        $data['compras'] = $this->Compra_model->obtener_compras_usuario($_SESSION['user_id']);
+        
+        $this->load->view('header');
+        $this->load->view('mis_compras', $data);
+        $this->load->view('footer');
     }
 }

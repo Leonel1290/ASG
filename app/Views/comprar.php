@@ -117,11 +117,19 @@
 
 <body>
 
+  <body>
+
   <div class="checkout-container">
     <div class="checkout-card">
       <h2>Confirmar Compra</h2>
       <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
-      <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
+      <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, completa tus datos y procede con el pago seguro a través de PayPal.</p>
+      
+      <!-- Formulario para la dirección -->
+      <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección de envío</label>
+        <textarea class="form-control bg-dark text-white" id="direccion" rows="3" required></textarea>
+      </div>
       
       <div id="paypal-button-container"></div>
       <div id="error-message" class="error-message"></div>
@@ -129,23 +137,6 @@
       <button class="btn btn-back mt-3" onclick="window.history.back();">
         <i class="fas fa-arrow-left"></i> Volver
       </button>
-    </div>
-  </div>
-
-  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content border-0">
-        <div class="modal-header">
-          <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
-        </div>
-        <div class="modal-footer">
-          <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -163,6 +154,13 @@
 
     paypal.Buttons({
       createOrder: (data, actions) => {
+        // Validar dirección antes de proceder
+        const direccion = document.getElementById('direccion').value.trim();
+        if (!direccion) {
+          showErrorMessage('Por favor ingresa tu dirección de envío');
+          return Promise.reject(new Error('Dirección requerida'));
+        }
+        
         return actions.order.create({
           purchase_units: [{
             amount: {
@@ -173,41 +171,47 @@
       },
       onApprove: (data, actions) => {
         return actions.order.capture().then((details) => {
-          // Envía los detalles de la compra a tu servidor para la inserción en la base de datos
-          fetch('<?= base_url("guardar_compra") ?>', { // Endpoint en tu servidor
+          const direccion = document.getElementById('direccion').value.trim();
+          
+          // Envía los detalles de la compra a tu servidor
+          fetch('<?= base_url("guardar_compra") ?>', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest' // Para identificar solicitudes AJAX
             },
             body: JSON.stringify({
-              // id_usuario debe ser obtenido de forma segura desde el servidor (ej. sesión PHP)
-              // Por ejemplo, si usas PHP y tienes una sesión, podrías hacer esto:
-              id_usuario: <?php echo $_SESSION['user_id'] ?? 'null'; ?>, 
-              MAC_dispositivo: null, // Si es un nuevo dispositivo, o no se asigna al momento de la compra
+              id_usuario: <?php echo $_SESSION['user_id'] ?? 'null'; ?>,
               monto: details.purchase_units[0].amount.value,
               moneda: details.purchase_units[0].amount.currency_code,
+              direccion: direccion,
               paypal_order_id: details.id,
               estado_pago: details.status === 'COMPLETED' ? 'completado' : 'fallido'
             })
           })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+          })
           .then(serverData => {
             if (serverData.success) {
               successModal.show();
               setTimeout(() => {
                 const modal = document.getElementById('successModal');
                 if (modal && modal.classList.contains('show')) {
-                  window.location.href = '<?= base_url("loginobtener") ?>';
+                  window.location.href = '<?= base_url("mis_compras") ?>';
                 }
               }, 3000);
             } else {
-              showErrorMessage('Error al guardar la compra en la base de datos.');
+              showErrorMessage(serverData.message || 'Error al guardar la compra');
               console.error('Server error:', serverData.message);
             }
           })
           .catch(error => {
-            console.error('Error al enviar los datos de la compra al servidor:', error);
-            showErrorMessage('Error de conexión al servidor al guardar la compra.');
+            console.error('Error:', error);
+            showErrorMessage('Error de conexión al servidor');
           });
         });
       },
@@ -221,15 +225,7 @@
     }).render('#paypal-button-container');
   </script>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
-          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
-      });
-    }
-  </script>
+  <!-- ... (mantén el resto del código igual) ... -->
 
 </body>
 </html>

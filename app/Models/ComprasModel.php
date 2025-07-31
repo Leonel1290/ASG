@@ -2,14 +2,23 @@
 
 use CodeIgniter\Model;
 
-class ComprasModel extends Model
-{
-    protected $table = 'compras';
-    protected $primaryKey = 'id';
-    protected $allowedFields = ['id_usuario', 'MAC_dispositivo', 'monto', 'moneda', 'paypal_order_id', 'estado_pago'];
-    protected $useTimestamps = true; // Usa created_at y updated_at
-    protected $createdField  = 'created_at';
-    protected $updatedField  = false; // Solo created_at se maneja automáticamente para esta tabla
+class CompraModel extends CI_Model {
 
-    // Aquí podrías añadir reglas de validación si es necesario
+    public function __construct() {
+        parent::__construct();
+        $this->load->database();
+    }
+
+    public function obtener_compras_usuario($id_usuario) {
+        return $this->db
+            ->where('id_usuario', $id_usuario)
+            ->order_by('fecha_compra', 'DESC')
+            ->get('compras')
+            ->result_array();
+    }
+
+    public function crear_compra($data) {
+        $this->db->insert('compras', $data);
+        return $this->db->insert_id();
+    }
 }
