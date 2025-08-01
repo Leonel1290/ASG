@@ -191,7 +191,7 @@
                     <li class="nav-item">
                         <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
-                            <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/" target="_blank">Descargar App</a>
+                            <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
                         </div>
                     </li>
                 </ul>
