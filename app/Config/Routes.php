@@ -80,4 +80,4 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
-$routes->post('guardar_compra', 'Payment::guardarCompra');
+$routes->post('guardar_Compra', 'Payment::guardarCompra');
