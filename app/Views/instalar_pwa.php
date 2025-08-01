@@ -31,7 +31,7 @@
             text-align: center;
             color: #fff; /* Texto del card en blanco para contraste */
         }
-        .btn-install {
+        .btn-install, .btn-open {
             background-color: #698180; /* Color de btn-custom de inicio.php */
             border: none;
             color: #fff;
@@ -44,7 +44,7 @@
             display: inline-block; /* Para que el padding y el margen funcionen bien */
             text-decoration: none; /* Eliminar subrayado si fuera un enlace */
         }
-        .btn-install:hover {
+        .btn-install:hover, .btn-open:hover {
             background-color: #2D4A53; /* Hover de btn-custom de inicio.php */
         }
         .icon-container {
@@ -71,10 +71,51 @@
             color: #cbd5e0; /* Un gris claro para el texto de descripción */
             margin-bottom: 1rem;
         }
-        p#notSupportedMessage {
-            color: #a0aec0; /* Un gris más oscuro para el mensaje de no soportado */
-            font-size: 0.9rem;
-            margin-top: 1rem;
+        
+        /* Estilos para el modal de incompatibilidad */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #2D4A53;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 28rem;
+            width: 90%;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        .modal-message {
+            margin-bottom: 1.5rem;
+            color: #cbd5e0;
+        }
+        .modal-close {
+            background-color: #698180;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .modal-close:hover {
+            background-color: #2D4A53;
         }
     </style>
 </head>
@@ -92,22 +133,74 @@
         <button id="installButton" class="btn-install hidden">
             Descargar e Instalar App
         </button>
+        
+        <button id="openButton" class="btn-open hidden">
+            Abrir Aplicación
+        </button>
+    </div>
 
-        <p id="notSupportedMessage" class="hidden">
-            Tu navegador no soporta la instalación de aplicaciones web (PWA) de esta manera, o ya la tienes instalada.
-            Puedes intentar añadir la página a tu pantalla de inicio manualmente si tu navegador lo permite (busca la opción "Añadir a pantalla de inicio" o similar en el menú del navegador).
-        </p>
+    <!-- Modal de incompatibilidad -->
+    <div id="incompatibilityModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Compatibilidad no soportada</h3>
+            <p class="modal-message">
+                Tu navegador no soporta la instalación de aplicaciones web (PWA) o ya tienes la aplicación instalada.
+                <br><br>
+                Puedes intentar añadir la página a tu pantalla de inicio manualmente si tu navegador lo permite (busca la opción "Añadir a pantalla de inicio" o similar en el menú del navegador).
+            </p>
+            <button id="modalClose" class="modal-close">Entendido</button>
+        </div>
     </div>
 
     <script>
-        let deferredPrompt; // Variable para almacenar el evento de instalación
+        let deferredPrompt;
         const installButton = document.getElementById('installButton');
-        const notSupportedMessage = document.getElementById('notSupportedMessage');
+        const openButton = document.getElementById('openButton');
+        const incompatibilityModal = document.getElementById('incompatibilityModal');
+        const modalClose = document.getElementById('modalClose');
 
-        // --- Log de las URLs generadas por base_url() ---
+        // Verificar si la app ya está instalada
+        function checkIfAppInstalled() {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('La aplicación ya está instalada y se está ejecutando en modo standalone.');
+                openButton.classList.remove('hidden');
+                openButton.addEventListener('click', () => {
+                    // Intenta abrir la app (esto depende de cómo esté configurado tu manifest)
+                    window.location.href = '/';
+                });
+                return true;
+            }
+            return false;
+        }
+
+        // Mostrar modal de incompatibilidad
+        function showIncompatibilityModal() {
+            incompatibilityModal.style.display = 'flex';
+        }
+
+        // Cerrar modal
+        modalClose.addEventListener('click', () => {
+            incompatibilityModal.style.display = 'none';
+        });
+
+        // Verificar compatibilidad con PWA
+        function checkPwaSupport() {
+            if (!('BeforeInstallPromptEvent' in window) && !checkIfAppInstalled()) {
+                console.log('Navegador no soporta instalación de PWA');
+                showIncompatibilityModal();
+                return false;
+            }
+            return true;
+        }
+
+        // Log de las URLs generadas por base_url()
         console.log('URL del Manifest:', '<?= base_url('manifest.json'); ?>');
         console.log('URL del Service Worker:', '<?= base_url('service-worker.js'); ?>');
-        // --- FIN Log ---
+
+        // Verificaciones iniciales
+        if (!checkIfAppInstalled()) {
+            checkPwaSupport();
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -128,27 +221,21 @@
                     console.log('El usuario aceptó la instalación de la PWA.');
                 } else {
                     console.log('El usuario rechazó la instalación de la PWA.');
+                    showIncompatibilityModal();
                 }
             } else {
                 console.log('deferredPrompt no está disponible. Posiblemente ya se instaló o no es compatible.');
-                notSupportedMessage.classList.remove('hidden');
+                showIncompatibilityModal();
             }
         });
 
         window.addEventListener('appinstalled', () => {
             console.log('ASG PWA instalada exitosamente!');
             installButton.classList.add('hidden');
-            notSupportedMessage.classList.add('hidden');
+            openButton.classList.remove('hidden');
         });
 
-        setTimeout(() => {
-            if (!deferredPrompt && installButton.classList.contains('hidden')) {
-                notSupportedMessage.classList.remove('hidden');
-                console.log('No se detectó soporte para beforeinstallprompt o la PWA ya está instalada.');
-            }
-        }, 1000);
-
-        // --- REGISTRO DEL SERVICE WORKER PARA LA PWA ---
+        // Registrar Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
@@ -160,7 +247,14 @@
                     });
             });
         }
-        // --- FIN REGISTRO ---
+
+        // Verificación final después de un tiempo
+        setTimeout(() => {
+            if (!deferredPrompt && !checkIfAppInstalled()) {
+                console.log('No se detectó soporte para beforeinstallprompt o la PWA ya está instalada.');
+                showIncompatibilityModal();
+            }
+        }, 1000);
     </script>
 
 </body>
