@@ -80,4 +80,4 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
-$routes->post('guardar_Compra', 'Payment::guardarCompra');
+$routes->get('/registrar-pago-paypal', 'PagosController::registrarPagoPaypal');
