@@ -80,4 +80,16 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
-$routes->get('/registrar-pago-paypal', 'PagosController::registrarPagoPaypal');
+// app/Config/Routes.php
+
+$routes->post('paypal/createOrder', 'PayPalController::createOrder');
+$routes->post('paypal/captureOrder', 'PayPalController::captureOrder');
+
+// Esta ruta la necesitarás si usas la Opción 1 de Javascript
+$routes->get('pago-exitoso', function() {
+    echo "<h1>¡Pago Exitoso! Gracias por tu compra.</h1>";
+    // Aquí podrías cargar una vista o redirigir a la página principal de tu aplicación
+});
+
+// Si usaras la Opción 2 con GET (no recomendada para este caso)
+// $routes->get('registrar-pago-paypal', 'PayPalController::captureOrder');
