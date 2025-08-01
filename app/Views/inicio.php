@@ -14,7 +14,8 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #0D1F23, #132E35);
+            /* CAMBIO A AZUL MARINO OSCURO */
+            background: linear-gradient(135deg, #0A192F, #0D203B);
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
@@ -22,7 +23,8 @@
 
         .navbar {
             backdrop-filter: blur(10px);
-            background-color: rgba(13, 31, 35, 0.8);
+            /* Ajustado el color de la navbar para que combine mejor */
+            background-color: rgba(10, 25, 47, 0.8);
             position: fixed;
             top: 0;
             width: 100%;
@@ -34,11 +36,11 @@
         }
 
         .navbar-brand:hover, .nav-link:hover {
-            color: #698180;
+            color: #8CA9B9; /* Nuevo color al pasar el ratón para combinar con el azul */
         }
 
         .btn-custom {
-            background-color: #698180;
+            background-color: #36678C; /* Un azul más oscuro para los botones */
             border: none;
             color: #fff;
             font-weight: 600;
@@ -47,7 +49,7 @@
         }
 
         .btn-custom:hover {
-            background-color: #2D4A53;
+            background-color: #2A5173; /* Tono más oscuro al pasar el ratón */
         }
 
         .hero {
@@ -107,7 +109,7 @@
         .hero-line {
             width: 80px;
             height: 4px;
-            background-color: #698180;
+            background-color: #36678C; /* Color de la línea ajustado */
             margin: 1rem 0 1.5rem;
         }
 
@@ -129,7 +131,7 @@
 
         .features i {
             font-size: 3rem;
-            color: #698180;
+            color: #36678C; /* Color de los iconos ajustado */
         }
 
         .features h3 {
@@ -137,14 +139,14 @@
         }
 
         .company-info {
-            background-color: #2D4A53;
+            background-color: #1A3E5C; /* Un azul más oscuro para la sección de información */
             border-radius: 10px;
             padding: 2rem;
             color: #fff;
         }
 
         footer {
-            background-color: #0D1F23;
+            background-color: #0A192F; /* Fondo del footer a juego con el body */
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
@@ -164,7 +166,7 @@
         }
 
         .navbar-toggler:focus {
-            box-shadow: 0 0 0 .25rem rgba(105, 129, 128, .5);
+            box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5); /* Sombra ajustada al foco */
         }
     </style>
 </head>

@@ -79,3 +79,6 @@ $routes->group('registros-gas', function($routes) {
 $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
+
+$routes->post('guardar_compra', 'Compras::guardarCompra');
+$routes->get('mis-compras', 'Compras::misCompras');

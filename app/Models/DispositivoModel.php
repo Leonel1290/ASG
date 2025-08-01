@@ -40,6 +40,14 @@ class DispositivoModel extends Model
         return $this->where('MAC', $mac)->set($filteredData)->update();
     }
 
-    // Resto de tus métodos (getDispositivoById, getDispositivoByMac, etc.)
-    // ... 
+    /**
+     * Recupera un dispositivo por su dirección MAC.
+     *
+     * @param string $macAddress La dirección MAC del dispositivo a recuperar.
+     * @return array|null Retorna los datos del dispositivo como un array, o null si no se encuentra.
+     */
+    public function getDispositivoByMac(string $macAddress)
+    {
+        return $this->where('MAC', $macAddress)->first();
+    }
 }
