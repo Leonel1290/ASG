@@ -17,8 +17,8 @@ class PagosController extends BaseController
         $payerId = $this->request->getGet('PayerID');
 
         // Datos del cliente PayPal Sandbox
-        $clientId = 'TU_CLIENT_ID_SANDBOX';
-        $secret = 'TU_SECRET_SANDBOX';
+        $clientId = 'AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_';
+        $secret = 'EEOWwqaRKfgtQYKYReuEcNZrRJJuGcJBWaUlKrYmzPLu4f7zGjHovQ8l9T_xASTSq9lDCErw6vR-RxKb';
 
         // Obtener token
         $ch = curl_init();
