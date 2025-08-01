@@ -132,13 +132,6 @@
       <h2>Confirmar Compra</h2>
       <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
       <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
-      
-      <!-- Formulario para dirección de envío -->
-      <div class="mb-3">
-        <label for="direccion" class="form-label">Dirección de envío</label>
-        <textarea class="form-control bg-dark text-light" id="direccion" rows="3" required></textarea>
-      </div>
-      
       <div id="paypal-button-container"></div>
       <div id="error-message" class="error-message"></div>
 
