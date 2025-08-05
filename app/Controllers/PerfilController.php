@@ -99,27 +99,18 @@ class PerfilController extends BaseController
 
     // --- MÉTODOS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN ---
 
-    public function configuracion()
+    public function configForm()
     {
         $session = session();
         $loggedInUserId = $session->get('id');
 
-        if (!$loggedInUserId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+             if ($loggedInUserId) {
+                 return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de acceder a la configuración.');
+             } else {
+                 return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+             }
         }
-
-        $userData = $this->userModel->find($loggedInUserId);
-
-        if (!$userData) {
-            $session->destroy();
-            return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
-        }
-
-        $data['userEmail'] = $userData['email'] ?? 'No disponible';
-
-        return view('perfil/verificar_email', $data);
-    }
-
     public function enviarVerificacion()
     {
         $session = session();
