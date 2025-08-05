@@ -169,7 +169,7 @@ class PerfilController extends BaseController
     }
 
 
-    public function editarDispositivo($mac)
+    public function editDevice($mac)
     {
         $session = session();
         $usuarioId = $session->get('id');
