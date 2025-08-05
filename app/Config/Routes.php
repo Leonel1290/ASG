@@ -95,5 +95,4 @@ $routes->get('pago-exitoso', function() {
 // $routes->get('registrar-pago-paypal', 'PayPalController::captureOrder');
 
 // Rutas de PayPal
-$routes->post('api/paypal/create-order', 'PayPalController::createOrder');
-$routes->post('api/paypal/capture-order', 'PayPalController::captureOrder');
+$routes->get('pago-exitoso', 'PayPalController::pagoExitoso');

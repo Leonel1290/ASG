@@ -9,36 +9,6 @@ class PayPalController extends Controller
     private $clientId = "AdGS2GrGBbZXq41yYDW2A-0dVD5avVuWiQO-XQDVAOxMepuO0HmkCL6kFfwIbLLjIc0gT9tB3KmIL0hJ";
     private $clientSecret = "ENwZmSdEKvlXWlybPNngQbhf1KZhN9S_1bVV3lfJbtTF1oc0waa3RxYjImQaeeafjMKQe48pbJM07A";
 
-    private function getAccessToken()
-    {
-        $url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->clientId . ":" . $this->clientSecret);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Accept: application/json",
-            "Accept-Language: es_ES",
-        ]);
-
-        $response = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
-
-        if ($err) {
-            log_message('error', 'cURL Error for getAccessToken: ' . $err);
-            return null;
-        }
-
-        $data = json_decode($response, true);
-        return $data["access_token"] ?? null;
-    }
-
     public function createOrder()
     {
         $input = $this->request->getJSON();
@@ -46,7 +16,7 @@ class PayPalController extends Controller
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            return $this->response->setJSON(["error" => "No se pudo obtener el token de acceso de PayPal"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "No se pudo obtener el token"])->setStatusCode(500);
         }
 
         $url = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
@@ -55,46 +25,25 @@ class PayPalController extends Controller
             "purchase_units" => [
                 [
                     "amount" => [
-                        "currency_code" => "ARS",
+                        "currency_code" => "USD", // Asegúrate de que esta moneda coincida con la del cliente si es ARS, como indicas en el HTML.
                         "value" => $amount
                     ]
                 ]
             ]
         ]);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Content-Type: application/json",
-            "Authorization: Bearer $accessToken"
-        ]);
+        $options = [
+            "http" => [
+                "header" => "Authorization: Bearer $accessToken\r\n" .
+                            "Content-Type: application/json\r\n",
+                "method" => "POST",
+                "content" => $body
+            ]
+        ];
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
 
-        $response = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
-
-        if ($err) {
-            log_message('error', 'cURL Error for createOrder: ' . $err);
-            return $this->response->setJSON(["error" => "Error de cURL al comunicarse con PayPal"])->setStatusCode(500);
-        }
-        
-        $resultData = json_decode($response, true);
-        
-        // Loguear la respuesta completa de PayPal para depuración
-        log_message('info', 'PayPal createOrder API Response: ' . $response);
-        
-        if (!isset($resultData['id'])) {
-            // Si la respuesta no contiene un ID de orden, algo salió mal
-            log_message('error', 'PayPal createOrder response did not contain an ID. Full response: ' . print_r($resultData, true));
-            return $this->response->setJSON(["error" => "La creación de la orden falló. Verifique sus credenciales de PayPal."])->setStatusCode(500);
-        }
-
-        return $this->response->setJSON($resultData);
+        return $this->response->setJSON(json_decode($result, true));
     }
 
     public function captureOrder()
@@ -108,58 +57,94 @@ class PayPalController extends Controller
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            return $this->response->setJSON(["error" => "No se pudo obtener el token de acceso de PayPal"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "No se pudo obtener el token"])->setStatusCode(500);
         }
 
         $url = "https://api-m.sandbox.paypal.com/v2/checkout/orders/$orderID/capture";
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Content-Type: application/json",
-            "Authorization: Bearer $accessToken"
-        ]);
+        $options = [
+            "http" => [
+                "header" => "Authorization: Bearer $accessToken\r\n" .
+                            "Content-Type: application/json\r\n",
+                "method" => "POST"
+            ]
+        ];
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $resultData = json_decode($result, true);
 
-        $response = curl_exec($ch);
-        $err = curl_error($ch);
-        curl_close($ch);
-
-        if ($err) {
-            log_message('error', 'cURL Error for captureOrder: ' . $err);
-            return $this->response->setJSON(["error" => "Error de cURL al capturar la orden de PayPal"])->setStatusCode(500);
+        // Guardar en base de datos si el pago fue exitoso
+        if(isset($resultData['status']) && $resultData['status'] === 'COMPLETED') {
+            $this->savePaymentToDatabase($orderID, $resultData);
         }
 
-        $resultData = json_decode($response, true);
-        
-        if(isset($resultData['status']) && $resultData['status'] === 'COMPLETED') {
-            $this->savePaymentToDatabase($resultData);
+        // Enviar email de confirmación
+        // Asegúrate de que tu servicio de correo esté configurado y funcionando.
+        if(isset($resultData['payer']['email_address'])) {
+            $email = $resultData['payer']['email_address'];
+            // Esto asume que tienes un método 'sendEmail' configurado en Services.php
+            // Si no, necesitarás cargar una librería de correo o configurarlo.
+            // Por ejemplo, con el Email Library de CodeIgniter 4:
+            $emailService = Services::email();
+            $emailService->setTo($email);
+            $emailService->setSubject('¡Gracias por comprar AgainSafeGas!');
+            $emailService->setMessage("<h1>Su compra ha sido cargada en nuestro sistema<br><br>Cuando reciba el producto, ya podrá disfrutar de todas las funciones de AgainSafeGas</h1>");
+            $emailService->send();
         }
 
         return $this->response->setJSON($resultData);
     }
-    
-    private function savePaymentToDatabase($paymentData)
+
+    private function savePaymentToDatabase($orderID, $paymentData)
     {
+        $db = \Config\Database::connect();
+
         try {
-            $db = \Config\Database::connect();
-            $builder = $db->table('pagos_paypal');
-    
+            $db->transStart();
+
+            // Asegúrate de que estas claves existan antes de intentar acceder a ellas
+            $payerEmail = $paymentData['payer']['email_address'] ?? 'unknown@example.com';
+            $amountValue = $paymentData['purchase_units'][0]['amount']['value'] ?? '0.00';
+            $currencyCode = $paymentData['purchase_units'][0]['amount']['currency_code'] ?? 'USD';
+            $paymentStatus = strtolower($paymentData['status'] ?? 'pending');
+
             $data = [
-                'order_id' => $paymentData['id'],
-                'payer_id' => $paymentData['payer']['payer_id'],
-                'payer_email' => $paymentData['payer']['email_address'],
-                'amount_value' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
-                'currency_code' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code'],
-                'payment_status' => $paymentData['status']
+                'order_id' => $orderID,
+                'email' => $payerEmail,
+                'monto' => $amountValue,
+                'moneda' => $currencyCode,
+                'fecha' => date('Y-m-d H:i:s'),
+                'estado' => $paymentStatus,
+                'detalles' => json_encode($paymentData) // Guarda todos los detalles de la respuesta de PayPal
             ];
-            
-            $builder->insert($data);
+
+            $db->table('pagos')->insert($data);
+
+            $db->transComplete();
+
+            if(!$db->transStatus()) {
+                log_message('error', 'Error al guardar pago en BD: ' . print_r($db->error(), true));
+            }
 
         } catch (\Exception $e) {
-            log_message('error', 'Database Error in savePaymentToDatabase: ' . $e->getMessage());
+            log_message('error', 'Excepción al guardar pago: ' . $e->getMessage());
         }
+    }
+
+    private function getAccessToken()
+    {
+        $url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
+        $credentials = base64_encode("$this->clientId:$this->clientSecret");
+
+        $options = [
+            "http" => [
+                "header" => "Authorization: Basic $credentials\r\n" .
+                            "Content-Type: application/x-www-form-urlencoded\r\n",
+                "method" => "POST",
+                "content" => "grant_type=client_credentials"
+            ]
+        ];
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        return json_decode($result, true)["access_token"] ?? null;
     }
 }

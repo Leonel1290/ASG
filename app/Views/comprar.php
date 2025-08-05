@@ -1,105 +1,201 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagar con PayPal</title>
-    <style>
-        /* Estilos básicos para la página */
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-        }
-        .container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Confirmar Compra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1E3D59;
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .checkout-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .product-card h2 {
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+
+    .product-card p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .price {
+      font-size: 24px;
+      color: #28a745;
+      margin-bottom: 20px;
+    }
+
+    #paypal-button-container {
+      margin-top: 20px;
+    }
+
+    .footer {
+      margin-top: 50px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+
+    .modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      color: #333;
+    }
+
+    .modal-content h3 {
+      margin: 0;
+      color: #28a745;
+    }
+
+    .modal-content button {
+      margin-top: 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Realizar Compra</h1>
-        <p>El total a pagar es de $10.00 ARS. Haga clic en el botón de PayPal para continuar.</p>
-        <div id="paypal-button-container"></div>
+
+<!-- Botón volver -->
+<button class="btn btn-outline-light position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#logoutModal">
+  <i class="fas fa-sign-out-alt"></i> Volver al Inicio
+</button>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="logoutModalLabel">¿Deseas volver?</h5>
+        <a href="<?= base_url('logout') ?>" class="btn btn-danger">Volver</a>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AdGS2GrGBbZXq41yYDW2A-0dVD5avVuWiQO-XQDVAOxMepuO0HmkCL6kFfwIbLLjIc0gT9tB3KmIL0hJ&currency=ARS"></script>
+<!-- FontAwesome & Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
-    <script>
-        paypal.Buttons({
-            // Configurar la transacción
-            createOrder: function(data, actions) {
-                return fetch('/api/paypal/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        // El valor debe coincidir con el del controlador para evitar errores
-                        // Tu controlador actualmente usa USD, pero tu vista indica ARS.
-                        // Asegúrate de que ambas partes usen la misma moneda.
-                        amount: '10.00'
-                    })
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(order) {
-                    return order.id;
-                });
-            },
+<div class="checkout-container">
+  <div class="product-card">
+    <img src="https://www.rosarioseguridad.com.ar/admin/productos/3fbd1467fa1e6f1747aa1651f7545fc0.jpg" alt="Producto">
+    <h2>Detector de Gas</h2>
+    <p>Dispositivo inteligente para monitoreo de gas en tiempo real.</p>
+    <div class="price">$100.00 USD</div>
 
-            // Capturar la transacción cuando se aprueba
-            onApprove: function(data, actions) {
-                return fetch('/api/paypal/capture-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        orderID: data.orderID
-                    })
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(details) {
-                    // Muestra un mensaje de éxito al usuario
-                    if (details.status === 'COMPLETED') {
-                        alert('¡Transacción completada! ID de pago: ' + details.id);
-                        // Aquí puedes redirigir al usuario o actualizar la página
-                        // window.location.href = '/success_page';
-                    } else {
-                        alert('La transacción no se pudo completar. Estado: ' + details.status);
-                    }
-                }).catch(function(error) {
-                    console.error('Error al capturar la orden:', error);
-                    alert('Hubo un error al procesar el pago.');
-                });
-            },
+    <div id="paypal-button-container"></div>
+  </div>
 
-            // Manejar errores
-            onError: function(err) {
-                console.error('Error en el pago de PayPal:', err);
-                alert('Ocurrió un error con el pago de PayPal.');
-            },
+  <div class="footer">
+    &copy; 2024 AgainSafeGas Solutions | Todos los derechos reservados.
+  </div>
+</div>
 
-            // Cancelar la transacción
-            onCancel: function(data) {
-                alert('Transacción cancelada por el usuario.');
-            }
-        }).render('#paypal-button-container'); // Renderiza el botón de PayPal en el contenedor
-    </script>
+<!-- Modal -->
+<div class="modal" id="modalExito">
+  <div class="modal-content">
+    <h3>✅ ¡Pago realizado con éxito!</h3>
+    <button id="cerrarModal">Aceptar</button>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('modalExito');
+  const cerrarModal = document.getElementById('cerrarModal');
+
+  paypal.Buttons({
+    createOrder: function (data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: '100.00'
+          }
+        }]
+      });
+    },
+    onApprove: function (data, actions) {
+      return actions.order.capture().then(function (details) {
+        modal.classList.add('show');
+
+        // Redirige al login tras 2 segundos
+        setTimeout(() => {
+          window.location.href = '<?= base_url("login") ?>';
+        }, 2000);
+      });
+    },
+    onCancel: function (data) {
+      alert('❌ Pago cancelado');
+    },
+    onError: function (err) {
+      alert('⚠️ Error al procesar el pago');
+      console.error(err);
+    }
+  }).render('#paypal-button-container');
+
+  cerrarModal.addEventListener('click', () => {
+    modal.classList.remove('show');
+    window.location.href = '<?= base_url("login") ?>';
+  });
+</script>
+
 </body>
 </html>
