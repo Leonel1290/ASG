@@ -1,157 +1,105 @@
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Confirmar Compra | AgainSafeGas</title>
-
-      <!-- Bootstrap & FontAwesome -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-      <!-- Icono -->
-      <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-
-      <!-- PayPal SDK con SANDBOX -->
-      <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=ARS"></script>
-
-      <!-- PWA -->
-      <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-      <meta name="apple-mobile-web-app-capable" content="yes">
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-      <meta name="apple-mobile-web-app-title" content="ASG">
-
-      <style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar con PayPal</title>
+    <style>
+        /* Estilos básicos para la página */
         body {
-          background-color: #0d1117;
-          font-family: 'Segoe UI', sans-serif;
-          color: #e6edf3;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
         }
-
-        .checkout-container {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-
-        .checkout-card {
-          background-color: #161b22;
-          border-radius: 0.75rem;
-          padding: 2.5rem;
-          box-shadow: 0 0 20px rgba(0,0,0,0.2);
-          max-width: 500px;
-          width: 100%;
-          text-align: center;
-          animation: fadeIn 1s ease-in-out;
+        h1 {
+            color: #333;
         }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        p {
+            color: #666;
+            margin-bottom: 1.5rem;
         }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Realizar Compra</h1>
+        <p>El total a pagar es de $10.00 ARS. Haga clic en el botón de PayPal para continuar.</p>
+        <div id="paypal-button-container"></div>
+    </div>
 
-        .checkout-card h2 {
-          color: #58a6ff;
-          font-weight: bold;
-          margin-bottom: 1.5rem;
-        }
+    <script src="https://www.paypal.com/sdk/js?client-id=AdGS2GrGBbZXq41yYDW2A-0dVD5avVuWiQO-XQDVAOxMepuO0HmkCL6kFfwIbLLjIc0gT9tB3KmIL0hJ&currency=ARS"></script>
 
-        .checkout-card img {
-          max-width: 140px;
-          margin-bottom: 1.5rem;
-        }
-
-        .checkout-card p {
-          font-size: 1.05rem;
-          line-height: 1.6;
-          margin-bottom: 2rem;
-        }
-
-        #paypal-button-container {
-          margin-bottom: 1.5rem;
-        }
-
-        .error-message {
-          color: #f87171;
-          font-weight: bold;
-          margin-top: 1rem;
-        }
-
-        .btn-back {
-          background-color: #2d333b;
-          color: #e6edf3;
-          border: none;
-          border-radius: 0.375rem;
-          padding: 0.6rem 1.25rem;
-          transition: all 0.3s ease;
-        }
-
-        .btn-back:hover {
-          background-color: #21262d;
-          color: #fff;
-        }
-      </style>
-    </head>
-
-    <body>
-
-      <div class="checkout-container">
-        <div class="checkout-card">
-          <h2>Confirmar Compra</h2>
-          <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
-          <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
-          
-          <div id="paypal-button-container"></div>
-          <div id="error-message" class="error-message"></div>
-
-          <button class="btn btn-back mt-3" onclick="window.history.back();">
-            <i class="fas fa-arrow-left"></i> Volver
-          </button>
-        </div>
-      </div>
-
-      <!-- Bootstrap JS -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-      <script>
-        function showErrorMessage(message) {
-          document.getElementById('error-message').innerText = message;
-        }
-
+    <script>
         paypal.Buttons({
-          createOrder: (data, actions) => {
-            return actions.order.create({
-              purchase_units: [{
-                amount: {
-                  value: '95000' // Precio en ARS
-                }
-              }]
-            });
-          },
-          onApprove: (data, actions) => {
-            return actions.order.capture().then(details => {
-              const params = new URLSearchParams({
-                paymentId: data.orderID,
-                PayerID: details.payer.payer_id
-              });
-              window.location.href = '<?= base_url("registrar-pago-paypal") ?>?' + params.toString();
-            });
-          },
-          onCancel: () => {
-            showErrorMessage('❌ El pago fue cancelado.');
-          },
-          onError: (err) => {
-            console.error('Error en la transacción:', err);
-            showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
-          }
-        }).render('#paypal-button-container');
-      </script>
+            // Configurar la transacción
+            createOrder: function(data, actions) {
+                return fetch('/api/paypal/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        // El valor debe coincidir con el del controlador para evitar errores
+                        // Tu controlador actualmente usa USD, pero tu vista indica ARS.
+                        // Asegúrate de que ambas partes usen la misma moneda.
+                        amount: '10.00'
+                    })
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(order) {
+                    return order.id;
+                });
+            },
 
-    </body>
-    </html>
+            // Capturar la transacción cuando se aprueba
+            onApprove: function(data, actions) {
+                return fetch('/api/paypal/capture-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        orderID: data.orderID
+                    })
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(details) {
+                    // Muestra un mensaje de éxito al usuario
+                    if (details.status === 'COMPLETED') {
+                        alert('¡Transacción completada! ID de pago: ' + details.id);
+                        // Aquí puedes redirigir al usuario o actualizar la página
+                        // window.location.href = '/success_page';
+                    } else {
+                        alert('La transacción no se pudo completar. Estado: ' + details.status);
+                    }
+                }).catch(function(error) {
+                    console.error('Error al capturar la orden:', error);
+                    alert('Hubo un error al procesar el pago.');
+                });
+            },
+
+            // Manejar errores
+            onError: function(err) {
+                console.error('Error en el pago de PayPal:', err);
+                alert('Ocurrió un error con el pago de PayPal.');
+            },
+
+            // Cancelar la transacción
+            onCancel: function(data) {
+                alert('Transacción cancelada por el usuario.');
+            }
+        }).render('#paypal-button-container'); // Renderiza el botón de PayPal en el contenedor
+    </script>
+</body>
+</html>
