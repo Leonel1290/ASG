@@ -402,10 +402,10 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
+                            <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Mi Perfil</a>
                         </li>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">

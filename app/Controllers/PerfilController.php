@@ -135,6 +135,7 @@ class PerfilController extends BaseController
             return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
         }
 
+
         $email = $user['email'];
         $token = random_string('alnum', 32);
         $expires = Time::now()->addMinutes(15);
@@ -200,7 +201,7 @@ class PerfilController extends BaseController
                  return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
              }
         }
-
+        
         $userData = $this->userModel->find($loggedInUserId);
 
          if (!$userData) {
