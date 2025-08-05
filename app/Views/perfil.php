@@ -405,7 +405,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                             <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                            <a class="nav-link" href="<?= base_url('/configperfil.php') ?>">Configuración</a>
                         </li>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
