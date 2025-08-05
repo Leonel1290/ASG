@@ -6,8 +6,38 @@ use Config\Services;
 
 class PayPalController extends Controller
 {
-    private $clientId = "AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_";
-    private $clientSecret = "EEOWwqaRKfgtQYKYReuEcNZrRJJuGcJBWaUlKrYmzPLu4f7zGjHovQ8l9T_xASTSq9lDCErw6vR-RxKb";
+    private $clientId = "AdGS2GrGBbZXq41yYDW2A-0dVD5avVuWiQO-XQDVAOxMepuO0HmkCL6kFfwIbLLjIc0gT9tB3KmIL0hJ";
+    private $clientSecret = "ENwZmSdEKvlXWlybPNngQbhf1KZhN9S_1bVV3lfJbtTF1oc0waa3RxYjImQaeeafjMKQe48pbJM07A";
+
+    private function getAccessToken()
+    {
+        $url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->clientId . ":" . $this->clientSecret);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Accept: application/json",
+            "Accept-Language: es_ES",
+        ]);
+
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            log_message('error', 'cURL Error for getAccessToken: ' . $err);
+            return null;
+        }
+
+        $data = json_decode($response, true);
+        return $data["access_token"] ?? null;
+    }
 
     public function createOrder()
     {
@@ -32,18 +62,28 @@ class PayPalController extends Controller
             ]
         ]);
 
-        $options = [
-            "http" => [
-                "header" => "Authorization: Bearer $accessToken\r\n" .
-                            "Content-Type: application/json\r\n",
-                "method" => "POST",
-                "content" => $body
-            ]
-        ];
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json",
+            "Authorization: Bearer $accessToken"
+        ]);
 
-        return $this->response->setJSON(json_decode($result, true));
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            log_message('error', 'cURL Error for createOrder: ' . $err);
+            return $this->response->setJSON(["error" => "Error al crear la orden de PayPal"])->setStatusCode(500);
+        }
+
+        return $this->response->setJSON(json_decode($response, true));
     }
 
     public function captureOrder()
@@ -61,17 +101,28 @@ class PayPalController extends Controller
         }
 
         $url = "https://api-m.sandbox.paypal.com/v2/checkout/orders/$orderID/capture";
-        $options = [
-            "http" => [
-                "header" => "Authorization: Bearer $accessToken\r\n" .
-                            "Content-Type: application/json\r\n",
-                "method" => "POST"
-            ]
-        ];
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        $resultData = json_decode($result, true);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json",
+            "Authorization: Bearer $accessToken"
+        ]);
 
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            log_message('error', 'cURL Error for captureOrder: ' . $err);
+            return $this->response->setJSON(["error" => "Error al capturar la orden de PayPal"])->setStatusCode(500);
+        }
+
+        $resultData = json_decode($response, true);
+        
         // Guardar en base de datos si el pago fue exitoso
         if(isset($resultData['status']) && $resultData['status'] === 'COMPLETED') {
             $this->savePaymentToDatabase($resultData);
@@ -80,48 +131,25 @@ class PayPalController extends Controller
         return $this->response->setJSON($resultData);
     }
     
-    // Función para guardar el pago en la base de datos
     private function savePaymentToDatabase($paymentData)
     {
-        // Obtener la instancia de la base de datos de CodeIgniter
-        $db = \Config\Database::connect();
-        $builder = $db->table('pagos_paypal');
+        try {
+            $db = \Config\Database::connect();
+            $builder = $db->table('pagos_paypal');
+    
+            $data = [
+                'order_id' => $paymentData['id'],
+                'payer_id' => $paymentData['payer']['payer_id'],
+                'payer_email' => $paymentData['payer']['email_address'],
+                'amount_value' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
+                'currency_code' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code'],
+                'payment_status' => $paymentData['status']
+            ];
+            
+            $builder->insert($data);
 
-        // Extraer los datos relevantes de la respuesta de PayPal
-        $data = [
-            'order_id' => $paymentData['id'],
-            'payer_id' => $paymentData['payer']['payer_id'],
-            'payer_email' => $paymentData['payer']['email_address'],
-            'amount_value' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
-            'currency_code' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code'],
-            'payment_status' => $paymentData['status']
-        ];
-        
-        // Insertar los datos en la tabla
-        $builder->insert($data);
-    }
-
-    private function getAccessToken()
-    {
-        $url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
-        $headers = [
-            "Accept: application/json",
-            "Accept-Language: es_ES",
-            "Content-Type: application/x-www-form-urlencoded"
-        ];
-        $auth = base64_encode($this->clientId . ":" . $this->clientSecret);
-
-        $options = [
-            "http" => [
-                "header" => array_merge($headers, ["Authorization: Basic $auth"]),
-                "method" => "POST",
-                "content" => "grant_type=client_credentials"
-            ]
-        ];
-        $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
-
-        $data = json_decode($response, true);
-        return $data["access_token"] ?? null;
+        } catch (\Exception $e) {
+            log_message('error', 'Database Error in savePaymentToDatabase: ' . $e->getMessage());
+        }
     }
 }
