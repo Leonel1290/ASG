@@ -169,23 +169,26 @@ class PerfilController extends BaseController
     }
 
 
-    public function editDevice($mac)
+    public function editDevice($mac = null)
     {
         $session = session();
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para editar dispositivos.');
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
-        // Verificar que la MAC pertenece al usuario logueado
+        if ($mac === null) {
+            return redirect()->to('/perfil')->with('error', 'MAC del dispositivo no especificada.');
+        }
+
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
                         ->where('MAC', $mac)
                         ->first();
 
         if (!$enlace) {
-            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo o no existe.');
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo.');
         }
 
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
@@ -194,18 +197,18 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
-        return view('perfil/editar_dispositivo', [
+        return view('perfil/edit_device', [
             'dispositivo' => $dispositivo
         ]);
     }
 
-    public function actualizarDispositivo()
+    public function updateDevice()
     {
         $session = session();
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar dispositivos.');
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
         $mac = $this->request->getPost('mac');
