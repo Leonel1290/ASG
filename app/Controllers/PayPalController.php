@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
@@ -13,8 +13,6 @@ class PayPalController extends Controller
     {
         $input = $this->request->getJSON();
         $amount = $input->amount ?? "10.00";
-        $dispositivoId = $input->dispositivo_id ?? null;
-        $usuarioId = $input->usuario_id ?? null;
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
@@ -29,11 +27,7 @@ class PayPalController extends Controller
                     "amount" => [
                         "currency_code" => "USD",
                         "value" => $amount
-                    ],
-                    "custom_id" => json_encode([
-                        'usuario_id' => $usuarioId,
-                        'dispositivo_id' => $dispositivoId
-                    ])
+                    ]
                 ]
             ]
         ]);
@@ -80,71 +74,54 @@ class PayPalController extends Controller
 
         // Guardar en base de datos si el pago fue exitoso
         if(isset($resultData['status']) && $resultData['status'] === 'COMPLETED') {
-            $this->savePaymentToDatabase($orderID, $resultData);
+            $this->savePaymentToDatabase($resultData);
         }
 
         return $this->response->setJSON($resultData);
     }
-
-    private function savePaymentToDatabase($orderID, $paymentData)
+    
+    // Función para guardar el pago en la base de datos
+    private function savePaymentToDatabase($paymentData)
     {
+        // Obtener la instancia de la base de datos de CodeIgniter
         $db = \Config\Database::connect();
+        $builder = $db->table('pagos_paypal');
+
+        // Extraer los datos relevantes de la respuesta de PayPal
+        $data = [
+            'order_id' => $paymentData['id'],
+            'payer_id' => $paymentData['payer']['payer_id'],
+            'payer_email' => $paymentData['payer']['email_address'],
+            'amount_value' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
+            'currency_code' => $paymentData['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code'],
+            'payment_status' => $paymentData['status']
+        ];
         
-        try {
-            $db->transStart();
-            
-            // Extraer datos del custom_id
-            $customData = json_decode($paymentData['purchase_units'][0]['custom_id'] ?? '{}', true);
-            $usuarioId = $customData['usuario_id'] ?? null;
-            $dispositivoId = $customData['dispositivo_id'] ?? null;
-
-            $data = [
-                'order_id' => $orderID,
-                'usuario_id' => $usuarioId,
-                'dispositivo_id' => $dispositivoId,
-                'email' => $paymentData['payer']['email_address'] ?? '',
-                'monto' => $paymentData['purchase_units'][0]['amount']['value'] ?? 0,
-                'moneda' => $paymentData['purchase_units'][0]['amount']['currency_code'] ?? 'USD',
-                'fecha' => date('Y-m-d H:i:s'),
-                'estado' => strtolower($paymentData['status']),
-                'detalles' => json_encode($paymentData)
-            ];
-
-            $db->table('pagos')->insert($data);
-            
-            // Si hay un dispositivo asociado, actualizar su estado
-            if ($dispositivoId) {
-                $db->table('dispositivos')
-                  ->where('id', $dispositivoId)
-                  ->update(['estado_dispositivo' => 'asignado']);
-            }
-            
-            $db->transComplete();
-            
-            if(!$db->transStatus()) {
-                log_message('error', 'Error al guardar pago en BD: ' . print_r($db->error(), true));
-            }
-            
-        } catch (\Exception $e) {
-            log_message('error', 'Excepción al guardar pago: ' . $e->getMessage());
-        }
+        // Insertar los datos en la tabla
+        $builder->insert($data);
     }
 
     private function getAccessToken()
     {
         $url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
-        $credentials = base64_encode("$this->clientId:$this->clientSecret");
+        $headers = [
+            "Accept: application/json",
+            "Accept-Language: es_ES",
+            "Content-Type: application/x-www-form-urlencoded"
+        ];
+        $auth = base64_encode($this->clientId . ":" . $this->clientSecret);
 
         $options = [
             "http" => [
-                "header" => "Authorization: Basic $credentials\r\n" .
-                            "Content-Type: application/x-www-form-urlencoded\r\n",
+                "header" => array_merge($headers, ["Authorization: Basic $auth"]),
                 "method" => "POST",
                 "content" => "grant_type=client_credentials"
             ]
         ];
         $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        return json_decode($result, true)["access_token"] ?? null;
+        $response = file_get_contents($url, false, $context);
+
+        $data = json_decode($response, true);
+        return $data["access_token"] ?? null;
     }
 }
