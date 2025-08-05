@@ -191,7 +191,7 @@
                     <li class="nav-item">
                         <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
-                            <a class="btn btn-custom" href="https://pwa-1s1m.onrender.com/instalar-pwa" target="_blank">Descargar App</a>
+                            <a class="btn btn-custom" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
                         </div>
                     </li>
                 </ul>
@@ -261,6 +261,20 @@
     <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
 </footer>
 
+<div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="appModalLabel">Descargar App PWA</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <iframe id="appIframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -293,6 +307,27 @@
                 });
         });
     }
+</script>
+
+<script>
+    // Script para manejar la carga del iframe en el modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const appModal = document.getElementById('appModal');
+        const appIframe = document.getElementById('appIframe');
+
+        if (appModal && appIframe) {
+            appModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Botón que activó el modal
+                const url = button.getAttribute('data-url'); // Obtiene la URL del atributo data-url
+                appIframe.src = url; // Carga la URL en el iframe
+            });
+
+            // Opcional: limpiar el src del iframe cuando el modal se cierra para evitar que el video siga reproduciéndose, etc.
+            appModal.addEventListener('hidden.bs.modal', function () {
+                appIframe.src = '';
+            });
+        }
+    });
 </script>
 
 </body>
