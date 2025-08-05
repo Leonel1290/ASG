@@ -66,7 +66,6 @@ class PerfilController extends BaseController
         }
 
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
-        // CAMBIO: Se ha corregido el nombre del método de LecturasGasModel
         $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
         // Procesar las lecturas para agruparlas por MAC
@@ -110,7 +109,7 @@ class PerfilController extends BaseController
 
         $userData = $this->userModel->find($loggedInUserId);
 
-        if (!$userData) {
+         if (!$userData) {
             $session->destroy();
             return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
         }
@@ -136,56 +135,185 @@ class PerfilController extends BaseController
             return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
         }
 
+
         $email = $user['email'];
         $token = random_string('alnum', 32);
-        $expires = Time::now()->addMinutes(15); // Token válido por 15 minutos
+        $expires = Time::now()->addMinutes(15);
 
-        // Guardar el token y su expiración en la base de datos para el usuario
         $this->userModel->update($loggedInUserId, [
             'reset_token' => $token,
             'reset_expires' => $expires->toDateTimeString(),
         ]);
 
-        // Cargar el servicio de email
         $emailService = \Config\Services::email();
+        // Configura el remitente en app/Config/Email.php o .env
+        // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
 
-        $emailService->setFrom('no-reply@tudominio.com', 'Sistema de Monitoreo de Gas');
         $emailService->setTo($email);
-        $emailService->setSubject('Verifica tu cuenta de Sistema de Monitoreo de Gas');
-
-        $verificationLink = site_url('register/verify-email/' . $token); // Usa site_url para generar la URL base
-
-        $message = view('emails/verify_email', ['verificationLink' => $verificationLink]); // Crea una vista para el contenido del email
+        $emailService->setSubject('Verificación de Email para Configuración de Perfil');
+        $verificationLink = base_url("perfil/verificar-email/{$token}");
+        $message = "Hola {$user['nombre']},\n\nHaz solicitado verificar tu email para acceder a la configuración de tu perfil.\n\nPor favor, haz clic en el siguiente enlace para verificar tu email:\n{$verificationLink}\n\nEste enlace expirará en 15 minutos.\n\nSi no solicitaste esta verificación, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
         $emailService->setMessage($message);
-        $emailService->setAltMessage(strip_tags($message)); // Versión de texto plano
 
         if ($emailService->send()) {
-            return redirect()->back()->with('success', 'Correo de verificación enviado. Revisa tu bandeja de entrada.');
+            log_message('debug', 'Correo de verificación de configuración enviado a: ' . $email);
+            return redirect()->to('/perfil/configuracion')->with('success', 'Se ha enviado un correo de verificación a tu email actual. Por favor, revisa tu bandeja de entrada.');
         } else {
-            $error = $emailService->printDebugger(['headers']);
-            log_message('error', 'Fallo al enviar correo de verificación a ' . $email . ': ' . $error);
-            return redirect()->back()->with('error', 'No se pudo enviar el correo de verificación. Por favor, inténtalo de nuevo más tarde.');
+            log_message('error', 'Error al enviar correo de verificación de configuración a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
+            return redirect()->to('/perfil/configuracion')->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
         }
     }
 
+    public function verificarEmailToken($token = null)
+    {
+        if ($token === null) {
+            return redirect()->to('/perfil/configuracion')->with('error', 'Token de verificación no proporcionado.');
+        }
 
-    public function editarDispositivo($mac)
+        $user = $this->userModel->where('reset_token', $token)->first();
+
+        if (!$user) {
+            return redirect()->to('/perfil/configuracion')->with('error', 'Token de verificación inválido.');
+        }
+
+        $expires = Time::parse($user['reset_expires']);
+        if ($expires->isBefore(Time::now())) {
+            $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+            return redirect()->to('/perfil/configuracion')->with('error', 'El token de verificación ha expirado. Por favor, solicita uno nuevo.');
+        }
+
+        $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+        $session = session();
+        $session->set('email_verified_for_config', true);
+
+        return redirect()->to('/perfil/config_form')->with('success', 'Email verificado exitosamente. Ahora puedes actualizar tu perfil.');
+    }
+
+    public function configForm()
+    {
+        $session = session();
+        $loggedInUserId = $session->get('id');
+
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+             if ($loggedInUserId) {
+                 return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de acceder a la configuración.');
+             } else {
+                 return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+             }
+        }
+        
+        $userData = $this->userModel->find($loggedInUserId);
+
+         if (!$userData) {
+            $session->destroy();
+            return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
+        }
+
+         $data['userData'] = [
+            'nombre' => $userData['nombre'] ?? '',
+            'email' => $userData['email'] ?? ''
+        ];
+
+        return view('perfil/configuracion_form', $data);
+    }
+
+    public function actualizar()
+    {
+        $session = session();
+        $loggedInUserId = $session->get('id');
+
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+             if ($loggedInUserId) {
+                 return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de actualizar tu perfil.');
+             } else {
+                 return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar tu perfil.');
+             }
+        }
+
+        $requestMethod = $this->request->getMethod();
+        if (strcasecmp($requestMethod, 'post') !== 0) {
+            return redirect()->to('/perfil/configuracion');
+        }
+
+        $rules = [
+            'nombre' => [
+                'rules' => 'required|min_length[3]|max_length[50]',
+                'errors' => [
+                    'required' => 'El campo Nombre es obligatorio.',
+                    'min_length' => 'El Nombre debe tener al menos 3 caracteres.',
+                    'max_length' => 'El Nombre no puede exceder los 50 caracteres.'
+                ]
+            ],
+            'email'  => [
+                'rules' => "required|valid_email|max_length[100]|is_unique[usuarios.email,id,{$loggedInUserId}]",
+                 'errors' => [
+                    'required' => 'El campo Email es obligatorio.',
+                    'valid_email' => 'Por favor, ingresa un Email válido.',
+                    'max_length' => 'El Email no puede exceder los 100 caracteres.',
+                    'is_unique' => 'Este Email ya está registrado por otro usuario.'
+                ]
+            ],
+        ];
+
+        if (! $this->validate($rules)) {
+            return redirect()->to('/perfil/config_form')->withInput()->with('errors', $this->validator->getErrors())->with('error', 'Error de validación. Por favor, revisa los datos.');
+        }
+
+        $nombre = $this->request->getPost('nombre');
+        $email = $this->request->getPost('email');
+
+        $updateData = [
+            'nombre' => $nombre,
+            'email'  => $email,
+        ];
+
+        $updated = $this->userModel->update($loggedInUserId, $updateData);
+
+        if ($updated) {
+            $session->set('nombre', $nombre);
+            $session->set('email', $email);
+            $session->remove('email_verified_for_config');
+
+            return redirect()->to('/perfil/cambio-exitoso')->with('success', '¡Configuración actualizada exitosamente!');
+        } else {
+             return redirect()->to('/perfil/config_form')->withInput()->with('error', 'Hubo un error al intentar actualizar la configuración.');
+        }
+    }
+
+    public function cambioExitoso()
+    {
+        $session = session();
+        if (!session('success')) {
+             return redirect()->to('/perfil')->with('error', 'Acceso no autorizado a la página de éxito.');
+        }
+        return view('perfil/cambio_exitoso');
+    }
+
+    // --- FIN MÉTODOS FLUJO VERIFICACIÓN Y CONFIGURACIÓN ---
+
+
+    // --- MÉTODOS PARA GESTIÓN DE DISPOSITIVOS ---
+
+    public function editDevice($mac = null)
     {
         $session = session();
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para editar dispositivos.');
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
-        // Verificar que la MAC pertenece al usuario logueado
+        if ($mac === null) {
+            return redirect()->to('/perfil')->with('error', 'MAC del dispositivo no especificada.');
+        }
+
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
                         ->where('MAC', $mac)
                         ->first();
 
         if (!$enlace) {
-            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo o no existe.');
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo.');
         }
 
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
@@ -194,42 +322,63 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'Dispositivo no encontrado.');
         }
 
-        return view('perfil/editar_dispositivo', [
+        return view('perfil/edit_device', [
             'dispositivo' => $dispositivo
         ]);
     }
 
-    public function actualizarDispositivo()
+    public function updateDevice()
     {
         $session = session();
         $usuarioId = $session->get('id');
 
         if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para actualizar dispositivos.');
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
         }
 
         $mac = $this->request->getPost('mac');
         $nombre = $this->request->getPost('nombre');
         $ubicacion = $this->request->getPost('ubicacion');
 
-        // Validar el formato de la MAC si es necesario
-        if (!preg_match('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', $mac)) {
-            return redirect()->back()->with('error', 'Formato de MAC inválido.');
+        $rules = [
+            'mac' => [
+                'rules' => 'required|exact_length[17]',
+                'errors' => [
+                    'required' => 'La MAC es obligatoria.',
+                    'exact_length' => 'El formato de la MAC es incorrecto.'
+                ]
+            ],
+            'nombre' => [
+                'rules' => 'required|max_length[255]',
+                'errors' => [
+                    'required' => 'El Nombre del dispositivo es obligatorio.',
+                    'max_length' => 'El Nombre no puede exceder los 255 caracteres.'
+                ]
+            ],
+            'ubicacion' => [
+                'rules' => 'max_length[255]',
+                'errors' => [
+                    'max_length' => 'La Ubicación no puede exceder los 255 caracteres.'
+                ]
+            ],
+        ];
+
+        if (! $this->validate($rules)) {
+            return redirect()->to("/perfil/dispositivo/editar/{$mac}")->withInput()->with('errors', $this->validator->getErrors())->with('error', 'Error de validación. Por favor, revisa los datos.');
         }
 
-        // Verificar que la MAC realmente pertenece al usuario logueado
         $enlace = $this->enlaceModel
                         ->where('id_usuario', $usuarioId)
                         ->where('MAC', $mac)
                         ->first();
 
         if (!$enlace) {
-            return redirect()->to('/perfil')->with('error', 'No tienes permiso para actualizar este dispositivo.');
+            return redirect()->to('/perfil')->with('error', 'No tienes permiso para editar este dispositivo.');
         }
 
         $updateData = [
             'nombre' => $nombre,
-            'ubicacion' => $ubicacion
+            'ubicacion' => $ubicacion,
         ];
 
         $updated = $this->dispositivoModel->updateDispositivoByMac($mac, $updateData);
@@ -261,16 +410,5 @@ class PerfilController extends BaseController
         } else {
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
-    }
-
-    public function cambiarIdioma()
-    {
-        $idioma = $this->request->getPost('idioma');
-
-        if (in_array($idioma, ['en', 'es'])) {
-            session()->set('locale', $idioma);
-        }
-
-        return redirect()->back();
     }
 }
