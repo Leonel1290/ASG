@@ -46,7 +46,7 @@ class PayPalController extends Controller
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            return $this->response->setJSON(["error" => "No se pudo obtener el token"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "No se pudo obtener el token de acceso de PayPal"])->setStatusCode(500);
         }
 
         $url = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
@@ -80,10 +80,21 @@ class PayPalController extends Controller
 
         if ($err) {
             log_message('error', 'cURL Error for createOrder: ' . $err);
-            return $this->response->setJSON(["error" => "Error al crear la orden de PayPal"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "Error de cURL al comunicarse con PayPal"])->setStatusCode(500);
+        }
+        
+        $resultData = json_decode($response, true);
+        
+        // Loguear la respuesta completa de PayPal para depuración
+        log_message('info', 'PayPal createOrder API Response: ' . $response);
+        
+        if (!isset($resultData['id'])) {
+            // Si la respuesta no contiene un ID de orden, algo salió mal
+            log_message('error', 'PayPal createOrder response did not contain an ID. Full response: ' . print_r($resultData, true));
+            return $this->response->setJSON(["error" => "La creación de la orden falló. Verifique sus credenciales de PayPal."])->setStatusCode(500);
         }
 
-        return $this->response->setJSON(json_decode($response, true));
+        return $this->response->setJSON($resultData);
     }
 
     public function captureOrder()
@@ -97,7 +108,7 @@ class PayPalController extends Controller
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            return $this->response->setJSON(["error" => "No se pudo obtener el token"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "No se pudo obtener el token de acceso de PayPal"])->setStatusCode(500);
         }
 
         $url = "https://api-m.sandbox.paypal.com/v2/checkout/orders/$orderID/capture";
@@ -118,12 +129,11 @@ class PayPalController extends Controller
 
         if ($err) {
             log_message('error', 'cURL Error for captureOrder: ' . $err);
-            return $this->response->setJSON(["error" => "Error al capturar la orden de PayPal"])->setStatusCode(500);
+            return $this->response->setJSON(["error" => "Error de cURL al capturar la orden de PayPal"])->setStatusCode(500);
         }
 
         $resultData = json_decode($response, true);
         
-        // Guardar en base de datos si el pago fue exitoso
         if(isset($resultData['status']) && $resultData['status'] === 'COMPLETED') {
             $this->savePaymentToDatabase($resultData);
         }
