@@ -1,4 +1,4 @@
-<?php
+<?php 
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
@@ -6,13 +6,15 @@ use Config\Services;
 
 class PayPalController extends Controller
 {
-    private $clientId = "AdGS2GrGBbZXq41yYDW2A-0dVD5avVuWiQO-XQDVAOxMepuO0HmkCL6kFfwIbLLjIc0gT9tB3KmIL0hJ";
-    private $clientSecret = "ENwZmSdEKvlXWlybPNngQbhf1KZhN9S_1bVV3lfJbtTF1oc0waa3RxYjImQaeeafjMKQe48pbJM07A";
+    private $clientId = "AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_";
+    private $clientSecret = "EEOWwqaRKfgtQYKYReuEcNZrRJJuGcJBWaUlKrYmzPLu4f7zGjHovQ8l9T_xASTSq9lDCErw6vR-RxKb";
 
     public function createOrder()
     {
         $input = $this->request->getJSON();
         $amount = $input->amount ?? "10.00";
+        $dispositivoId = $input->dispositivo_id ?? null;
+        $usuarioId = $input->usuario_id ?? null;
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
@@ -25,9 +27,13 @@ class PayPalController extends Controller
             "purchase_units" => [
                 [
                     "amount" => [
-                        "currency_code" => "USD", // Asegúrate de que esta moneda coincida con la del cliente si es ARS, como indicas en el HTML.
+                        "currency_code" => "USD",
                         "value" => $amount
-                    ]
+                    ],
+                    "custom_id" => json_encode([
+                        'usuario_id' => $usuarioId,
+                        'dispositivo_id' => $dispositivoId
+                    ])
                 ]
             ]
         ]);
@@ -77,54 +83,48 @@ class PayPalController extends Controller
             $this->savePaymentToDatabase($orderID, $resultData);
         }
 
-        // Enviar email de confirmación
-        // Asegúrate de que tu servicio de correo esté configurado y funcionando.
-        if(isset($resultData['payer']['email_address'])) {
-            $email = $resultData['payer']['email_address'];
-            // Esto asume que tienes un método 'sendEmail' configurado en Services.php
-            // Si no, necesitarás cargar una librería de correo o configurarlo.
-            // Por ejemplo, con el Email Library de CodeIgniter 4:
-            $emailService = Services::email();
-            $emailService->setTo($email);
-            $emailService->setSubject('¡Gracias por comprar AgainSafeGas!');
-            $emailService->setMessage("<h1>Su compra ha sido cargada en nuestro sistema<br><br>Cuando reciba el producto, ya podrá disfrutar de todas las funciones de AgainSafeGas</h1>");
-            $emailService->send();
-        }
-
         return $this->response->setJSON($resultData);
     }
 
     private function savePaymentToDatabase($orderID, $paymentData)
     {
         $db = \Config\Database::connect();
-
+        
         try {
             $db->transStart();
-
-            // Asegúrate de que estas claves existan antes de intentar acceder a ellas
-            $payerEmail = $paymentData['payer']['email_address'] ?? 'unknown@example.com';
-            $amountValue = $paymentData['purchase_units'][0]['amount']['value'] ?? '0.00';
-            $currencyCode = $paymentData['purchase_units'][0]['amount']['currency_code'] ?? 'USD';
-            $paymentStatus = strtolower($paymentData['status'] ?? 'pending');
+            
+            // Extraer datos del custom_id
+            $customData = json_decode($paymentData['purchase_units'][0]['custom_id'] ?? '{}', true);
+            $usuarioId = $customData['usuario_id'] ?? null;
+            $dispositivoId = $customData['dispositivo_id'] ?? null;
 
             $data = [
                 'order_id' => $orderID,
-                'email' => $payerEmail,
-                'monto' => $amountValue,
-                'moneda' => $currencyCode,
+                'usuario_id' => $usuarioId,
+                'dispositivo_id' => $dispositivoId,
+                'email' => $paymentData['payer']['email_address'] ?? '',
+                'monto' => $paymentData['purchase_units'][0]['amount']['value'] ?? 0,
+                'moneda' => $paymentData['purchase_units'][0]['amount']['currency_code'] ?? 'USD',
                 'fecha' => date('Y-m-d H:i:s'),
-                'estado' => $paymentStatus,
-                'detalles' => json_encode($paymentData) // Guarda todos los detalles de la respuesta de PayPal
+                'estado' => strtolower($paymentData['status']),
+                'detalles' => json_encode($paymentData)
             ];
 
             $db->table('pagos')->insert($data);
-
+            
+            // Si hay un dispositivo asociado, actualizar su estado
+            if ($dispositivoId) {
+                $db->table('dispositivos')
+                  ->where('id', $dispositivoId)
+                  ->update(['estado_dispositivo' => 'asignado']);
+            }
+            
             $db->transComplete();
-
+            
             if(!$db->transStatus()) {
                 log_message('error', 'Error al guardar pago en BD: ' . print_r($db->error(), true));
             }
-
+            
         } catch (\Exception $e) {
             log_message('error', 'Excepción al guardar pago: ' . $e->getMessage());
         }
