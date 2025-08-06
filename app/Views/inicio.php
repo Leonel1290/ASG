@@ -217,15 +217,6 @@
             </div>
         </div>
     </section>
-
-    <!-- NUEVA SECCIÓN: Contador de hogares protegidos -->
-    <section class="text-center py-5 bg-dark text-light">
-        <div class="container">
-            <h2 class="fw-bold">+<span id="contador">0</span> hogares protegidos</h2>
-            <p class="lead">Confían en ASG para mantener a salvo a sus familias</p>
-        </div>
-    </section>
-
     <section class="py-5" id="company">
         <div class="container">
             <div class="company-info mx-auto text-center">
