@@ -194,6 +194,26 @@
         .image.active {
             opacity: 1;
         }
+
+        /* Nuevo estilo para el botón circular */
+        .btn-circle {
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-circle:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -312,7 +332,9 @@
                     <img id="frame-2" class="image" src="<?= base_url('/imagenes/frame_2.jpg'); ?>" alt="Fuga de gas">
                     <img id="frame-3" class="image" src="<?= base_url('/imagenes/frame_3.jpg'); ?>" alt="Detector activo">
                 </div>
-                <button id="animationButton" class="btn btn-custom mt-3">Mantén Pulsado para Simular Fuga</button>
+                <button id="animationButton" class="btn btn-circle mt-3">
+                    <i class="fas fa-check"></i>
+                </button>
             </div>
         </div>
     </div>
