@@ -51,6 +51,10 @@ class Home extends BaseController
         // Si está logueado, muestra la vista de inicio
         return view('inicio');
     }
+    public function showLoginRegister()
+    {
+        return view('login_register');
+    }
 
     // Método de Login (POST /login) - Maneja el envío del formulario de login
     public function login()

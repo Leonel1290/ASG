@@ -7,46 +7,34 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->get('simulacion', 'Home::simulacion');
-// --- REGISTRATION AND LOGIN ROUTES (ADJUSTED FOR VERIFICATION) ---
 
-// Route to display the registration form
-$routes->get('/register', 'registerController::index');
+// Rutas de login y registro que ahora apuntan a la vista unificada
+$routes->get('/register', 'Home::showLoginRegister');
+$routes->get('/login', 'Home::showLoginRegister');
 
-// Route to process the registration form
-// POST /register/store (Matches the form action in register.php)
+// Rutas POST para el procesamiento de los formularios (no cambian)
 $routes->post('/register/store', 'registerController::store');
-
-// Route to display the page telling the user to check their email after registration
-$routes->get('/register/check-email', 'registerController::checkEmail');
-
-// Route to verify the token received by email for REGISTRATION
-$routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
-
-// Route to process the login form
 $routes->post('/login', 'Home::login');
 
-$routes->get('/login', 'Home::login');
+// Otras rutas de registro
+$routes->get('/register/check-email', 'registerController::checkEmail');
+$routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
 
-// Route to display the login form (if you use loginobtener for this)
+// Rutas de login (si existen)
 $routes->get('/loginobtener', 'Home::loginobtener');
 
-// Route to log out (using POST for better security)
+// Ruta para cerrar sesión
 $routes->post('/logout', 'Home::logout');
 
-
-// PASSWORD RECOVERY
+// RECUPERACIÓN DE CONTRASEÑA
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
-$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->post('/forgotpassword1', 'Home::forgotpassword1');
 
-
-// Rutas para el perfil y dispositivos (PerfilController)
+// PERFIL
 $routes->group('perfil', function($routes) {
-    $routes->get('/', 'PerfilController::index');
-    $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
+    $routes->get('form', 'PerfilController::form');
+    $routes->get('cambiar-email', 'PerfilController::cambiarEmail');
+    $routes->post('cambiar-email-proceso', 'PerfilController::cambiarEmailProceso');
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
     $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
     $routes->post('eliminar-cuenta', 'PerfilController::eliminarCuenta');
@@ -58,31 +46,16 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
+// OTRAS RUTAS
 $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
-
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
-
 $routes->get('/enlace', 'EnlaceController::index');
-
 $routes->post('/enlace/store', 'EnlaceController::store');
-
-
 $routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
-
-
 $routes->get('/comprar', 'Home::comprar');
 
 // NUEVAS RUTAS AÑADIDAS
 $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
-    $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
+    $routes->get('(:any)', 'RegistrosGasController::index');
 });
-
-
-$routes->get('prueba', function() {
-    return '¡Ruta de prueba funcionando!';
-});
-
-
-// ESTA ES LA RUTA QUE FALTABA PARA GUARDAR LA COMPRA CON PAYPAL
-$routes->post('/home/guardar_compra', 'Home::guardar_compra');
