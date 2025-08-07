@@ -181,6 +181,10 @@
             height: 500px; /* Ajusta según el tamaño de tus imágenes */
             margin: 20px auto;
         }
+        .modal-title{
+            background_color: black;
+            color-font: white;
+        }
 
         .image {
             position: absolute;
@@ -189,7 +193,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 0.5s ease-in-out;
         }
         .image.active {
             opacity: 1;
