@@ -89,7 +89,6 @@
             color: #fff;
         }
 
-        /* Modal personalizado */
         .modal-content {
             background-color: #1c2128;
             color: #c9d1d9;
@@ -146,10 +145,8 @@
         </div>
     </div>
 
-    <!-- PayPal SDK con el nuevo Client ID -->
+    <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -164,7 +161,6 @@
             errorDiv.innerText = message;
         }
 
-        // Se verifica que el objeto de PayPal exista antes de intentar usarlo.
         if (typeof paypal === 'undefined') {
             showErrorMessage("⚠️ Error: El SDK de PayPal no se ha cargado correctamente. Revisa tu conexión y el Client ID.");
             console.error("Error: Objeto 'paypal' no encontrado. El script del SDK no se cargó.");
@@ -172,44 +168,46 @@
             console.log("SDK de PayPal cargado exitosamente. Renderizando botones...");
 
             paypal.Buttons({
-    createOrder: function(data, actions) {
-        console.log("Creando orden de PayPal...");
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: '10.00'
-                }
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        console.log("Pago aprobado. Capturando transacción...");
-        return actions.order.capture().then(function(details) {
-            console.log('Transacción completada por ' + details.payer.name.given_name);
-
-            // Guardar en base de datos
-            fetch('/home/guardar_compra', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+                createOrder: function(data, actions) {
+                    console.log("Creando orden de PayPal...");
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '100.00'
+                            }
+                        }]
+                    });
                 },
-                body: JSON.stringify({
-                    producto: 'Sensor de Gas',
-                    monto: details.purchase_units[0].amount.value
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error del servidor: " + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert('Compra guardada exitosamente.');
-            })
-            .catch(error => {
-                console.error('Error al guardar la compra:', error);
-            });
+                onApprove: function(data, actions) {
+                    console.log("Pago aprobado. Capturando transacción...");
+                    return actions.order.capture().then(function(details) {
+                        console.log('Transacción completada por ' + details.payer.name.given_name);
+
+                        // Guardar en la base de datos (con URL absoluta)
+                        fetch('https://asg-rxnu.onrender.com/home/guardar_compra', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                producto: 'Sensor de Gas',
+                                monto: details.purchase_units[0].amount.value
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error del servidor: " + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("Compra guardada correctamente.");
+                            successModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error al guardar la compra:', error);
+                            showErrorMessage('⚠️ Hubo un error al guardar la compra. Intenta nuevamente.');
+                        });
                     });
                 },
                 onCancel: () => {
@@ -227,16 +225,5 @@
             });
         }
     </script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                    .then(reg => console.log('ServiceWorker registrado:', reg.scope))
-                    .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
-            });
-        }
-    </script>
-
 </body>
 </html>

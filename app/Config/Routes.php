@@ -83,4 +83,4 @@ $routes->get('prueba', function() {
 
 
 // ESTA ES LA RUTA QUE FALTABA PARA GUARDAR LA COMPRA CON PAYPAL
-$routes->get('/home/guardar_compra', 'Home::guardar_compra');
+$routes->post('/home/guardar_compra', 'Home::guardar_compra');
