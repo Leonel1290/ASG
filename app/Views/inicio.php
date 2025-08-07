@@ -176,8 +176,8 @@
         /* --- Estilos de la Animación --- */
         .image-container {
             position: relative;
-            width: 500px; /* Ajusta según el tamaño de tus imágenes */
-            height: 500px; /* Ajusta según el tamaño de tus imágenes */
+            width: 800px; /* Ajusta según el tamaño de tus imágenes */
+            height: 600px; /* Ajusta según el tamaño de tus imágenes */
             margin: 20px auto;
         }
 
@@ -191,7 +191,7 @@
             transition: opacity 2s ease-in-out;
         }
         .image.active {
-            opacity: 0;
+            opacity: 1;
         }
     </style>
 </head>
