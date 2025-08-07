@@ -82,4 +82,4 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
-// app/Config/Routes.php
+$routes->post('/home/guardar_compra', 'Home::guardar_compra');
