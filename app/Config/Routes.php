@@ -42,7 +42,7 @@ $routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the r
 $routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
 
 
-// Profile (Group routes related to PerfilController)
+// Rutas para el perfil y dispositivos (PerfilController)
 $routes->group('perfil', function($routes) {
     $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
@@ -54,7 +54,6 @@ $routes->group('perfil', function($routes) {
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
-
 });
 
 $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
@@ -71,7 +70,7 @@ $routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
 
 $routes->get('/comprar', 'Home::comprar');
 
-
+// NUEVAS RUTAS AÑADIDAS
 $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
     $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
@@ -82,4 +81,6 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
+
+// ESTA ES LA RUTA QUE FALTABA PARA GUARDAR LA COMPRA CON PAYPAL
 $routes->post('/home/guardar_compra', 'Home::guardar_compra');
