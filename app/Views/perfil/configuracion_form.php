@@ -276,9 +276,72 @@ $errors = session('errors') ?? []; // Obtener errores de validación de la sesi�
 
             </div>
         </div>
+
+        <hr>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title"><i class="fas fa-lock me-2"></i> Cambiar Contraseña</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="<?= base_url('/perfil/cambiar-contrasena') ?>">
+                    <?= csrf_field() ?>
+                    <div class="form-group">
+                        <label for="current_password"><i class="fas fa-key me-2"></i> Contraseña Actual:</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password"><i class="fas fa-lock me-2"></i> Nueva Contraseña:</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password"><i class="fas fa-lock me-2"></i> Confirmar Nueva Contraseña:</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-save me-2"></i> Cambiar Contraseña</button>
+                </form>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title"><i class="fas fa-trash me-2"></i> Eliminar Cuenta</h5>
+            </div>
+            <div class="card-body">
+                <p>Al eliminar tu cuenta, todos tus datos serán borrados permanentemente.</p>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash-alt me-2"></i> Eliminar Mi Cuenta
+                </button>
+            </div>
+        </div>
+
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Confirmar Eliminación de Cuenta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="<?= base_url('/perfil/eliminar-cuenta') ?>" method="post" style="display:inline;">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger">Sí, Eliminar Cuenta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

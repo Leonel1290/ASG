@@ -48,6 +48,8 @@ $routes->group('perfil', function($routes) {
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
+    $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
+    $routes->post('eliminar-cuenta', 'PerfilController::eliminarCuenta');
     $routes->get('config_form', 'PerfilController::configForm');
     $routes->post('actualizar', 'PerfilController::actualizar');
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');

@@ -188,6 +188,84 @@ class PerfilController extends BaseController
 
         return redirect()->to('/perfil/config_form')->with('success', 'Email verificado exitosamente. Ahora puedes actualizar tu perfil.');
     }
+    // En PerfilController.php
+
+// ... (métodos existentes)
+
+public function cambiarContrasena()
+{
+    // Cargar librerías y helpers necesarios
+    $session = \Config\Services::session();
+    $validation = \Config\Services::validation();
+
+    // Reglas de validación para el cambio de contraseña
+    $rules = [
+        'current_password' => [
+            'rules'  => 'required',
+            'errors' => [
+                'required' => 'La contraseña actual es requerida.'
+            ]
+        ],
+        'new_password' => [
+            'rules'  => 'required|min_length[8]',
+            'errors' => [
+                'required'   => 'La nueva contraseña es requerida.',
+                'min_length' => 'La nueva contraseña debe tener al menos 8 caracteres.'
+            ]
+        ],
+        'confirm_password' => [
+            'rules'  => 'required|matches[new_password]',
+            'errors' => [
+                'required' => 'La confirmación de la contraseña es requerida.',
+                'matches'  => 'Las contraseñas no coinciden.'
+            ]
+        ],
+    ];
+
+    // Ejecutar la validación
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    // Obtener los datos del formulario y del usuario
+    $currentPassword = $this->request->getPost('current_password');
+    $newPassword = $this->request->getPost('new_password');
+    $userId = $session->get('id_usuario'); // Asume que la sesión guarda el ID del usuario
+
+    $userModel = new \App\Models\UserModel(); // Asegúrate de que el modelo de usuario esté instanciado
+    $user = $userModel->find($userId);
+
+    if ($user) {
+        // Verificar que la contraseña actual sea correcta
+        if (password_verify($currentPassword, $user['password'])) {
+            // Hash de la nueva contraseña y actualizar en la base de datos
+            $userModel->update($userId, [
+                'password' => password_hash($newPassword, PASSWORD_DEFAULT)
+            ]);
+            return redirect()->to('/perfil/configuracion')->with('success', 'Contraseña cambiada exitosamente.');
+        } else {
+            return redirect()->to('/perfil/configuracion')->with('error', 'La contraseña actual es incorrecta.');
+        }
+    }
+
+    return redirect()->to('/perfil/configuracion')->with('error', 'Ocurrió un error inesperado.');
+}
+
+public function eliminarCuenta()
+{
+    $session = \Config\Services::session();
+    $userId = $session->get('id_usuario');
+
+    $userModel = new \App\Models\UserModel(); // Asegúrate de que el modelo de usuario esté instanciado
+
+    if ($userModel->delete($userId)) {
+        // Cerrar sesión después de eliminar la cuenta
+        $session->destroy();
+        return redirect()->to('/')->with('success', 'Tu cuenta ha sido eliminada permanentemente.');
+    } else {
+        return redirect()->to('/perfil/configuracion')->with('error', 'Ocurrió un error al intentar eliminar la cuenta.');
+    }
+}
 
     public function configForm()
     {
@@ -411,4 +489,5 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
     }
+    
 }
