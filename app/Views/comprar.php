@@ -5,18 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Confirmar Compra | AgainSafeGas</title>
 
+    <!-- Bootstrap & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <!-- Icono -->
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
-
+    <!-- PWA -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ASG">
 
+    <!-- Estilos personalizados -->
     <style>
         body {
             background-color: #0d1117;
@@ -132,6 +134,7 @@
         </div>
     </div>
 
+    <!-- Modal Éxito -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content border-0">
@@ -149,9 +152,15 @@
         </div>
     </div>
 
+    <!-- PayPal SDK con el nuevo Client ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        console.log("Script principal de compra iniciado.");
+
         const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
             keyboard: false
         });
@@ -161,64 +170,71 @@
             errorDiv.innerText = message;
         }
 
-        paypal.Buttons({
-            createOrder: (data, actions) => {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '100.00'
-                        }
-                    }]
-                });
-            },
-            onApprove: (data, actions) => {
-                return actions.order.capture().then((details) => {
-                    // En este punto, la compra fue aprobada y capturada.
-                    // Hacemos una llamada al servidor para guardar los detalles.
-                    fetch('<?= base_url("home/guardar_compra") ?>', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID,
-                            payerID: data.payerID,
-                            paymentID: details.id,
-                            status: details.status,
-                            // Aquí se podría enviar más información si el usuario está logueado
-                            // Por ejemplo: 'usuario_id': <?= session('id') ?? 'null' ?>
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(serverData => {
-                        if (serverData.status === 'success') {
-                            // Si el servidor guardó los datos correctamente, mostramos el modal de éxito.
-                            successModal.show();
-                            
-                            // Redireccionamos después de 3 segundos
-                            setTimeout(() => {
-                                window.location.href = '<?= base_url("loginobtener") ?>';
-                            }, 3000);
-                        } else {
-                            // Manejar errores del servidor
-                            showErrorMessage('⚠️ Error al guardar la compra en la base de datos.');
-                            console.error('Error del servidor:', serverData.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error en la llamada al servidor:', error);
-                        showErrorMessage('⚠️ Error de conexión. El pago se realizó, pero no pudimos registrarlo.');
+        // Se verifica que el objeto de PayPal exista antes de intentar usarlo.
+        if (typeof paypal === 'undefined') {
+            showErrorMessage("⚠️ Error: El SDK de PayPal no se ha cargado correctamente. Revisa tu conexión y el Client ID.");
+            console.error("Error: Objeto 'paypal' no encontrado. El script del SDK no se cargó.");
+        } else {
+            console.log("SDK de PayPal cargado exitosamente. Renderizando botones...");
+
+            paypal.Buttons({
+                createOrder: (data, actions) => {
+                    console.log("Creando orden de PayPal...");
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '100.00'
+                            }
+                        }]
                     });
-                });
-            },
-            onCancel: () => {
-                showErrorMessage('❌ El pago fue cancelado.');
-            },
-            onError: (err) => {
-                console.error('Error en la transacción:', err);
-                showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
-            }
-        }).render('#paypal-button-container');
+                },
+                onApprove: (data, actions) => {
+                    console.log("Pago aprobado. Capturando transacción...");
+                    return actions.order.capture().then((details) => {
+                        fetch('<?= base_url("home/guardar_compra") ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID,
+                                payerID: data.payerID,
+                                paymentID: details.id,
+                                status: details.status,
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(serverData => {
+                            if (serverData.status === 'success') {
+                                successModal.show();
+                                setTimeout(() => {
+                                    window.location.href = '<?= base_url("loginobtener") ?>';
+                                }, 3000);
+                            } else {
+                                showErrorMessage('⚠️ Error al guardar la compra en la base de datos.');
+                                console.error('Error del servidor:', serverData.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error en la llamada al servidor:', error);
+                            showErrorMessage('⚠️ Error de conexión. El pago se realizó, pero no pudimos registrarlo.');
+                        });
+                    });
+                },
+                onCancel: () => {
+                    showErrorMessage('❌ El pago fue cancelado.');
+                    console.log("Pago cancelado por el usuario.");
+                },
+                onError: (err) => {
+                    console.error('Error en la transacción:', err);
+                    showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+                }
+            }).render('#paypal-button-container')
+            .catch(err => {
+                console.error("Error al renderizar el botón de PayPal:", err);
+                showErrorMessage('⚠️ Error al intentar mostrar el botón de PayPal. Revisa la consola para más detalles.');
+            });
+        }
     </script>
 
     <script>
