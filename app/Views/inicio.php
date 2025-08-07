@@ -431,7 +431,7 @@
             frame3.classList.add('active');
             alarmaAudio.pause(); // Detener la alarma
             alarmaAudio.currentTime = 0; // Reiniciar el audio
-        }, 2000);
+        }, 2500);
     });
 
     animationButton.addEventListener('mouseup', () => {
