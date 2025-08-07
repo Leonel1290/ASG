@@ -31,7 +31,7 @@
         .card-flip.flipped {
             transform: rotateY(180deg);
         }
-        /* Estilos modificados para hacer la tarjeta "invisible" */
+        /* Estilos modificados para agregar difuminado */
         .card-front, .card-back {
             position: absolute;
             width: 100%;
@@ -42,9 +42,13 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            box-shadow: none; /* Quitamos la sombra */
-            border-radius: 0;  /* Quitamos el radio de borde */
-            background: none; /* Quitamos el color de fondo */
+            /* Agregamos el difuminado aquí */
+            background: rgba(255, 255, 255, 0.2); /* Fondo semitransparente */
+            backdrop-filter: blur(10px); /* Efecto de difuminado */
+            -webkit-backdrop-filter: blur(10px); /* Soporte para navegadores WebKit */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Mantenemos una sombra sutil */
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Un borde sutil para el efecto de "vidrio" */
         }
         .card-back {
             transform: rotateY(180deg);
