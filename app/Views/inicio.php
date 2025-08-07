@@ -393,6 +393,7 @@
     const frame1 = document.getElementById('frame-1');
     const frame2 = document.getElementById('frame-2');
     const frame3 = document.getElementById('frame-3');
+    const alarmaAudio = new Audio('<?= base_url('/audio/alarma.mp3') ?>');
 
     let isAnimating = false;
     let animationTimeout;
@@ -408,6 +409,8 @@
         frame1.classList.add('active');
         frame2.classList.remove('active');
         frame3.classList.remove('active');
+        alarmaAudio.pause();
+        alarmaAudio.currentTime = 0;
     }
 
     animationButton.addEventListener('mousedown', () => {
@@ -418,10 +421,16 @@
         frame1.classList.remove('active');
         frame2.classList.add('active');
         
+        // Iniciar la alarma al pasar a frame_2
+        alarmaAudio.loop = true; // Para que se repita
+        alarmaAudio.play();
+
         // Temporizador para pasar a frame_3 después de 2 segundos
         animationTimeout = setTimeout(() => {
             frame2.classList.remove('active');
             frame3.classList.add('active');
+            alarmaAudio.pause(); // Detener la alarma
+            alarmaAudio.currentTime = 0; // Reiniciar el audio
         }, 2000);
     });
 
