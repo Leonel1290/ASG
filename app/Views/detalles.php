@@ -106,7 +106,6 @@
             border-radius: 2px;
         }
 
-        /* --- Secciones y encabezados mejorados --- */
         .card-section {
             padding: 1.5rem 0;
             border-bottom: 1px solid #e9ecef;
@@ -132,7 +131,6 @@
             color: var(--primary-color);
         }
 
-        /* --- Indicador de estado de la válvula --- */
         #status-display {
             display: flex;
             align-items: center;
@@ -159,7 +157,6 @@
             background-color: rgba(247, 37, 133, 0.1);
         }
 
-        /* --- Botones de control --- */
         .btn-group-responsive {
             display: flex;
             flex-direction: column;
@@ -214,7 +211,7 @@
         .btn-secondary { background-color: var(--gray-color); color: #fff; }
         .btn-secondary:hover { background-color: #5a6268; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3); }
 
-        /* --- Velocímetro mejorado --- */
+        /* --- Estilos del nuevo velocímetro --- */
         .gauge-container {
             width: 100%;
             display: flex;
@@ -230,13 +227,6 @@
             height: 125px;
             position: relative;
             overflow: hidden;
-        }
-
-        .gauge-arc {
-            position: absolute;
-            bottom: 0;
-            width: 250px;
-            height: 125px;
             border-radius: 125px 125px 0 0;
             background: #e0e0e0;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
@@ -251,8 +241,9 @@
             border-radius: 125px 125px 0 0;
             position: absolute;
             bottom: 0;
+            transform: rotate(0deg); /* Estado inicial */
         }
-
+        
         .gauge-pointer {
             position: absolute;
             bottom: 0;
@@ -264,6 +255,7 @@
             background-color: var(--dark-color);
             border-radius: 2px;
             z-index: 2;
+            transform: translateX(-50%) rotate(0deg); /* Estado inicial */
         }
 
         .gauge-center-circle {
@@ -302,35 +294,6 @@
         .pulse { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- Tooltips personalizados --- */
-        .tooltip-custom {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-custom .tooltiptext {
-            visibility: hidden;
-            width: 120px;
-            background-color: var(--dark-color);
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-        }
-
-        .tooltip-custom:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
         /* --- Media Queries --- */
         @media (max-width: 768px) {
             .container.main-content {
@@ -346,7 +309,7 @@
                 width: 180px;
                 height: 90px;
             }
-            .gauge-arc, .gauge-fill {
+            .gauge-fill {
                 width: 180px;
                 height: 90px;
                 border-radius: 90px 90px 0 0;
@@ -373,7 +336,7 @@
             .card { background-color: rgba(30, 30, 30, 0.9); color: #f0f0f0; }
             h2 { -webkit-text-fill-color: #f0f0f0; }
             .section-title, .section-title i { color: #7b9cff; }
-            .gauge-arc { background-color: #3a3a3a; }
+            .gauge-display { background-color: #3a3a3a; }
             .gauge-value { color: #f0f0f0; }
             .gauge-center-circle, .gauge-pointer { background-color: #f0f0f0; }
         }
@@ -404,7 +367,6 @@
                             <p class="section-title justify-content-center"><i class="fas fa-tachometer-alt"></i>Nivel de Gas en Ambiente</p>
                             <div class="gauge-container">
                                 <div class="gauge-display">
-                                    <div class="gauge-arc"></div>
                                     <div class="gauge-fill" id="gaugeFill"></div>
                                     <div class="gauge-pointer" id="gaugePointer"></div>
                                     <span class="gauge-value" id="gasLevel">0%</span>
@@ -465,7 +427,6 @@ $(document).ready(function() {
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-    // Efecto de carga inicial
     $('.card').css('opacity', 0).animate({opacity: 1}, 600);
     
     function actualizarEstadoUI(estado) {
@@ -480,14 +441,11 @@ $(document).ready(function() {
         level = Math.max(0, Math.min(100, parseFloat(level))); 
         const rotation = (level / 100) * 180;
         
-        // Animación del velocímetro
         gaugeFill.css('transform', `rotate(${rotation}deg)`);
-        gaugePointer.css('transform', `rotate(${rotation}deg)`);
+        gaugePointer.css('transform', `translateX(-50%) rotate(${rotation}deg)`);
         
-        // Actualizar valor de texto
         gasLevelSpan.text(`${level.toFixed(1)}%`); 
 
-        // Actualizar colores según el nivel de riesgo
         let textColor;
         if (level < 30) {
             textColor = 'var(--success-color)';
@@ -495,7 +453,7 @@ $(document).ready(function() {
             textColor = 'var(--warning-color)';
         } else {
             textColor = 'var(--danger-color)';
-            if (level > 80 && !statusDisplay.hasClass('cerrada')) {
+            if (level > 80 && statusDisplay.hasClass('abierta')) {
                 showGasAlert(level);
             }
         }
@@ -535,10 +493,8 @@ $(document).ready(function() {
         });
     }
     
-    // Cargar estado inicial
     fetchDeviceState();
     
-    // Eventos de botones
     $('#btn-abrir').click(function() {
         controlarServo(mac, 1, 'Válvula abierta correctamente', btnAbrir, '<i class="fas fa-fan"></i> Abrir Válvula');
     });
@@ -577,7 +533,6 @@ $(document).ready(function() {
             });
     }
     
-    // Función para mostrar toasts de éxito y error
     function showSuccessToast(message) {
         Swal.fire({
             toast: true,
@@ -602,10 +557,8 @@ $(document).ready(function() {
         });
     }
     
-    // Actualizar cada 5 segundos
     const intervalId = setInterval(fetchDeviceState, 5000);
     
-    // Limpiar intervalo al salir de la página
     $(window).on('beforeunload', function() {
         clearInterval(intervalId);
     });
