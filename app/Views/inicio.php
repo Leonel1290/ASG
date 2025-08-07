@@ -145,6 +145,54 @@
         .navbar-toggler:focus {
             box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
         }
+
+        /* --- Estilos del Modal --- */
+        .modal-body {
+            position: relative;
+        }
+        .modal-content-simulacion {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* --- Estilos de la Animación --- */
+        .image-container {
+            position: relative;
+            width: 500px; /* Ajusta según el tamaño de tus imágenes */
+            height: 500px; /* Ajusta según el tamaño de tus imágenes */
+            margin: 20px auto;
+        }
+
+        .image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .image.active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -183,7 +231,7 @@
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                     <button class="btn btn-outline-light mt-3 ms-2" onclick="probarAlerta()">🔊 Probar Alarma</button>
-                    <a href="<?= base_url('/simulacion-interactiva') ?>" class="btn btn-outline-light mt-3 ms-2">⚡ Simular Actuación</a>
+                    <button class="btn btn-outline-light mt-3 ms-2" data-bs-toggle="modal" data-bs-target="#simulacionModal">⚡ Simular Actuación</button>
                     <audio id="alarmaAudio" src="<?= base_url('/audio/alarma.mp3') ?>" preload="auto"></audio>
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
@@ -248,6 +296,25 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="simulacionModal" tabindex="-1" aria-labelledby="simulacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="simulacionModalLabel">Simulación de Fuga de Gas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="image-container">
+                    <img id="frame-1" class="image active" src="<?= base_url('/imagenes/frame_1.jpg'); ?>" alt="Garrafa sin fuga">
+                    <img id="frame-2" class="image" src="<?= base_url('/imagenes/frame_2.jpg'); ?>" alt="Fuga de gas">
+                    <img id="frame-3" class="image" src="<?= base_url('/imagenes/frame_3.jpg'); ?>" alt="Detector activo">
+                </div>
+                <button id="animationButton" class="btn btn-custom mt-3">Mantén Pulsado para Simular Fuga</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -317,6 +384,59 @@
             appModal.addEventListener('hidden.bs.modal', function () {
                 appIframe.src = '';
             });
+        }
+    });
+
+    // Lógica de la animación de la garrafa dentro del modal
+    const simulacionModal = document.getElementById('simulacionModal');
+    const animationButton = document.getElementById('animationButton');
+    const frame1 = document.getElementById('frame-1');
+    const frame2 = document.getElementById('frame-2');
+    const frame3 = document.getElementById('frame-3');
+    const alarmaAudio = new Audio('<?= base_url('/audio/alarma.mp3') ?>');
+
+    let isAnimating = false;
+    let animationTimeout;
+
+    // Resetear la animación cuando el modal se oculta
+    simulacionModal.addEventListener('hidden.bs.modal', function () {
+        resetAnimation();
+    });
+
+    function resetAnimation() {
+        isAnimating = false;
+        clearTimeout(animationTimeout);
+        frame1.classList.add('active');
+        frame2.classList.remove('active');
+        frame3.classList.remove('active');
+        alarmaAudio.pause();
+        alarmaAudio.currentTime = 0;
+    }
+
+    animationButton.addEventListener('mousedown', () => {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        // Transición de frame_1 a frame_2
+        frame1.classList.remove('active');
+        frame2.classList.add('active');
+        
+        // Iniciar la alarma al pasar a frame_2
+        alarmaAudio.loop = true; // Para que se repita
+        alarmaAudio.play();
+
+        // Temporizador para pasar a frame_3 después de 2 segundos
+        animationTimeout = setTimeout(() => {
+            frame2.classList.remove('active');
+            frame3.classList.add('active');
+            alarmaAudio.pause(); // Detener la alarma
+            alarmaAudio.currentTime = 0; // Reiniciar el audio
+        }, 2000);
+    });
+
+    animationButton.addEventListener('mouseup', () => {
+        if (isAnimating) {
+            resetAnimation();
         }
     });
 </script>
