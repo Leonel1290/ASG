@@ -3,12 +3,16 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\ComprasModel;
 use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
+use CodeIgniter\API\ResponseTrait;
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
+    use ResponseTrait;
+
     // Puedes instanciar modelos aquí si los usas en múltiples métodos
     // protected $userModel;
     // protected $lecturasGasModel;
@@ -145,8 +149,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         if ($user) {
             if (!$user['is_active']) {
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
-                 return redirect()->back()->withInput();
+                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
+                return redirect()->back()->withInput();
             }
 
             $token = bin2hex(random_bytes(50));
@@ -169,8 +173,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             if (!$emailService->send()) {
                 $data = $emailService->printDebugger(['headers']);
                 log_message('error', 'Error enviando correo de recuperación a ' . $user['email'] . ': ' . $data);
-                 $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
-                 return redirect()->back()->withInput();
+                $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
+                return redirect()->back()->withInput();
             }
 
             if ($updated) {
@@ -196,14 +200,14 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
     {
         $userModel = new UserModel();
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                return redirect()->to('/register');
             }
 
             return view('reset_password', ['token' => $token]);
@@ -222,14 +226,14 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         $password = $this->request->getPost('password');
 
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                return redirect()->to('/register');
             }
 
             $userModel->update($user['id'], [
