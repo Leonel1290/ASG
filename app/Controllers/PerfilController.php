@@ -19,38 +19,27 @@ class PerfilController extends BaseController
 
     public function __construct()
     {
-        // Llama al constructor de la clase padre (BaseController) si es necesario
-        // parent::__construct();
-
         $this->userModel = new UserModel();
         $this->enlaceModel = new EnlaceModel();
         $this->lecturasGasModel = new LecturasGasModel();
         $this->dispositivoModel = new DispositivoModel();
 
-
-        // --- CARGAR HELPERS ---
         helper(['form', 'url', 'text', 'email']);
-        // --- FIN CARGAR HELPERS ---
     }
 
-    // Método para mostrar la página principal del perfil (GET /perfil)
     public function index()
     {
         $session = session();
         $usuarioId = $session->get('id');
 
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'PerfilController::index() - Estado de la sesión al inicio: ' . json_encode($session->get()));
         log_message('debug', 'PerfilController::index() - Usuario ID de la sesión: ' . ($usuarioId ?? 'null'));
-        // --- FIN LOGGING ---
 
-        // Redirigir si el usuario no está logueado
         if (!$usuarioId) {
             log_message('debug', 'PerfilController::index() - Usuario ID no encontrado en sesión, redirigiendo a login.');
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
         }
 
-        // Obtener las direcciones MAC enlazadas al usuario actual desde la tabla 'enlace'
         $enlaces = $this->enlaceModel
                         ->select('MAC')
                         ->where('id_usuario', $usuarioId)
@@ -65,10 +54,8 @@ class PerfilController extends BaseController
                                         ->findAll();
         }
 
-        // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
         $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
-        // Procesar las lecturas para agruparlas por MAC
         $lecturasPorMac = [];
         if (!empty($allLecturas)) {
              foreach ($allLecturas as $lectura) {
@@ -82,21 +69,15 @@ class PerfilController extends BaseController
             }
         }
 
-        // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'PerfilController::index() - Dispositivos enlazados obtenidos: ' . json_encode($dispositivosEnlazados));
         log_message('debug', 'PerfilController::index() - Lecturas por MAC procesadas: ' . json_encode($lecturasPorMac));
-        // --- FIN LOGGING ---
 
 
-        // Pasar los datos a la vista.
         return view('perfil', [
             'dispositivosEnlazados' => $dispositivosEnlazados,
             'lecturasPorMac' => $lecturasPorMac
         ]);
     }
-
-
-    // --- MÉTODOS PARA EL FLUJO DE VERIFICACIÓN Y CONFIGURACIÓN ---
 
     public function configuracion()
     {
@@ -146,8 +127,6 @@ class PerfilController extends BaseController
         ]);
 
         $emailService = \Config\Services::email();
-        // Configura el remitente en app/Config/Email.php o .env
-        // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
 
         $emailService->setTo($email);
         $emailService->setSubject('Verificación de Email para Configuración de Perfil');
@@ -188,84 +167,80 @@ class PerfilController extends BaseController
 
         return redirect()->to('/perfil/config_form')->with('success', 'Email verificado exitosamente. Ahora puedes actualizar tu perfil.');
     }
-    // En PerfilController.php
 
-// ... (métodos existentes)
+    public function cambiarContrasena()
+    {
+        $session = session();
+        $validation = \Config\Services::validation();
 
-public function cambiarContrasena()
-{
-    // Cargar librerías y helpers necesarios
-    $session = \Config\Services::session();
-    $validation = \Config\Services::validation();
+        $userId = $session->get('id');
 
-    // Reglas de validación para el cambio de contraseña
-    $rules = [
-        'current_password' => [
-            'rules'  => 'required',
-            'errors' => [
-                'required' => 'La contraseña actual es requerida.'
-            ]
-        ],
-        'new_password' => [
-            'rules'  => 'required|min_length[8]',
-            'errors' => [
-                'required'   => 'La nueva contraseña es requerida.',
-                'min_length' => 'La nueva contraseña debe tener al menos 8 caracteres.'
-            ]
-        ],
-        'confirm_password' => [
-            'rules'  => 'required|matches[new_password]',
-            'errors' => [
-                'required' => 'La confirmación de la contraseña es requerida.',
-                'matches'  => 'Las contraseñas no coinciden.'
-            ]
-        ],
-    ];
+        if (!$userId) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para cambiar tu contraseña.');
+        }
 
-    // Ejecutar la validación
-    if (!$this->validate($rules)) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        $rules = [
+            'current_password' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'La contraseña actual es requerida.'
+                ]
+            ],
+            'new_password' => [
+                'rules'  => 'required|min_length[8]',
+                'errors' => [
+                    'required'   => 'La nueva contraseña es requerida.',
+                    'min_length' => 'La nueva contraseña debe tener al menos 8 caracteres.'
+                ]
+            ],
+            'confirm_password' => [
+                'rules'  => 'required|matches[new_password]',
+                'errors' => [
+                    'required' => 'La confirmación de la contraseña es requerida.',
+                    'matches'  => 'Las contraseñas no coinciden.'
+                ]
+            ],
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $currentPassword = $this->request->getPost('current_password');
+        $newPassword = $this->request->getPost('new_password');
+
+        $user = $this->userModel->findWithPassword($userId);
+
+        if ($user) {
+            if (password_verify($currentPassword, $user['password'])) {
+                $this->userModel->update($userId, [
+                    'password' => password_hash($newPassword, PASSWORD_DEFAULT)
+                ]);
+                return redirect()->to('/perfil/config_form')->with('success', 'Contraseña cambiada exitosamente.');
+            } else {
+                return redirect()->to('/perfil/config_form')->with('error', 'La contraseña actual es incorrecta.');
+            }
+        }
+
+        return redirect()->to('/perfil/config_form')->with('error', 'Ocurrió un error inesperado al cambiar la contraseña.');
     }
 
-    // Obtener los datos del formulario y del usuario
-    $currentPassword = $this->request->getPost('current_password');
-    $newPassword = $this->request->getPost('new_password');
-    $userId = $session->get('id_usuario'); // Asume que la sesión guarda el ID del usuario
+    public function eliminarCuenta()
+    {
+        $session = session();
+        $userId = $session->get('id');
 
-    $userModel = new \App\Models\UserModel(); // Asegúrate de que el modelo de usuario esté instanciado
-    $user = $userModel->find($userId);
+        if (!$userId) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para eliminar tu cuenta.');
+        }
 
-    if ($user) {
-        // Verificar que la contraseña actual sea correcta
-        if (password_verify($currentPassword, $user['password'])) {
-            // Hash de la nueva contraseña y actualizar en la base de datos
-            $userModel->update($userId, [
-                'password' => password_hash($newPassword, PASSWORD_DEFAULT)
-            ]);
-            return redirect()->to('/perfil/configuracion')->with('success', 'Contraseña cambiada exitosamente.');
+        if ($this->userModel->delete($userId)) {
+            $session->destroy();
+            return redirect()->to('/')->with('success', 'Tu cuenta ha sido eliminada permanentemente.');
         } else {
-            return redirect()->to('/perfil/configuracion')->with('error', 'La contraseña actual es incorrecta.');
+            return redirect()->to('/perfil/config_form')->with('error', 'Ocurrió un error al intentar eliminar la cuenta.');
         }
     }
-
-    return redirect()->to('/perfil/configuracion')->with('error', 'Ocurrió un error inesperado.');
-}
-
-public function eliminarCuenta()
-{
-    $session = \Config\Services::session();
-    $userId = $session->get('id_usuario');
-
-    $userModel = new \App\Models\UserModel(); // Asegúrate de que el modelo de usuario esté instanciado
-
-    if ($userModel->delete($userId)) {
-        // Cerrar sesión después de eliminar la cuenta
-        $session->destroy();
-        return redirect()->to('/')->with('success', 'Tu cuenta ha sido eliminada permanentemente.');
-    } else {
-        return redirect()->to('/perfil/configuracion')->with('error', 'Ocurrió un error al intentar eliminar la cuenta.');
-    }
-}
 
     public function configForm()
     {
@@ -366,11 +341,6 @@ public function eliminarCuenta()
         }
         return view('perfil/cambio_exitoso');
     }
-
-    // --- FIN MÉTODOS FLUJO VERIFICACIÓN Y CONFIGURACIÓN ---
-
-
-    // --- MÉTODOS PARA GESTIÓN DE DISPOSITIVOS ---
 
     public function editDevice($mac = null)
     {
@@ -489,5 +459,4 @@ public function eliminarCuenta()
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
     }
-    
 }
