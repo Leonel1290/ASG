@@ -149,9 +149,10 @@
         /* --- Estilos del Modal --- */
         .modal-body {
             position: relative;
+            background-color: black;
         }
         .modal-content-simulacion {
-            background-color: #fefefe;
+            background-color: #000000ff;
             margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
