@@ -176,13 +176,13 @@
         /* --- Estilos de la Animación --- */
         .image-container {
             position: relative;
-            width: 500px; /* Ajusta según el tamaño de tus imágenes */
+            width: 700px; /* Ajusta según el tamaño de tus imágenes */
             height: 500px; /* Ajusta según el tamaño de tus imágenes */
             margin: 20px auto;
         }
 
         .image {
-            position: relative;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
