@@ -9,24 +9,22 @@
     <style>
         /* Estilos para mensajes de éxito y error (se mantienen aquí) */
         .success-message {
-            color: green; /* O el color de tu tema para éxito */
+            color: green;
             font-weight: bold;
             margin-bottom: 15px;
-            text-align: center; /* Centrar mensajes */
+            text-align: center;
         }
         .error-messages ul {
             list-style: none;
             padding: 0;
             margin: 0 0 15px 0;
-            color: red; /* O el color de tu tema para error */
-            text-align: left; /* Alinear lista de errores a la izquierda si hay varios */
+            color: red;
+            text-align: left;
         }
         .error-messages li {
             margin-bottom: 5px;
-            text-align: center; /* Centrar cada mensaje de error */
+            text-align: center;
         }
-        /* Nota: Otros estilos como .form-register, .controls, .botons, etc.,
-                 se espera que provengan de tu archivo register.css */
     </style>
 </head>
 <body class="body">
@@ -64,7 +62,10 @@
 
             <input class="controls" type="email" name="email" id="correo" placeholder="Ingrese su Correo" value="<?= old('email') ?>" required>
 
-            <input class="controls" type="password" name="password" id="password" placeholder="Ingrese su password" required>
+            <div class="controls-container">
+                <input class="controls" type="password" name="password" id="password" placeholder="Ingrese su password" required>
+                <img src="https://static.thenounproject.com/png/1035969-200.png" id="eyeicon" alt="Mostrar/Ocultar contraseña">
+            </div>
 
             <p>Estoy de acuerdo con <a href="#">Términos y Condiciones</a></p>
 
@@ -72,5 +73,20 @@
         </form>
         <p><a href="<?= base_url('loginobtener') ?>">¿Ya tengo Cuenta?</a></p>
     </section>
+
+    <script>
+        let eyeicon = document.getElementById("eyeicon");
+        let password = document.getElementById("password");
+        eyeicon.onclick = function(){
+            if(password.type == "password"){
+                password.type = "text";
+                eyeicon.src = "https://icons.veryicon.com/png/o/miscellaneous/myfont/eye-open-4.png";
+            }
+            else{
+                password.type = "password";
+                eyeicon.src = "https://static.thenounproject.com/png/1035969-200.png";
+            }
+        }
+    </script>
 </body>
 </html>
