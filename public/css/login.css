@@ -6,9 +6,9 @@ body {
     background: url('90514.jpg');
     background-size: cover;
     background-position: center;
-    }
-    
-    .container {
+}
+
+.container {
     width: 420px;
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.1);
@@ -17,21 +17,21 @@ body {
     color: #fff;
     border-radius: 10px;
     padding: 30px 40px;
-    }
-    
-    .container h1 {
+}
+
+.container h1 {
     font-size: 36px;
     text-align: center;
-    }
-    
-    .container .input-box {
-    position: relative;
+}
+
+.container .input-box {
+    position: relative; /* Este es clave para el posicionamiento del ícono */
     width: 100%;
     height: 50px;
     margin: 30px 0px;
-    }
-    
-    .input-box input {
+}
+
+.input-box input {
     width: 100%;
     height: 100%;
     background: transparent;
@@ -41,76 +41,72 @@ body {
     border-radius: 5px;
     font-size: 16px;
     color: #fff;
+    /* Ajustado el padding derecho para dejar espacio al ícono */
     padding: 20px 45px 20px 20px;
-    }
-    
-    .input-box input::placeholder {
+}
+
+.input-box input::placeholder {
     color: #fff;
-    }
-    
-    .input-box i {
+}
+
+/* Reglas correctas para el ícono del ojo */
+.input-box img {
     position: absolute;
-    right: 20px;
+    right: 15px; /* Mueve el ícono 15px desde el borde derecho */
     top: 50%;
     transform: translateY(-50%);
-    font-size: 20px;
-    }
-    
-    .container .remember-forgot {
+    width: 25px; /* Tamaño del ícono */
+    cursor: pointer;
+}
+
+
+.container .remember-forgot {
     display: flex;
     justify-content: space-between;
     font-size: 14.5px;
     margin: -15px 0px 15px;
-    }
-    
-    .remember-forgot label input {
+}
+
+.remember-forgot label input {
     color: #fff;
     margin-right: 3px;
-    }
-    
-    .remember-forgot a {
+}
+
+.remember-forgot a {
     color: #fff;
     text-decoration: none;
-    }
-    
-    .remember-forgot a:hover {
+}
+
+.remember-forgot a:hover {
     text-decoration: underline;
-    }
-    
-    .container .btn {
+}
+
+.container .btn {
     width: 100%;
     height: 45px;
     background: #fff;
     border: none;
     outline: none;
     border-radius: 5px;
-    box-decoration-break: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
     color: #333;
-    }
-    
-    .container .register-link {
+}
+
+.container .register-link {
     font-size: 14.5px;
     text-align: center;
     margin: 20px 0px 15px;
-    }
-    
-    .register-link p a {
+}
+
+.register-link p a {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
-    }
-    
-    .register-link p a:hover {
+}
+
+.register-link p a:hover {
     text-decoration: underline;
-    }
-    #eyeicon {
-        margin-right: -500px;
-        padding-left: 15px;
-        cursor: pointer;
-        width: 50px;   /* Ajusta el ancho de la imagen */
-        height: 40px;  /* Ajusta la altura de la imagen */
-        transform: translate(580%, -130%);
-    }
+}
