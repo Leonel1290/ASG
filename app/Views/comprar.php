@@ -12,12 +12,6 @@
     <!-- Icono -->
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
 
-    <!-- PWA -->
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ASG">
-
     <!-- Estilos personalizados -->
     <style>
         body {
