@@ -151,12 +151,12 @@
             position: relative;
         }
         .modal-content-simulacion {
-            background-color: #fefefe;
+            background-color:rgb(0, 0, 0);
             margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            max-width: 600px;
+            max-width: 700px;
             border-radius: 10px;
             position: relative;
         }
