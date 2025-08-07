@@ -9,25 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <title>Login y Registro</title>
     <style>
-        /* Estilos base de tu register.css */
-        .success-message {
-            color: green;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .error-messages ul {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 15px 0;
-            color: red;
-            text-align: left;
-        }
-        .error-messages li {
-            margin-bottom: 5px;
-            text-align: center;
-        }
-        /* Estilos de la tarjeta para el efecto de volteo */
+        /* Estilos base de la tarjeta */
         body {
             display: flex;
             justify-content: center;
@@ -40,7 +22,7 @@
         }
         .card-flip {
             width: 350px;
-            height: 550px; /* Altura ajustada para los formularios */
+            height: 550px;
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.8s;
@@ -65,13 +47,28 @@
         .card-back {
             transform: rotateY(180deg);
         }
-        /* Estilos del formulario de registro */
-        .form-register {
+        /* Estilos del formulario de login para que ocupe el espacio */
+        .card-front .container, .card-back .container {
             width: 100%;
-            height: auto;
             padding: 0;
-            background: none;
-            box-shadow: none;
+        }
+        /* Estilos de tus archivos CSS originales */
+        .success-message {
+            color: green;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .error-messages ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            color: red;
+            text-align: left;
+        }
+        .error-messages li {
+            margin-bottom: 5px;
+            text-align: center;
         }
         .controls {
             width: 100%;
@@ -98,21 +95,6 @@
             color: #007bff;
             margin-top: 10px;
         }
-        /* Estilos del formulario de login */
-        .container {
-            width: 100%;
-            padding: 0;
-        }
-        .form-group {
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
         .ver {
             position: absolute;
             right: 15px;
@@ -123,38 +105,51 @@
         .ver-icon {
             width: 20px;
         }
+        /* Estilos de la tarjeta para que el contenido se ajuste */
+        .card-front > div, .card-back > section {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
     </style>
 </head>
 <body class="body">
     <div class="container-flip">
         <div id="card-flip" class="card-flip">
             <div class="card-front">
-                <div class="col-sm-12 col-md-12">
-                    <div class="text-center mb-4">
-                        <h1 class="h3">Login</h1>
-                    </div>
-                    <?php if (session()->get('error')): ?>
-                        <div>
-                            <p style="color: red;"><?= session()->get('error') ?></p>
-                        </div>
-                    <?php endif; ?>
-                    <form action="<?= base_url('login') ?>" method="POST">
-                        <div class="form-group">
-                            <label for="login-email">Email</label>
-                            <input type="email" name="email" id="login-email" class="form-control" required>
-                        </div>
-                        <div class="form-group" style="position: relative;">
-                            <label for="login-password">Password</label>
-                            <input type="password" name="password" id="login-password" class="form-control" required>
-                            <div class="ver">
-                                <img src="https://static.thenounproject.com/png/1035969-200.png" id="eyeicon-login" class="ver-icon" alt="Mostrar/Ocultar contraseña">
+                <div class="container">
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="text-center mb-4">
+                                <h1 class="h3">Login</h1>
+                            </div>
+                            <?php if (session()->get('error')): ?>
+                                <div>
+                                    <p style="color: red;"><?= session()->get('error') ?></p>
+                                </div>
+                            <?php endif; ?>
+                            <form action="<?= base_url('login') ?>" method="POST">
+                                <div class="form-group">
+                                    <label for="login-email">Email</label>
+                                    <input type="email" name="email" id="login-email" class="form-control" required>
+                                </div>
+                                <div class="form-group" style="position: relative;">
+                                    <label for="login-password">Password</label>
+                                    <input type="password" name="password" id="login-password" class="form-control" required>
+                                    <div class="ver">
+                                        <img src="https://static.thenounproject.com/png/1035969-200.png" id="eyeicon-login" class="ver-icon" alt="Mostrar/Ocultar contraseña">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <br><a href="<?= base_url('/forgotpassword') ?>">¿Olvidaste tu contraseña?</a></br>
+                                <a href="#" class="toggle-link" onclick="flipCard()">Crear cuenta nueva</a>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
-                    </form>
-                    <div class="text-center mt-3">
-                        <br><a href="<?= base_url('/forgotpassword') ?>">¿Olvidaste tu contraseña?</a></br>
-                        <a href="#" class="toggle-link" onclick="flipCard()">Crear cuenta nueva</a>
                     </div>
                 </div>
             </div>
