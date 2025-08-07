@@ -172,47 +172,44 @@
             console.log("SDK de PayPal cargado exitosamente. Renderizando botones...");
 
             paypal.Buttons({
-                createOrder: (data, actions) => {
-                    console.log("Creando orden de PayPal...");
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: '100.00'
-                            }
-                        }]
-                    });
+    createOrder: function(data, actions) {
+        console.log("Creando orden de PayPal...");
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '10.00'
+                }
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        console.log("Pago aprobado. Capturando transacción...");
+        return actions.order.capture().then(function(details) {
+            console.log('Transacción completada por ' + details.payer.name.given_name);
+
+            // Guardar en base de datos
+            fetch('/home/guardar_compra', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                onApprove: (data, actions) => {
-                    console.log("Pago aprobado. Capturando transacción...");
-                    return actions.order.capture().then((details) => {
-                        fetch('<?= base_url("home/guardar_compra") ?>', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                orderID: data.orderID,
-                                payerID: data.payerID,
-                                paymentID: details.id,
-                                status: details.status,
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(serverData => {
-                            if (serverData.status === 'success') {
-                                successModal.show();
-                                setTimeout(() => {
-                                    window.location.href = '<?= base_url("loginobtener") ?>';
-                                }, 3000);
-                            } else {
-                                showErrorMessage('⚠️ Error al guardar la compra en la base de datos.');
-                                console.error('Error del servidor:', serverData.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error en la llamada al servidor:', error);
-                            showErrorMessage('⚠️ Error de conexión. El pago se realizó, pero no pudimos registrarlo.');
-                        });
+                body: JSON.stringify({
+                    producto: 'Sensor de Gas',
+                    monto: details.purchase_units[0].amount.value
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error del servidor: " + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Compra guardada exitosamente.');
+            })
+            .catch(error => {
+                console.error('Error al guardar la compra:', error);
+            });
                     });
                 },
                 onCancel: () => {
