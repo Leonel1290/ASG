@@ -2,200 +2,212 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Confirmar Compra</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmar Compra | AgainSafeGas</title>
+
+  <!-- Bootstrap & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Icono -->
+  <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
+
+  <!-- PayPal -->
+  <script src="https://www.paypal.com/sdk/js?client-id=Aaf4oThh4f97w4hkRqUL7QgtSSHKTpruCpklUqcwWhotqUyLbCMnGXQgwqNEvv-LZ9TnVHTdIH5FECk0&currency=USD"></script>
+
+  <!-- PWA -->
+  <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ASG">
+
+  <!-- Estilos personalizados -->
   <style>
     body {
-      background-color: #1E3D59;
+      background-color: #0d1117;
       font-family: 'Segoe UI', sans-serif;
-      color: #333;
+      color: #e6edf3;
       margin: 0;
-      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     .checkout-container {
+      flex: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 2rem;
     }
 
-    .product-card {
-      background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      max-width: 400px;
+    .checkout-card {
+      background-color: #161b22;
+      border-radius: 0.75rem;
+      padding: 2.5rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      max-width: 500px;
       width: 100%;
       text-align: center;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    .product-card img {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 20px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .product-card h2 {
-      margin-bottom: 10px;
-      color: #007bff;
+    .checkout-card h2 {
+      color: #58a6ff;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
     }
 
-    .product-card p {
-      font-size: 18px;
-      margin-bottom: 20px;
+    .checkout-card img {
+      max-width: 140px;
+      margin-bottom: 1.5rem;
     }
 
-    .price {
-      font-size: 24px;
-      color: #28a745;
-      margin-bottom: 20px;
+    .checkout-card p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
     }
 
     #paypal-button-container {
-      margin-top: 20px;
+      margin-bottom: 1.5rem;
     }
 
-    .footer {
-      margin-top: 50px;
-      text-align: center;
-      color: #aaa;
-      font-size: 14px;
+    .error-message {
+      color: #f87171;
+      font-weight: bold;
+      margin-top: 1rem;
     }
 
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.4s ease, visibility 0.4s;
-    }
-
-    .modal.show {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    .modal-content {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      width: 300px;
-      color: #333;
-    }
-
-    .modal-content h3 {
-      margin: 0;
-      color: #28a745;
-    }
-
-    .modal-content button {
-      margin-top: 20px;
-      background: #007bff;
-      color: #fff;
+    .btn-back {
+      background-color: #2d333b;
+      color: #e6edf3;
       border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
+      border-radius: 0.375rem;
+      padding: 0.6rem 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #21262d;
+      color: #fff;
+    }
+
+    /* Modal personalizado */
+    .modal-content {
+      background-color: #1c2128;
+      color: #c9d1d9;
+    }
+
+    .modal-title {
+      color: #2ea043;
+    }
+
+    .btn-primary {
+      background-color: #238636;
+      border-color: #238636;
+    }
+
+    .btn-primary:hover {
+      background-color: #2ea043;
+      border-color: #2ea043;
     }
   </style>
 </head>
+
 <body>
 
-<!-- Botón volver -->
-<button class="btn btn-outline-light position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#logoutModal">
-  <i class="fas fa-sign-out-alt"></i> Volver al Inicio
-</button>
+  <div class="checkout-container">
+    <div class="checkout-card">
+      <h2>Confirmar Compra</h2>
+      <img src="<?= base_url('/imagenes/detector.png'); ?>" alt="Detector ASG">
+      <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
+      
+      <div id="paypal-button-container"></div>
+      <div id="error-message" class="error-message"></div>
 
-<!-- Modal de Confirmación -->
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white">
-      <div class="modal-header border-0">
-        <h5 class="modal-title" id="logoutModalLabel">¿Deseas volver?</h5>
-        <a href="<?= base_url('logout') ?>" class="btn btn-danger">Volver</a>
+      <button class="btn btn-back mt-3" onclick="window.history.back();">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Éxito -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
+        </div>
+        <div class="modal-footer">
+          <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- FontAwesome & Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<div class="checkout-container">
-  <div class="product-card">
-    <img src="https://www.rosarioseguridad.com.ar/admin/productos/3fbd1467fa1e6f1747aa1651f7545fc0.jpg" alt="Producto">
-    <h2>Detector de Gas</h2>
-    <p>Dispositivo inteligente para monitoreo de gas en tiempo real.</p>
-    <div class="price">$100.00 USD</div>
+  <script>
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+      keyboard: false
+    });
 
-    <div id="paypal-button-container"></div>
-  </div>
-
-  <div class="footer">
-    &copy; 2024 AgainSafeGas Solutions | Todos los derechos reservados.
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal" id="modalExito">
-  <div class="modal-content">
-    <h3>✅ ¡Pago realizado con éxito!</h3>
-    <button id="cerrarModal">Aceptar</button>
-  </div>
-</div>
-
-<script>
-  const modal = document.getElementById('modalExito');
-  const cerrarModal = document.getElementById('cerrarModal');
-
-  paypal.Buttons({
-    createOrder: function (data, actions) {
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: '100.00'
-          }
-        }]
-      });
-    },
-    onApprove: function (data, actions) {
-      return actions.order.capture().then(function (details) {
-        modal.classList.add('show');
-
-        // Redirige al login tras 2 segundos
-        setTimeout(() => {
-          window.location.href = '<?= base_url("login") ?>';
-        }, 2000);
-      });
-    },
-    onCancel: function (data) {
-      alert('❌ Pago cancelado');
-    },
-    onError: function (err) {
-      alert('⚠️ Error al procesar el pago');
-      console.error(err);
+    function showErrorMessage(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.innerText = message;
     }
-  }).render('#paypal-button-container');
 
-  cerrarModal.addEventListener('click', () => {
-    modal.classList.remove('show');
-    window.location.href = '<?= base_url("login") ?>';
-  });
-</script>
+    paypal.Buttons({
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '100.00'
+            }
+          }]
+        });
+      },
+      onApprove: (data, actions) => {
+        return actions.order.capture().then((details) => {
+          successModal.show();
+          setTimeout(() => {
+            const modal = document.getElementById('successModal');
+            if (modal && modal.classList.contains('show')) {
+              window.location.href = '<?= base_url("loginobtener") ?>';
+            }
+          }, 3000);
+        });
+      },
+      onCancel: () => {
+        showErrorMessage('❌ El pago fue cancelado.');
+      },
+      onError: (err) => {
+        console.error('Error en la transacción:', err);
+        showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+      }
+    }).render('#paypal-button-container');
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+          .then(reg => console.log('ServiceWorker registrado:', reg.scope))
+          .catch(err => console.error('Fallo en el registro del ServiceWorker:', err));
+      });
+    }
+  </script>
 
 </body>
 </html>
