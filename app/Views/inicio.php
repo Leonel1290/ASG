@@ -146,7 +146,7 @@
             box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
         }
 
-        /* --- Estilos del Modal --- */
+        /* --- Estilos del Modal de App --- */
         .modal-body {
             position: relative;
             background-color: black;
@@ -181,10 +181,6 @@
             height: 500px; /* Ajusta según el tamaño de tus imágenes */
             margin: 20px auto;
         }
-        .modal-title{
-            background_color: black;
-            color-font: white;
-        }
 
         .image {
             position: absolute;
@@ -193,7 +189,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 1s ease-in-out;
         }
         .image.active {
             opacity: 1;
@@ -217,6 +213,23 @@
 
         .btn-circle:hover {
             background-color: #218838;
+        }
+
+        /* Modificaciones del modal de simulación */
+        #simulacionModal .modal-header {
+            background-color: #000;
+            color: #fff;
+            border-bottom: 1px solid #333;
+        }
+        #simulacionModal .modal-body {
+            background-color: #000;
+            color: #fff;
+        }
+        #simulacionModal .modal-content {
+            background-color: #000;
+        }
+        #simulacionModal .btn-close {
+            filter: invert(1);
         }
     </style>
 </head>
@@ -330,7 +343,7 @@
                 <h5 class="modal-title" id="simulacionModalLabel">Simulación de Fuga de Gas</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
+            <div class="modal-body text-center d-flex flex-column justify-content-between align-items-center">
                 <div class="image-container">
                     <img id="frame-1" class="image active" src="<?= base_url('/imagenes/frame_1.jpg'); ?>" alt="Garrafa sin fuga">
                     <img id="frame-2" class="image" src="<?= base_url('/imagenes/frame_2.jpg'); ?>" alt="Fuga de gas">
