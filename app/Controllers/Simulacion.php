@@ -8,7 +8,6 @@ class Simulacion extends Controller
 {
     public function index()
     {
-        // Puedes pasar datos a la vista si es necesario
-        return view('simulacion_modal');
+        return view('simulacion_simple');
     }
 }

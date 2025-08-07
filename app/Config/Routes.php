@@ -6,7 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
-$routes->get('/simulacion', 'Simulacion::index');
+// ... tus otras rutas
+$routes->get('/simulacion-interactiva', 'Simulacion::index');
 // --- REGISTRATION AND LOGIN ROUTES (ADJUSTED FOR VERIFICATION) ---
 
 // Route to display the registration form
