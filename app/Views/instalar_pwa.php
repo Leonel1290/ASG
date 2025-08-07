@@ -50,6 +50,12 @@
         .hidden {
             display: none;
         }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -63,91 +69,15 @@
             Lleva la seguridad de tu hogar directamente a tu dispositivo. Instala nuestra aplicación para un acceso rápido y notificaciones instantáneas, ¡como una app nativa!
         </p>
         
-        <button id="installButton" class="btn hidden">
-            Descargar e Instalar App
-        </button>
-        
-        <button id="openButton" class="btn hidden">
-            Abrir Aplicación
-        </button>
-        
-        <a id="browserInstallLink" href="<?= current_url(); ?>" target="_blank" class="btn hidden">
-            Descargar en Navegador
-        </a>
+        <div class="button-group">
+            <a href="https://pwa-1s1m.onrender.com/instalar-pwa" class="btn" target="_blank">
+                Descargar e Instalar App
+            </a>
+            <a href="https://pwa-1s1m.onrender.com" class="btn" target="_blank">
+                Abrir App
+            </a>
+        </div>
     </div>
 
-    <script>
-        // Detección si estamos en la PWA
-        function isRunningInPWA() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone ||
-                   document.referrer.includes('android-app://');
-        }
-
-        // Detección si la PWA está instalada
-        function isPWAInstalled() {
-            // Para Chrome/Edge
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                return true;
-            }
-            // Para Safari iOS
-            if (window.navigator.standalone) {
-                return true;
-            }
-            return false;
-        }
-
-        // Redirigir a la PWA
-        function openPWA() {
-            // Usa tu URL de la PWA o un deep link
-            window.location.href = 'https://tudominio.com'; // CAMBIA ESTO
-        }
-
-        // Inicialización
-        function init() {
-            const installButton = document.getElementById('installButton');
-            const openButton = document.getElementById('openButton');
-            const browserInstallLink = document.getElementById('browserInstallLink');
-            
-            // Si estamos en la PWA, redirigir al inicio
-            if (isRunningInPWA()) {
-                window.location.href = '/';
-                return;
-            }
-            
-            // Si la PWA está instalada
-            if (isPWAInstalled()) {
-                openButton.classList.remove('hidden');
-                browserInstallLink.classList.remove('hidden');
-                installButton.classList.add('hidden');
-                
-                openButton.addEventListener('click', openPWA);
-                browserInstallLink.addEventListener('click', function() {
-                    // Esto ya abre en nueva pestaña por el target="_blank"
-                });
-            } 
-            // Si no está instalada pero es compatible
-            else if ('BeforeInstallPromptEvent' in window) {
-                installButton.classList.remove('hidden');
-                
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    const deferredPrompt = e;
-                    
-                    installButton.addEventListener('click', async () => {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            installButton.classList.add('hidden');
-                            openButton.classList.remove('hidden');
-                        }
-                    });
-                });
-            }
-        }
-
-        // Iniciar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
 </body>
 </html>
