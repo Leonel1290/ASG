@@ -188,10 +188,10 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 2s ease-in-out;
         }
         .image.active {
-            opacity: 1;
+            opacity: 0;
         }
     </style>
 </head>
