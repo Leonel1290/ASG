@@ -3,12 +3,16 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\ComprasModel;
 use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
+use CodeIgniter\API\ResponseTrait;
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
+    use ResponseTrait;
+
     // Puedes instanciar modelos aquí si los usas en múltiples métodos
     // protected $userModel;
     // protected $lecturasGasModel;
@@ -145,8 +149,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         if ($user) {
             if (!$user['is_active']) {
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
-                 return redirect()->back()->withInput();
+                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede recuperar la contraseña.');
+                return redirect()->back()->withInput();
             }
 
             $token = bin2hex(random_bytes(50));
@@ -169,8 +173,8 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             if (!$emailService->send()) {
                 $data = $emailService->printDebugger(['headers']);
                 log_message('error', 'Error enviando correo de recuperación a ' . $user['email'] . ': ' . $data);
-                 $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
-                 return redirect()->back()->withInput();
+                $session->setFlashdata('error', 'Hubo un error al enviar el correo de recuperación.');
+                return redirect()->back()->withInput();
             }
 
             if ($updated) {
@@ -196,14 +200,14 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
     {
         $userModel = new UserModel();
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                session()->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                return redirect()->to('/register');
             }
 
             return view('reset_password', ['token' => $token]);
@@ -222,14 +226,14 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         $password = $this->request->getPost('password');
 
         $user = $userModel->where('reset_token', $token)
-                          ->where('reset_expires >=', Time::now()->toDateTimeString())
-                          ->first();
+                         ->where('reset_expires >=', Time::now()->toDateTimeString())
+                         ->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                 $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
-                 return redirect()->to('/register');
+                $userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. No se puede resetear la contraseña.');
+                return redirect()->to('/register');
             }
 
             $userModel->update($user['id'], [
@@ -335,4 +339,57 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
     // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
     // public function verLecturas($mac) { ... }
+
+
+   public function guardar_compra()
+    {
+        // Verifica que la solicitud sea POST y que venga del frontend (AJAX).
+        if (!$this->request->isAJAX() || $this->request->getMethod() !== 'post') {
+            log_message('error', 'Petición no permitida en guardar_compra. Método: ' . $this->request->getMethod() . ', esAJAX: ' . ($this->request->isAJAX() ? 'true' : 'false'));
+            return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Método no permitido.']);
+        }
+
+        try {
+            // Obtén los datos enviados desde el JavaScript.
+            $data = $this->request->getJSON(true);
+
+            // Revisa si el usuario está logueado para asociar la compra a su ID.
+            $session = session();
+            $usuarioId = $session->get('id');
+
+            if (!$usuarioId) {
+                // Si el usuario no está logueado, responde con un error.
+                log_message('error', 'Intento de guardar compra sin usuario logueado.');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Usuario no logueado.']);
+            }
+            
+            // Carga el modelo de compras.
+            $comprasModel = new ComprasModel();
+
+            // Prepara los datos para la inserción.
+            $datosCompra = [
+                'usuario_id' => $usuarioId,
+                'order_id' => $data['orderID'],
+                'payer_id' => $data['payerID'],
+                'payment_id' => $data['paymentID'],
+                'status' => $data['status'],
+                'monto' => 100.00, // TODO: IMPORTANTE: Este valor debe ser el monto real del pago.
+                'fecha_compra' => date('Y-m-d H:i:s'),
+            ];
+
+            if ($comprasModel->insert($datosCompra)) {
+                // Si la inserción fue exitosa, respondemos al frontend.
+                log_message('info', 'Compra guardada exitosamente. Order ID: ' . $data['orderID']);
+                return $this->response->setJSON(['status' => 'success', 'message' => 'Compra guardada exitosamente.']);
+            } else {
+                // Si hubo un error en la inserción.
+                log_message('error', 'Error al guardar la compra en la base de datos. Order ID: ' . $data['orderID']);
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Error al guardar en la base de datos.']);
+            }
+        } catch (Exception $e) {
+            // Captura cualquier excepción que pueda ocurrir y la registra.
+            log_message('error', 'Excepción en guardar_compra: ' . $e->getMessage());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.']);
+        }
+    }
 }
