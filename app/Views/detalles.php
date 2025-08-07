@@ -227,20 +227,29 @@
             height: 125px;
             position: relative;
             overflow: hidden;
+        }
+
+        .gauge-arc {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-radius: 125px 125px 0 0;
             background: #e0e0e0;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
         }
 
         .gauge-fill {
-            height: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
             transform-origin: bottom center;
             transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             background: linear-gradient(90deg, var(--success-color), var(--warning-color), var(--danger-color));
             border-radius: 125px 125px 0 0;
-            position: absolute;
-            bottom: 0;
             transform: rotate(0deg); /* Estado inicial */
         }
         
@@ -309,7 +318,7 @@
                 width: 180px;
                 height: 90px;
             }
-            .gauge-fill {
+            .gauge-arc, .gauge-fill {
                 width: 180px;
                 height: 90px;
                 border-radius: 90px 90px 0 0;
@@ -336,7 +345,7 @@
             .card { background-color: rgba(30, 30, 30, 0.9); color: #f0f0f0; }
             h2 { -webkit-text-fill-color: #f0f0f0; }
             .section-title, .section-title i { color: #7b9cff; }
-            .gauge-display { background-color: #3a3a3a; }
+            .gauge-arc { background-color: #3a3a3a; }
             .gauge-value { color: #f0f0f0; }
             .gauge-center-circle, .gauge-pointer { background-color: #f0f0f0; }
         }
@@ -350,11 +359,7 @@
             <h2>Control de Válvula de Gas</h2>
             <div class="card">
                 <div class="card-body">
-                    <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger text-center pulse" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i><?= esc($error_message) ?>
-                        </div>
-                    <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
+                    <?php if (isset($dispositivo) && $dispositivo !== null): ?>
                         
                         <div class="card-section text-center">
                             <p class="section-title justify-content-center">
@@ -367,6 +372,7 @@
                             <p class="section-title justify-content-center"><i class="fas fa-tachometer-alt"></i>Nivel de Gas en Ambiente</p>
                             <div class="gauge-container">
                                 <div class="gauge-display">
+                                    <div class="gauge-arc"></div>
                                     <div class="gauge-fill" id="gaugeFill"></div>
                                     <div class="gauge-pointer" id="gaugePointer"></div>
                                     <span class="gauge-value" id="gasLevel">0%</span>
@@ -485,10 +491,12 @@ $(document).ready(function() {
                 }
             } else {
                 console.error('Error al obtener estado:', response.message);
+                // Muestra un toast en lugar de un cartel estático
                 showErrorToast('Error al obtener estado del dispositivo');
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Error de conexión:', textStatus, errorThrown);
+            // Muestra un toast en caso de fallo de conexión
             showErrorToast('Error de conexión con el servidor');
         });
     }
