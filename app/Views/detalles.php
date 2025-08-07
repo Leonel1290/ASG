@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Válvula de Gas | ASG</title>
+    <title>Control de Válvula | ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- PWA Metadata -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +15,6 @@
     <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- CSRF Protection -->
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
@@ -25,12 +23,13 @@
 
         :root {
             --primary-color: #4361ee;
+            --secondary-color: #48bfe3;
             --success-color: #4cc9f0;
-            --danger-color: #911b21ff;
+            --danger-color: #f72585;
             --warning-color: #f8961e;
             --dark-color: #212529;
             --light-color: #f8f9fa;
-            --gray-color: #ffffffff;
+            --gray-color: #6c757d;
             --border-radius: 16px;
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -62,13 +61,12 @@
         .card {
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 2.5rem;
             border: none;
             overflow: hidden;
             transition: var(--transition);
             backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.9);
         }
 
         .card:hover {
@@ -108,75 +106,65 @@
             border-radius: 2px;
         }
 
-        .card-title {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+        /* --- Secciones y encabezados mejorados --- */
+        .card-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-
-        .card-title i {
-            color: var(--primary-color);
-            font-size: 1.6rem;
-        }
-
-        .card-subtitle {
-            color: var(--gray-color);
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-
-        .card-subtitle i {
-            color: var(--gray-color);
-        }
-
-        .card-text {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 1rem;
-            gap: 0.75rem;
-        }
-
-        .card-text i {
-            color: var(--primary-color);
+            gap: 1rem;
             font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .section-title i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
         }
 
-        #estado-actual {
-            font-weight: 700;
-            transition: var(--transition);
-            padding: 0.25rem 0.75rem;
+        /* --- Indicador de estado de la válvula --- */
+        #status-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 0.75rem;
             border-radius: 50px;
+            transition: var(--transition);
         }
 
-        #estado-actual.abierta {
+        #status-display .status-icon {
+            font-size: 1.5rem;
+        }
+
+        #status-display.abierta {
             color: var(--success-color);
             background-color: rgba(76, 201, 240, 0.1);
         }
 
-        #estado-actual.cerrada {
+        #status-display.cerrada {
             color: var(--danger-color);
             background-color: rgba(247, 37, 133, 0.1);
         }
 
-        .btn-group {
+        /* --- Botones de control --- */
+        .btn-group-responsive {
             display: flex;
-            gap: 1.25rem;
+            flex-direction: column;
+            gap: 1rem;
             justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
         }
 
         .btn {
@@ -217,54 +205,40 @@
             font-size: 1.2rem;
         }
 
-        .btn-success {
-            background-color: var(--success-color);
-        }
+        .btn-success { background-color: var(--success-color); color: #fff; }
+        .btn-success:hover { background-color: #3ab7d8; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(76, 201, 240, 0.3); }
 
-        .btn-success:hover {
-            background-color: #3ab7d8;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(76, 201, 240, 0.3);
-        }
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .btn-danger:hover { background-color: #e51721ff; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(247, 37, 133, 0.3); }
 
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
+        .btn-secondary { background-color: var(--gray-color); color: #fff; }
+        .btn-secondary:hover { background-color: #5a6268; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3); }
 
-        .btn-danger:hover {
-            background-color: #e51721ff;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(247, 37, 133, 0.3);
-        }
-
-        .btn-primary-custom {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .btn-primary-custom:hover {
-            background-color: #3a56d4;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
-        }
-
-        /* Estilos del Velocímetro Mejorado */
+        /* --- Velocímetro mejorado --- */
         .gauge-container {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 2.5rem;
             position: relative;
+            margin-bottom: 2.5rem;
+            text-align: center;
         }
 
-        .gauge {
-            width: 220px;
-            height: 110px;
-            overflow: hidden;
+        .gauge-display {
+            width: 250px;
+            height: 125px;
             position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-arc {
+            position: absolute;
+            bottom: 0;
+            width: 250px;
+            height: 125px;
+            border-radius: 125px 125px 0 0;
             background: #e0e0e0;
-            border-radius: 110px 110px 0 0;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
         }
 
@@ -273,32 +247,47 @@
             width: 100%;
             transform-origin: bottom center;
             transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            background: linear-gradient(90deg, 
-                var(--success-color) 0%, 
-                var(--warning-color) 50%, 
-                var(--danger-color) 100%);
-            border-radius: 110px 110px 0 0;
+            background: linear-gradient(90deg, var(--success-color), var(--warning-color), var(--danger-color));
+            border-radius: 125px 125px 0 0;
             position: absolute;
             bottom: 0;
         }
 
-        .gauge-cover {
-            width: 160px;
-            height: 80px;
-            background: #ffffff;
-            border-radius: 80px 80px 0 0;
+        .gauge-pointer {
             position: absolute;
             bottom: 0;
             left: 50%;
+            transform-origin: bottom center;
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            width: 4px;
+            height: 120px;
+            background-color: var(--dark-color);
+            border-radius: 2px;
+            z-index: 2;
+        }
+
+        .gauge-center-circle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: var(--dark-color);
+            border-radius: 50%;
             transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            z-index: 3;
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: 700;
             color: var(--dark-color);
-            font-weight: bold;
-            font-size: 1.8rem;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            z-index: 1;
+            transition: color 0.5s ease;
+            z-index: 4;
         }
 
         .gauge-label {
@@ -308,25 +297,12 @@
             color: var(--gray-color);
             font-weight: 500;
         }
+        
+        /* --- Efectos de alerta --- */
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        .gauge-level {
-            font-size: 1.8rem;
-            font-weight: bold;
-            transition: color 0.5s ease;
-        }
-
-        /* Efecto de pulso para alertas */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Tooltip personalizado */
+        /* --- Tooltips personalizados --- */
         .tooltip-custom {
             position: relative;
             display: inline-block;
@@ -355,102 +331,51 @@
             opacity: 1;
         }
 
-        /* Media Queries */
+        /* --- Media Queries --- */
         @media (max-width: 768px) {
             .container.main-content {
-                margin-top: 1rem;
                 padding: 0 1rem;
             }
-            
             .card {
                 padding: 1.5rem;
             }
-            
             h2 {
                 font-size: 2rem;
-                margin-bottom: 2rem;
             }
-            
-            h2::after {
-                width: 60px;
-                height: 3px;
-                bottom: -0.75rem;
-            }
-            
-            .card-title {
-                font-size: 1.5rem;
-            }
-            
-            .card-title i {
-                font-size: 1.3rem;
-            }
-            
-            .card-subtitle {
-                font-size: 1rem;
-                margin-bottom: 1.25rem;
-            }
-            
-            .card-text {
-                font-size: 1.1rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 0.75rem;
-                font-size: 1rem;
-            }
-            
-            .gauge {
+            .gauge-display {
                 width: 180px;
                 height: 90px;
             }
-            
-            .gauge-cover {
-                width: 130px;
-                height: 65px;
-                font-size: 1.5rem;
+            .gauge-arc, .gauge-fill {
+                width: 180px;
+                height: 90px;
+                border-radius: 90px 90px 0 0;
+            }
+            .gauge-pointer {
+                height: 80px;
+            }
+            .gauge-center-circle {
+                width: 16px;
+                height: 16px;
+            }
+            .gauge-value {
+                font-size: 2rem;
+            }
+            .btn {
+                min-width: unset;
+                width: 100%;
             }
         }
 
-        /* Dark mode support */
+        /* --- Dark mode support --- */
         @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
-                color: #f0f0f0;
-            }
-            
-            .card {
-                background-color: rgba(30, 30, 30, 0.9);
-                color: #f0f0f0;
-            }
-            
-            .card-title, .card-title i {
-                color: #7b9cff;
-            }
-            
-            .card-subtitle, .card-subtitle i {
-                color: #a0a0a0;
-            }
-            
-            .gauge-cover {
-                background-color: #2a2a2a;
-                color: #f0f0f0;
-            }
-            
-            .gauge {
-                background-color: #3a3a3a;
-            }
-            
-            .alert {
-                background-color: #2a2a2a;
-                color: #f0f0f0;
-            }
+            body { background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%); color: #f0f0f0; }
+            .card { background-color: rgba(30, 30, 30, 0.9); color: #f0f0f0; }
+            h2 { -webkit-text-fill-color: #f0f0f0; }
+            .section-title, .section-title i { color: #7b9cff; }
+            .gauge-arc { background-color: #3a3a3a; }
+            .gauge-value { color: #f0f0f0; }
+            .gauge-center-circle, .gauge-pointer { background-color: #f0f0f0; }
         }
     </style>
 </head>
@@ -463,48 +388,58 @@
             <div class="card">
                 <div class="card-body">
                     <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger pulse" role="alert">
-                            <i class="fas fa-exclamation-triangle"></i><?= esc($error_message) ?>
+                        <div class="alert alert-danger text-center pulse" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i><?= esc($error_message) ?>
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
-                        <h5 class="card-title" id="nombre-dispositivo">
-                            <i class="fas fa-gas-pump"></i>Dispositivo: <?= esc($dispositivo->nombre) ?>
-                        </h5>
-                        <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">
-                            <i class="fas fa-map-marker-alt"></i>Ubicación: <?= esc($dispositivo->ubicacion) ?>
-                        </h6>
                         
-                        <div class="gauge-container">
-                            <div class="gauge">
-                                <div class="gauge-fill" id="gaugeFill"></div>
-                                <div class="gauge-cover">
-                                    <span id="gasLevel">0%</span>
+                        <div class="card-section text-center">
+                            <p class="section-title justify-content-center">
+                                <i class="fas fa-gas-pump"></i><span><?= esc($dispositivo->nombre) ?></span>
+                            </p>
+                            <p class="text-muted mb-0"><i class="fas fa-map-marker-alt me-2"></i><?= esc($dispositivo->ubicacion) ?></p>
+                        </div>
+                        
+                        <div class="card-section text-center">
+                            <p class="section-title justify-content-center"><i class="fas fa-tachometer-alt"></i>Nivel de Gas en Ambiente</p>
+                            <div class="gauge-container">
+                                <div class="gauge-display">
+                                    <div class="gauge-arc"></div>
+                                    <div class="gauge-fill" id="gaugeFill"></div>
+                                    <div class="gauge-pointer" id="gaugePointer"></div>
+                                    <span class="gauge-value" id="gasLevel">0%</span>
+                                    <div class="gauge-center-circle"></div>
                                 </div>
                             </div>
-                            <div class="gauge-label">Nivel de Gas en Ambiente</div>
                         </div>
 
-                        <p class="card-text">
-                            <i class="fas fa-toggle-on"></i>Estado actual: 
-                            <span id="estado-actual" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>">
-                                <?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?>
-                            </span>
-                        </p>
-                        
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
-                                <i class="fas fa-fan"></i>Abrir Válvula
-                            </button>
-                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
-                                <i class="fas fa-stop"></i>Cerrar Válvula
-                            </button>
-                            <button type="button" class="btn btn-primary-custom" id="btn-perfil" aria-label="Ir al perfil de usuario">
-                                <i class="fas fa-user-cog"></i>Configuración
-                            </button>
+                        <div class="card-section text-center">
+                            <p class="section-title justify-content-center"><i class="fas fa-cogs"></i>Control de Válvula</p>
+                            <div id="status-display" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>">
+                                <i class="status-icon fas fa-toggle-on"></i>
+                                <span id="estado-actual"><?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?></span>
+                            </div>
+                            <div class="btn-group-responsive mt-4">
+                                <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
+                                    <i class="fas fa-fan"></i>Abrir Válvula
+                                </button>
+                                <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
+                                    <i class="fas fa-stop"></i>Cerrar Válvula
+                                </button>
+                            </div>
                         </div>
+
+                        <div class="card-section text-center">
+                            <div class="btn-group-responsive">
+                                <button type="button" class="btn btn-secondary" id="btn-perfil" aria-label="Ir al perfil de usuario">
+                                    <i class="fas fa-user-cog"></i>Configuración
+                                </button>
+                            </div>
+                        </div>
+
                     <?php else: ?>
-                        <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle"></i>No se pudo cargar la información del dispositivo. Por favor, verifique la conexión o seleccione otro dispositivo.
+                        <div class="alert alert-info text-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>No se pudo cargar la información del dispositivo. Por favor, verifique la conexión o seleccione otro dispositivo.
                         </div>
                     <?php endif; ?>
                 </div>
@@ -519,8 +454,10 @@
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>'; 
+    const statusDisplay = $('#status-display');
     const estadoActualSpan = $('#estado-actual');
     const gaugeFill = $('#gaugeFill');
+    const gaugePointer = $('#gaugePointer');
     const gasLevelSpan = $('#gasLevel');
     const btnAbrir = $('#btn-abrir');
     const btnCerrar = $('#btn-cerrar');
@@ -533,41 +470,41 @@ $(document).ready(function() {
     
     function actualizarEstadoUI(estado) {
         estadoActualSpan.text(estado ? 'Abierta' : 'Cerrada');
-        if (estado) {
-            estadoActualSpan.removeClass('cerrada').addClass('abierta');
-            btnAbrir.prop('disabled', true).css('opacity', 0.7);
-            btnCerrar.prop('disabled', false).css('opacity', 1);
-        } else {
-            estadoActualSpan.removeClass('abierta').addClass('cerrada');
-            btnAbrir.prop('disabled', false).css('opacity', 1);
-            btnCerrar.prop('disabled', true).css('opacity', 0.7);
-        }
+        statusDisplay.removeClass('abierta cerrada').addClass(estado ? 'abierta' : 'cerrada');
+        
+        btnAbrir.prop('disabled', estado).css('opacity', estado ? 0.7 : 1);
+        btnCerrar.prop('disabled', !estado).css('opacity', !estado ? 0.7 : 1);
     }
 
     function updateGauge(level) {
         level = Math.max(0, Math.min(100, parseFloat(level))); 
         const rotation = (level / 100) * 180;
+        
+        // Animación del velocímetro
         gaugeFill.css('transform', `rotate(${rotation}deg)`);
+        gaugePointer.css('transform', `rotate(${rotation}deg)`);
+        
+        // Actualizar valor de texto
         gasLevelSpan.text(`${level.toFixed(1)}%`); 
 
-        // Actualizar colores según el nivel
+        // Actualizar colores según el nivel de riesgo
+        let textColor;
         if (level < 30) {
-            gasLevelSpan.css('color', 'var(--success-color)');
+            textColor = 'var(--success-color)';
         } else if (level < 70) {
-            gasLevelSpan.css('color', 'var(--warning-color)');
+            textColor = 'var(--warning-color)';
         } else {
-            gasLevelSpan.css('color', 'var(--danger-color)');
-            
-            // Mostrar alerta si el nivel es peligroso
-            if (level > 80 && !estadoActualSpan.hasClass('cerrada')) {
+            textColor = 'var(--danger-color)';
+            if (level > 80 && !statusDisplay.hasClass('cerrada')) {
                 showGasAlert(level);
             }
         }
+        gasLevelSpan.css('color', textColor);
     }
     
     function showGasAlert(level) {
         Swal.fire({
-            title: '¡Nivel de Gas Peligroso!',
+            title: '⚠️ Nivel de Gas Peligroso',
             text: `El nivel de gas ha alcanzado ${level.toFixed(1)}%. Se recomienda cerrar la válvula inmediatamente.`,
             icon: 'error',
             confirmButtonText: 'Entendido',
@@ -597,36 +534,28 @@ $(document).ready(function() {
             showErrorToast('Error de conexión con el servidor');
         });
     }
-
+    
     // Cargar estado inicial
     fetchDeviceState();
     
     // Eventos de botones
     $('#btn-abrir').click(function() {
-        controlarServo(mac, 1, 'Válvula abierta correctamente');
+        controlarServo(mac, 1, 'Válvula abierta correctamente', btnAbrir, '<i class="fas fa-fan"></i> Abrir Válvula');
     });
     
     $('#btn-cerrar').click(function() {
-        controlarServo(mac, 0, 'Válvula cerrada correctamente');
+        controlarServo(mac, 0, 'Válvula cerrada correctamente', btnCerrar, '<i class="fas fa-stop"></i> Cerrar Válvula');
     });
 
     $('#btn-perfil').click(function() {
         window.location.href = '<?= base_url('perfil') ?>';
     });
     
-    function controlarServo(mac, estado, successMessage) {
-        const postData = {
-            mac: mac,
-            estado: estado
-        };
-        
-        if (csrfName && csrfHash) {
-            postData[csrfName] = csrfHash;
-        }
+    function controlarServo(mac, estado, successMessage, button, originalText) {
+        const postData = { mac: mac, estado: estado };
+        if (csrfName && csrfHash) { postData[csrfName] = csrfHash; }
 
-        // Mostrar loader
-        const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
-        buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+        button.html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
         
         $.post('/servo/actualizarEstado', postData)
             .done(function(response) {
@@ -643,11 +572,34 @@ $(document).ready(function() {
                 showErrorToast('Error de conexión con el servidor');
             })
             .always(function() {
-                buttons[0].html(estado ? 
-                    '<i class="fas fa-fan"></i>Abrir Válvula' : 
-                    '<i class="fas fa-stop"></i>Cerrar Válvula').prop('disabled', estado);
+                button.html(originalText).prop('disabled', estado === 1);
                 fetchDeviceState();
             });
+    }
+    
+    // Función para mostrar toasts de éxito y error
+    function showSuccessToast(message) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
+
+    function showErrorToast(message) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
     }
     
     // Actualizar cada 5 segundos
