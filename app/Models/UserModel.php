@@ -70,4 +70,9 @@ public function isCommonPassword($password)
     
     return in_array(strtolower($password), $commonPasswords);
 }
+public function findWithPassword($id)
+{
+    return $this->select('id, nombre, email, password')
+                ->find($id);
+}
 }
