@@ -25,7 +25,7 @@
         </div>
     <?php endif; ?>
 
-          <form action="<?php echo base_url('/login') ?>" method="POST">
+          <form action="<?php echo base_url('/loginobtener') ?>" method="POST">
             <div class="form-group">
               <label for="email">Email</label>
               <input type="email" name="email" id="email" class="form-control" required>
