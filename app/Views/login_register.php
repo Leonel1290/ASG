@@ -31,7 +31,7 @@
         .card-flip.flipped {
             transform: rotateY(180deg);
         }
-        /* Estilos ajustados para el efecto de cristal esmerilado */
+        /* Estilos modificados para un efecto de vidrio esmerilado más transparente */
         .card-front, .card-back {
             position: absolute;
             width: 100%;
@@ -43,13 +43,14 @@
             align-items: center;
             padding: 20px;
             
-            background: rgba(255, 255, 255, 0.2); /* Fondo ligeramente transparente */
+            /* Quitamos el fondo y la sombra para hacerlo más transparente */
+            background: rgba(255, 255, 255, 0); /* Fondo completamente transparente */
             backdrop-filter: blur(10px); /* Efecto de difuminado al fondo */
             -webkit-backdrop-filter: blur(10px); /* Compatibilidad con navegadores WebKit */
             
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra sutil para definir los bordes */
+            box-shadow: none; /* Quitamos la sombra */
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.18); /* Un borde de color claro para el efecto de vidrio */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Un borde casi invisible para el efecto de "vidrio" */
         }
         .card-back {
             transform: rotateY(180deg);
