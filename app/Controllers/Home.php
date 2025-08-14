@@ -340,4 +340,9 @@ public function instalarPWA()
 
     // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
     // public function verLecturas($mac) { ... }
+     // Método agregado para la vista de simulación
+    public function simulacion()
+    {
+        return view('simulacion');
+    }
 }
