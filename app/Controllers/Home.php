@@ -392,4 +392,8 @@ class Home extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.']);
         }
     }
+        public function simulacion()
+    {
+        return view('simulacion');
+    }
 }

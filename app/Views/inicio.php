@@ -268,6 +268,8 @@
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
+                    <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom mt-4">Simulación</a>
+                </div>
                     <button class="btn btn-outline-light mt-3 ms-2" onclick="probarAlerta()">🔊 Probar Alarma</button>
                     <button class="btn btn-outline-light mt-3 ms-2" data-bs-toggle="modal" data-bs-target="#simulacionModal">⚡ Simular Actuación</button>
                     <audio id="alarmaAudio" src="<?= base_url('/audio/alarma.mp3') ?>" preload="auto"></audio>
