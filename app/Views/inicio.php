@@ -270,14 +270,12 @@
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                     <button class="btn btn-outline-light mt-3 ms-2" onclick="probarAlerta()">🔊 Probar Alarma</button>
-                    <button class="btn btn-outline-light mt-3 ms-2" data-bs-toggle="modal" data-bs-target="#simulacionModal">⚡ Simular Actuación</button>
-                    <audio id="alarmaAudio" src="<?= base_url('/audio/alarma.mp3') ?>" preload="auto"></audio>
-                </div>
+                    </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de fuga de gas"
-                         class="hero-img img-fluid"
-                         loading="lazy">
+                             alt="Ilustración de fuga de gas"
+                             class="hero-img img-fluid"
+                             loading="lazy">
                 </div>
             </div>
         </div>
@@ -353,6 +351,7 @@
                 <button id="animationButton" class="btn btn-circle mt-3">
                     <i class="fas fa-check"></i>
                 </button>
+                 <audio id="alarmaAudio" src="<?= base_url('/audio/alarma.mp3') ?>" preload="auto"></audio>
             </div>
         </div>
     </div>
@@ -388,10 +387,14 @@
     function actualizarContador() {
         if (contador < objetivo) {
             contador += Math.ceil((objetivo - contador) / 15);
-            contadorElemento.textContent = contador;
+            if (contadorElemento) {
+                contadorElemento.textContent = contador;
+            }
             setTimeout(actualizarContador, 30);
         } else {
-            contadorElemento.textContent = objetivo;
+            if (contadorElemento) {
+                contadorElemento.textContent = objetivo;
+            }
         }
     }
 
@@ -452,32 +455,35 @@
         frame3.classList.remove('active');
         alarmaAudio.pause();
         alarmaAudio.currentTime = 0;
+        animationButton.innerHTML = '<i class="fas fa-play"></i>'; // Cambiar el ícono a "play"
     }
 
-    animationButton.addEventListener('mousedown', () => {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        // Transición de frame_1 a frame_2
-        frame1.classList.remove('active');
-        frame2.classList.add('active');
-        
-        // Iniciar la alarma al pasar a frame_2
-        alarmaAudio.loop = true; // Para que se repita
-        alarmaAudio.play();
-
-        // Temporizador para pasar a frame_3 después de 2 segundos
-        animationTimeout = setTimeout(() => {
-            frame2.classList.remove('active');
-            frame3.classList.add('active');
-            alarmaAudio.pause(); // Detener la alarma
-            alarmaAudio.currentTime = 0; // Reiniciar el audio
-        }, 2000);
-    });
-
-    animationButton.addEventListener('mouseup', () => {
+    animationButton.addEventListener('click', () => {
         if (isAnimating) {
+            // Detener la animación si ya está en curso
             resetAnimation();
+        } else {
+            // Iniciar la animación
+            isAnimating = true;
+            animationButton.innerHTML = '<i class="fas fa-stop"></i>'; // Cambiar el ícono a "stop"
+
+            // Transición de frame_1 a frame_2
+            frame1.classList.remove('active');
+            frame2.classList.add('active');
+
+            // Iniciar la alarma al pasar a frame_2
+            alarmaAudio.loop = true;
+            alarmaAudio.play();
+
+            // Temporizador para pasar a frame_3 después de 2 segundos
+            animationTimeout = setTimeout(() => {
+                frame2.classList.remove('active');
+                frame3.classList.add('active');
+                alarmaAudio.pause(); // Detener la alarma
+                alarmaAudio.currentTime = 0; // Reiniciar el audio
+                isAnimating = false;
+                animationButton.innerHTML = '<i class="fas fa-check"></i>'; // O cambiar a un ícono de "listo"
+            }, 2000);
         }
     });
 </script>
