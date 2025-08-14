@@ -269,13 +269,12 @@
                     <div class="hero-line"></div>
                     <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
                     <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
-                    <button class="btn btn-outline-light mt-3 ms-2" onclick="probarAlerta()">🔊 Probar Alarma</button>
-                    </div>
+                </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                             alt="Ilustración de fuga de gas"
-                             class="hero-img img-fluid"
-                             loading="lazy">
+                         alt="Ilustración de fuga de gas"
+                         class="hero-img img-fluid"
+                         loading="lazy">
                 </div>
             </div>
         </div>
@@ -334,159 +333,8 @@
     </div>
   </div>
 </div>
-
-<div class="modal fade" id="simulacionModal" tabindex="-1" aria-labelledby="simulacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="simulacionModalLabel">Simulación de Fuga de Gas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center d-flex flex-column justify-content-between align-items-center">
-                <div class="image-container">
-                    <img id="frame-1" class="image active" src="<?= base_url('/imagenes/frame_1.jpg'); ?>" alt="Garrafa sin fuga">
-                    <img id="frame-2" class="image" src="<?= base_url('/imagenes/frame_2.jpg'); ?>" alt="Fuga de gas">
-                    <img id="frame-3" class="image" src="<?= base_url('/imagenes/frame_3.jpg'); ?>" alt="Detector activo">
-                </div>
-                <button id="animationButton" class="btn btn-circle mt-3">
-                    <i class="fas fa-check"></i>
-                </button>
-                 <audio id="alarmaAudio" src="<?= base_url('/audio/alarma.mp3') ?>" preload="auto"></audio>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    // Smooth scroll
-    $(document).ready(function(){
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            const target = $($(this).attr('href'));
-            if(target.length) {
-                const offset = $('.navbar').outerHeight() + 10;
-                $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
-            }
-        });
-    });
-
-    // Probar sonido de alerta
-    function probarAlerta() {
-        const audio = document.getElementById('alarmaAudio');
-        audio.play();
-    }
-
-    // Contador animado de hogares protegidos
-    let contador = 0;
-    const objetivo = 3274;
-    const contadorElemento = document.getElementById("contador");
-
-    function actualizarContador() {
-        if (contador < objetivo) {
-            contador += Math.ceil((objetivo - contador) / 15);
-            if (contadorElemento) {
-                contadorElemento.textContent = contador;
-            }
-            setTimeout(actualizarContador, 30);
-        } else {
-            if (contadorElemento) {
-                contadorElemento.textContent = objetivo;
-            }
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", actualizarContador);
-</script>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                .then(registration => {
-                    console.log('ServiceWorker registrado con éxito:', registration.scope);
-                })
-                .catch(error => {
-                    console.log('Fallo el registro de ServiceWorker:', error);
-                });
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const appModal = document.getElementById('appModal');
-        const appIframe = document.getElementById('appIframe');
-
-        if (appModal && appIframe) {
-            appModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const url = button.getAttribute('data-url');
-                appIframe.src = url;
-            });
-
-            appModal.addEventListener('hidden.bs.modal', function () {
-                appIframe.src = '';
-            });
-        }
-    });
-
-    // Lógica de la animación de la garrafa dentro del modal
-    const simulacionModal = document.getElementById('simulacionModal');
-    const animationButton = document.getElementById('animationButton');
-    const frame1 = document.getElementById('frame-1');
-    const frame2 = document.getElementById('frame-2');
-    const frame3 = document.getElementById('frame-3');
-    const alarmaAudio = new Audio('<?= base_url('/audio/alarma.mp3') ?>');
-
-    let isAnimating = false;
-    let animationTimeout;
-
-    // Resetear la animación cuando el modal se oculta
-    simulacionModal.addEventListener('hidden.bs.modal', function () {
-        resetAnimation();
-    });
-
-    function resetAnimation() {
-        isAnimating = false;
-        clearTimeout(animationTimeout);
-        frame1.classList.add('active');
-        frame2.classList.remove('active');
-        frame3.classList.remove('active');
-        alarmaAudio.pause();
-        alarmaAudio.currentTime = 0;
-        animationButton.innerHTML = '<i class="fas fa-play"></i>'; // Cambiar el ícono a "play"
-    }
-
-    animationButton.addEventListener('click', () => {
-        if (isAnimating) {
-            // Detener la animación si ya está en curso
-            resetAnimation();
-        } else {
-            // Iniciar la animación
-            isAnimating = true;
-            animationButton.innerHTML = '<i class="fas fa-stop"></i>'; // Cambiar el ícono a "stop"
-
-            // Transición de frame_1 a frame_2
-            frame1.classList.remove('active');
-            frame2.classList.add('active');
-
-            // Iniciar la alarma al pasar a frame_2
-            alarmaAudio.loop = true;
-            alarmaAudio.play();
-
-            // Temporizador para pasar a frame_3 después de 2 segundos
-            animationTimeout = setTimeout(() => {
-                frame2.classList.remove('active');
-                frame3.classList.add('active');
-                alarmaAudio.pause(); // Detener la alarma
-                alarmaAudio.currentTime = 0; // Reiniciar el audio
-                isAnimating = false;
-                animationButton.innerHTML = '<i class="fas fa-check"></i>'; // O cambiar a un ícono de "listo"
-            }, 2000);
-        }
-    });
-</script>
 
 </body>
 </html>
