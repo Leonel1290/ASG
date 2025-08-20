@@ -286,6 +286,7 @@ $(document).ready(function() {
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
+    // Función para actualizar el estado del LED y los botones
     function actualizarEstadoUI(estado) {
         if (estado) {
             statusLed.removeClass('cerrada').addClass('abierta');
@@ -298,6 +299,7 @@ $(document).ready(function() {
         }
     }
 
+    // Función para actualizar el medidor de gas
     function updateGauge(level) {
         level = Math.max(0, Math.min(100, parseFloat(level)));
         const height = (level / 100) * 100;
@@ -319,6 +321,21 @@ $(document).ready(function() {
         }
     }
 
+    // Función principal para obtener los datos y actualizar la vista
+    function fetchDeviceState() {
+        $.get('/lecturas/obtenerUltimaLectura/' + mac, function(response) {
+            if (response.status === 'success') {
+                actualizarEstadoUI(response.estado_valvula); 
+                updateGauge(response.nivel_gas || 0); 
+            } else {
+                console.error('Error al obtener estado:', response.message);
+            }
+        }).fail(function() {
+            console.error('Error de conexión con el servidor');
+        });
+    }
+    
+    // Función para mostrar alertas de nivel de gas
     function showGasAlert(level) {
         Swal.fire({
             title: '¡Nivel de Gas Peligroso!',
@@ -331,21 +348,7 @@ $(document).ready(function() {
         });
     }
 
-    function fetchDeviceState() {
-        $.get('/servo/obtenerEstado/' + mac, function(response) {
-            if (response.status === 'success') {
-                actualizarEstadoUI(response.estado_valvula);
-                updateGauge(response.nivel_gas || 0);
-            } else {
-                console.error('Error al obtener estado:', response.message);
-            }
-        }).fail(function() {
-            console.error('Error de conexión con el servidor');
-        });
-    }
-
-    fetchDeviceState();
-    
+    // Manejadores de eventos para los botones de control
     $('#btn-abrir').click(function() {
         controlarServo(mac, 1, 'Válvula abierta');
     });
@@ -403,6 +406,9 @@ $(document).ready(function() {
             });
     }
     
+    fetchDeviceState();
+    
+    // Configurar el refresco automático cada 5 segundos
     const intervalId = setInterval(fetchDeviceState, 5000);
     
     $(window).on('beforeunload', function() {

@@ -55,24 +55,43 @@ class LecturasController extends ResourceController // Mantengo ResourceControll
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Faltan datos (MAC o nivel_gas)']);
         }
     }
+// NUEVO MÉTODO PARA OBTENER LA ÚLTIMA LECTURA
+    public function obtenerUltimaLectura($mac)
+    {
+        // 1. Obtener el dispositivo por su MAC
+        $dispositivo = $this->dispositivosModel->where('MAC', $mac)->first();
 
-    // Método 'detalle' que parece duplicado con DetalleController::detalles
-    // Considera eliminar este método si ya usas DetalleController::detalles
-    // public function detalle($mac)
-    // {
-    //     $lecturaModel = new \App\Models\LecturasGasModel();
+        if (!$dispositivo) {
+            return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'Dispositivo no encontrado.']);
+        }
 
-    //     $lecturas = $lecturaModel->getLecturasPorMac($mac);
+        // 2. Obtener la última lectura de gas para esta MAC
+        // Asumo que tu modelo LecturasGasModel tiene un método para esto.
+        // Si no, lo crearemos en el paso 2.
+        $ultimaLectura = $this->lecturasGasModel
+                               ->where('MAC', $mac)
+                               ->orderBy('fecha', 'DESC')
+                               ->first();
 
-    //     // Armamos los datos para el gráfico
-    //     $labels = array_column($lecturas, 'fecha');
-    //     $data = array_column($lecturas, 'nivel_gas');
+        // 3. Obtener el estado de la válvula del dispositivo
+        $estadoValvula = $dispositivo['estado_valvula'] ?? false; // Asume 'estado_valvula' es el nombre de la columna
 
-    //     return view('detalle_dispositivo', [
-    //         'mac' => $mac,
-    //         'lecturas' => $lecturas,
-    //         'labels' => $labels,
-    //         'data' => $data
-    //     ]);
-    // }
+        // 4. Devolver la información en formato JSON
+        if ($ultimaLectura) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'nivel_gas' => $ultimaLectura['nivel_gas'],
+                'estado_valvula' => $estadoValvula,
+                'ultima_actualizacion' => $ultimaLectura['fecha']
+            ]);
+        } else {
+            // Si no hay lecturas, devolvemos un valor por defecto
+            return $this->response->setJSON([
+                'status' => 'success',
+                'nivel_gas' => 0,
+                'estado_valvula' => $estadoValvula,
+                'message' => 'No hay lecturas disponibles para este dispositivo.'
+            ]);
+        }
+    }
 }
