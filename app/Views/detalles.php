@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Válvula de Gas | ASG</title>
+    <title>Control de Válvula | ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,25 +19,27 @@
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
         :root {
+            /* Colores */
             --primary-color: #2c73d2;
-            --secondary-color: #7209b7;
             --success-color: #00b894;
             --danger-color: #d62828;
             --warning-color: #fca311;
-            --dark-color: #1a1a1a;
-            --light-color: #f4f4f9;
-            --text-color: #333;
-            --card-bg: #ffffff;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #2c2c2c;
+            --text-secondary: #6c757d;
+
+            /* Otros */
             --border-radius: 20px;
-            --box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
-            --transition: all 0.4s ease-in-out;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         body {
-            background: linear-gradient(135deg, var(--light-color) 0%, #dcdfe5 100%);
+            background: linear-gradient(135deg, #e4e9f0 0%, #d5d7de 100%);
             font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
@@ -45,12 +47,12 @@
             min-height: 100vh;
             margin: 0;
             color: var(--text-color);
-            line-height: 1.6;
         }
 
         .container.main-content {
             padding: 2rem 1rem;
-            animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: fadeIn 0.8s ease-in-out;
+            position: relative;
         }
 
         @keyframes fadeIn {
@@ -61,121 +63,124 @@
         .card {
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            background-color: var(--card-bg);
-            padding: 3rem;
+            background-color: var(--card-background);
+            padding: 3.5rem;
             border: none;
-            overflow: hidden;
             transition: var(--transition);
-            position: relative;
-            z-index: 1;
-            transform: scale(1);
         }
 
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        h2 {
-            color: var(--dark-color);
+        h2.main-title {
             font-weight: 700;
-            margin-bottom: 2.5rem;
             text-align: center;
-            font-size: 2.8rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        .device-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .device-info .name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .device-info .location {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Indicador de burbuja */
+        .gas-level-bubble {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: textGradient 6s ease infinite;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
         }
         
-        @keyframes textGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        h2::after {
-            content: '';
+        .bubble-fill {
             position: absolute;
-            bottom: -1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 3px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: transparent;
+            border-bottom-left-radius: 150px;
+            border-bottom-right-radius: 150px;
+            transition: height 1s ease-in-out, background-color 0.5s ease;
         }
 
-        .card-title, .card-subtitle, .card-text {
-            text-align: center;
+        .gas-level-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Indicador LED de estado */
+        .valve-status {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
+            gap: 12px;
+            margin-bottom: 2rem;
         }
 
-        .card-title i {
-            color: var(--primary-color);
-        }
-        
-        .card-subtitle i {
-            color: #888;
-        }
-        
-        .card-text i {
-            color: var(--primary-color);
+        .valve-status-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
         }
 
-        #estado-actual {
-            font-weight: 700;
-            padding: 0.35rem 1rem;
-            border-radius: 50px;
-            transition: var(--transition);
-            min-width: 120px;
-            text-align: center;
-            font-size: 1.1rem;
+        .status-led {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ccc;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transition: background-color 0.5s ease;
         }
 
-        #estado-actual.abierta {
-            color: var(--success-color);
-            background-color: rgba(0, 184, 148, 0.1);
+        .status-led.abierta {
+            background-color: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color);
         }
 
-        #estado-actual.cerrada {
-            color: var(--danger-color);
-            background-color: rgba(214, 40, 40, 0.1);
+        .status-led.cerrada {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color);
         }
-        
-        .btn-group {
+
+        .btn-group-actions {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 1.2rem;
             justify-content: center;
-            margin-top: 2.5rem;
-            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 0.9rem 2rem;
-            border-radius: 50px;
-            font-size: 1rem;
+            padding: 1.2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
             font-weight: 600;
             transition: var(--transition);
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 180px;
             gap: 10px;
             border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .btn-success {
@@ -188,226 +193,97 @@
             color: #fff;
         }
 
-        .btn-primary-custom {
-            background-color: var(--primary-color);
-            color: #fff;
-        }
-        
-        /* Nuevo velocímetro radial */
-        .gauge-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-
-        .gauge-circle {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: conic-gradient(
-                var(--success-color) 0% 30%,
-                var(--warning-color) 30% 70%,
-                var(--danger-color) 70% 100%
-            );
-            position: relative;
-            transition: all 0.5s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .gauge-inner-circle {
-            width: 180px;
-            height: 180px;
-            background-color: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .gauge-level {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--dark-color);
-            transition: color 0.5s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .gauge-label {
-            font-size: 1rem;
-            color: #888;
-            margin-top: 5px;
-            font-weight: 500;
-        }
-        
-        .gauge-pointer {
+        /* Botón flotante de configuración */
+        #btn-perfil {
             position: absolute;
-            width: 80px;
-            height: 4px;
-            background-color: var(--dark-color);
-            border-radius: 2px;
-            bottom: 50%;
-            left: 50%;
-            transform-origin: 0 2px;
-            transform: rotate(-90deg);
-            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            z-index: 1;
-        }
-        
-        .gauge-pointer::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background-color: var(--dark-color);
-            border-radius: 50%;
-            top: -4px;
-            right: -6px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        }
-        
-        /* Sorpresa: partículas de fondo */
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-        
-        .particle {
-            position: absolute;
+            top: 2rem;
+            right: 2rem;
             background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
             border-radius: 50%;
-            animation: moveParticles 20s infinite linear;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            z-index: 10;
         }
 
-        @keyframes moveParticles {
-            0% { transform: translate(0, 0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translate(100vw, 100vh); opacity: 0; }
+        #btn-perfil:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.9);
         }
-        
+
         /* Dark mode */
         @media (prefers-color-scheme: dark) {
             :root {
-                --dark-color: #f4f4f9;
-                --text-color: #f4f4f9;
-                --card-bg: #2a2a2a;
+                --background-color: #121212;
+                --card-background: #1e1e1e;
+                --text-color: #f5f5f5;
+                --text-secondary: #aaa;
             }
             body {
-                background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
-            }
-            h2 {
-                color: var(--dark-color);
-            }
-            h2::after {
-                background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+                background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
             }
             .card {
-                background-color: var(--card-bg);
+                box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03);
             }
-            .card-title, .card-subtitle, .card-text {
-                color: #e0e0e0;
+            .btn {
+                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
             }
-            .gauge-inner-circle {
-                background-color: #1e1e1e;
+            #btn-perfil {
+                background: rgba(30, 30, 30, 0.6);
             }
-            .gauge-level {
-                color: var(--dark-color);
-            }
-            .gauge-pointer {
-                background-color: var(--dark-color);
-            }
-        }
-        
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .card {
-                padding: 2rem;
-            }
-            h2 {
-                font-size: 2.2rem;
-            }
-            .gauge-circle {
-                width: 200px;
-                height: 200px;
-            }
-            .gauge-inner-circle {
-                width: 140px;
-                height: 140px;
-            }
-            .gauge-level {
-                font-size: 2.5rem;
+            #btn-perfil:hover {
+                background: rgba(30, 30, 30, 0.9);
             }
         }
     </style>
 </head>
 <body>
 
-<div class="particles"></div>
-
 <div class="container main-content">
+    <button id="btn-perfil" class="btn btn-light" aria-label="Ir a la configuración">
+        <i class="fas fa-cog text-dark"></i>
+    </button>
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <h2>Control de Válvula de Gas</h2>
+            <h2 class="main-title">Control de Válvula</h2>
             <div class="card">
                 <div class="card-body">
                     <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger pulse" role="alert">
+                        <div class="alert alert-danger" role="alert">
                             <i class="fas fa-exclamation-triangle"></i> <?= esc($error_message) ?>
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
-                        <h5 class="card-title" id="nombre-dispositivo">
-                            <i class="fas fa-gas-pump"></i> Dispositivo: <?= esc($dispositivo->nombre) ?>
-                        </h5>
-                        <h6 class="card-subtitle mb-2 text-muted" id="ubicacion-dispositivo">
-                            <i class="fas fa-map-marker-alt"></i> Ubicación: <?= esc($dispositivo->ubicacion) ?>
-                        </h6>
+                        <div class="device-info">
+                            <div class="name">Dispositivo: <?= esc($dispositivo->nombre) ?></div>
+                            <div class="location">Ubicación: <?= esc($dispositivo->ubicacion) ?></div>
+                        </div>
                         
-                        <div class="gauge-container">
-                            <div class="gauge-circle">
-                                <div class="gauge-inner-circle">
-                                    <div class="gauge-level" id="gasLevel">0%</div>
-                                    <div class="gauge-label">Nivel de Gas</div>
-                                </div>
-                                <div class="gauge-pointer" id="gaugePointer"></div>
-                            </div>
+                        <div class="gas-level-bubble">
+                            <div class="bubble-fill" id="gasLevelFill"></div>
+                            <div class="gas-level-value" id="gasLevel">0%</div>
                         </div>
 
-                        <p class="card-text">
-                            <i class="fas fa-toggle-on"></i> Estado actual: 
-                            <span id="estado-actual" class="<?= $dispositivo->estado_valvula ? 'abierta' : 'cerrada' ?>">
-                                <?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?>
-                            </span>
-                        </p>
+                        <div class="valve-status">
+                            <div class="valve-status-text">Estado actual:</div>
+                            <div class="status-led" id="statusLed"></div>
+                        </div>
                         
-                        <div class="btn-group" role="group">
+                        <div class="btn-group-actions" role="group">
                             <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
                                 <i class="fas fa-play"></i> Abrir Válvula
                             </button>
                             <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
                                 <i class="fas fa-stop"></i> Cerrar Válvula
                             </button>
-                            <button type="button" class="btn btn-primary-custom" id="btn-perfil" aria-label="Ir al perfil de usuario">
-                                <i class="fas fa-cog"></i> Configuración
-                            </button>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle"></i> No se pudo cargar la información del dispositivo. Por favor, verifique la conexión o seleccione otro dispositivo.
+                            <i class="fas fa-info-circle"></i> No se pudo cargar el dispositivo.
                         </div>
                     <?php endif; ?>
                 </div>
@@ -422,48 +298,22 @@
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>';
-    const estadoActualSpan = $('#estado-actual');
-    const gaugeLevelSpan = $('#gasLevel');
-    const gaugePointer = $('#gaugePointer');
+    const statusLed = $('#statusLed');
+    const gasLevelSpan = $('#gasLevel');
+    const gasLevelFill = $('#gasLevelFill');
     const btnAbrir = $('#btn-abrir');
     const btnCerrar = $('#btn-cerrar');
-    const gaugeCircle = $('.gauge-circle');
 
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-    // Función para generar partículas
-    function createParticles() {
-        const particlesContainer = $('.particles');
-        const count = 30;
-        for (let i = 0; i < count; i++) {
-            const size = Math.random() * 8 + 2;
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
-            const delay = Math.random() * 20;
-            const duration = Math.random() * 15 + 10;
-            const particle = $('<div>').addClass('particle').css({
-                width: `${size}px`,
-                height: `${size}px`,
-                left: `${x}vw`,
-                top: `${y}vh`,
-                animationDelay: `${delay}s`,
-                animationDuration: `${duration}s`
-            });
-            particlesContainer.append(particle);
-        }
-    }
-    
-    createParticles();
-
     function actualizarEstadoUI(estado) {
-        estadoActualSpan.text(estado ? 'Abierta' : 'Cerrada');
         if (estado) {
-            estadoActualSpan.removeClass('cerrada').addClass('abierta');
+            statusLed.removeClass('cerrada').addClass('abierta');
             btnAbrir.prop('disabled', true).css('opacity', 0.6);
             btnCerrar.prop('disabled', false).css('opacity', 1);
         } else {
-            estadoActualSpan.removeClass('abierta').addClass('cerrada');
+            statusLed.removeClass('abierta').addClass('cerrada');
             btnAbrir.prop('disabled', false).css('opacity', 1);
             btnCerrar.prop('disabled', true).css('opacity', 0.6);
         }
@@ -471,31 +321,29 @@ $(document).ready(function() {
 
     function updateGauge(level) {
         level = Math.max(0, Math.min(100, parseFloat(level)));
-        const rotation = (level / 100) * 180;
-        gaugePointer.css('transform', `rotate(${rotation - 90}deg)`);
-        gaugeLevelSpan.text(`${level.toFixed(1)}%`);
+        const height = (level / 100) * 100;
+        gasLevelFill.css('height', `${height}%`);
+        gasLevelSpan.text(`${level.toFixed(1)}%`);
         
-        // Efectos de color y vibración
         if (level < 30) {
-            gaugeLevelSpan.css('color', 'var(--success-color)');
-            gaugeCircle.removeClass('pulse');
+            gasLevelFill.css('background-color', 'var(--success-color)');
+            gasLevelSpan.css('color', 'var(--success-color)');
         } else if (level < 70) {
-            gaugeLevelSpan.css('color', 'var(--warning-color)');
-            gaugeCircle.removeClass('pulse');
+            gasLevelFill.css('background-color', 'var(--warning-color)');
+            gasLevelSpan.css('color', 'var(--warning-color)');
         } else {
-            gaugeLevelSpan.css('color', 'var(--danger-color)');
-            gaugeCircle.addClass('pulse'); // Efecto de pulso en el medidor
-            
-            if (level > 80 && !estadoActualSpan.hasClass('cerrada')) {
+            gasLevelFill.css('background-color', 'var(--danger-color)');
+            gasLevelSpan.css('color', 'var(--danger-color)');
+            if (level > 80 && !statusLed.hasClass('cerrada')) {
                 showGasAlert(level);
             }
         }
     }
-    
+
     function showGasAlert(level) {
         Swal.fire({
             title: '¡Nivel de Gas Peligroso!',
-            text: `El nivel de gas ha alcanzado ${level.toFixed(1)}%. Se recomienda cerrar la válvula inmediatamente.`,
+            text: `El nivel de gas ha alcanzado ${level.toFixed(1)}%. Se recomienda cerrar la válvula.`,
             icon: 'error',
             confirmButtonText: 'Entendido',
             confirmButtonColor: 'var(--danger-color)',
@@ -511,21 +359,20 @@ $(document).ready(function() {
                 updateGauge(response.nivel_gas || 0);
             } else {
                 console.error('Error al obtener estado:', response.message);
-                showErrorToast('Error al obtener estado del dispositivo');
             }
         }).fail(function() {
-            showErrorToast('Error de conexión con el servidor');
+            console.error('Error de conexión con el servidor');
         });
     }
 
     fetchDeviceState();
     
     $('#btn-abrir').click(function() {
-        controlarServo(mac, 1, 'Válvula abierta correctamente');
+        controlarServo(mac, 1, 'Válvula abierta');
     });
     
     $('#btn-cerrar').click(function() {
-        controlarServo(mac, 0, 'Válvula cerrada correctamente');
+        controlarServo(mac, 0, 'Válvula cerrada');
     });
 
     $('#btn-perfil').click(function() {
@@ -560,7 +407,7 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: response.message || 'Error al actualizar el estado',
+                        text: response.message || 'Error al actualizar',
                     });
                 }
             })
