@@ -193,29 +193,11 @@
             color: #fff;
         }
 
-        /* Botón flotante de configuración */
-        #btn-perfil {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-            z-index: 10;
+        .btn-secondary-custom {
+            background-color: var(--text-secondary);
+            color: #fff;
         }
-
-        #btn-perfil:hover {
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
+        
         /* Dark mode */
         @media (prefers-color-scheme: dark) {
             :root {
@@ -233,11 +215,8 @@
             .btn {
                 box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
             }
-            #btn-perfil {
-                background: rgba(30, 30, 30, 0.6);
-            }
-            #btn-perfil:hover {
-                background: rgba(30, 30, 30, 0.9);
+            .btn-secondary-custom {
+                background-color: #555;
             }
         }
     </style>
@@ -245,9 +224,6 @@
 <body>
 
 <div class="container main-content">
-    <button id="btn-perfil" class="btn btn-light" aria-label="Ir a la configuración">
-        <i class="fas fa-cog text-dark"></i>
-    </button>
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <h2 class="main-title">Control de Válvula</h2>
@@ -279,6 +255,9 @@
                             </button>
                             <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
                                 <i class="fas fa-stop"></i> Cerrar Válvula
+                            </button>
+                            <button type="button" class="btn btn-secondary-custom" id="btn-perfil" aria-label="Volver al perfil de usuario">
+                                <i class="fas fa-arrow-left"></i> Volver al Perfil
                             </button>
                         </div>
                     <?php else: ?>
