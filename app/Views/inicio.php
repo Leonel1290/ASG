@@ -73,7 +73,7 @@
             width: 100%;
             height: 100%;
             color: transparent;
-            background-image: url('<?= base_url('/imagenes/verde.jpg'); ?>');
+            background-image: url('<?= base_url('public/imagenes/verde.png'); ?>');
             background-size: 100% 250%;
             background-repeat: no-repeat;
             background-position: center bottom;
