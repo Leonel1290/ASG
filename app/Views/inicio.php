@@ -146,77 +146,90 @@
             box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
         }
 
-        /* Estilos mejorados para el modal de instalación */
-        #appModal .modal-content {
-            background: linear-gradient(135deg, #0A192F, #0D203B);
-            color: #AFB3B7;
-            border-radius: 15px;
-            border: 1px solid #36678C;
+        /* --- Estilos del Modal de App --- */
+        .modal-body {
+            position: relative;
+            background-color: black;
         }
-        
-        #appModal .modal-header {
-            border-bottom: 1px solid #36678C;
-            background-color: rgba(10, 25, 47, 0.9);
-            border-radius: 15px 15px 0 0;
+        .modal-content-simulacion {
+            background-color: #000000ff;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
         }
-        
-        #appModal .modal-body {
-            padding: 2rem;
-            text-align: center;
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
         }
-        
-        #appModal .modal-title {
-            color: #fff;
-            font-weight: 600;
+        .close-button:hover, .close-button:focus {
+            color: black;
+            text-decoration: none;
         }
-        
-        .install-steps {
-            text-align: left;
-            margin-top: 20px;
+
+        /* --- Estilos de la Animación --- */
+        .image-container {
+            position: relative;
+            width: 700px;
+            height: 500px;
+            margin: 20px auto;
         }
-        
-        .install-steps li {
-            margin-bottom: 10px;
-            color: #AFB3B7;
+
+        .image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
         }
-        
-        .install-icon {
-            font-size: 4rem;
-            color: #36678C;
-            margin-bottom: 1.5rem;
+        .image.active {
+            opacity: 1;
         }
-        
-        .btn-install {
+
+        /* Nuevo estilo para el botón circular */
+        .btn-circle {
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            border-radius: 50%;
             background-color: #28a745;
-            color: white;
-            font-weight: 600;
-            padding: 0.8rem 2rem;
-            border-radius: 30px;
+            color: #fff;
             border: none;
-            margin-top: 1rem;
-            transition: all 0.3s;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
         }
-        
-        .btn-install:hover {
+
+        .btn-circle:hover {
             background-color: #218838;
-            transform: scale(1.05);
         }
-        
-        .btn-install:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
+
+        /* Modificaciones del modal de simulación */
+        #simulacionModal .modal-header {
+            background-color: #000;
+            color: #fff;
+            border-bottom: 1px solid #333;
         }
-        
-        .manual-install {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #36678C;
+        #simulacionModal .modal-body {
+            background-color: #000;
+            color: #fff;
         }
-        
-        .browser-icon {
-            font-size: 2rem;
-            margin: 0 10px;
-            color: #36678C;
+        #simulacionModal .modal-content {
+            background-color: #000;
+        }
+        #simulacionModal .btn-close {
+            filter: invert(1);
         }
     </style>
 </head>
@@ -237,8 +250,9 @@
                     <li class="nav-item">
                         <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
+                            <!-- Botón Simulación modificado -->
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
-                            <a class="btn btn-custom" href="#" data-bs-toggle="modal" data-bs-target="#appModal">Descargar App</a>
+                            <a class="btn btn-custom" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
                         </div>
                     </li>
                 </ul>
@@ -307,95 +321,21 @@
     <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
 </footer>
 
-<!-- Modal de instalación de la App -->
 <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="appModalLabel">Instalar App ASG</h5>
+        <h5 class="modal-title" id="appModalLabel">Descargar App PWA</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="install-icon">
-          <i class="fas fa-mobile-alt"></i>
-        </div>
-        <h4>Instala nuestra App PWA</h4>
-        <p>Disfruta de una experiencia mejorada instalando nuestra aplicación en tu dispositivo.</p>
-        
-        <button id="installButton" class="btn btn-install">Instalar Ahora</button>
-        
-        <div class="manual-install">
-          <p>Si la instalación no comienza automáticamente:</p>
-          <div class="install-steps">
-            <ul>
-              <li><strong>Chrome/Edge:</strong> Haz clic en el icono <i class="fas fa-ellipsis-h browser-icon"></i> (Menú) y luego en "Instalar"</li>
-              <li><strong>Safari:</strong> Haz clic en <i class="fas fa-upload browser-icon"></i> (Compartir) y luego en "Añadir a pantalla de inicio"</li>
-              <li><strong>Firefox:</strong> En la barra de direcciones, haz clic en el icono <i class="fas fa-house-user browser-icon"></i> y luego en "Instalar"</li>
-            </ul>
-          </div>
-        </div>
+      <div class="modal-body p-0">
+        <iframe id="appIframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
       </div>
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Variables para el manejo de la instalación de PWA
-let deferredPrompt;
-const installButton = document.getElementById('installButton');
-
-// Escuchar el evento beforeinstallprompt
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevenir que el navegador muestre el prompt automáticamente
-  e.preventDefault();
-  // Guardar el evento para usarlo después
-  deferredPrompt = e;
-  // Mostrar el botón de instalación
-  installButton.style.display = 'block';
-  installButton.disabled = false;
-});
-
-// Manejar el clic en el botón de instalación
-installButton.addEventListener('click', async () => {
-  if (!deferredPrompt) {
-    // El evento beforeinstallprompt no está disponible
-    alert('Para instalar la app, use las opciones de instalación de su navegador (ver instrucciones abajo).');
-    return;
-  }
-  
-  // Mostrar el prompt de instalación
-  deferredPrompt.prompt();
-  
-  // Esperar a que el usuario responda al prompt
-  const { outcome } = await deferredPrompt.userChoice;
-  
-  // Opcional: hacer algo según la elección del usuario
-  console.log(`User response to the install prompt: ${outcome}`);
-  
-  // Ya hemos usado el prompt, no podemos usarlo de nuevo
-  deferredPrompt = null;
-  
-  // Ocultar el botón de instalación
-  installButton.style.display = 'none';
-});
-
-// Escuchar el evento de instalación exitosa
-window.addEventListener('appinstalled', () => {
-  // Ocultar el botón de instalación
-  installButton.style.display = 'none';
-  // Limpiar el deferredPrompt
-  deferredPrompt = null;
-  console.log('PWA was installed');
-});
-
-// Comprobar si la PWA ya está instalada
-window.addEventListener('load', () => {
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    installButton.style.display = 'none';
-  }
-});
-</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </body>
 </html>
