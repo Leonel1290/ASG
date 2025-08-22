@@ -250,7 +250,6 @@
                     <li class="nav-item">
                         <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
-                            <!-- Botón Simulación modificado -->
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
                             <a class="btn btn-custom" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
                         </div>
@@ -273,9 +272,9 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de fuga de gas"
-                         class="hero-img img-fluid"
-                         loading="lazy">
+                            alt="Ilustración de fuga de gas"
+                            class="hero-img img-fluid"
+                            loading="lazy">
                 </div>
             </div>
         </div>
@@ -322,18 +321,22 @@
 </footer>
 
 <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="appModalLabel">Descargar App PWA</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-0">
-        <iframe id="appIframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
-      </div>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appModalLabel">Descargar App PWA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="appIframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
+<script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
+<script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
