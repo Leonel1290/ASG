@@ -65,45 +65,6 @@
             line-height: 1.2;
         }
 
-        .hero h1::before {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: transparent;
-            background-image: url('<?= base_url('public/imagenes/verde.png'); ?>');
-            background-size: 100% 250%;
-            background-repeat: no-repeat;
-            background-position: center bottom;
-            -webkit-background-clip: text;
-            background-clip: text;
-            filter: blur(1.5px);
-            opacity: 0;
-            animation: greenSmokeTextEffect 5s infinite alternate ease-in-out;
-        }
-
-        @keyframes greenSmokeTextEffect {
-            0% { background-position: center bottom; opacity: 0; }
-            20% { opacity: 0.8; }
-            60% { background-position: center top; opacity: 0.6; }
-            100% { background-position: center top; opacity: 0; }
-        }
-
-        .hero-line {
-            width: 80px;
-            height: 4px;
-            background-color: #36678C;
-            margin: 1rem 0 1.5rem;
-        }
-
-        .hero-img {
-            max-width: 100%;
-            height: auto;
-            animation: float 6s ease-in-out infinite;
-        }
-
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
