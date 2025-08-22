@@ -56,7 +56,7 @@
 
         .checkout-card img {
             width: 100%;
-            max-width: 220px; /* tamaño equilibrado para PC y móviles */
+            max-width: 400px; /* tamaño equilibrado para PC y móviles */
             height: auto;
             margin-bottom: 1.5rem;
         }
