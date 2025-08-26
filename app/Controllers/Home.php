@@ -332,7 +332,7 @@ class Home extends BaseController
         ]);
     }
 
-    public function comprar()
+        public function comprar()
     {
         $session = session();
         log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
@@ -341,65 +341,70 @@ class Home extends BaseController
 
     public function guardar_compra()
     {
-        // Define las reglas de validación para los datos entrantes.
-        $rules = [
-            'order_id' => 'required',
-            'payer_id' => 'required',
-            'payment_id' => 'required',
-            'status' => 'required',
-            'monto' => 'required|numeric'
-        ];
+        if ($this->request->getMethod() !== 'post') {
+            log_message('error', 'Método HTTP no permitido. Se esperaba POST, pero se recibió ' . $this->request->getMethod());
+            return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Método no permitido. Se esperaba POST.']);
+        }
+        
+        if (!$this->request->isAJAX()) {
+             log_message('error', 'Petición no es AJAX. Se esperaba una petición XMLHttpRequest.');
+             return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Petición no es AJAX.']);
+        }
 
-        // Verifica si la solicitud es una petición AJAX y POST.
-        if ($this->request->isAJAX() && $this->request->getMethod() === 'post') {
-            try {
-                // Obtén los datos JSON de la solicitud.
-                $datos = $this->request->getJSON(true);
+        try {
+            // Define las reglas de validación para los datos entrantes.
+            $rules = [
+                'order_id' => 'required',
+                'payer_id' => 'required',
+                'payment_id' => 'required',
+                'status' => 'required',
+                'monto' => 'required|numeric'
+            ];
 
-                // Valida los datos recibidos.
-                if (!$this->validateData($datos, $rules)) {
-                    log_message('error', 'Validación fallida al guardar compra: ' . json_encode($this->validator->getErrors()));
-                    return $this->response->setJSON(['status' => 'error', 'message' => 'Datos de validación faltantes o incorrectos.'])->setStatusCode(400);
-                }
+            // Obtén los datos JSON de la solicitud.
+            $datos = $this->request->getJSON(true);
 
-                $session = session();
-                $usuarioId = $session->get('id');
-
-                // Asegúrate de que el usuario esté logueado.
-                if (!$usuarioId) {
-                    log_message('error', 'Intento de guardar compra sin usuario logueado.');
-                    return $this->response->setJSON(['status' => 'error', 'message' => 'Usuario no logueado.'])->setStatusCode(401);
-                }
-
-                // Carga el modelo de compras.
-                $comprasModel = new ComprasModel();
-
-                // Prepara los datos para la inserción en la base de datos.
-                $datosCompra = [
-                    'usuario_id' => $usuarioId,
-                    'order_id' => $datos['order_id'],
-                    'payer_id' => $datos['payer_id'],
-                    'payment_id' => $datos['payment_id'],
-                    'status' => $datos['status'],
-                    'monto' => $datos['monto'],
-                    'fecha_compra' => date('Y-m-d H:i:s'),
-                ];
-                
-                // Realiza la inserción.
-                if ($comprasModel->insert($datosCompra)) {
-                    log_message('info', 'Compra guardada exitosamente. Order ID: ' . $datos['order_id']);
-                    return $this->response->setJSON(['status' => 'success', 'message' => 'Compra guardada exitosamente.'])->setStatusCode(200);
-                } else {
-                    log_message('error', 'Error al guardar la compra en la base de datos. Order ID: ' . $datos['order_id']);
-                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al guardar en la base de datos.'])->setStatusCode(500);
-                }
-
-            } catch (Exception $e) {
-                log_message('error', 'Excepción en guardar_compra: ' . $e->getMessage());
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.'])->setStatusCode(500);
+            // Valida los datos recibidos.
+            if (!$this->validateData($datos, $rules)) {
+                log_message('error', 'Validación fallida al guardar compra: ' . json_encode($this->validator->getErrors()));
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Datos de validación faltantes o incorrectos.'])->setStatusCode(400);
             }
-        } else {
-            return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Método no permitido.']);
+
+            $session = session();
+            $usuarioId = $session->get('id');
+
+            // Asegúrate de que el usuario esté logueado.
+            if (!$usuarioId) {
+                log_message('error', 'Intento de guardar compra sin usuario logueado.');
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Usuario no logueado.'])->setStatusCode(401);
+            }
+
+            // Carga el modelo de compras.
+            $comprasModel = new ComprasModel();
+
+            // Prepara los datos para la inserción en la base de datos.
+            $datosCompra = [
+                'usuario_id' => $usuarioId,
+                'order_id' => $datos['order_id'],
+                'payer_id' => $datos['payer_id'],
+                'payment_id' => $datos['payment_id'],
+                'status' => $datos['status'],
+                'monto' => $datos['monto'],
+                'fecha_compra' => date('Y-m-d H:i:s'),
+            ];
+            
+            // Realiza la inserción.
+            if ($comprasModel->insert($datosCompra)) {
+                log_message('info', 'Compra guardada exitosamente. Order ID: ' . $datos['order_id']);
+                return $this->response->setJSON(['status' => 'success', 'message' => 'Compra guardada exitosamente.'])->setStatusCode(200);
+            } else {
+                log_message('error', 'Error al guardar la compra en la base de datos. Order ID: ' . $datos['order_id']);
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Error al guardar en la base de datos.'])->setStatusCode(500);
+            }
+
+        } catch (Exception $e) {
+            log_message('error', 'Excepción en guardar_compra: ' . $e->getMessage());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.'])->setStatusCode(500);
         }
     }
     
