@@ -346,10 +346,10 @@ class Home extends BaseController
             return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Método no permitido. Se esperaba POST.']);
         }
         
-        if (!$this->request->isAJAX()) {
-             log_message('error', 'Petición no es AJAX. Se esperaba una petición XMLHttpRequest.');
-             return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Petición no es AJAX.']);
-        }
+        if ($this->request->getMethod() !== 'post') {
+    return $this->response->setStatusCode(405)
+        ->setJSON(['status' => 'error', 'message' => 'Método no permitido.']);
+}
 
         try {
             // Define las reglas de validación para los datos entrantes.
