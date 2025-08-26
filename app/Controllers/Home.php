@@ -334,69 +334,76 @@ class Home extends BaseController
 
     public function comprar()
     {
-        // --- LOGGING PARA DEBUGGING ---
         $session = session();
         log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
         return view('comprar');
     }
 
-    // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
-    // public function verLecturas($mac) { ... }
-
-
-   public function guardar_compra()
+    public function guardar_compra()
     {
-        // Verifica que la solicitud sea POST y que venga del frontend (AJAX).
-        if (!$this->request->isAJAX() || $this->request->getMethod() !== 'post') {
-            log_message('error', 'Petición no permitida en guardar_compra. Método: ' . $this->request->getMethod() . ', esAJAX: ' . ($this->request->isAJAX() ? 'true' : 'false'));
+        // Define las reglas de validación para los datos entrantes.
+        $rules = [
+            'order_id' => 'required',
+            'payer_id' => 'required',
+            'payment_id' => 'required',
+            'status' => 'required',
+            'monto' => 'required|numeric'
+        ];
+
+        // Verifica si la solicitud es una petición AJAX y POST.
+        if ($this->request->isAJAX() && $this->request->getMethod() === 'post') {
+            try {
+                // Obtén los datos JSON de la solicitud.
+                $datos = $this->request->getJSON(true);
+
+                // Valida los datos recibidos.
+                if (!$this->validateData($datos, $rules)) {
+                    log_message('error', 'Validación fallida al guardar compra: ' . json_encode($this->validator->getErrors()));
+                    return $this->response->setJSON(['status' => 'error', 'message' => 'Datos de validación faltantes o incorrectos.'])->setStatusCode(400);
+                }
+
+                $session = session();
+                $usuarioId = $session->get('id');
+
+                // Asegúrate de que el usuario esté logueado.
+                if (!$usuarioId) {
+                    log_message('error', 'Intento de guardar compra sin usuario logueado.');
+                    return $this->response->setJSON(['status' => 'error', 'message' => 'Usuario no logueado.'])->setStatusCode(401);
+                }
+
+                // Carga el modelo de compras.
+                $comprasModel = new ComprasModel();
+
+                // Prepara los datos para la inserción en la base de datos.
+                $datosCompra = [
+                    'usuario_id' => $usuarioId,
+                    'order_id' => $datos['order_id'],
+                    'payer_id' => $datos['payer_id'],
+                    'payment_id' => $datos['payment_id'],
+                    'status' => $datos['status'],
+                    'monto' => $datos['monto'],
+                    'fecha_compra' => date('Y-m-d H:i:s'),
+                ];
+                
+                // Realiza la inserción.
+                if ($comprasModel->insert($datosCompra)) {
+                    log_message('info', 'Compra guardada exitosamente. Order ID: ' . $datos['order_id']);
+                    return $this->response->setJSON(['status' => 'success', 'message' => 'Compra guardada exitosamente.'])->setStatusCode(200);
+                } else {
+                    log_message('error', 'Error al guardar la compra en la base de datos. Order ID: ' . $datos['order_id']);
+                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al guardar en la base de datos.'])->setStatusCode(500);
+                }
+
+            } catch (Exception $e) {
+                log_message('error', 'Excepción en guardar_compra: ' . $e->getMessage());
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.'])->setStatusCode(500);
+            }
+        } else {
             return $this->response->setStatusCode(405)->setJSON(['status' => 'error', 'message' => 'Método no permitido.']);
         }
-
-        try {
-            // Obtén los datos enviados desde el JavaScript.
-            $data = $this->request->getJSON(true);
-
-            // Revisa si el usuario está logueado para asociar la compra a su ID.
-            $session = session();
-            $usuarioId = $session->get('id');
-
-            if (!$usuarioId) {
-                // Si el usuario no está logueado, responde con un error.
-                log_message('error', 'Intento de guardar compra sin usuario logueado.');
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Usuario no logueado.']);
-            }
-            
-            // Carga el modelo de compras.
-            $comprasModel = new ComprasModel();
-
-            // Prepara los datos para la inserción.
-            $datosCompra = [
-                'usuario_id' => $usuarioId,
-                'order_id' => $data['orderID'],
-                'payer_id' => $data['payerID'],
-                'payment_id' => $data['paymentID'],
-                'status' => $data['status'],
-                'monto' => 100.00, // TODO: IMPORTANTE: Este valor debe ser el monto real del pago.
-                'fecha_compra' => date('Y-m-d H:i:s'),
-            ];
-
-            if ($comprasModel->insert($datosCompra)) {
-                // Si la inserción fue exitosa, respondemos al frontend.
-                log_message('info', 'Compra guardada exitosamente. Order ID: ' . $data['orderID']);
-                return $this->response->setJSON(['status' => 'success', 'message' => 'Compra guardada exitosamente.']);
-            } else {
-                // Si hubo un error en la inserción.
-                log_message('error', 'Error al guardar la compra en la base de datos. Order ID: ' . $data['orderID']);
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Error al guardar en la base de datos.']);
-            }
-        } catch (Exception $e) {
-            // Captura cualquier excepción que pueda ocurrir y la registra.
-            log_message('error', 'Excepción en guardar_compra: ' . $e->getMessage());
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Error interno del servidor.']);
-        }
     }
-        public function simulacion()
+    
+    public function simulacion()
     {
         return view('simulacion');
     }

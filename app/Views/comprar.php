@@ -56,7 +56,7 @@
 
         .checkout-card img {
             width: 100%;
-            max-width: 400px; /* tamaño equilibrado para PC y móviles */
+            max-width: 400px;
             height: auto;
             margin-bottom: 1.5rem;
         }
@@ -185,14 +185,18 @@
                     return actions.order.capture().then(function(details) {
                         console.log('Transacción completada por ' + details.payer.name.given_name);
 
-                        // Guardar en la base de datos (con URL absoluta)
+                        // Aquí se realiza la modificación para enviar los datos de la compra
                         fetch('https://asg-rxnu.onrender.com/home/guardar_compra', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest' // Importante para isAJAX() en CodeIgniter
                             },
                             body: JSON.stringify({
-                                producto: 'Sensor de Gas',
+                                order_id: data.orderID,
+                                payer_id: details.payer.payer_id,
+                                payment_id: details.id,
+                                status: details.status,
                                 monto: details.purchase_units[0].amount.value
                             })
                         })
@@ -202,9 +206,14 @@
                             }
                             return response.json();
                         })
-                        .then(data => {
-                            console.log("Compra guardada correctamente.");
-                            successModal.show();
+                        .then(responseData => {
+                            console.log("Respuesta del servidor:", responseData);
+                            if (responseData.status === 'success') {
+                                console.log("Compra guardada correctamente.");
+                                successModal.show();
+                            } else {
+                                throw new Error(responseData.message || "Error desconocido al guardar la compra.");
+                            }
                         })
                         .catch(error => {
                             console.error('Error al guardar la compra:', error);
