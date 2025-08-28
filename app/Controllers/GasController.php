@@ -6,7 +6,7 @@ use CodeIgniter\I18n\Time;
 
 class GasController extends Controller
 {
-    protected $gasThreshold = 500; // Umbral de ejemplo (ajusta según necesidad)
+    protected $gasThreshold = 300; 
     protected $valveModel;
 
     public function __construct()
@@ -30,8 +30,8 @@ class GasController extends Controller
             }
 
             $elapsedTime = Time::now()->getTimestamp() - $session->get('gas_alert_start');
-            if ($elapsedTime >= 60 && !$session->get('user_action_taken')) {
-                // Sin acción del usuario tras 60 segundos, cierra válvula
+            if ($elapsedTime >= 10 && !$session->get('user_action_taken')) {
+            
                 $this->valveModel->closeValve();
                 $session->remove('gas_alert_start');
                 return $this->response->setJSON([
