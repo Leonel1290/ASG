@@ -84,4 +84,5 @@ $routes->get('prueba', function() {
 });
 
 
-$routes->post('home/guardar_compra', 'Home::guardar_compra');
+$routes->post('paypal/create-order', 'CompraController::createOrder');
+$routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');

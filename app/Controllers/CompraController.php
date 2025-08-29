@@ -9,7 +9,7 @@ class CompraController extends Controller
 {
     private $clientId     = "AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_";
     private $clientSecret = "EEOWwqaRKfgtQYKYReuEcNZrRJJuGcJBWaUlKrYmzPLu4f7zGjHovQ8l9T_xASTSq9lDCErw6vR-RxKb";
-    private $paypalApiUrl = "https://api-m.sandbox.paypal.com"; // Sandbox
+    private $paypalApiUrl = "https://sandbox.paypal.com"; // Sandbox
 
     protected $comprasModel;
 
