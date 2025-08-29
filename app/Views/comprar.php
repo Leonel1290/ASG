@@ -9,9 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Icono -->
-    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-
     <!-- Estilos personalizados -->
     <style>
         body {
@@ -109,6 +106,21 @@
             background-color: #2ea043;
             border-color: #2ea043;
         }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -117,7 +129,7 @@
     <div class="checkout-container">
         <div class="checkout-card">
             <h2>Confirmar Compra</h2>
-            <img src="<?= base_url('/imagenes/Sentinel.png'); ?>" alt="Detector ASG">
+            <img src="/imagenes/Sentinel.png" alt="Detector ASG">
             <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
             
             <div id="paypal-button-container"></div>
@@ -141,7 +153,22 @@
                     Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
                 </div>
                 <div class="modal-footer">
-                    <a href="<?= base_url('loginobtener') ?>" class="btn btn-primary">Continuar al Login</a>
+                    <a href="/loginobtener" class="btn btn-primary">Continuar al Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Procesando -->
+    <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="processingModalLabel">Procesando compra</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="loading-spinner"></div> 
+                    <span>Estamos guardando los detalles de tu compra...</span>
                 </div>
             </div>
         </div>
@@ -156,6 +183,11 @@
 
         const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
             keyboard: false
+        });
+        
+        const processingModal = new bootstrap.Modal(document.getElementById('processingModal'), {
+            keyboard: false,
+            backdrop: 'static'
         });
 
         function showErrorMessage(message) {
@@ -172,33 +204,63 @@
             paypal.Buttons({
                 createOrder: function(data, actions) {
                     // Llamamos a nuestro backend para crear la orden
-                    return fetch('<?= base_url("/paypal/create-order") ?>', { method: 'POST' })
-                        .then(res => res.json())
-                        .then(order => {
-                            console.log("Orden creada en backend:", order);
-                            return order.id; // Retorna el orderID para PayPal
-                        })
-                        .catch(err => {
-                            console.error("Error al crear la orden:", err);
-                            showErrorMessage("⚠️ Error al crear la orden de pago.");
-                        });
+                    return fetch('/paypal/create-order', { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return res.json();
+                    })
+                    .then(order => {
+                        console.log("Orden creada en backend:", order);
+                        if (order.error) {
+                            showErrorMessage("Error: " + order.error);
+                            return;
+                        }
+                        return order.id; // Retorna el orderID para PayPal
+                    })
+                    .catch(err => {
+                        console.error("Error al crear la orden:", err);
+                        showErrorMessage("⚠️ Error al crear la orden de pago.");
+                    });
                 },
                 onApprove: function(data, actions) {
+                    // Mostrar modal de procesamiento
+                    processingModal.show();
+                    
                     // Llamamos a nuestro backend para capturar la orden y guardar en BD
-                    return fetch(`<?= base_url("/paypal/capture-order/") ?>${data.orderID}`, { method: 'POST' })
-                        .then(res => res.json())
-                        .then(details => {
-                            console.log("Orden capturada:", details);
-                            if (details.status === "COMPLETED") {
-                                successModal.show();
-                            } else {
-                                showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
-                            }
-                        })
-                        .catch(err => {
-                            console.error("Error al capturar la orden:", err);
-                            showErrorMessage("⚠️ Error al procesar la compra.");
-                        });
+                    return fetch(`/paypal/capture-order/${data.orderID}`, { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return res.json();
+                    })
+                    .then(details => {
+                        console.log("Orden capturada:", details);
+                        processingModal.hide();
+                        
+                        if (details.status === "COMPLETED") {
+                            successModal.show();
+                        } else {
+                            showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error al capturar la orden:", err);
+                        processingModal.hide();
+                        showErrorMessage("⚠️ Error al procesar la compra.");
+                    });
                 },
                 onCancel: () => {
                     showErrorMessage('❌ El pago fue cancelado.');
