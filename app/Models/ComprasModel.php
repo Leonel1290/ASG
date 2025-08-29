@@ -18,7 +18,14 @@ class ComprasModel extends Model
         'fecha_compra'
     ];
 
-    protected $useTimestamps = true;
+    protected $useTimestamps = false; // Desactivamos si usamos fecha_compra manual
     protected $createdField  = 'fecha_compra';
     protected $updatedField  = null;
+    
+    // Si la tabla no tiene timestamps, mejor desactivarlos completamente
+    public function __construct()
+    {
+        parent::__construct();
+        $this->useTimestamps = false;
+    }
 }

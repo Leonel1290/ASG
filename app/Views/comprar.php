@@ -212,7 +212,7 @@
                     })
                     .then(res => {
                         if (!res.ok) {
-                            throw new Error('Error en la respuesta del servidor');
+                            return res.text().then(text => { throw new Error(text) });
                         }
                         return res.json();
                     })
@@ -226,7 +226,7 @@
                     })
                     .catch(err => {
                         console.error("Error al crear la orden:", err);
-                        showErrorMessage("⚠️ Error al crear la orden de pago.");
+                        showErrorMessage("⚠️ Error al crear la orden de pago: " + err.message);
                     });
                 },
                 onApprove: function(data, actions) {
@@ -242,7 +242,7 @@
                     })
                     .then(res => {
                         if (!res.ok) {
-                            throw new Error('Error en la respuesta del servidor');
+                            return res.text().then(text => { throw new Error(text) });
                         }
                         return res.json();
                     })
@@ -253,13 +253,13 @@
                         if (details.status === "COMPLETED") {
                             successModal.show();
                         } else {
-                            showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
+                            showErrorMessage("⚠️ Hubo un problema al procesar el pago: " + JSON.stringify(details));
                         }
                     })
                     .catch(err => {
                         console.error("Error al capturar la orden:", err);
                         processingModal.hide();
-                        showErrorMessage("⚠️ Error al procesar la compra.");
+                        showErrorMessage("⚠️ Error al procesar la compra: " + err.message);
                     });
                 },
                 onCancel: () => {
