@@ -9,7 +9,7 @@ class CompraController extends Controller
 {
     private $clientId     = "AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_";
     private $clientSecret = "EEOWwqaRKfgtQYKYReuEcNZrRJJuGcJBWaUlKrYmzPLu4f7zGjHovQ8l9T_xASTSq9lDCErw6vR-RxKb";
-    private $paypalApiUrl = "https://api-m.sandbox.paypal.com"; // Sandbox - Nota: cambié a api-m
+    private $paypalApiUrl = "https://api-m.sandbox.paypal.com";
 
     protected $comprasModel;
 
@@ -89,11 +89,6 @@ class CompraController extends Controller
                 "Prefer: return=representation"
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-            
-            // Para debugging
-            curl_setopt($ch, CURLOPT_VERBOSE, true);
-            $verbose = fopen('php://temp', 'w+');
-            curl_setopt($ch, CURLOPT_STDERR, $verbose);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -101,11 +96,6 @@ class CompraController extends Controller
             if (curl_error($ch)) {
                 log_message('error', 'cURL Error creating order: ' . curl_error($ch));
             }
-            
-            rewind($verbose);
-            $verboseLog = stream_get_contents($verbose);
-            log_message('debug', 'cURL Verbose: ' . $verboseLog);
-            fclose($verbose);
             
             curl_close($ch);
 
@@ -126,7 +116,7 @@ class CompraController extends Controller
     }
 
     /**
-     * ✅ Capturar orden y guardar en BD
+     * ✅ Capturar orden y guardar en BD (sin depender de usuario)
      */
     public function captureOrder($orderId)
     {
@@ -148,22 +138,12 @@ class CompraController extends Controller
                 "Prefer: return=representation"
             ]);
 
-            // Para debugging
-            curl_setopt($ch, CURLOPT_VERBOSE, true);
-            $verbose = fopen('php://temp', 'w+');
-            curl_setopt($ch, CURLOPT_STDERR, $verbose);
-
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             
             if (curl_error($ch)) {
                 log_message('error', 'cURL Error capturing order: ' . curl_error($ch));
             }
-            
-            rewind($verbose);
-            $verboseLog = stream_get_contents($verbose);
-            log_message('debug', 'cURL Verbose: ' . $verboseLog);
-            fclose($verbose);
             
             curl_close($ch);
 
@@ -181,7 +161,6 @@ class CompraController extends Controller
                 $capture = $purchaseUnit['payments']['captures'][0];
                 
                 $data = [
-                    'usuario_id' => session()->get('id') ?? null,
                     'order_id'   => $result['id'],
                     'payer_id'   => $result['payer']['payer_id'] ?? null,
                     'payment_id' => $capture['id'] ?? null,
