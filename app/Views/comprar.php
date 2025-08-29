@@ -146,11 +146,7 @@
             </div>
         </div>
     </div>
-
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <script>
         console.log("Script principal de compra iniciado.");
 
@@ -164,62 +160,41 @@
         }
 
         if (typeof paypal === 'undefined') {
-            showErrorMessage("⚠️ Error: El SDK de PayPal no se ha cargado correctamente. Revisa tu conexión y el Client ID.");
-            console.error("Error: Objeto 'paypal' no encontrado. El script del SDK no se cargó.");
+            showErrorMessage("⚠️ Error: El SDK de PayPal no se ha cargado correctamente.");
+            console.error("Error: Objeto 'paypal' no encontrado.");
         } else {
             console.log("SDK de PayPal cargado exitosamente. Renderizando botones...");
 
             paypal.Buttons({
                 createOrder: function(data, actions) {
-                    console.log("Creando orden de PayPal...");
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: '100.00'
-                            }
-                        }]
-                    });
+                    // Llamamos a nuestro backend para crear la orden
+                    return fetch('<?= base_url("/paypal/create-order") ?>', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(order => {
+                            console.log("Orden creada en backend:", order);
+                            return order.id; // Retorna el orderID para PayPal
+                        })
+                        .catch(err => {
+                            console.error("Error al crear la orden:", err);
+                            showErrorMessage("⚠️ Error al crear la orden de pago.");
+                        });
                 },
                 onApprove: function(data, actions) {
-                    console.log("Pago aprobado. Capturando transacción...");
-                    return actions.order.capture().then(function(details) {
-                        console.log('Transacción completada por ' + details.payer.name.given_name);
-
-                        // Aquí se realiza la modificación para enviar los datos de la compra
-                        fetch('https://asg-rxnu.onrender.com/home/guardar_compra', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest' // Importante para isAJAX() en CodeIgniter
-                            },
-                            body: JSON.stringify({
-                                order_id: data.orderID,
-                                payer_id: details.payer.payer_id,
-                                payment_id: details.id,
-                                status: details.status,
-                                monto: details.purchase_units[0].amount.value
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Error del servidor: " + response.statusText);
-                            }
-                            return response.json();
-                        })
-                        .then(responseData => {
-                            console.log("Respuesta del servidor:", responseData);
-                            if (responseData.status === 'success') {
-                                console.log("Compra guardada correctamente.");
+                    // Llamamos a nuestro backend para capturar la orden y guardar en BD
+                    return fetch(`<?= base_url("/paypal/capture-order/") ?>${data.orderID}`, { method: 'POST' })
+                        .then(res => res.json())
+                        .then(details => {
+                            console.log("Orden capturada:", details);
+                            if (details.status === "COMPLETED") {
                                 successModal.show();
                             } else {
-                                throw new Error(responseData.message || "Error desconocido al guardar la compra.");
+                                showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
                             }
                         })
-                        .catch(error => {
-                            console.error('Error al guardar la compra:', error);
-                            showErrorMessage('⚠️ Hubo un error al guardar la compra. Intenta nuevamente.');
+                        .catch(err => {
+                            console.error("Error al capturar la orden:", err);
+                            showErrorMessage("⚠️ Error al procesar la compra.");
                         });
-                    });
                 },
                 onCancel: () => {
                     showErrorMessage('❌ El pago fue cancelado.');
@@ -227,13 +202,9 @@
                 },
                 onError: (err) => {
                     console.error('Error en la transacción:', err);
-                    showErrorMessage('⚠️ Error al procesar el pago. Intenta de nuevo.');
+                    showErrorMessage('⚠️ Error al procesar el pago.');
                 }
-            }).render('#paypal-button-container')
-            .catch(err => {
-                console.error("Error al renderizar el botón de PayPal:", err);
-                showErrorMessage('⚠️ Error al intentar mostrar el botón de PayPal. Revisa la consola para más detalles.');
-            });
+            }).render('#paypal-button-container');
         }
     </script>
 </body>
