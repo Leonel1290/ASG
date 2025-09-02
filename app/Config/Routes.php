@@ -55,7 +55,7 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 $routes->get('/comprar', 'Home::comprar');
 
 // Ruta para la PWA
-$routes->get('/instalar-pwa', 'Home::instalarPWA');
+//$routes->get('/instalar-pwa', 'Home::instalarPWA');
 
 
 
