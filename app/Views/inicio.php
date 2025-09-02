@@ -65,9 +65,14 @@
             line-height: 1.2;
         }
 
+        /* Animación para la imagen de fuga de gas */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
+        }
+
+        .hero-img {
+            animation: float 3s ease-in-out infinite;
         }
 
         .features {
@@ -192,6 +197,11 @@
         #simulacionModal .btn-close {
             filter: invert(1);
         }
+
+        /* Estilo para ocultar el botón de instalación por defecto */
+        #installPWAButton {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -212,7 +222,8 @@
                         <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
-                            <a class="btn btn-custom" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
+                            <button id="installPWAButton" class="btn btn-custom">Descargar App</button>
+                            <a class="btn btn-custom d-none" id="fallbackDownloadButton" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
                         </div>
                     </li>
                 </ul>
@@ -233,9 +244,9 @@
                 </div>
                 <div class="col-md-6 text-center mt-4 mt-md-0">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                            alt="Ilustración de fuga de gas"
-                            class="hero-img img-fluid"
-                            loading="lazy">
+                                alt="Ilustración de fuga de gas"
+                                class="hero-img img-fluid"
+                                loading="lazy">
                 </div>
             </div>
         </div>
@@ -299,7 +310,52 @@
 <script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    let deferredPrompt;
+    const installButton = document.getElementById('installPWAButton');
+    const fallbackButton = document.getElementById('fallbackDownloadButton');
+
+    // Escuchar el evento 'beforeinstallprompt'
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+        fallbackButton.style.display = 'none'; // Ocultar el botón de fallback
+    });
+
+    // Manejar el clic en el botón de instalación
+    installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            installButton.style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`El usuario eligió: ${outcome}`);
+            deferredPrompt = null;
+        }
+    });
+
+    // Si el evento 'beforeinstallprompt' no se dispara (ej. en navegadores no compatibles),
+    // mostrar el botón de fallback que abre el modal.
+    window.addEventListener('load', () => {
+        if (!deferredPrompt) {
+            fallbackButton.classList.remove('d-none');
+        }
+    });
+
+    const appModal = document.getElementById('appModal');
+    appModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const url = button.getAttribute('data-url');
+        const iframe = appModal.querySelector('#appIframe');
+        iframe.src = url;
+    });
+
+    appModal.addEventListener('hide.bs.modal', function () {
+        const iframe = appModal.querySelector('#appIframe');
+        iframe.src = '';
+    });
+</script>
 
 </body>
 </html>
