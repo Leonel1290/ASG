@@ -112,92 +112,6 @@
             box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
         }
 
-        /* --- Estilos del Modal de App --- */
-        .modal-body {
-            position: relative;
-            background-color: black;
-        }
-        .modal-content-simulacion {
-            background-color: #000000ff;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-button:hover, .close-button:focus {
-            color: black;
-            text-decoration: none;
-        }
-
-        /* --- Estilos de la Animación --- */
-        .image-container {
-            position: relative;
-            width: 700px;
-            height: 500px;
-            margin: 20px auto;
-        }
-
-        .image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .image.active {
-            opacity: 1;
-        }
-
-        /* Nuevo estilo para el botón circular */
-        .btn-circle {
-            width: 60px;
-            height: 60px;
-            padding: 0;
-            border-radius: 50%;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-circle:hover {
-            background-color: #218838;
-        }
-
-        /* Modificaciones del modal de simulación */
-        #simulacionModal .modal-header {
-            background-color: #000;
-            color: #fff;
-            border-bottom: 1px solid #333;
-        }
-        #simulacionModal .modal-body {
-            background-color: #000;
-            color: #fff;
-        }
-        #simulacionModal .modal-content {
-            background-color: #000;
-        }
-        #simulacionModal .btn-close {
-            filter: invert(1);
-        }
-
         /* Estilo para ocultar el botón de instalación por defecto */
         #installPWAButton {
             display: none;
@@ -223,7 +137,7 @@
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
                             <button id="installPWAButton" class="btn btn-custom">Descargar App</button>
-                            <a class="btn btn-custom d-none" id="fallbackDownloadButton" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/">Descargar App</a>
+                            <a class="btn btn-custom d-none" id="fallbackDownloadButton" href="https://pwa-1s1m.onrender.com/" target="_blank">Descargar App</a>
                         </div>
                     </li>
                 </ul>
@@ -292,20 +206,6 @@
     <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
 </footer>
 
-<div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="appModalLabel">Descargar App PWA</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="appIframe" src="" style="width: 100%; height: 80vh; border: none;"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
 <script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
 
@@ -321,7 +221,7 @@
         e.preventDefault();
         deferredPrompt = e;
         installButton.style.display = 'block';
-        fallbackButton.style.display = 'none'; // Ocultar el botón de fallback
+        fallbackButton.style.display = 'none';
     });
 
     // Manejar el clic en el botón de instalación
@@ -335,27 +235,13 @@
         }
     });
 
-    // Si el evento 'beforeinstallprompt' no se dispara (ej. en navegadores no compatibles),
-    // mostrar el botón de fallback que abre el modal.
+    // Si el evento 'beforeinstallprompt' no se dispara, mostrar el botón de respaldo
     window.addEventListener('load', () => {
         if (!deferredPrompt) {
             fallbackButton.classList.remove('d-none');
         }
     });
-
-    const appModal = document.getElementById('appModal');
-    appModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const url = button.getAttribute('data-url');
-        const iframe = appModal.querySelector('#appIframe');
-        iframe.src = url;
-    });
-
-    appModal.addEventListener('hide.bs.modal', function () {
-        const iframe = appModal.querySelector('#appIframe');
-        iframe.src = '';
-    });
 </script>
 
 </body>
-</html> 
+</html>
