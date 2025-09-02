@@ -1,0 +1,22 @@
+{
+  "name": "ASG - Seguridad en tu Hogar",
+  "short_name": "ASG",
+  "description": "Monitorea la seguridad de tu hogar con ASG. Detección de fugas de gas y control remoto en tiempo real.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A192F",
+  "theme_color": "#36678C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/imagenes/Logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagenes/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
