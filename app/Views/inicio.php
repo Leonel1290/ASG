@@ -223,7 +223,7 @@
                             <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
                             <button id="installPWAButton" class="btn btn-custom">Descargar App</button>
-                            <a class="btn btn-custom d-none" id="fallbackDownloadButton" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/instalar-pwa">Descargar App</a>
+                            <a class="btn btn-custom d-none" id="fallbackDownloadButton" href="#" data-bs-toggle="modal" data-bs-target="#appModal" data-url="https://pwa-1s1m.onrender.com/">Descargar App</a>
                         </div>
                     </li>
                 </ul>
