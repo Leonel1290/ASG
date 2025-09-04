@@ -17,12 +17,14 @@
             /* Colores Base */
             --dark-background: #0B1A1E;
             --dark-secondary: #10262B;
-            --dark-card-background: #1A2F34; /* Un poco más claro para las tarjetas */
-            --primary-highlight: #00A3A3; /* Un teal vibrante */
-            --primary-highlight-darker: #008D8D; /* Un tono más oscuro para hover */
-            --text-light: #C9D6DF; /* Gris claro para el texto principal */
-            --text-lighter: #F0F4F8; /* Blanco casi puro para títulos */
-            --navbar-bg-opacity: rgba(11, 26, 30, 0.9); /* Fondo del navbar ligeramente transparente */
+            --dark-card-background: #1A2F34;
+            --primary-highlight: #00A3A3;
+            --primary-highlight-darker: #008D8D;
+            --text-light: #C9D6DF;
+            --text-lighter: #F0F4F8;
+            --navbar-bg-opacity: rgba(11, 26, 30, 0.9);
+            --danger-alert: #ff4444;
+            --danger-alert-darker: #cc0000;
         }
 
         body {
@@ -33,7 +35,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Evita el scroll horizontal */
+            overflow-x: hidden;
         }
 
         .navbar {
@@ -43,12 +45,12 @@
             top: 0;
             width: 100%;
             z-index: 1000;
-            padding: 1rem 0; /* Padding vertical para un navbar más robusto */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada para profundidad */
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .navbar-brand, .nav-link {
-            color: var(--text-lighter); /* Blanco para el texto del navbar */
+            color: var(--text-lighter);
             font-weight: 600;
             transition: color 0.3s ease;
         }
@@ -62,20 +64,37 @@
             border: none;
             color: var(--text-lighter);
             font-weight: 600;
-            border-radius: 30px; /* Más redondeado */
-            padding: 0.75rem 2rem; /* Más padding para botones prominentes */
+            border-radius: 30px;
+            padding: 0.75rem 2rem;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 163, 163, 0.2); /* Sombra sutil del color del botón */
+            box-shadow: 0 4px 15px rgba(0, 163, 163, 0.2);
         }
 
         .btn-custom:hover {
             background-color: var(--primary-highlight-darker);
-            transform: translateY(-2px); /* Efecto sutil al pasar el mouse */
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 163, 163, 0.3);
         }
 
+        .btn-alert {
+            background-color: var(--danger-alert);
+            border: none;
+            color: var(--text-lighter);
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 0.75rem 2rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
+        }
+
+        .btn-alert:hover {
+            background-color: var(--danger-alert-darker);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.3);
+        }
+
         .hero {
-            padding: 4rem 0; /* Ajuste de padding */
+            padding: 4rem 0;
             text-align: center;
             flex-grow: 1;
             display: flex;
@@ -83,15 +102,15 @@
         }
 
         .hero h1 {
-            font-size: 2.8rem; /* Tamaño de fuente para el título */
+            font-size: 2.8rem;
             color: var(--text-lighter);
             font-weight: 700;
             line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Pequeña sombra para el texto */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero-line {
-            width: 70px; /* Más compacto */
+            width: 70px;
             height: 4px;
             background-color: var(--primary-highlight);
             margin: 1.25rem auto 1.75rem;
@@ -99,10 +118,10 @@
         }
 
         .hero-img {
-            max-width: 90%; /* Ajuste para móviles */
+            max-width: 90%;
             height: auto;
             margin-top: 2rem;
-            animation: float 6s ease-in-out infinite; /* Mantener la animación si te gusta el efecto */
+            animation: float 6s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -112,12 +131,12 @@
 
         .features {
             padding: 4rem 0;
-            background-color: var(--dark-card-background); /* Fondo para la sección */
-            border-radius: 20px; /* Bordes más redondeados */
-            margin: 3rem auto; /* Espacio entre secciones */
-            max-width: 95%; /* Ocupa más ancho */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Sombra más profunda */
-            border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil */
+            background-color: var(--dark-card-background);
+            border-radius: 20px;
+            margin: 3rem auto;
+            max-width: 95%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .features h2 {
@@ -128,7 +147,7 @@
         }
 
         .feature-card {
-            background-color: var(--dark-background); /* Fondo aún más oscuro para las tarjetas internas */
+            background-color: var(--dark-background);
             border-radius: 15px;
             padding: 2rem;
             margin-bottom: 1.5rem;
@@ -138,19 +157,19 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.08); /* Borde sutil */
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .feature-card:hover {
-            transform: translateY(-8px); /* Mayor elevación */
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
         .features i {
-            font-size: 3rem; /* Iconos más grandes */
+            font-size: 3rem;
             color: var(--primary-highlight);
             margin-bottom: 1.5rem;
-            text-shadow: 0 0 10px rgba(0, 163, 163, 0.5); /* Sombra luminosa para iconos */
+            text-shadow: 0 0 10px rgba(0, 163, 163, 0.5);
         }
 
         .features h3 {
@@ -190,7 +209,7 @@
         }
 
         .company-info strong {
-            color: var(--primary-highlight); /* Resaltar las etiquetas */
+            color: var(--primary-highlight);
         }
 
         .company-info a {
@@ -214,13 +233,26 @@
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* --- Estilos para las líneas del menú  */
+        .notification-permission {
+            background-color: var(--dark-card-background);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 95%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .notification-permission p {
+            margin-bottom: 1rem;
+        }
+
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28201, 214, 223, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
         .navbar-toggler:focus {
-            box-shadow: 0 0 0 .25rem var(--primary-highlight); /* Resaltado al hacer foco */
+            box-shadow: 0 0 0 .25rem var(--primary-highlight);
             border-color: var(--primary-highlight);
         }
 
@@ -232,8 +264,8 @@
             .hero-img {
                 max-width: 100%;
             }
-            .features, .company-info {
-                max-width: 80%; /* Menos ancho en pantallas grandes para centrar mejor */
+            .features, .company-info, .notification-permission {
+                max-width: 80%;
                 margin: 5rem auto;
             }
             .feature-card {
@@ -242,6 +274,12 @@
             .company-info {
                 padding: 3.5rem;
             }
+        }
+
+        /* Estilos para la notificación de prueba */
+        .test-notification {
+            text-align: center;
+            margin: 2rem 0;
         }
     </style>
 </head>
@@ -318,6 +356,18 @@
         </div>
     </section>
 
+    <section class="notification-permission">
+        <div class="container">
+            <h3>Notificaciones de Seguridad</h3>
+            <p>Activa las notificaciones para recibir alertas inmediatas en caso de fuga de gas.</p>
+            <button id="enableNotifications" class="btn btn-custom">Activar Notificaciones</button>
+            <div class="test-notification">
+                <p>¿Quieres probar cómo funcionarían las alertas?</p>
+                <button id="testNotification" class="btn btn-alert">Probar Notificación de Alerta</button>
+            </div>
+        </div>
+    </section>
+
     <section class="py-5" id="company">
         <div class="container">
             <div class="company-info">
@@ -352,22 +402,88 @@
             }
         });
 
-        // Ocultar overlay de animación al cargar la página (si lo mantienes)
+        // Ocultar overlay de animación al cargar la página
         $(window).on('load', function() {
-            // Elimina la clase o aplica un fade-out si quieres una animación al inicio
             $('#explosionOverlay').addClass('fade-out');
-            // O simplemente ocultarlo si no quieres animación
-            // $('#explosionOverlay').hide();
+        });
+
+        // Solicitar permiso para notificaciones
+        $('#enableNotifications').on('click', function() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        alert('Notificaciones activadas. Recibirás alertas en caso de fuga de gas.');
+                    } else {
+                        alert('Has bloqueado las notificaciones. No podrás recibir alertas de seguridad.');
+                    }
+                });
+            } else {
+                alert('Tu navegador no soporta notificaciones. Actualízalo o usa uno más moderno.');
+            }
+        });
+
+        // Probar notificación de alerta
+        $('#testNotification').on('click', function() {
+            showGasLeakAlert('Prueba de notificación', 'Esta es una simulación de alerta por fuga de gas.');
         });
     });
+
+    // Función para mostrar notificación de fuga de gas
+    function showGasLeakAlert(title, message) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            // Crear notificación
+            const notification = new Notification(title, {
+                body: message,
+                icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp',
+                badge: 'https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp',
+                tag: 'gas-leak-alert',
+                requireInteraction: true,
+                vibrate: [200, 100, 200, 100, 200, 100, 200] // Patrón de vibración para alertas
+            });
+
+            // Acción al hacer clic en la notificación
+            notification.onclick = function() {
+                window.focus();
+                notification.close();
+            };
+
+            // Cerrar automáticamente después de 10 segundos
+            setTimeout(function() {
+                notification.close();
+            }, 10000);
+        } else if ('Notification' in window && Notification.permission !== 'denied') {
+            // Si no tenemos permiso, solicitarlo
+            Notification.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    showGasLeakAlert(title, message);
+                }
+            });
+        } else {
+            // Fallback para navegadores sin soporte o que han denegado permisos
+            alert('ALERTA: ' + title + ' - ' + message);
+        }
+    }
+
+    // Simular una alerta de fuga de gas (esto normalmente vendría del servidor)
+    // function simulateGasLeak() {
+    //     setTimeout(function() {
+    //         showGasLeakAlert('¡ALERTA DE FUGA DE GAS!', 'Se ha detectado una fuga de gas en la cocina. Ventile el área y evite fuentes de ignición.');
+    //     }, 10000); // Simular alerta después de 10 segundos
+    // }
+    // simulateGasLeak(); // Descomenta para probar una alerta automática
 </script>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            // Asegúrate de que base_url('service-worker.js') apunte a la ruta correcta
             navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
                 .then(registration => {
                     console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    
+                    // Suscribirse a push notifications después de registrar el service worker
+                    if ('PushManager' in window) {
+                        // Aquí iría la lógica para suscribirse al servicio de push notifications
+                        // Esto requiere un servidor con claves VAPID y configuración adicional
+                    }
                 })
                 .catch(error => {
                     console.log('Fallo el registro de ServiceWorker:', error);
