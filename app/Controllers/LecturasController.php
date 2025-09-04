@@ -39,9 +39,9 @@ class LecturasController extends ResourceController
                 if ($nivel_gas >= $nivelCritico) {
                     $titulo = "¡Alerta de fuga de gas!";
                     $mensaje = "Se ha detectado un nivel crítico de gas en tu hogar. Por favor revisa inmediatamente.";
-                    // Llamada al método que envía notificación a todos los suscritos
-                    $this->pushController->sendNotificationPush($titulo, $mensaje);
-                }
+                        $this->pushController->sendNotificationPush($titulo, $mensaje);
+    }
+
 
                 return $this->response->setJSON([
                     'status' => 'success',

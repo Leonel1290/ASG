@@ -4,10 +4,17 @@ namespace App\Controllers;
 
 use App\Models\SuscripcionesModel;
 use CodeIgniter\RESTful\ResourceController;
+use Minishlink\WebPush\WebPush;
+use Minishlink\WebPush\Subscription;
 
 class PushController extends ResourceController
 {
     protected $suscripcionesModel;
+
+    // Claves VAPID (usa tus propias claves)
+    private $vapidPublicKey  = 'TU_PUBLIC_KEY';
+    private $vapidPrivateKey = 'TU_PRIVATE_KEY';
+    private $vapidSubject    = 'mailto:tu-email@example.com';
 
     public function __construct()
     {
@@ -22,7 +29,7 @@ class PushController extends ResourceController
     {
         $data = $this->request->getJSON(true);
 
-        if (!$data || !isset($data['endpoint'])) {
+        if (!$data || !isset($data['endpoint']) || !isset($data['keys'])) {
             return $this->response->setStatusCode(400)->setJSON([
                 'status' => 'error',
                 'message' => 'Datos de suscripción incompletos.'
@@ -46,7 +53,6 @@ class PushController extends ResourceController
     /**
      * Enviar notificación push a todos los usuarios suscritos
      * POST /push/send
-     * Recibe: title, body
      */
     public function send()
     {
@@ -72,28 +78,45 @@ class PushController extends ResourceController
     }
 
     /**
+     * Método público para enviar notificación desde LecturasController
+     */
+    public function sendNotificationPush($title, $body)
+    {
+        $suscripciones = $this->suscripcionesModel->findAll();
+
+        foreach ($suscripciones as $sub) {
+            $this->enviarNotificacion($sub, $title, $body);
+        }
+    }
+
+    /**
      * Función interna para enviar la notificación usando Web Push
      */
     private function enviarNotificacion($subscription, $title, $body)
     {
-        // Aquí puedes usar la librería Minishlink/web-push
-        // https://github.com/web-push-libs/web-push-php
-        // Ejemplo:
-        /*
-        $auth = [
-            'VAPID' => [
-                'subject' => 'mailto:tu-email@example.com',
-                'publicKey' => 'TU_PUBLIC_KEY',
-                'privateKey' => 'TU_PRIVATE_KEY'
-            ],
-        ];
-        $webPush = new \Minishlink\WebPush\WebPush($auth);
-        $webPush->sendNotification(
-            $subscription['endpoint'],
-            json_encode(['title' => $title, 'body' => $body]),
-            $subscription['keys']['p256dh'],
-            $subscription['keys']['auth']
-        );
-        */
+        try {
+            $auth = [
+                'VAPID' => [
+                    'subject' => $this->vapidSubject,
+                    'publicKey' => $this->vapidPublicKey,
+                    'privateKey' => $this->vapidPrivateKey,
+                ],
+            ];
+
+            $webPush = new WebPush($auth);
+
+            $sub = Subscription::create([
+                'endpoint' => $subscription['endpoint'],
+                'publicKey' => $subscription['keys']['p256dh'],
+                'authToken' => $subscription['keys']['auth'],
+            ]);
+
+            $webPush->sendOneNotification($sub, json_encode([
+                'title' => $title,
+                'body'  => $body,
+            ]));
+        } catch (\Exception $e) {
+            log_message('error', 'Error enviando notificación: ' . $e->getMessage());
+        }
     }
 }
