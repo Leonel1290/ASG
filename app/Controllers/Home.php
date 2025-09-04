@@ -340,8 +340,4 @@ public function instalarPWA()
 
     // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
     // public function verLecturas($mac) { ... }
-    public function Alertagas()
-    {
-    return view('Alertagas');
-}
 }
