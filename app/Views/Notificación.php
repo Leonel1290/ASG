@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ASG - Prueba de Notificaciones</title>
+    <title>ASG - Simulador de Fugas de Gas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -106,41 +106,68 @@
             transform: translateY(-2px);
         }
 
-        .btn-warning {
-            background-color: var(--warning-alert);
-            color: #333;
-            border: none;
-            border-radius: 30px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-warning:hover {
-            background-color: #eeaa22;
-            transform: translateY(-2px);
-        }
-
-        .notification-panel {
+        .simulation-panel {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 1.5rem;
             margin-top: 1.5rem;
         }
 
-        .notification-type {
-            flex: 1;
-            min-width: 300px;
+        .sensor-status {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
             background: var(--dark-background);
             border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .notification-icon {
-            font-size: 3rem;
+        .sensor-icon {
+            font-size: 2.5rem;
+            margin-right: 1.5rem;
+            width: 60px;
+            text-align: center;
+        }
+
+        .sensor-info {
+            flex: 1;
+        }
+
+        .sensor-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .progress {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .countdown {
+            text-align: center;
+            padding: 2rem;
+            background: var(--dark-background);
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .countdown-text {
+            font-size: 1.2rem;
             margin-bottom: 1rem;
+        }
+
+        .countdown-timer {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-highlight);
         }
 
         .test-results {
@@ -210,13 +237,38 @@
             color: var(--warning-alert);
         }
 
+        .notification-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--danger-alert);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-badge:hover {
+            transform: scale(1.1);
+        }
+
         @media (max-width: 768px) {
-            .notification-panel {
+            .sensor-status {
                 flex-direction: column;
+                text-align: center;
             }
             
-            .notification-type {
-                min-width: 100%;
+            .sensor-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -225,7 +277,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-gas-pump"></i> ASG - Prueba de Notificaciones
+                <i class="fas fa-gas-pump"></i> ASG - Simulador de Fugas de Gas
             </a>
         </div>
     </nav>
@@ -233,8 +285,8 @@
     <div class="container-main">
         <div class="card">
             <div class="card-header">
-                <h2><i class="fas fa-bell"></i> Panel de Control de Notificaciones</h2>
-                <p class="mb-0">Simula y prueba las notificaciones push para fugas de gas</p>
+                <h2><i class="fas fa-flask"></i> Simulación de Detección de Gas</h2>
+                <p class="mb-0">El sistema simulará una fuga de gas después de 1 minuto y enviará notificaciones automáticas</p>
             </div>
             <div class="card-body">
                 <div class="permission-status" id="permissionStatus">
@@ -242,50 +294,36 @@
                 </div>
 
                 <button id="requestPermission" class="btn btn-primary">
-                    <i class="fas fa-check-circle"></i> Solicitar Permiso para Notificaciones
+                    <i class="fas fa-check-circle"></i> Activar Notificaciones
                 </button>
 
-                <div class="notification-panel">
-                    <div class="notification-type">
-                        <div class="notification-icon text-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <h4>Fuga Leve</h4>
-                        <p>Niveles bajos de gas detectados</p>
-                        <button class="btn btn-warning test-notification" data-level="leve">
-                            <i class="fas fa-bell"></i> Probar Notificación
-                        </button>
-                    </div>
+                <div class="countdown">
+                    <div class="countdown-text">La simulación comenzará en:</div>
+                    <div class="countdown-timer" id="countdown">01:00</div>
+                </div>
 
-                    <div class="notification-type">
-                        <div class="notification-icon text-danger">
-                            <i class="fas fa-radiation"></i>
+                <div class="simulation-panel">
+                    <div class="sensor-status">
+                        <div class="sensor-icon text-success">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <h4>Fuga Moderada</h4>
-                        <p>Niveles moderados de gas detectados</p>
-                        <button class="btn btn-danger test-notification" data-level="moderada">
-                            <i class="fas fa-bell"></i> Probar Notificación
-                        </button>
-                    </div>
-
-                    <div class="notification-type">
-                        <div class="notification-icon text-danger">
-                            <i class="fas fa-skull-crossbones"></i>
+                        <div class="sensor-info">
+                            <h4>Sensor de Gas - Cocina</h4>
+                            <div class="sensor-value" id="gasValue">0 ppm</div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" id="gasProgress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div>Estado: <span id="sensorStatus" class="text-success">Normal</span></div>
                         </div>
-                        <h4>Fuga Crítica</h4>
-                        <p>Niveles peligrosos de gas detectados - Evacuación inmediata</p>
-                        <button class="btn btn-danger test-notification" data-level="critica">
-                            <i class="fas fa-bell"></i> Probar Notificación
-                        </button>
                     </div>
                 </div>
 
                 <div class="test-results">
-                    <h4><i class="fas fa-clipboard-list"></i> Registro de Pruebas</h4>
-                    <div class="log-container" id="testLog" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
+                    <h4><i class="fas fa-clipboard-list"></i> Registro del Sistema</h4>
+                    <div class="log-container" id="systemLog" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
                         <div class="log-entry">
                             <span class="log-time" id="current-time"></span>
-                            <span class="log-message">Sistema de prueba inicializado. Haz clic en los botones para probar las notificaciones.</span>
+                            <span class="log-message">Sistema de monitoreo inicializado. Esperando inicio de simulación.</span>
                         </div>
                     </div>
                 </div>
@@ -294,28 +332,26 @@
 
         <div class="card">
             <div class="card-header">
-                <h3><i class="fas fa-info-circle"></i> Información de Prueba</h3>
+                <h3><i class="fas fa-info-circle"></i> Información del Sistema</h3>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h4>¿Cómo probar las notificaciones?</h4>
-                        <ol>
-                            <li>Haz clic en "Solicitar Permiso para Notificaciones"</li>
-                            <li>Acepta los permisos cuando tu navegador te lo solicite</li>
-                            <li>Haz clic en cualquiera de los botones de prueba</li>
-                            <li>Verifica que recibes la notificación</li>
-                            <li>Revisa los resultados en el registro de pruebas</li>
-                        </ol>
+                        <h4>Niveles de Gas</h4>
+                        <ul>
+                            <li><span class="text-success">0-100 ppm:</span> Nivel normal</li>
+                            <li><span class="text-warning">100-300 ppm:</span> Fuga leve detectada</li>
+                            <li><span class="text-warning">300-600 ppm:</span> Fuga moderada</li>
+                            <li><span class="text-danger">600+ ppm:</span> Fuga crítica - ¡Peligro!</li>
+                        </ul>
                     </div>
                     <div class="col-md-6">
-                        <h4>Solución de problemas</h4>
+                        <h4>Acciones Automáticas</h4>
                         <ul>
-                            <li>Asegúrate de que tu navegador permita notificaciones</li>
-                            <li>Verifica que no tengas el "modo silencioso" activado</li>
-                            <li>Si usas Chrome, revisa la configuración de notificaciones en:
-                                <br><code>chrome://settings/content/notifications</code></li>
-                            <li>Actualiza tu navegador a la versión más reciente</li>
+                            <li>Notificación en fuga leve</li>
+                            <li>Alerta sonora en fuga moderada</li>
+                            <li>Notificación crítica y simulación de cierre de válvula en fugas críticas</li>
+                            <li>Registro de todos los eventos en el sistema</li>
                         </ul>
                     </div>
                 </div>
@@ -323,12 +359,25 @@
         </div>
     </div>
 
+    <div class="notification-badge d-none" id="notificationBadge">
+        <i class="fas fa-bell"></i>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const permissionStatus = document.getElementById('permissionStatus');
             const requestPermissionBtn = document.getElementById('requestPermission');
-            const testLog = document.getElementById('testLog');
-            const testButtons = document.querySelectorAll('.test-notification');
+            const systemLog = document.getElementById('systemLog');
+            const countdownElement = document.getElementById('countdown');
+            const gasValueElement = document.getElementById('gasValue');
+            const gasProgressElement = document.getElementById('gasProgress');
+            const sensorStatusElement = document.getElementById('sensorStatus');
+            const notificationBadge = document.getElementById('notificationBadge');
+            
+            let simulationTimer;
+            let countdownTimer;
+            let secondsLeft = 60; // 1 minuto para comenzar la simulación
+            let simulationActive = false;
             
             // Actualizar la hora actual en el registro
             function updateCurrentTime() {
@@ -350,15 +399,17 @@
                 }
                 
                 if (Notification.permission === 'granted') {
-                    permissionStatus.innerHTML = '<span class="status-indicator status-active"></span> Permisos concedidos: Puedes probar las notificaciones';
+                    permissionStatus.innerHTML = '<span class="status-indicator status-active"></span> Notificaciones activadas: El sistema alertará sobre fugas de gas';
                     permissionStatus.className = 'permission-granted';
                     requestPermissionBtn.disabled = true;
+                    startCountdown();
                 } else if (Notification.permission === 'denied') {
-                    permissionStatus.innerHTML = '<span class="status-indicator status-inactive"></span> Permisos denegados: Debes habilitar manualmente las notificaciones';
+                    permissionStatus.innerHTML = '<span class="status-indicator status-inactive"></span> Permisos denegados: El sistema no podrá enviar alertas';
                     permissionStatus.className = 'permission-denied';
                     requestPermissionBtn.disabled = true;
+                    startCountdown();
                 } else {
-                    permissionStatus.innerHTML = '<span class="status-indicator status-inactive"></span> Permisos no concedidos: Haz clic en el botón para solicitar permisos';
+                    permissionStatus.innerHTML = '<span class="status-indicator status-inactive"></span> Active las notificaciones para recibir alertas de fugas';
                     permissionStatus.className = 'permission-default';
                     requestPermissionBtn.disabled = false;
                 }
@@ -381,80 +432,147 @@
                 logEntry.className = 'log-entry';
                 logEntry.innerHTML = '<span class="log-time">[' + timeString + ']</span> <span class="log-message">' + message + '</span>';
                 
-                testLog.appendChild(logEntry);
-                testLog.scrollTop = testLog.scrollHeight;
+                systemLog.appendChild(logEntry);
+                systemLog.scrollTop = systemLog.scrollHeight;
             }
             
-            // Probar notificación
-            function testNotification(level) {
-                if (Notification.permission !== 'granted') {
-                    addLog('Error: Primero debes conceder los permisos de notificación');
-                    return;
-                }
-                
-                let title, message, icon;
-                
-                switch(level) {
-                    case 'leve':
-                        title = '⚠️ Fuga de Gas Leve';
-                        message = 'Se detectaron niveles bajos de gas. Verifique ventilación.';
-                        icon = 'https://cdn-icons-png.flaticon.com/512/3616/3616932.png';
-                        break;
-                    case 'moderada':
-                        title = '🚨 Fuga de Gas Moderada';
-                        message = 'Niveles moderados de gas detectados. Ventile el área y evite llamas.';
-                        icon = 'https://cdn-icons-png.flaticon.com/512/3616/3616945.png';
-                        break;
-                    case 'critica':
-                        title = '🔥¡PELIGRO! Fuga de Gas Crítica';
-                        message = '¡EVACUACIÓN INMEDIATA! Niveles peligrosos de gas detectados.';
-                        icon = 'https://cdn-icons-png.flaticon.com/512/3616/3616961.png';
-                        break;
-                    default:
-                        title = 'Notificación de Prueba';
-                        message = 'Esta es una notificación de prueba del sistema ASG.';
-                        icon = 'https://cdn-icons-png.flaticon.com/512/3616/3616932.png';
-                }
-                
-                try {
-                    const notification = new Notification(title, {
-                        body: message,
-                        icon: icon,
-                        requireInteraction: level === 'critica',
-                        tag: 'asg-gas-alert',
-                        vibrate: [200, 100, 200, 100, 200]
-                    });
+            // Iniciar cuenta regresiva
+            function startCountdown() {
+                countdownTimer = setInterval(function() {
+                    secondsLeft--;
                     
-                    notification.onclick = function() {
-                        window.focus();
-                        notification.close();
-                        addLog('Notificación "' + title + '" fue clickeada por el usuario');
-                    };
+                    const minutes = Math.floor(secondsLeft / 60);
+                    const seconds = secondsLeft % 60;
                     
-                    addLog('Notificación enviada: ' + title);
+                    countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                     
-                    // Cerrar automáticamente después de 10 segundos (excepto críticas)
-                    if (level !== 'critica') {
-                        setTimeout(function() {
-                            notification.close();
-                        }, 10000);
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        startSimulation();
                     }
-                } catch (error) {
-                    addLog('Error al mostrar notificación: ' + error.message);
+                }, 1000);
+            }
+            
+            // Iniciar simulación de fuga de gas
+            function startSimulation() {
+                simulationActive = true;
+                addLog('Iniciando simulación de fuga de gas...');
+                
+                let gasLevel = 0;
+                let simulationStage = 0;
+                
+                // Ocultar countdown
+                document.querySelector('.countdown').classList.add('d-none');
+                
+                // Función para actualizar el nivel de gas
+                function updateGasLevel() {
+                    if (!simulationActive) return;
+                    
+                    // Aumentar el nivel de gas según la etapa de simulación
+                    if (simulationStage === 0) {
+                        gasLevel += 5; // Aumento lento al inicio
+                        if (gasLevel >= 100) simulationStage = 1;
+                    } else if (simulationStage === 1) {
+                        gasLevel += 15; // Aumento moderado
+                        if (gasLevel >= 300) simulationStage = 2;
+                    } else {
+                        gasLevel += 25; // Aumento rápido (fuga crítica)
+                        if (gasLevel >= 1000) {
+                            clearInterval(simulationTimer);
+                            addLog('Niveles de gas críticos. Simulando cierre de válvula principal...');
+                            return;
+                        }
+                    }
+                    
+                    // Actualizar UI
+                    gasValueElement.textContent = gasLevel + ' ppm';
+                    gasProgressElement.style.width = Math.min(gasLevel / 10, 100) + '%';
+                    
+                    // Cambiar colores según el nivel
+                    if (gasLevel < 100) {
+                        gasProgressElement.className = 'progress-bar bg-success';
+                        sensorStatusElement.textContent = 'Normal';
+                        sensorStatusElement.className = 'text-success';
+                    } else if (gasLevel < 300) {
+                        gasProgressElement.className = 'progress-bar bg-warning';
+                        sensorStatusElement.textContent = 'Fuga Leve';
+                        sensorStatusElement.className = 'text-warning';
+                        
+                        // Enviar notificación de fuga leve
+                        if (gasLevel === 100) {
+                            showNotification('⚠️ Fuga de Gas Leve', 'Se detectaron niveles bajos de gas (100 ppm). Verifique ventilación.');
+                        }
+                    } else if (gasLevel < 600) {
+                        gasProgressElement.className = 'progress-bar bg-warning';
+                        sensorStatusElement.textContent = 'Fuga Moderada';
+                        sensorStatusElement.className = 'text-warning';
+                        
+                        // Enviar notificación de fuga moderada
+                        if (gasLevel === 300) {
+                            showNotification('🚨 Fuga de Gas Moderada', 'Niveles moderados de gas detectados (300 ppm). Ventile el área y evite llamas.');
+                        }
+                    } else {
+                        gasProgressElement.className = 'progress-bar bg-danger';
+                        sensorStatusElement.textContent = 'Fuga Crítica';
+                        sensorStatusElement.className = 'text-danger';
+                        
+                        // Enviar notificación de fuga crítica
+                        if (gasLevel === 600) {
+                            showNotification('🔥 ¡PELIGRO! Fuga de Gas Crítica', '¡EVACUACIÓN INMEDIATA! Niveles peligrosos de gas detectados (600 ppm).');
+                        }
+                    }
+                }
+                
+                // Actualizar cada 2 segundos
+                simulationTimer = setInterval(updateGasLevel, 2000);
+            }
+            
+            // Mostrar notificación
+            function showNotification(title, message) {
+                addLog('Enviando notificación: ' + title);
+                
+                // Mostrar badge de notificación
+                notificationBadge.classList.remove('d-none');
+                
+                if (Notification.permission === 'granted') {
+                    try {
+                        const notification = new Notification(title, {
+                            body: message,
+                            icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp',
+                            requireInteraction: title.includes('PELIGRO'),
+                            tag: 'asg-gas-alert'
+                        });
+                        
+                        notification.onclick = function() {
+                            window.focus();
+                            notification.close();
+                            addLog('Notificación "' + title + '" fue clickeada por el usuario');
+                            notificationBadge.classList.add('d-none');
+                        };
+                        
+                        // Cerrar automáticamente después de 10 segundos (excepto críticas)
+                        if (!title.includes('PELIGRO')) {
+                            setTimeout(function() {
+                                notification.close();
+                                notificationBadge.classList.add('d-none');
+                            }, 10000);
+                        }
+                    } catch (error) {
+                        addLog('Error al mostrar notificación: ' + error.message);
+                    }
+                } else {
+                    addLog('No se pudo enviar notificación: Permisos no concedidos');
                 }
             }
             
-            // Configurar botones de prueba
-            testButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const level = this.getAttribute('data-level');
-                    testNotification(level);
-                });
+            // Configurar el badge de notificación
+            notificationBadge.addEventListener('click', function() {
+                this.classList.add('d-none');
             });
             
             // Inicializar comprobación de permisos
             checkNotificationPermission();
-            addLog('Sistema de prueba de notificaciones inicializado');
+            addLog('Sistema de monitoreo de gas inicializado');
         });
     </script>
 </body>
