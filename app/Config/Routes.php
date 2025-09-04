@@ -67,4 +67,4 @@ $routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 // RUTA CORREGIDA: Cambiado 'estado_valvula' a 'valve_status' para que coincida con la solicitud del ESP
 $routes->get('api/valve_status', 'ApiEspController::estadoValvula');
 
-$routes->get('/Alertagas', 'Home::Alertagas')
+$routes->get('/Alertagas', 'Home::Alertagas');
