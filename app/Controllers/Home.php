@@ -61,6 +61,13 @@ class Home extends BaseController
             if (!$user['is_active']) {
                 $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
                 log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
+                
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.'
+                    ]);
+                }
                 return redirect()->back()->withInput();
             }
 
@@ -93,34 +100,68 @@ class Home extends BaseController
                     $biometricToken = bin2hex(random_bytes(32));
                     $expires = Time::now()->addDays(30); // Válido por 30 días
                     
-                    // Guardar token en la base de datos
-                    $userModel->update($user['id'], [
+                    // Guardar token en la base de datos - CORREGIDO
+                    $updateData = [
                         'biometric_token' => $biometricToken,
                         'biometric_expires' => $expires->toDateTimeString()
-                    ]);
+                    ];
                     
-                    // Devolver el token para almacenamiento local (para solicitudes AJAX)
-                    if ($this->request->isAJAX()) {
-                        return $this->response->setJSON([
-                            'success' => true,
-                            'biometric_token' => $biometricToken,
-                            'redirect' => '/perfil'
-                        ]);
+                    // Verificar que el usuario existe antes de actualizar
+                    $affectedRows = $userModel->update($user['id'], $updateData);
+                    
+                    if ($affectedRows === false) {
+                        log_message('error', 'Error al actualizar token biométrico para usuario ID: ' . $user['id']);
+                        // Continuar con el login aunque falle la actualización biométrica
+                    } else {
+                        log_message('debug', 'Token biométrico actualizado para usuario ID: ' . $user['id']);
+                        
+                        // Devolver el token para almacenamiento local (para solicitudes AJAX)
+                        if ($this->request->isAJAX()) {
+                            return $this->response->setJSON([
+                                'success' => true,
+                                'biometric_token' => $biometricToken,
+                                'redirect' => '/perfil'
+                            ]);
+                        }
+                        
+                        // Para solicitudes normales, almacenar token en flashdata
+                        $session->setFlashdata('biometric_token', $biometricToken);
                     }
-                    
-                    // Para solicitudes normales, almacenar token en flashdata
-                    $session->setFlashdata('biometric_token', $biometricToken);
                 }
 
+                // Redirección normal para solicitudes no AJAX
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'redirect' => '/perfil'
+                    ]);
+                }
+                
                 return redirect()->to('/perfil');
             } else {
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
+                $errorMsg = 'Contraseña incorrecta.';
+                $session->setFlashdata('error', $errorMsg);
                 log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
+                
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => $errorMsg
+                    ]);
+                }
                 return redirect()->back()->withInput();
             }
         } else {
-            $session->setFlashdata('error', 'Email no encontrado.');
+            $errorMsg = 'Email no encontrado.';
+            $session->setFlashdata('error', $errorMsg);
             log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
+            
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => $errorMsg
+                ]);
+            }
             return redirect()->back()->withInput();
         }
     }
@@ -159,7 +200,7 @@ class Home extends BaseController
             
             return $this->response->setJSON(['success' => true, 'redirect' => '/perfil']);
         } else {
-            return $this->response->setJSON(['success' => false, 'message' => 'Autenticación biométrica fallida']);
+            return $this->response->setJSON(['success' => false, 'message' => 'Autenticación biométrica fallida. Por favor, inicie sesión con sus credenciales.']);
         }
     }
 
@@ -175,15 +216,28 @@ class Home extends BaseController
         $userId = $session->get('id');
         $userModel = new UserModel();
         
-        $userModel->update($userId, [
+        // Verificar que el usuario existe antes de intentar actualizar
+        $user = $userModel->find($userId);
+        if (!$user) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Usuario no encontrado']);
+        }
+        
+        $updateData = [
             'biometric_token' => null,
             'biometric_expires' => null
-        ]);
+        ];
+        
+        $affectedRows = $userModel->update($userId, $updateData);
+        
+        if ($affectedRows === false) {
+            log_message('error', 'Error al deshabilitar autenticación biométrica para usuario ID: ' . $userId);
+            return $this->response->setJSON(['success' => false, 'message' => 'Error al deshabilitar autenticación biométrica']);
+        }
         
         // Actualizar estado en sesión
         $session->set('biometric_enabled', 0);
         
-        return $this->response->setJSON(['success' => true]);
+        return $this->response->setJSON(['success' => true, 'message' => 'Autenticación biométrica deshabilitada']);
     }
 
     public function register()
