@@ -260,13 +260,6 @@
             transform: scale(1.1);
         }
 
-        .audio-controls {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--dark-background);
-            border-radius: 10px;
-        }
-
         @media (max-width: 768px) {
             .sensor-status {
                 flex-direction: column;
@@ -325,15 +318,6 @@
                     </div>
                 </div>
 
-                <div class="audio-controls">
-                    <h4><i class="fas fa-volume-up"></i> Control de Audio</h4>
-                    <p>Para que las alertas de sonido funcionen correctamente, interactúa con esta página:</p>
-                    <button id="testAudio" class="btn btn-primary">
-                        <i class="fas fa-play"></i> Probar Sonido de Alerta
-                    </button>
-                    <div id="audioStatus" class="mt-2"></div>
-                </div>
-
                 <div class="test-results">
                     <h4><i class="fas fa-clipboard-list"></i> Registro del Sistema</h4>
                     <div class="log-container" id="systemLog" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
@@ -379,12 +363,6 @@
         <i class="fas fa-bell"></i>
     </div>
 
-    <!-- Audio de alerta: usando un archivo online para evitar problemas de ruta -->
-    <audio id="alerta-audio" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
-        Tu navegador no soporta el elemento de audio.
-    </audio>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const permissionStatus = document.getElementById('permissionStatus');
@@ -395,26 +373,22 @@
             const gasProgressElement = document.getElementById('gasProgress');
             const sensorStatusElement = document.getElementById('sensorStatus');
             const notificationBadge = document.getElementById('notificationBadge');
-            const audioEl = document.getElementById('alerta-audio');
-            const testAudioBtn = document.getElementById('testAudio');
-            const audioStatus = document.getElementById('audioStatus');
-
+            
             let simulationTimer;
             let countdownTimer;
             let secondsLeft = 60; // 1 minuto para comenzar la simulación
             let simulationActive = false;
-            let audioUnlocked = false;
-
+            
             // Actualizar la hora actual en el registro
             function updateCurrentTime() {
                 const now = new Date();
                 const timeString = now.toLocaleTimeString();
                 document.getElementById('current-time').textContent = '[' + timeString + ']';
             }
-
+            
             setInterval(updateCurrentTime, 1000);
             updateCurrentTime();
-
+            
             // Comprobar el estado de los permisos
             function checkNotificationPermission() {
                 if (!('Notification' in window)) {
@@ -423,7 +397,7 @@
                     requestPermissionBtn.disabled = true;
                     return;
                 }
-
+                
                 if (Notification.permission === 'granted') {
                     permissionStatus.innerHTML = '<span class="status-indicator status-active"></span> Notificaciones activadas: El sistema alertará sobre fugas de gas';
                     permissionStatus.className = 'permission-granted';
@@ -440,131 +414,60 @@
                     requestPermissionBtn.disabled = false;
                 }
             }
-
+            
             // Solicitar permisos
             requestPermissionBtn.addEventListener('click', function() {
                 Notification.requestPermission().then(function(permission) {
                     addLog('Solicitud de permisos: ' + permission);
                     checkNotificationPermission();
-                    // Intento de desbloquear audio por la interacción del usuario
-                    tryUnlockAudio();
                 });
             });
-
-            // Botón para probar el audio
-            testAudioBtn.addEventListener('click', function() {
-                playAudioForNotification('Prueba de sonido');
-                audioStatus.innerHTML = '<span class="text-success">Reproduciendo sonido de prueba...</span>';
-                setTimeout(() => {
-                    audioStatus.innerHTML = '<span class="text-success">Sonido probado correctamente</span>';
-                }, 1000);
-            });
-
-            // Intenta reproducir en silencio para "desbloquear" reproducción futura
-            function tryUnlockAudio() {
-                if (!audioEl || audioUnlocked) return;
-                
-                try {
-                    // Reproducir silenciado y pausar para que el navegador considere que hubo interacción del usuario
-                    audioEl.volume = 0.1; // Volumen muy bajo en lugar de muteado
-                    
-                    const playPromise = audioEl.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            // Pausar inmediatamente después de comenzar la reproducción
-                            audioEl.pause();
-                            audioEl.currentTime = 0;
-                            audioEl.volume = 1.0;
-                            audioUnlocked = true;
-                            addLog('Audio desbloqueado por interacción del usuario.');
-                        }).catch(err => {
-                            audioEl.volume = 1.0;
-                            addLog('No se pudo desbloquear audio automáticamente: ' + err.message);
-                        });
-                    }
-                } catch (e) {
-                    audioEl.volume = 1.0;
-                    addLog('Error al intentar desbloquear audio: ' + e.message);
-                }
-            }
-
-            // Reproducir audio para la notificación
-            function playAudioForNotification(context) {
-                if (!audioEl) {
-                    addLog('Elemento de audio no encontrado');
-                    return;
-                }
-                
-                try {
-                    // Detener cualquier reproducción previa y reiniciar
-                    audioEl.pause();
-                    audioEl.currentTime = 0;
-                    
-                    // Intentar reproducir
-                    const playPromise = audioEl.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            addLog('Sonido de alerta reproducido correctamente: ' + context);
-                        }).catch(err => {
-                            addLog('No se pudo reproducir el sonido de alerta (' + context + '): ' + err.message);
-                            // Si falla, intentar desbloquear el audio
-                            if (!audioUnlocked) {
-                                tryUnlockAudio();
-                            }
-                        });
-                    }
-                } catch (e) {
-                    addLog('Error al reproducir audio (' + context + '): ' + e.message);
-                }
-            }
-
+            
             // Añadir entrada al registro
             function addLog(message) {
                 const now = new Date();
                 const timeString = now.toLocaleTimeString();
-
+                
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
                 logEntry.innerHTML = '<span class="log-time">[' + timeString + ']</span> <span class="log-message">' + message + '</span>';
-
+                
                 systemLog.appendChild(logEntry);
                 systemLog.scrollTop = systemLog.scrollHeight;
             }
-
+            
             // Iniciar cuenta regresiva
             function startCountdown() {
                 countdownTimer = setInterval(function() {
                     secondsLeft--;
-
+                    
                     const minutes = Math.floor(secondsLeft / 60);
                     const seconds = secondsLeft % 60;
-
+                    
                     countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
+                    
                     if (secondsLeft <= 0) {
                         clearInterval(countdownTimer);
                         startSimulation();
                     }
                 }, 1000);
             }
-
+            
             // Iniciar simulación de fuga de gas
             function startSimulation() {
                 simulationActive = true;
                 addLog('Iniciando simulación de fuga de gas...');
-
+                
                 let gasLevel = 0;
                 let simulationStage = 0;
-
+                
                 // Ocultar countdown
                 document.querySelector('.countdown').classList.add('d-none');
-
+                
                 // Función para actualizar el nivel de gas
                 function updateGasLevel() {
                     if (!simulationActive) return;
-
+                    
                     // Aumentar el nivel de gas según la etapa de simulación
                     if (simulationStage === 0) {
                         gasLevel += 5; // Aumento lento al inicio
@@ -580,11 +483,11 @@
                             return;
                         }
                     }
-
+                    
                     // Actualizar UI
                     gasValueElement.textContent = gasLevel + ' ppm';
                     gasProgressElement.style.width = Math.min(gasLevel / 10, 100) + '%';
-
+                    
                     // Cambiar colores según el nivel
                     if (gasLevel < 100) {
                         gasProgressElement.className = 'progress-bar bg-success';
@@ -594,7 +497,7 @@
                         gasProgressElement.className = 'progress-bar bg-warning';
                         sensorStatusElement.textContent = 'Fuga Leve';
                         sensorStatusElement.className = 'text-warning';
-
+                        
                         // Enviar notificación de fuga leve
                         if (gasLevel === 100) {
                             showNotification('⚠️ Fuga de Gas Leve', 'Se detectaron niveles bajos de gas (100 ppm). Verifique ventilación.');
@@ -603,7 +506,7 @@
                         gasProgressElement.className = 'progress-bar bg-warning';
                         sensorStatusElement.textContent = 'Fuga Moderada';
                         sensorStatusElement.className = 'text-warning';
-
+                        
                         // Enviar notificación de fuga moderada
                         if (gasLevel === 300) {
                             showNotification('🚨 Fuga de Gas Moderada', 'Niveles moderados de gas detectados (300 ppm). Ventile el área y evite llamas.');
@@ -612,28 +515,25 @@
                         gasProgressElement.className = 'progress-bar bg-danger';
                         sensorStatusElement.textContent = 'Fuga Crítica';
                         sensorStatusElement.className = 'text-danger';
-
+                        
                         // Enviar notificación de fuga crítica
                         if (gasLevel === 600) {
                             showNotification('🔥 ¡PELIGRO! Fuga de Gas Crítica', '¡EVACUACIÓN INMEDIATA! Niveles peligrosos de gas detectados (600 ppm).');
                         }
                     }
                 }
-
+                
                 // Actualizar cada 2 segundos
                 simulationTimer = setInterval(updateGasLevel, 2000);
             }
-
+            
             // Mostrar notificación
             function showNotification(title, message) {
                 addLog('Enviando notificación: ' + title);
-
+                
                 // Mostrar badge de notificación
                 notificationBadge.classList.remove('d-none');
-
-                // Reproducir sonido de alerta
-                playAudioForNotification(title);
-
+                
                 if (Notification.permission === 'granted') {
                     try {
                         const notification = new Notification(title, {
@@ -642,22 +542,18 @@
                             requireInteraction: title.includes('PELIGRO'),
                             tag: 'asg-gas-alert'
                         });
-
+                        
                         notification.onclick = function() {
                             window.focus();
                             notification.close();
                             addLog('Notificación "' + title + '" fue clickeada por el usuario');
                             notificationBadge.classList.add('d-none');
                         };
-
+                        
                         // Cerrar automáticamente después de 10 segundos (excepto críticas)
                         if (!title.includes('PELIGRO')) {
                             setTimeout(function() {
-                                try {
-                                    notification.close();
-                                } catch (e) {
-                                    // no-op
-                                }
+                                notification.close();
                                 notificationBadge.classList.add('d-none');
                             }, 10000);
                         }
@@ -668,27 +564,15 @@
                     addLog('No se pudo enviar notificación: Permisos no concedidos');
                 }
             }
-
+            
             // Configurar el badge de notificación
             notificationBadge.addEventListener('click', function() {
                 this.classList.add('d-none');
             });
-
+            
             // Inicializar comprobación de permisos
             checkNotificationPermission();
             addLog('Sistema de monitoreo de gas inicializado');
-            
-            // Intentar desbloquear audio al hacer clic en cualquier parte de la página
-            document.body.addEventListener('click', function() {
-                if (!audioUnlocked) {
-                    tryUnlockAudio();
-                }
-            });
-
-            // Informar sobre las restricciones de notificaciones en móviles
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                addLog('Dispositivo móvil detectado: Las notificaciones push pueden tener restricciones adicionales');
-            }
         });
     </script>
 </body>
