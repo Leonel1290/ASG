@@ -69,3 +69,8 @@ $routes->get('api/valve_status', 'ApiEspController::estadoValvula');
 
 //Datodsbiométricos
 $routes->post('biometric-login', 'Home::biometricLogin');
+$routes->post('perfil/biometric-settings', 'ProfileController::updateBiometricSettings');
+
+// Configuración biométrica
+$routes->get('biometric-settings', 'Home::biometricSettings');
+$routes->post('biometric-settings/update', 'Home::updateBiometricSettings');
