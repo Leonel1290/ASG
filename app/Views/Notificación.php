@@ -260,6 +260,13 @@
             transform: scale(1.1);
         }
 
+        .audio-controls {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--dark-background);
+            border-radius: 10px;
+        }
+
         @media (max-width: 768px) {
             .sensor-status {
                 flex-direction: column;
@@ -318,6 +325,15 @@
                     </div>
                 </div>
 
+                <div class="audio-controls">
+                    <h4><i class="fas fa-volume-up"></i> Control de Audio</h4>
+                    <p>Para que las alertas de sonido funcionen correctamente, interactúa con esta página:</p>
+                    <button id="testAudio" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Probar Sonido de Alerta
+                    </button>
+                    <div id="audioStatus" class="mt-2"></div>
+                </div>
+
                 <div class="test-results">
                     <h4><i class="fas fa-clipboard-list"></i> Registro del Sistema</h4>
                     <div class="log-container" id="systemLog" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
@@ -363,9 +379,9 @@
         <i class="fas fa-bell"></i>
     </div>
 
-    <!-- Audio de alerta: coloca tu archivo alerta.mp3 en /audio/alerta.mp3 -->
+    <!-- Audio de alerta: usando un archivo online para evitar problemas de ruta -->
     <audio id="alerta-audio" preload="auto">
-        <source src="public/audio/alerta.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
         Tu navegador no soporta el elemento de audio.
     </audio>
 
@@ -380,6 +396,8 @@
             const sensorStatusElement = document.getElementById('sensorStatus');
             const notificationBadge = document.getElementById('notificationBadge');
             const audioEl = document.getElementById('alerta-audio');
+            const testAudioBtn = document.getElementById('testAudio');
+            const audioStatus = document.getElementById('audioStatus');
 
             let simulationTimer;
             let countdownTimer;
@@ -433,14 +451,22 @@
                 });
             });
 
+            // Botón para probar el audio
+            testAudioBtn.addEventListener('click', function() {
+                playAudioForNotification('Prueba de sonido');
+                audioStatus.innerHTML = '<span class="text-success">Reproduciendo sonido de prueba...</span>';
+                setTimeout(() => {
+                    audioStatus.innerHTML = '<span class="text-success">Sonido probado correctamente</span>';
+                }, 1000);
+            });
+
             // Intenta reproducir en silencio para "desbloquear" reproducción futura
             function tryUnlockAudio() {
                 if (!audioEl || audioUnlocked) return;
                 
                 try {
                     // Reproducir silenciado y pausar para que el navegador considere que hubo interacción del usuario
-                    audioEl.muted = true;
-                    audioEl.volume = 0;
+                    audioEl.volume = 0.1; // Volumen muy bajo en lugar de muteado
                     
                     const playPromise = audioEl.play();
                     
@@ -449,25 +475,22 @@
                             // Pausar inmediatamente después de comenzar la reproducción
                             audioEl.pause();
                             audioEl.currentTime = 0;
-                            audioEl.muted = false;
                             audioEl.volume = 1.0;
                             audioUnlocked = true;
                             addLog('Audio desbloqueado por interacción del usuario.');
                         }).catch(err => {
-                            audioEl.muted = false;
                             audioEl.volume = 1.0;
                             addLog('No se pudo desbloquear audio automáticamente: ' + err.message);
                         });
                     }
                 } catch (e) {
-                    audioEl.muted = false;
                     audioEl.volume = 1.0;
                     addLog('Error al intentar desbloquear audio: ' + e.message);
                 }
             }
 
             // Reproducir audio para la notificación
-            function playAudioForNotification() {
+            function playAudioForNotification(context) {
                 if (!audioEl) {
                     addLog('Elemento de audio no encontrado');
                     return;
@@ -483,9 +506,9 @@
                     
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
-                            addLog('Sonido de alerta reproducido correctamente');
+                            addLog('Sonido de alerta reproducido correctamente: ' + context);
                         }).catch(err => {
-                            addLog('No se pudo reproducir el sonido de alerta: ' + err.message);
+                            addLog('No se pudo reproducir el sonido de alerta (' + context + '): ' + err.message);
                             // Si falla, intentar desbloquear el audio
                             if (!audioUnlocked) {
                                 tryUnlockAudio();
@@ -493,7 +516,7 @@
                         });
                     }
                 } catch (e) {
-                    addLog('Error al reproducir audio: ' + e.message);
+                    addLog('Error al reproducir audio (' + context + '): ' + e.message);
                 }
             }
 
@@ -609,7 +632,7 @@
                 notificationBadge.classList.remove('d-none');
 
                 // Reproducir sonido de alerta
-                playAudioForNotification();
+                playAudioForNotification(title);
 
                 if (Notification.permission === 'granted') {
                     try {
@@ -661,6 +684,11 @@
                     tryUnlockAudio();
                 }
             });
+
+            // Informar sobre las restricciones de notificaciones en móviles
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                addLog('Dispositivo móvil detectado: Las notificaciones push pueden tener restricciones adicionales');
+            }
         });
     </script>
 </body>
