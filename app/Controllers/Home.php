@@ -7,20 +7,11 @@ use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
-    // Puedes instanciar modelos aquí si los usas en múltiples métodos
-    // protected $userModel;
-    // protected $lecturasGasModel;
-
     public function __construct()
     {
-        // Llama al constructor de la clase padre si es necesario
-        // parent::__construct();
-
-        // Instanciar modelos si se usan en el constructor o en varios métodos
-        // $this->userModel = new UserModel();
-        // $this->lecturasGasModel = new LecturasGasModel();
+        // Constructor vacío o con lógica si es necesaria
     }
 
     public function index()
@@ -62,6 +53,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
+        $useBiometric = $this->request->getPost('use_biometric');
 
         $user = $userModel->where('email', $email)->first();
 
@@ -87,12 +79,38 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
                     'nombre'    => $user['nombre'],
                     'email'     => $user['email'],
                     'logged_in' => true,
+                    'biometric_enabled' => $useBiometric ? 1 : 0
                 ];
                 $session->set($sessionData);
 
                 // --- LOGGING PARA DEBUGGING ---
                 log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
                 // --- FIN LOGGING ---
+
+                // Si el usuario quiere habilitar autenticación biométrica
+                if ($useBiometric) {
+                    // Generar credenciales para autenticación biométrica
+                    $biometricToken = bin2hex(random_bytes(32));
+                    $expires = Time::now()->addDays(30); // Válido por 30 días
+                    
+                    // Guardar token en la base de datos
+                    $userModel->update($user['id'], [
+                        'biometric_token' => $biometricToken,
+                        'biometric_expires' => $expires->toDateTimeString()
+                    ]);
+                    
+                    // Devolver el token para almacenamiento local (para solicitudes AJAX)
+                    if ($this->request->isAJAX()) {
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'biometric_token' => $biometricToken,
+                            'redirect' => '/perfil'
+                        ]);
+                    }
+                    
+                    // Para solicitudes normales, almacenar token en flashdata
+                    $session->setFlashdata('biometric_token', $biometricToken);
+                }
 
                 return redirect()->to('/perfil');
             } else {
@@ -105,6 +123,67 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
             log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
             return redirect()->back()->withInput();
         }
+    }
+
+    // Nuevo método para autenticación biométrica
+    public function biometricLogin()
+    {
+        $session = session();
+        $userModel = new UserModel();
+        
+        $token = $this->request->getPost('biometric_token');
+        
+        if (!$token) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Token no proporcionado']);
+        }
+        
+        // Buscar usuario por token biométrico
+        $user = $userModel->where('biometric_token', $token)
+                         ->where('biometric_expires >=', Time::now()->toDateTimeString())
+                         ->first();
+        
+        if ($user) {
+            if (!$user['is_active']) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Cuenta no verificada']);
+            }
+            
+            // Iniciar sesión
+            $sessionData = [
+                'id'        => $user['id'],
+                'nombre'    => $user['nombre'],
+                'email'     => $user['email'],
+                'logged_in' => true,
+                'biometric_enabled' => 1
+            ];
+            $session->set($sessionData);
+            
+            return $this->response->setJSON(['success' => true, 'redirect' => '/perfil']);
+        } else {
+            return $this->response->setJSON(['success' => false, 'message' => 'Autenticación biométrica fallida']);
+        }
+    }
+
+    // Método para deshabilitar autenticación biométrica
+    public function disableBiometric()
+    {
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'No autenticado']);
+        }
+        
+        $userId = $session->get('id');
+        $userModel = new UserModel();
+        
+        $userModel->update($userId, [
+            'biometric_token' => null,
+            'biometric_expires' => null
+        ]);
+        
+        // Actualizar estado en sesión
+        $session->set('biometric_enabled', 0);
+        
+        return $this->response->setJSON(['success' => true]);
     }
 
     public function register()
@@ -122,7 +201,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         return redirect()->to('/');
     }
 
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
+    // Rutas que parecen vistas directas o redundantes
     public function loginobtener() {
         $session = session();
         // --- LOGGING PARA DEBUGGING ---
@@ -130,12 +209,13 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         // --- FIN LOGGING ---
         return view('login');
     }
+    
     public function configview() { return view('configuracion'); }
     public function salirdelconfig() { return view('inicio'); }
     public function volveralinicio() { return view('inicio'); }
     public function volveralperfil() { return view('perfil'); }
 
-    // Recuperación de contraseña (mantengo tu lógica existente, usa UserModel)
+    // Recuperación de contraseña
     public function forgotPPassword()
     {
         $session = session();
@@ -246,8 +326,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         }
     }
 
-    // Método para enlazar MACs (parece que lo tienes duplicado con EnlaceController::store)
-    // Considera eliminar este si usas EnlaceController::store
+    // Método para enlazar MACs
     public function storeMac()
     {
         $session = session();
@@ -278,18 +357,13 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         return redirect()->to('/perfil');
     }
 
-    // Rutas que parecen vistas directas o redundantes (considera limpiarlas)
-    // public function inicioresetpass() { return view('reset_password'); }
-    // public function obtenerperfil() { return view('perfilobtener'); }
-
-    // Vistas varias (mantengo las que tenías)
+    // Vistas varias
     public function dispositivos()
     {
         return view('dispositivos');
     }
 
-    // Método para mostrar la página de perfil (parece que PerfilController::index es la principal ahora)
-    // Considera eliminar este si usas PerfilController::index
+    // Método para mostrar la página de perfil
     public function perfil()
     {
         $session = session();
@@ -307,6 +381,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
         $enlaceModel = new \App\Models\EnlaceModel();
         $lecturasGasModel = new \App\Models\LecturasGasModel();
+        $userModel = new UserModel();
 
         $macs = $enlaceModel
                     ->select('MAC')
@@ -315,12 +390,18 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
                     ->findAll();
 
         $lecturas = $lecturasGasModel->getLecturasPorUsuario($usuarioId);
+        
+        // Obtener información biométrica del usuario
+        $user = $userModel->find($usuarioId);
+        $biometricEnabled = !empty($user['biometric_token']) && 
+                           Time::parse($user['biometric_expires'])->isAfter(Time::now());
 
         log_message('debug', 'Home::perfil() - Lecturas por usuario obtenidas: ' . print_r($lecturas, true));
 
         return view('perfil', [
             'macs' => $macs,
-            'lecturas' => $lecturas
+            'lecturas' => $lecturas,
+            'biometric_enabled' => $biometricEnabled
         ]);
     }
 
@@ -332,12 +413,9 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         // --- FIN LOGGING ---
         return view('comprar');
     }
-    // En app/Controllers/Home.php
-public function instalarPWA()
-{
-    return view('instalar_pwa');
-}
-
-    // Parece que tenías un método verLecturas, asegúrate de que exista si la ruta /mac/(:segment) lo usa
-    // public function verLecturas($mac) { ... }
+    
+    public function instalarPWA()
+    {
+        return view('instalar_pwa');
+    }
 }

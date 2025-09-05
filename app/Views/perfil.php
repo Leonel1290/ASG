@@ -402,7 +402,41 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
                         </li>
                     </ul>
+<div class="card-body">
+        <h5 class="card-title">Autenticación Biométrica</h5>
+        <p class="card-text">Habilitar o deshabilitar el inicio de sesión con huella digital/reconocimiento facial.</p>
+        
+        <button id="disable-biometric" class="btn btn-warning">
+            <i class="fas fa-fingerprint"></i> Deshabilitar autenticación biométrica
+        </button>
+    </div>
+</div>
 
+<script>
+document.getElementById('disable-biometric').addEventListener('click', function() {
+    if (confirm('¿Estás seguro de que deseas deshabilitar la autenticación biométrica?')) {
+        // Eliminar del almacenamiento local
+        if (window.biometricAuth) {
+            window.biometricAuth.removeCredentials();
+        }
+        
+        // Hacer solicitud al servidor para eliminar el token
+        fetch('/disable-biometric', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Autenticación biométrica deshabilitada');
+                this.disabled = true;
+            }
+        });
+    }
+});
+</script>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-outline-secondary btn-sm">
