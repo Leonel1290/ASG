@@ -364,7 +364,10 @@
     </div>
 
     <!-- Audio de alerta: coloca tu archivo alerta.mp3 en /audio/alerta.mp3 -->
-    <audio id="alerta-audio" src="/audio/alerta.mp3" preload="auto"></audio>
+    <audio id="alerta-audio" preload="auto">
+        <source src="public/audio/alerta.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -382,6 +385,7 @@
             let countdownTimer;
             let secondsLeft = 60; // 1 minuto para comenzar la simulación
             let simulationActive = false;
+            let audioUnlocked = false;
 
             // Actualizar la hora actual en el registro
             function updateCurrentTime() {
@@ -424,66 +428,72 @@
                 Notification.requestPermission().then(function(permission) {
                     addLog('Solicitud de permisos: ' + permission);
                     checkNotificationPermission();
-                    // Intento de desbloquear audio por la interacción del usuario (silencioso)
+                    // Intento de desbloquear audio por la interacción del usuario
                     tryUnlockAudio();
                 });
             });
 
-            // Intenta reproducir en silencio para "desbloquear" reproducción futura (si el navegador lo permite)
+            // Intenta reproducir en silencio para "desbloquear" reproducción futura
             function tryUnlockAudio() {
-                if (!audioEl) return;
+                if (!audioEl || audioUnlocked) return;
+                
                 try {
                     // Reproducir silenciado y pausar para que el navegador considere que hubo interacción del usuario
                     audioEl.muted = true;
-                    const p = audioEl.play();
-                    if (p && typeof p.then === 'function') {
-                        p.then(() => {
+                    audioEl.volume = 0;
+                    
+                    const playPromise = audioEl.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            // Pausar inmediatamente después de comenzar la reproducción
                             audioEl.pause();
                             audioEl.currentTime = 0;
                             audioEl.muted = false;
-                            addLog('Audio desbloqueado por interacción del usuario (silencioso).');
+                            audioEl.volume = 1.0;
+                            audioUnlocked = true;
+                            addLog('Audio desbloqueado por interacción del usuario.');
                         }).catch(err => {
                             audioEl.muted = false;
+                            audioEl.volume = 1.0;
                             addLog('No se pudo desbloquear audio automáticamente: ' + err.message);
                         });
-                    } else {
-                        audioEl.pause();
-                        audioEl.currentTime = 0;
-                        audioEl.muted = false;
                     }
                 } catch (e) {
                     audioEl.muted = false;
+                    audioEl.volume = 1.0;
                     addLog('Error al intentar desbloquear audio: ' + e.message);
                 }
             }
 
             // Reproducir audio para la notificación
-            function playAudioForNotification(title) {
-                if (!audioEl) return;
+            function playAudioForNotification() {
+                if (!audioEl) {
+                    addLog('Elemento de audio no encontrado');
+                    return;
+                }
+                
                 try {
-                    // Si es crítica, dejamos en loop hasta que el usuario interactúe
-                    audioEl.loop = title.includes('PELIGRO');
-                    audioEl.muted = false;
+                    // Detener cualquier reproducción previa y reiniciar
+                    audioEl.pause();
+                    audioEl.currentTime = 0;
+                    
+                    // Intentar reproducir
                     const playPromise = audioEl.play();
-                    if (playPromise && typeof playPromise.then === 'function') {
-                        playPromise.catch(err => {
-                            addLog('El navegador bloqueó el sonido: ' + err.message);
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            addLog('Sonido de alerta reproducido correctamente');
+                        }).catch(err => {
+                            addLog('No se pudo reproducir el sonido de alerta: ' + err.message);
+                            // Si falla, intentar desbloquear el audio
+                            if (!audioUnlocked) {
+                                tryUnlockAudio();
+                            }
                         });
                     }
                 } catch (e) {
                     addLog('Error al reproducir audio: ' + e.message);
-                }
-            }
-
-            // Detener audio
-            function stopAudio() {
-                if (!audioEl) return;
-                try {
-                    audioEl.loop = false;
-                    audioEl.pause();
-                    audioEl.currentTime = 0;
-                } catch (e) {
-                    addLog('Error al detener audio: ' + e.message);
                 }
             }
 
@@ -598,6 +608,9 @@
                 // Mostrar badge de notificación
                 notificationBadge.classList.remove('d-none');
 
+                // Reproducir sonido de alerta
+                playAudioForNotification();
+
                 if (Notification.permission === 'granted') {
                     try {
                         const notification = new Notification(title, {
@@ -607,16 +620,11 @@
                             tag: 'asg-gas-alert'
                         });
 
-                        // Reproducir audio asociado
-                        playAudioForNotification(title);
-
                         notification.onclick = function() {
                             window.focus();
                             notification.close();
                             addLog('Notificación "' + title + '" fue clickeada por el usuario');
                             notificationBadge.classList.add('d-none');
-                            // Detener audio cuando el usuario interactúe
-                            stopAudio();
                         };
 
                         // Cerrar automáticamente después de 10 segundos (excepto críticas)
@@ -628,14 +636,10 @@
                                     // no-op
                                 }
                                 notificationBadge.classList.add('d-none');
-                                // Detener audio si no es crítica
-                                stopAudio();
                             }, 10000);
                         }
                     } catch (error) {
                         addLog('Error al mostrar notificación: ' + error.message);
-                        // Intentar reproducir audio aun si hubo error local (para pruebas)
-                        playAudioForNotification(title);
                     }
                 } else {
                     addLog('No se pudo enviar notificación: Permisos no concedidos');
@@ -645,22 +649,18 @@
             // Configurar el badge de notificación
             notificationBadge.addEventListener('click', function() {
                 this.classList.add('d-none');
-                // detener audio al ocultar badge manualmente
-                stopAudio();
-            });
-
-            // Detener audio también al cambiar de pestaña o al cerrar
-            window.addEventListener('blur', function() {
-                // No forzamos detener audio aquí (podés ajustar si querés)
-            });
-
-            window.addEventListener('beforeunload', function() {
-                stopAudio();
             });
 
             // Inicializar comprobación de permisos
             checkNotificationPermission();
             addLog('Sistema de monitoreo de gas inicializado');
+            
+            // Intentar desbloquear audio al hacer clic en cualquier parte de la página
+            document.body.addEventListener('click', function() {
+                if (!audioUnlocked) {
+                    tryUnlockAudio();
+                }
+            });
         });
     </script>
 </body>
