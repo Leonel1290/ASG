@@ -20,9 +20,8 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
+        /* --- Tu CSS original --- */
         :root {
-            /* Colores */
             --primary-color: #2c73d2;
             --success-color: #00b894;
             --danger-color: #d62828;
@@ -31,13 +30,10 @@
             --card-background: #ffffff;
             --text-color: #2c2c2c;
             --text-secondary: #6c757d;
-
-            /* Otros */
             --border-radius: 20px;
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-
         body {
             background: linear-gradient(135deg, #e4e9f0 0%, #d5d7de 100%);
             font-family: 'Poppins', sans-serif;
@@ -48,176 +44,32 @@
             margin: 0;
             color: var(--text-color);
         }
-
-        .container.main-content {
-            padding: 2rem 1rem;
-            animation: fadeIn 0.8s ease-in-out;
-            position: relative;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card {
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            background-color: var(--card-background);
-            padding: 3.5rem;
-            border: none;
-            transition: var(--transition);
-        }
-
-        h2.main-title {
-            font-weight: 700;
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            color: var(--text-color);
-        }
-
-        .device-info {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .device-info .name {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .device-info .location {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        /* Indicador de burbuja */
-        .gas-level-bubble {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 3rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-        
-        .bubble-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: transparent;
-            border-bottom-left-radius: 150px;
-            border-bottom-right-radius: 150px;
-            transition: height 1s ease-in-out, background-color 0.5s ease;
-        }
-
-        .gas-level-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-color);
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Indicador LED de estado */
-        .valve-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 2rem;
-        }
-
-        .valve-status-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .status-led {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #ccc;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            transition: background-color 0.5s ease;
-        }
-
-        .status-led.abierta {
-            background-color: var(--success-color);
-            box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color);
-        }
-
-        .status-led.cerrada {
-            background-color: var(--danger-color);
-            box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color);
-        }
-
-        .btn-group-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 1.2rem;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: #fff;
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: #fff;
-        }
-
-        .btn-secondary-custom {
-            background-color: var(--text-secondary);
-            color: #fff;
-        }
-        
-        /* Dark mode */
+        .container.main-content { padding: 2rem 1rem; animation: fadeIn 0.8s ease-in-out; position: relative; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .card { border-radius: var(--border-radius); box-shadow: var(--box-shadow); background-color: var(--card-background); padding: 3.5rem; border: none; transition: var(--transition); }
+        h2.main-title { font-weight: 700; text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-color); }
+        .device-info { text-align: center; margin-bottom: 2rem; }
+        .device-info .name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
+        .device-info .location { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
+        .gas-level-bubble { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 3rem; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1); transition: var(--transition); }
+        .bubble-fill { position: absolute; bottom: 0; left: 0; width: 100%; background-color: transparent; border-bottom-left-radius: 150px; border-bottom-right-radius: 150px; transition: height 1s ease-in-out, background-color 0.5s ease; }
+        .gas-level-value { font-size: 2.5rem; font-weight: 700; color: var(--text-color); position: relative; z-index: 2; }
+        .valve-status { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; }
+        .valve-status-text { font-size: 1.2rem; font-weight: 600; color: var(--text-color); }
+        .status-led { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: background-color 0.5s ease; }
+        .status-led.abierta { background-color: var(--success-color); box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color); }
+        .status-led.cerrada { background-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color); }
+        .btn-group-actions { display: flex; flex-direction: column; gap: 1.2rem; justify-content: center; }
+        .btn { padding: 1.2rem; border-radius: 15px; font-size: 1.1rem; font-weight: 600; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .btn-success { background-color: var(--success-color); color: #fff; }
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .btn-secondary-custom { background-color: var(--text-secondary); color: #fff; }
         @media (prefers-color-scheme: dark) {
-            :root {
-                --background-color: #121212;
-                --card-background: #1e1e1e;
-                --text-color: #f5f5f5;
-                --text-secondary: #aaa;
-            }
-            body {
-                background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
-            }
-            .card {
-                box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03);
-            }
-            .btn {
-                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
-            }
-            .btn-secondary-custom {
-                background-color: #555;
-            }
+            :root { --background-color: #121212; --card-background: #1e1e1e; --text-color: #f5f5f5; --text-secondary: #aaa; }
+            body { background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%); }
+            .card { box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03); }
+            .btn { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); }
+            .btn-secondary-custom { background-color: #555; }
         }
     </style>
 </head>
@@ -277,6 +129,7 @@
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>';
+    const macUrl = mac.replace(/:/g, '-'); // <-- CORRECCIÓN PRINCIPAL
     const statusLed = $('#statusLed');
     const gasLevelSpan = $('#gasLevel');
     const gasLevelFill = $('#gasLevelFill');
@@ -286,7 +139,6 @@ $(document).ready(function() {
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-    // Función para actualizar el estado del LED y los botones
     function actualizarEstadoUI(estado) {
         if (estado) {
             statusLed.removeClass('cerrada').addClass('abierta');
@@ -299,7 +151,6 @@ $(document).ready(function() {
         }
     }
 
-    // Función para actualizar el medidor de gas
     function updateGauge(level) {
         level = Math.max(0, Math.min(100, parseFloat(level)));
         const height = (level / 100) * 100;
@@ -321,9 +172,8 @@ $(document).ready(function() {
         }
     }
 
-    // Función principal para obtener los datos y actualizar la vista
     function fetchDeviceState() {
-        $.get('/lecturas/obtenerUltimaLectura/' + mac, function(response) {
+        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) { // <-- usa macUrl
             if (response.status === 'success') {
                 actualizarEstadoUI(response.estado_valvula); 
                 updateGauge(response.nivel_gas || 0); 
@@ -334,8 +184,7 @@ $(document).ready(function() {
             console.error('Error de conexión con el servidor');
         });
     }
-    
-    // Función para mostrar alertas de nivel de gas
+
     function showGasAlert(level) {
         Swal.fire({
             title: '¡Nivel de Gas Peligroso!',
@@ -348,7 +197,6 @@ $(document).ready(function() {
         });
     }
 
-    // Manejadores de eventos para los botones de control
     $('#btn-abrir').click(function() {
         controlarServo(mac, 1, 'Válvula abierta');
     });
@@ -366,11 +214,9 @@ $(document).ready(function() {
             mac: mac,
             estado: estado
         };
-        
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         }
-
         const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
         buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
         
@@ -378,27 +224,13 @@ $(document).ready(function() {
             .done(function(response) {
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado);
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: successMessage,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: successMessage, timer: 2000, showConfirmButton: false });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'Error al actualizar',
-                    });
+                    Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Error al actualizar' });
                 }
             })
             .fail(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de conexión',
-                    text: 'No se pudo comunicar con el servidor.',
-                });
+                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo comunicar con el servidor.' });
             })
             .always(function() {
                 buttons[0].html(estado ? '<i class="fas fa-play"></i> Abrir Válvula' : '<i class="fas fa-stop"></i> Cerrar Válvula');
@@ -407,13 +239,8 @@ $(document).ready(function() {
     }
     
     fetchDeviceState();
-    
-    // Configurar el refresco automático cada 5 segundos
     const intervalId = setInterval(fetchDeviceState, 5000);
-    
-    $(window).on('beforeunload', function() {
-        clearInterval(intervalId);
-    });
+    $(window).on('beforeunload', function() { clearInterval(intervalId); });
 });
 <?php endif; ?>
 </script>
