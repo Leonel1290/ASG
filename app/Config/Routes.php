@@ -88,3 +88,4 @@ $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
 $routes->get('api/valve_status', 'ApiEspController::estadoValvula');
+$routes->get('lecturas/obtenerUltimaLectura/(:segment)', 'LecturasController::obtenerUltimaLectura/$1');
