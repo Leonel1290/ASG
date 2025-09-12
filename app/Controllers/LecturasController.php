@@ -80,31 +80,56 @@ class LecturasController extends ResourceController
      * @return string
      */
     public function obtenerUltimaLectura($mac)
-    {
-    // Buscar la última lectura del dispositivo
-    $lectura = $this->lecturasGasModel
-                    ->where('MAC', $mac)
-                    ->orderBy('id', 'desc')
-                    ->first();
+{
+    try {
+        // DECODIFICAR LA MAC
+        $mac_decoded = urldecode($mac);
+        
+        log_message('debug', 'MAC recibida: ' . $mac);
+        log_message('debug', 'MAC decodificada: ' . $mac_decoded);
+        
+        // Validar formato de MAC
+        if (!preg_match('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', $mac_decoded)) {
+            log_message('error', 'Formato de MAC inválido: ' . $mac_decoded);
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error',
+                'message' => 'Formato de MAC inválido'
+            ]);
+        }
 
-    if ($lectura) {
-        // También podemos incluir el estado de la válvula si lo guardas en la tabla dispositivos
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-        $estado_valvula = $dispositivo['estado_valvula'] ?? false;
+        // Buscar la última lectura del dispositivo
+        $lectura = $this->lecturasGasModel
+                        ->where('MAC', $mac_decoded)
+                        ->orderBy('id', 'desc')
+                        ->first();
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'nivel_gas' => (float)$lectura['nivel_gas'],
-            'estado_valvula' => (bool)$estado_valvula
-        ]);
-    } else {
-        return $this->response->setJSON([
+        if ($lectura) {
+            // Obtener estado de la válvula
+            $dispositivo = $this->dispositivoModel->where('MAC', $mac_decoded)->first();
+            $estado_valvula = $dispositivo['estado_valvula'] ?? false;
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'nivel_gas' => (float)$lectura['nivel_gas'],
+                'estado_valvula' => (bool)$estado_valvula,
+                'timestamp' => $lectura['fecha'] ?? null
+            ]);
+        } else {
+            log_message('info', 'No se encontraron lecturas para MAC: ' . $mac_decoded);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No se encontró lectura para este dispositivo'
+            ]);
+        }
+        
+    } catch (\Exception $e) {
+        log_message('error', 'Error en obtenerUltimaLectura: ' . $e->getMessage());
+        return $this->response->setStatusCode(500)->setJSON([
             'status' => 'error',
-            'message' => 'No se encontró lectura para este dispositivo'
+            'message' => 'Error interno del servidor'
         ]);
     }
 }
-
 
 
     public function detalle($mac)
