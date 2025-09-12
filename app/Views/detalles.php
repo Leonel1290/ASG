@@ -129,7 +129,7 @@
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>';
-    const macUrl = mac.replace(/:/g, '-'); // <-- CORRECCIÓN PRINCIPAL
+    const macUrl = encodeURIComponent(mac); // CORRECCIÓN: Codificar la MAC
     const statusLed = $('#statusLed');
     const gasLevelSpan = $('#gasLevel');
     const gasLevelFill = $('#gasLevelFill');
@@ -173,15 +173,17 @@ $(document).ready(function() {
     }
 
     function fetchDeviceState() {
-        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) { // <-- usa macUrl
+        // CORRECCIÓN: Usar macUrl codificado
+        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) {
             if (response.status === 'success') {
                 actualizarEstadoUI(response.estado_valvula); 
                 updateGauge(response.nivel_gas || 0); 
             } else {
                 console.error('Error al obtener estado:', response.message);
             }
-        }).fail(function() {
-            console.error('Error de conexión con el servidor');
+        }).fail(function(xhr, status, error) {
+            console.error('Error de conexión con el servidor:', error);
+            console.log('URL intentada:', '/lecturas/obtenerUltimaLectura/' + macUrl);
         });
     }
 
