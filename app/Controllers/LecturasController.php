@@ -79,6 +79,34 @@ class LecturasController extends ResourceController
      * @param string $mac La dirección MAC del dispositivo.
      * @return string
      */
+    public function obtenerUltimaLectura($mac)
+    {
+    // Buscar la última lectura del dispositivo
+    $lectura = $this->lecturasGasModel
+                    ->where('MAC', $mac)
+                    ->orderBy('id', 'desc')
+                    ->first();
+
+    if ($lectura) {
+        // También podemos incluir el estado de la válvula si lo guardas en la tabla dispositivos
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+        $estado_valvula = $dispositivo['estado_valvula'] ?? false;
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'nivel_gas' => (float)$lectura['nivel_gas'],
+            'estado_valvula' => (bool)$estado_valvula
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No se encontró lectura para este dispositivo'
+        ]);
+    }
+}
+
+
+
     public function detalle($mac)
     {
         $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
