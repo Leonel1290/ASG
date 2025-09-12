@@ -83,6 +83,8 @@ $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
 
+// Ruta que faltaba para actualizar el estado del servo
+$routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado');
 
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
