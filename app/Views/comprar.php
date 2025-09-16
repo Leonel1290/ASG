@@ -27,18 +27,17 @@
             padding: 2rem;
         }
         
-        /* Contenedor principal para la vista de producto */
         .product-checkout-view {
             background-color: #161b22;
             border-radius: 0.75rem;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
             padding: 2.5rem;
-            max-width: 900px; /* Aumentar el ancho para acomodar más contenido */
+            max-width: 900px;
             width: 100%;
-            display: flex; /* Usar flexbox para el layout de dos columnas */
+            display: flex;
             gap: 2rem;
             animation: fadeIn 1s ease-in-out;
-            flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+            flex-wrap: wrap;
         }
         
         .product-image-section {
@@ -55,7 +54,7 @@
         }
         
         .product-details-section {
-            flex: 1.5; /* Darle más espacio a la sección de detalles */
+            flex: 1.5;
             min-width: 300px;
         }
         
@@ -68,7 +67,7 @@
         .product-price {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #2ea043; /* Color verde para el precio, destaca la oferta */
+            color: #2ea043;
             margin-bottom: 1.5rem;
         }
         
@@ -112,7 +111,6 @@
             font-size: 0.9rem;
         }
 
-        /* Estilos de botones, modales, etc. se mantienen igual */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -185,10 +183,6 @@
 
     <div class="checkout-container">
         <div class="product-checkout-view">
-            <div class="product-image-section">
-                <img src="/imagenes/Sentinel.png" alt="Detector ASG">
-            </div>
-
             <div class="product-details-section">
                 <h2>Confirmar Compra</h2>
                 <h1 class="mb-2">AgainSafeGas Sentinel</h1>
@@ -230,6 +224,10 @@
                 <button class="btn btn-back mt-3" onclick="window.history.back();">
                     <i class="fas fa-arrow-left"></i> Volver
                 </button>
+            </div>
+            
+            <div class="product-image-section">
+                <img src="/imagenes/Sentinel.png" alt="Detector ASG">
             </div>
         </div>
     </div>
