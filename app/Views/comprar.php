@@ -9,16 +9,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        :root {
+            --bg-color-main: #0d1117;
+            --bg-color-card: #161b22;
+            --font-color-main: #e6edf3;
+            --accent-color-blue: #58a6ff;
+            --accent-color-green: #2ea043;
+            --accent-color-red: #f87171;
+            --border-color-dark: #2d333b;
+            --shadow-light: rgba(0,0,0,0.2);
+            --shadow-dark: rgba(0,0,0,0.4);
+        }
+
         body {
-            background-color: #0d1117;
-            font-family: 'Segoe UI', sans-serif;
-            color: #e6edf3;
+            background-color: var(--bg-color-main);
+            background-image: radial-gradient(circle, #1a222e 0%, var(--bg-color-main) 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            color: var(--font-color-main);
             margin: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
+        /* ------------------- HEADER Y BOTÓN DE PERFIL ------------------- */
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .profile-btn {
+            background-color: var(--bg-color-card);
+            color: var(--font-color-main);
+            border: 1px solid var(--border-color-dark);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 10px var(--shadow-dark);
+        }
+
+        .profile-btn:hover {
+            background-color: var(--border-color-dark);
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px var(--shadow-dark);
+        }
+
+        /* ------------------- CONTENEDOR PRINCIPAL ------------------- */
         .checkout-container {
             flex: 1;
             display: flex;
@@ -26,12 +74,12 @@
             justify-content: center;
             padding: 2rem;
         }
-        
+
         .product-checkout-view {
-            background-color: #161b22;
-            border-radius: 0.75rem;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            padding: 2.5rem;
+            background-color: var(--bg-color-card);
+            border-radius: 1rem;
+            box-shadow: 0 0 30px var(--shadow-dark);
+            padding: 3rem;
             max-width: 900px;
             width: 100%;
             display: flex;
@@ -39,36 +87,61 @@
             animation: fadeIn 1s ease-in-out;
             flex-wrap: wrap;
         }
-        
+
+        /* ------------------- SECCIONES DEL PRODUCTO ------------------- */
         .product-image-section {
             flex: 1;
             min-width: 300px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        
+
         .product-image-section img {
             width: 100%;
             height: auto;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px var(--shadow-dark);
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .product-image-section img:hover {
+            transform: translateY(-10px);
         }
         
         .product-details-section {
             flex: 1.5;
             min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-details-section h2 {
+            color: var(--accent-color-blue);
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
         
-        .product-details-section h2 {
-            color: #58a6ff;
-            font-weight: bold;
+        .product-details-section h1 {
+            font-size: 2.2rem;
             margin-bottom: 0.5rem;
         }
         
         .product-price {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             font-weight: bold;
-            color: #2ea043;
+            color: var(--accent-color-green);
             margin-bottom: 1.5rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        .product-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
         }
         
         .product-features {
@@ -80,16 +153,18 @@
         .product-features li {
             font-size: 1rem;
             margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
         }
 
         .product-features i {
-            color: #2ea043;
+            color: var(--accent-color-green);
             margin-right: 10px;
         }
         
         .trust-badges {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 1.5rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
@@ -98,10 +173,11 @@
         .trust-badges .badge-item {
             text-align: center;
             font-size: 0.85rem;
+            color: #99aab5;
         }
         
         .trust-badges i {
-            color: #58a6ff;
+            color: var(--accent-color-blue);
             font-size: 2rem;
         }
         
@@ -111,20 +187,16 @@
             font-size: 0.9rem;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* ------------------- OTROS ESTILOS ------------------- */
         .error-message {
-            color: #f87171;
+            color: var(--accent-color-red);
             font-weight: bold;
             margin-top: 1rem;
         }
 
         .btn-back {
-            background-color: #2d333b;
-            color: #e6edf3;
+            background-color: var(--border-color-dark);
+            color: var(--font-color-main);
             border: none;
             border-radius: 0.375rem;
             padding: 0.6rem 1.25rem;
@@ -142,7 +214,7 @@
         }
 
         .modal-title {
-            color: #2ea043;
+            color: var(--accent-color-green);
         }
 
         .btn-primary {
@@ -166,20 +238,41 @@
             margin-right: 10px;
         }
         
+        /* ------------------- ANIMACIONES ------------------- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        /* ------------------- RESPONSIVIDAD ------------------- */
         @media (max-width: 768px) {
             .product-checkout-view {
                 flex-direction: column;
                 padding: 1.5rem;
+            }
+            .trust-badges {
+                justify-content: center;
             }
         }
     </style>
 </head>
 
 <body>
+    <header class="header">
+        <button class="profile-btn" aria-label="Abrir perfil">
+            <i class="fas fa-user"></i>
+        </button>
+    </header>
 
     <div class="checkout-container">
         <div class="product-checkout-view">
@@ -187,11 +280,11 @@
                 <h2>Confirmar Compra</h2>
                 <h1 class="mb-2">AgainSafeGas Sentinel</h1>
                 <p class="product-price">
-                    $29.99 USD
+                    $100 USD
                 </p>
-                <p>Estás a punto de adquirir el innovador dispositivo <strong>AgainSafeGas Sentinel</strong>, un detector de gas de última generación que garantiza la seguridad de tu hogar y de tu familia.</p>
+                <p class="product-description">Estás a punto de adquirir el innovador dispositivo <strong>AgainSafeGas Sentinel</strong>, un detector de gas de última generación que garantiza la seguridad de tu hogar y de tu familia.</p>
                 
-                <hr style="border-color: #2d333b;">
+                <hr style="border-color: var(--border-color-dark);">
 
                 <h4>Características Clave:</h4>
                 <ul class="product-features">
@@ -201,7 +294,7 @@
                     <li><i class="fas fa-check-circle"></i> Diseño compacto y fácil instalación.</li>
                 </ul>
 
-                <hr style="border-color: #2d333b;">
+                <hr style="border-color: var(--border-color-dark);">
                 
                 <div class="trust-badges">
                     <div class="badge-item">
