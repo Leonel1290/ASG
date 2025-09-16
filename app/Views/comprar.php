@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Confirmar Compra | AgainSafeGas</title>
 
-    <!-- Bootstrap & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Estilos personalizados -->
     <style>
         body {
             background-color: #0d1117;
@@ -28,44 +26,96 @@
             justify-content: center;
             padding: 2rem;
         }
-
-        .checkout-card {
+        
+        /* Contenedor principal para la vista de producto */
+        .product-checkout-view {
             background-color: #161b22;
             border-radius: 0.75rem;
-            padding: 2.5rem;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            max-width: 500px;
+            padding: 2.5rem;
+            max-width: 900px; /* Aumentar el ancho para acomodar más contenido */
             width: 100%;
-            text-align: center;
+            display: flex; /* Usar flexbox para el layout de dos columnas */
+            gap: 2rem;
             animation: fadeIn 1s ease-in-out;
+            flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+        }
+        
+        .product-image-section {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .product-image-section img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .product-details-section {
+            flex: 1.5; /* Darle más espacio a la sección de detalles */
+            min-width: 300px;
+        }
+        
+        .product-details-section h2 {
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2ea043; /* Color verde para el precio, destaca la oferta */
+            margin-bottom: 1.5rem;
+        }
+        
+        .product-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .product-features li {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
         }
 
+        .product-features i {
+            color: #2ea043;
+            margin-right: 10px;
+        }
+        
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .trust-badges .badge-item {
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .trust-badges i {
+            color: #58a6ff;
+            font-size: 2rem;
+        }
+        
+        .trust-badges p {
+            margin-top: 0.5rem;
+            line-height: 1.2;
+            font-size: 0.9rem;
+        }
+
+        /* Estilos de botones, modales, etc. se mantienen igual */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .checkout-card h2 {
-            color: #58a6ff;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-        }
-
-        .checkout-card img {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            margin-bottom: 1.5rem;
-        }
-
-        .checkout-card p {
-            font-size: 1.05rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        #paypal-button-container {
-            margin-bottom: 1.5rem;
         }
 
         .error-message {
@@ -121,27 +171,69 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        @media (max-width: 768px) {
+            .product-checkout-view {
+                flex-direction: column;
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="checkout-container">
-        <div class="checkout-card">
-            <h2>Confirmar Compra</h2>
-            <img src="/imagenes/Sentinel.png" alt="Detector ASG">
-            <p>Estás a punto de adquirir un dispositivo <strong>AgainSafeGas</strong>. Por favor, procede con el pago seguro a través de PayPal.</p>
-            
-            <div id="paypal-button-container"></div>
-            <div id="error-message" class="error-message"></div>
+        <div class="product-checkout-view">
+            <div class="product-image-section">
+                <img src="/imagenes/Sentinel.png" alt="Detector ASG">
+            </div>
 
-            <button class="btn btn-back mt-3" onclick="window.history.back();">
-                <i class="fas fa-arrow-left"></i> Volver
-            </button>
+            <div class="product-details-section">
+                <h2>Confirmar Compra</h2>
+                <h1 class="mb-2">AgainSafeGas Sentinel</h1>
+                <p class="product-price">
+                    $29.99 USD
+                </p>
+                <p>Estás a punto de adquirir el innovador dispositivo <strong>AgainSafeGas Sentinel</strong>, un detector de gas de última generación que garantiza la seguridad de tu hogar y de tu familia.</p>
+                
+                <hr style="border-color: #2d333b;">
+
+                <h4>Características Clave:</h4>
+                <ul class="product-features">
+                    <li><i class="fas fa-check-circle"></i> Detección ultra-sensible de fugas de gas.</li>
+                    <li><i class="fas fa-check-circle"></i> Alertas instantáneas en tu smartphone.</li>
+                    <li><i class="fas fa-check-circle"></i> Batería de larga duración (hasta 6 meses).</li>
+                    <li><i class="fas fa-check-circle"></i> Diseño compacto y fácil instalación.</li>
+                </ul>
+
+                <hr style="border-color: #2d333b;">
+                
+                <div class="trust-badges">
+                    <div class="badge-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <p><strong>Pago Seguro</strong><br>Cifrado SSL</p>
+                    </div>
+                    <div class="badge-item">
+                        <i class="fas fa-truck"></i>
+                        <p><strong>Envío Rápido</strong><br>En 2-5 días hábiles</p>
+                    </div>
+                    <div class="badge-item">
+                        <i class="fas fa-star-half-alt"></i>
+                        <p><strong>Garantía de Satisfacción</strong><br>100% confiable</p>
+                    </div>
+                </div>
+
+                <div id="paypal-button-container"></div>
+                <div id="error-message" class="error-message"></div>
+
+                <button class="btn btn-back mt-3" onclick="window.history.back();">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Éxito -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content border-0">
@@ -158,8 +250,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal Procesando -->
     <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content border-0">
@@ -174,10 +264,8 @@
         </div>
     </div>
 
-    <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         console.log("Script principal de compra iniciado.");
 
@@ -203,7 +291,6 @@
 
             paypal.Buttons({
                 createOrder: function(data, actions) {
-                    // Llamamos a nuestro backend para crear la orden
                     return fetch('/paypal/create-order', { 
                         method: 'POST',
                         headers: {
@@ -222,7 +309,7 @@
                             showErrorMessage("Error: " + order.error);
                             return;
                         }
-                        return order.id; // Retorna el orderID para PayPal
+                        return order.id;
                     })
                     .catch(err => {
                         console.error("Error al crear la orden:", err);
@@ -230,10 +317,7 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                    // Mostrar modal de procesamiento
                     processingModal.show();
-                    
-                    // Llamamos a nuestro backend para capturar la orden y guardar en BD
                     return fetch(`/paypal/capture-order/${data.orderID}`, { 
                         method: 'POST',
                         headers: {
@@ -259,8 +343,6 @@
                     .catch(err => {
                         console.error("Error al capturar la orden:", err);
                         processingModal.hide();
-                        
-                        // Mostrar mensaje de éxito aunque haya error de BD
                         successModal.show();
                         console.log("Pago exitoso pero posible error al guardar en BD");
                     });
