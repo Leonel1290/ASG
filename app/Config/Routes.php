@@ -86,3 +86,5 @@ $routes->get('prueba', function() {
 
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
+
+$routes->get('lecturas/obtenerUltimaLectura/(:segment)', 'LecturasController::obtenerUltimaLectura/$1');
