@@ -3,118 +3,377 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ASG - Seguridad en tu Hogar</title>
+    <title>ASG - Seguridad Inteligente para tu Hogar</title>
 
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-dark: #0A192F;
+            --primary-medium: #0D203B;
+            --primary-light: #1A3E5C;
+            --accent: #36678C;
+            --accent-hover: #2A5173;
+            --text-primary: #FFFFFF;
+            --text-secondary: #AFB3B7;
+            --text-hover: #8CA9B9;
+        }
+        
         body {
-            background: linear-gradient(135deg, #0A192F, #0D203B);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));
             font-family: 'Poppins', sans-serif;
-            color: #AFB3B7;
+            color: var(--text-secondary);
             margin: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Navbar mejorada */
         .navbar {
             backdrop-filter: blur(10px);
-            background-color: rgba(10, 25, 47, 0.8);
+            background-color: rgba(10, 25, 47, 0.95);
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
+            padding: 0.8rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.5rem 0;
+            background-color: rgba(10, 25, 47, 0.98);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .navbar-brand, .nav-link {
-            color: #AFB3B7;
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand span {
+            color: var(--accent);
         }
 
-        .navbar-brand:hover, .nav-link:hover {
-            color: #8CA9B9;
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link:focus {
+            color: var(--text-hover);
+            background: rgba(54, 103, 140, 0.1);
         }
 
         .btn-custom {
-            background-color: #36678C;
+            background-color: var(--accent);
             border: none;
-            color: #fff;
+            color: var(--text-primary);
             font-weight: 600;
             border-radius: 30px;
-            padding: 0.6rem 1.6rem;
+            padding: 0.7rem 1.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(54, 103, 140, 0.3);
         }
 
         .btn-custom:hover {
-            background-color: #2A5173;
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(54, 103, 140, 0.4);
+        }
+        
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 0.6rem 1.6rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-custom:hover {
+            background-color: var(--accent);
+            color: var(--text-primary);
+            transform: translateY(-2px);
         }
 
+        /* Hero section mejorada */
         .hero {
-            padding: 6rem 0;
+            padding: 8rem 0 5rem;
             position: relative;
-            padding-top: 80px;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(54, 103, 140, 0.1) 0%, transparent 70%);
+            z-index: -1;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 .highlight {
             position: relative;
             display: inline-block;
-            color: #fff;
-            line-height: 1.2;
+        }
+        
+        .hero h1 .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: rgba(54, 103, 140, 0.3);
+            z-index: -1;
+            border-radius: 3px;
         }
 
-        /* Animación para la imagen de fuga de gas */
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 90%;
+        }
+
+        /* Animación mejorada para la imagen */
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-15px) rotate(1deg); }
+            66% { transform: translateY(10px) rotate(-1deg); }
         }
 
         .hero-img {
-            animation: float 3s ease-in-out infinite;
+            animation: float 6s ease-in-out infinite;
+            max-width: 90%;
+            filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.2));
         }
 
+        /* Features section mejorada */
         .features {
-            padding-top: 3rem;
-            padding-bottom: 3rem;
+            padding: 5rem 0;
+            background: rgba(13, 32, 59, 0.5);
         }
-
-        .features i {
-            font-size: 3rem;
-            color: #36678C;
-        }
-
-        .features h3 {
-            color: #fff;
-        }
-
-        .company-info {
-            background-color: #1A3E5C;
-            border-radius: 10px;
-            padding: 2rem;
-            color: #fff;
-        }
-
-        footer {
-            background-color: #0A192F;
+        
+        .section-title {
             text-align: center;
-            padding: 1rem;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            color: var(--text-primary);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .feature-card {
+            background: rgba(26, 62, 92, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(54, 103, 140, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(54, 103, 140, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Company info mejorada */
+        .company-info {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-medium));
+            border-radius: 15px;
+            padding: 3rem;
+            color: var(--text-primary);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(54, 103, 140, 0.2);
+        }
+        
+        .company-info h2 {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        
+        .company-info h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .company-info address p {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .company-info strong {
+            min-width: 100px;
+            display: inline-block;
+            color: var(--accent);
+        }
+        
+        .company-info a {
+            color: var(--text-hover);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .company-info a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        /* Footer mejorado */
+        footer {
+            background-color: var(--primary-dark);
+            text-align: center;
+            padding: 2rem 1rem;
             font-size: 0.9rem;
             margin-top: auto;
         }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        
+        .social-links {
+            margin-bottom: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin: 0 0.7rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .social-links a:hover {
+            color: var(--accent);
+            transform: translateY(-3px);
         }
 
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
+        /* Utilidades */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent), var(--text-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        /* Estilo para ocultar el botón de instalación por defecto */
-        #installPWAButton {
-            display: none;
+        
+        /* Responsive improvements */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                padding: 7rem 0 4rem;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .feature-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .company-info {
+                padding: 2rem;
+            }
+            
+            .btn-group-mobile {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .btn-group-mobile .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -123,21 +382,37 @@
 <header>
     <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="">ASG</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2 text-gradient"></i>ASG<span>Safe</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="#company">Contacto</a>
+                        <a class="nav-link" href="#inicio">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
-                            <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
-                            <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
-                            <button id="installPWAButton" class="btn btn-custom">Descargar App</button>
-                            <a href="<?= base_url('/descarga') ?>" class="btn btn-custom">Descargar App</a>
+                        <a class="nav-link" href="#features">Características</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Contacto</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <div class="d-flex flex-column flex-lg-row align-items-center btn-group-mobile">
+                            <a class="btn btn-custom mb-2 mb-lg-0 me-lg-2" href="<?= base_url('/comprar') ?>">
+                                <i class="fas fa-shopping-cart me-1"></i>Comprar
+                            </a>
+                            <a href="<?= base_url('/simulacion') ?>" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
+                                <i class="fas fa-desktop me-1"></i>Simulación
+                            </a>
+                            <button id="installPWAButton" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
+                                <i class="fas fa-download me-1"></i>Instalar App
+                            </button>
+                            <a href="<?= base_url('/loginobtener') ?>" class="btn btn-outline-custom">
+                                <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                            </a>
                         </div>
                     </li>
                 </ul>
@@ -147,99 +422,159 @@
 </header>
 
 <main>
-    <section class="hero" id="inicio">
+    <section class="hero" id="inicio" data-aos="fade-in">
         <div class="container">
-            <div class="row align-items-centers">
-                <div class="col-md-6 text-start">
-                    <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
-                    <div class="hero-line"></div>
-                    <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
-                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 data-aos="fade-up" data-aos-delay="200">
+                        Protege lo que <span class="highlight">más importa</span>
+                    </h1>
+                    <p data-aos="fade-up" data-aos-delay="300">
+                        Tu hogar seguro con ASG. Sistema de detección precisa de fugas de gas con monitoreo en tiempo real y control remoto.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
+                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom">
+                            <i class="fas fa-store me-1"></i>Comprar Ahora
+                        </a>
+                        <a href="#features" class="btn btn-outline-custom">
+                            <i class="fas fa-info-circle me-1"></i>Más Información
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-center mt-4 mt-md-0">
+                <div class="col-lg-6 text-center" data-aos="fade-left" data-aos-delay="500">
                     <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                                alt="Ilustración de fuga de gas"
-                                class="hero-img img-fluid"
-                                loading="lazy">
+                         alt="Sistema de detección de fugas de gas ASG"
+                         class="hero-img img-fluid"
+                         loading="eager">
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="features py-5 text-center">
+    <section class="features" id="features">
         <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Nuestras Soluciones</h2>
+                <p>Tecnología avanzada para la seguridad de tu familia</p>
+            </div>
             <div class="row g-4">
-                <div class="col-md-4">
-                    <i class="fas fa-shield-alt mb-3"></i>
-                    <h3>Seguridad Total</h3>
-                    <p>Sistema de cierre automático de válvulas para una protección eficaz.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h3>Seguridad Total</h3>
+                        <p>Sistema de cierre automático de válvulas que se activa instantáneamente ante cualquier fuga detectada.</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <i class="fas fa-mobile-alt mb-3"></i>
-                    <h3>Monitoreo Remoto</h3>
-                    <p>Control desde tu celular a través de nuestra app segura.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt feature-icon"></i>
+                        <h3>Monitoreo Remoto</h3>
+                        <p>Controla y supervisa tu sistema desde cualquier lugar a través de nuestra aplicación móvil segura.</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <i class="fas fa-bell mb-3"></i>
-                    <h3>Alertas en Tiempo Real</h3>
-                    <p>Notificaciones inmediatas ante cualquier fuga detectada.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <i class="fas fa-bell feature-icon"></i>
+                        <h3>Alertas Inteligentes</h3>
+                        <p>Notificaciones inmediatas en tu dispositivo ante cualquier incidente o nivel peligroso de gas.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+    
     <section class="py-5" id="company">
         <div class="container">
-            <div class="company-info mx-auto text-center">
-                <h2 class="mb-3">Sobre Nosotros</h2>
-                <address>
-                    <p><strong>Empresa:</strong> AgainSafeGas</p>
-                    <p><strong>Dirección:</strong> Río Tercero</p>
-                    <p><strong>Teléfono:</strong> <a href="tel:+543571623889" class="text-light">3571-623889</a></p>
-                    <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com" class="text-light">againsafegas.ascii@gmail.com</a></p>
-                </address>
+            <div class="section-title" data-aos="fade-up">
+                <h2>Contáctanos</h2>
+                <p>Estamos aquí para proteger lo que más te importa</p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+                    <div class="company-info">
+                        <h2>AgainSafeGas</h2>
+                        <address>
+                            <p><strong>Empresa:</strong> AgainSafeGas Solutions</p>
+                            <p><strong>Dirección:</strong> Río Tercero, Córdoba, Argentina</p>
+                            <p><strong>Teléfono:</strong> <a href="tel:+543571623889">+54 3571-623889</a></p>
+                            <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com">againsafegas.ascii@gmail.com</a></p>
+                        </address>
+                        <div class="social-links mt-4">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 </main>
 
 <footer>
-    <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
+    <div class="container">
+        <div class="social-links mb-3">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
+    </div>
 </footer>
 
 <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
 <script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
+    // Inicializar AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+        
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    });
+
+    // PWA Installation
     let deferredPrompt;
     const installButton = document.getElementById('installPWAButton');
-    const fallbackButton = document.getElementById('fallbackDownloadButton');
 
-    // Escuchar el evento 'beforeinstallprompt'
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         installButton.style.display = 'block';
-        fallbackButton.style.display = 'none';
     });
 
-    // Manejar el clic en el botón de instalación
     installButton.addEventListener('click', async () => {
         if (deferredPrompt) {
-            installButton.style.display = 'none';
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            console.log(`El usuario eligió: ${outcome}`);
+            if (outcome === 'accepted') {
+                installButton.style.display = 'none';
+            }
             deferredPrompt = null;
         }
     });
 
-    // Si el evento 'beforeinstallprompt' no se dispara, mostrar el botón de respaldo
-    window.addEventListener('load', () => {
-        if (!deferredPrompt) {
-            fallbackButton.classList.remove('d-none');
-        }
+    window.addEventListener('appinstalled', () => {
+        installButton.style.display = 'none';
+        deferredPrompt = null;
     });
 </script>
 
