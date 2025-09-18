@@ -263,7 +263,7 @@ $(document).ready(function() {
     
     let isOnline = false;
     let retryCount = 0;
-    const maxRetries = 10;
+    const maxRetries = 20; // Aumentar el número de reintentos
 
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
@@ -349,13 +349,14 @@ $(document).ready(function() {
             url: '<?= base_url() ?>' + 'lecturas/obtenerUltimaLectura/' + macUrl,
             method: 'GET',
             dataType: 'json',
-            timeout: 8000,
+            timeout: 5000, // Reducir timeout
             success: function(response) {
                 if (response.status === 'success') {
                     setDeviceOnline(true);
                     actualizarEstadoUI(response.estado_valvula); 
                     updateGauge(response.nivel_gas || 0);
                 } else {
+                    // Si hay respuesta pero no es success, considerar offline
                     setDeviceOnline(false);
                     console.warn('Dispositivo sin datos:', response.message);
                 }
@@ -364,9 +365,10 @@ $(document).ready(function() {
                 setDeviceOnline(false);
                 retryCount++;
                 
+                // No detener el intervalo incluso después de maxRetries
+                // para permitir reconexión si el dispositivo vuelve
                 if (retryCount >= maxRetries) {
                     console.warn('Dispositivo offline después de múltiples intentos');
-                    clearInterval(intervalId);
                 }
             }
         });
@@ -432,7 +434,8 @@ $(document).ready(function() {
             })
             .always(function() {
                 buttons[0].html(estado ? '<i class="fas fa-play"></i> Abrir Válvula' : '<i class="fas fa-stop"></i> Cerrar Válvula');
-                fetchDeviceState();
+                // Forzar una actualización del estado después de cambiar la válvula
+                setTimeout(fetchDeviceState, 1000);
             });
     }
     
@@ -442,7 +445,7 @@ $(document).ready(function() {
     gasLevelSpan.text('--%');
     gasLevelSpan.css('color', 'var(--offline-color)');
     
-    // Intentar conectar
+    // Intentar conectar inmediatamente y luego cada 5 segundos
     fetchDeviceState();
     const intervalId = setInterval(fetchDeviceState, 5000);
     $(window).on('beforeunload', function() { clearInterval(intervalId); });
