@@ -99,16 +99,19 @@
             justify-content: center;
         }
 
+        /* MODIFICACIÓN: Imagen más grande */
         .product-image-section img {
             width: 100%;
+            max-width: 450px; /* Aumentado el tamaño máximo */
             height: auto;
             border-radius: 0.5rem;
             box-shadow: 0 8px 25px var(--shadow-dark);
             transition: transform 0.4s ease-in-out;
+            margin: 0 auto; /* Centrar la imagen */
         }
 
         .product-image-section img:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.05); /* Efecto de zoom al hacer hover */
         }
         
         .product-details-section {
@@ -263,6 +266,11 @@
             }
             .trust-badges {
                 justify-content: center;
+            }
+            
+            /* Ajuste para móviles: imagen más pequeña */
+            .product-image-section img {
+                max-width: 300px;
             }
         }
     </style>
