@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Descargar ASG App - Seguridad en tu Hogar</title>
+    <title>ASG - Seguridad en tu Hogar</title>
 
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
@@ -18,166 +18,82 @@
             font-family: 'Poppins', sans-serif;
             color: #AFB3B7;
             margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .download-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(10, 25, 47, 0.8);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar-brand, .nav-link {
+            color: #AFB3B7;
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #8CA9B9;
+        }
+
+        .btn-custom {
+            background-color: #36678C;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 0.6rem 1.6rem;
+        }
+
+        .btn-custom:hover {
+            background-color: #2A5173;
+        }
+
+        .hero {
+            padding: 6rem 0;
+            position: relative;
             padding-top: 80px;
         }
 
-        .download-card {
-            background: rgba(26, 62, 92, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            text-align: center;
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .app-icon {
-            width: 120px;
-            height: 120px;
-            border-radius: 25px;
-            margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, #36678C, #2A5173);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .app-icon i {
-            font-size: 60px;
-            color: white;
-        }
-
-        h1 {
-            color: white;
+        .hero h1 {
+            font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            font-size: 2.5rem;
-        }
-
-        .description {
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .features-list {
-            text-align: left;
-            margin-bottom: 2.5rem;
+            position: relative;
             display: inline-block;
+            color: #fff;
+            line-height: 1.2;
         }
 
-        .features-list li {
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
+        /* Animación para la imagen de fuga de gas */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
-        .features-list i {
+        .hero-img {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .features {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+
+        .features i {
+            font-size: 3rem;
             color: #36678C;
-            margin-right: 10px;
-            font-size: 1.2rem;
         }
 
-        .btn-download {
-            background: linear-gradient(135deg, #36678C, #2A5173);
-            border: none;
-            color: white;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(54, 103, 140, 0.4);
-            margin: 0.5rem;
+        .features h3 {
+            color: #fff;
         }
 
-        .btn-download:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(54, 103, 140, 0.6);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: #AFB3B7;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            margin: 0.5rem;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .instructions {
-            margin-top: 2.5rem;
-            padding: 1.5rem;
-            background: rgba(10, 25, 47, 0.5);
-            border-radius: 15px;
-            text-align: left;
-        }
-
-        .instructions h3 {
-            color: white;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .step {
-            display: flex;
-            margin-bottom: 1rem;
-            align-items: flex-start;
-        }
-
-        .step-number {
-            background: #36678C;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .step-content {
-            flex: 1;
-        }
-
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #AFB3B7;
-            font-size: 1.5rem;
-            transition: color 0.3s;
-        }
-
-        .back-button:hover {
-            color: white;
+        .company-info {
+            background-color: #1A3E5C;
+            border-radius: 10px;
+            padding: 2rem;
+            color: #fff;
         }
 
         footer {
@@ -185,133 +101,147 @@
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
+            margin-top: auto;
         }
 
-        /* Animaciones */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28175, 179, 183, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 .25rem rgba(54, 103, 140, .5);
         }
 
-        @media (max-width: 768px) {
-            .download-card {
-                padding: 2rem 1.5rem;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .btn-download, .btn-secondary {
-                padding: 0.8rem 1.8rem;
-                font-size: 1rem;
-                display: block;
-                width: 100%;
-                margin: 0.5rem 0;
-            }
+        /* Estilo para ocultar el botón de instalación por defecto */
+        #installPWAButton {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <a href="<?= base_url('/') ?>" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
+<header>
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="">ASG</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="d-flex flex-column flex-lg-row align-items-center hstack gap-3">
+                            <a class="btn btn-custom" href="<?= base_url('/comprar') ?>">Comprar Dispositivo</a>
+                            <a href="<?= base_url('/simulacion') ?>" class="btn btn-custom">Simulación</a>
+                            <button id="installPWAButton" class="btn btn-custom">Descargar App</button>
+                            <a href="<?= base_url('/descarga') ?>" class="btn btn-custom">Descargar App</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
 
-    <div class="download-container">
-        <div class="download-card">
-            <div class="app-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            
-            <h1>Descarga la App ASG</h1>
-            <p class="description">Protege tu hogar con nuestra aplicación. Recibe alertas instantáneas, controla tus dispositivos y mantén tu familia segura desde cualquier lugar.</p>
-            
-            <ul class="features-list">
-                <li><i class="fas fa-check-circle"></i> Alertas en tiempo real de fugas de gas</li>
-                <li><i class="fas fa-check-circle"></i> Control remoto de tus dispositivos</li>
-                <li><i class="fas fa-check-circle"></i> Historial de eventos y notificaciones</li>
-                <li><i class="fas fa-check-circle"></i> Interfaz intuitiva y fácil de usar</li>
-                <li><i class="fas fa-check-circle"></i> Funciona sin conexión a internet</li>
-            </ul>
-            
-            <div>
-                <button id="installPWAButton" class="btn-download pulse">
-                    <i class="fas fa-download me-2"></i> Instalar App
-                </button>
-                <a href="<?= base_url('/') ?>" class="btn-secondary">
-                    <i class="fas fa-home me-2"></i> Volver al Inicio
-                </a>
-            </div>
-            
-            <div class="instructions">
-                <h3>¿Cómo instalar?</h3>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">Haz clic en el botón "Instalar App"</div>
+<main>
+    <section class="hero" id="inicio">
+        <div class="container">
+            <div class="row align-items-centers">
+                <div class="col-md-6 text-start">
+                    <h1 data-text="Protege lo que más importa">Protege lo que más importa</h1>
+                    <div class="hero-line"></div>
+                    <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
+                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">Sigue las instrucciones en tu navegador para completar la instalación</div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">Encuentra el icono de ASG en tu pantalla de inicio y ¡listo!</div>
+                <div class="col-md-6 text-center mt-4 mt-md-0">
+                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
+                                alt="Ilustración de fuga de gas"
+                                class="hero-img img-fluid"
+                                loading="lazy">
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <footer>
-        <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
-    </footer>
+    <section class="features py-5 text-center">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <i class="fas fa-shield-alt mb-3"></i>
+                    <h3>Seguridad Total</h3>
+                    <p>Sistema de cierre automático de válvulas para una protección eficaz.</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-mobile-alt mb-3"></i>
+                    <h3>Monitoreo Remoto</h3>
+                    <p>Control desde tu celular a través de nuestra app segura.</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-bell mb-3"></i>
+                    <h3>Alertas en Tiempo Real</h3>
+                    <p>Notificaciones inmediatas ante cualquier fuga detectada.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-5" id="company">
+        <div class="container">
+            <div class="company-info mx-auto text-center">
+                <h2 class="mb-3">Sobre Nosotros</h2>
+                <address>
+                    <p><strong>Empresa:</strong> AgainSafeGas</p>
+                    <p><strong>Dirección:</strong> Río Tercero</p>
+                    <p><strong>Teléfono:</strong> <a href="tel:+543571623889" class="text-light">3571-623889</a></p>
+                    <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com" class="text-light">againsafegas.ascii@gmail.com</a></p>
+                </address>
+            </div>
+        </div>
+    </section>
+</main>
 
-    <script>
-        let deferredPrompt;
-        const installButton = document.getElementById('installPWAButton');
+<footer>
+    <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
+</footer>
 
-        // Escuchar el evento 'beforeinstallprompt'
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installButton.style.display = 'inline-block';
-        });
+<script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
+<script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
 
-        // Manejar el clic en el botón de instalación
-        installButton.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                installButton.classList.remove('pulse');
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                
-                if (outcome === 'accepted') {
-                    installButton.innerHTML = '<i class="fas fa-check me-2"></i> ¡App Instalada!';
-                    installButton.style.background = 'linear-gradient(135deg, #4CAF50, #2E7D32)';
-                } else {
-                    installButton.innerHTML = '<i class="fas fa-download me-2"></i> Instalar App';
-                    installButton.classList.add('pulse');
-                }
-                
-                deferredPrompt = null;
-            }
-        });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        // Si el evento 'beforeinstallprompt' no se dispara
-        window.addEventListener('load', () => {
-            if (!deferredPrompt) {
-                installButton.innerHTML = '<i class="fas fa-external-link-alt me-2"></i> Abrir en Navegador';
-                installButton.onclick = function() {
-                    window.open('https://pwa-1s1m.onrender.com/', '_blank');
-                };
-            }
-        });
-    </script>
+<script>
+    let deferredPrompt;
+    const installButton = document.getElementById('installPWAButton');
+    const fallbackButton = document.getElementById('fallbackDownloadButton');
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    // Escuchar el evento 'beforeinstallprompt'
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+        fallbackButton.style.display = 'none';
+    });
+
+    // Manejar el clic en el botón de instalación
+    installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            installButton.style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`El usuario eligió: ${outcome}`);
+            deferredPrompt = null;
+        }
+    });
+
+    // Si el evento 'beforeinstallprompt' no se dispara, mostrar el botón de respaldo
+    window.addEventListener('load', () => {
+        if (!deferredPrompt) {
+            fallbackButton.classList.remove('d-none');
+        }
+    });
+</script>
+
 </body>
 </html>
