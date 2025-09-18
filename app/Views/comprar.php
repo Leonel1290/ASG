@@ -277,12 +277,6 @@
 </head>
 
 <body>
-    <header class="header">
-        <button class="profile-btn" aria-label="Abrir perfil">
-            <i class="fas fa-user"></i>
-        </button>
-    </header>
-
     <div class="checkout-container">
         <div class="product-checkout-view">
             <div class="product-details-section">
