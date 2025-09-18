@@ -1,18 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASG - Seguridad Inteligente para tu Hogar</title>
-
-    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <style>
         :root {
             --primary-dark: #0A192F;
@@ -209,11 +204,15 @@
         .feature-card {
             background: rgba(26, 62, 92, 0.3);
             border-radius: 15px;
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             height: 100%;
             transition: all 0.3s ease;
             border: 1px solid rgba(54, 103, 140, 0.2);
             backdrop-filter: blur(5px);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .feature-card:hover {
@@ -246,6 +245,7 @@
             color: var(--text-primary);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(54, 103, 140, 0.2);
+            text-align: center;
         }
         
         .company-info h2 {
@@ -259,7 +259,8 @@
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 60px;
             height: 3px;
             background: var(--accent);
@@ -270,6 +271,7 @@
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
         
         .company-info strong {
@@ -355,6 +357,16 @@
                 padding: 2rem;
             }
             
+            .company-info address p {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .company-info strong {
+                min-width: auto;
+                margin-bottom: 0.3rem;
+            }
+            
             .btn-group-mobile {
                 display: flex;
                 flex-direction: column;
@@ -401,15 +413,15 @@
                     </li>
                     <li class="nav-item ms-lg-3">
                         <div class="d-flex flex-column flex-lg-row align-items-center btn-group-mobile">
-                            <a class="btn btn-custom mb-2 mb-lg-0 me-lg-2" href="<?= base_url('/comprar') ?>">
+                            <a class="btn btn-custom mb-2 mb-lg-0 me-lg-2" href="#">
                                 <i class="fas fa-shopping-cart me-1"></i>Comprar
                             </a>
-                            <a href="<?= base_url('/simulacion') ?>" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
+                            <a href="#" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
                                 <i class="fas fa-desktop me-1"></i>Simulación
                             </a>
-                            <button id="installPWAButton" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
-                                <i class="fas fa-download me-1"></i>Instalar App
-                            </button>
+                            <a href="<?= base_url('/descarga') ?>" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
+                                <i class="fas fa-download me-1"></i>Descargar App
+                            </a>
                             <a href="<?= base_url('/loginobtener') ?>" class="btn btn-outline-custom">
                                 <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
                             </a>
@@ -433,10 +445,10 @@
                         Tu hogar seguro con ASG. Sistema de detección precisa de fugas de gas con monitoreo en tiempo real y control remoto.
                     </p>
                     <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
-                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom">
+                        <a href="#" class="btn btn-custom">
                             <i class="fas fa-store me-1"></i>Comprar Ahora
                         </a>
-                        <a href="#features" class="btn btn-outline-custom">
+                        <a href="#company" class="btn btn-outline-custom">
                             <i class="fas fa-info-circle me-1"></i>Más Información
                         </a>
                     </div>
@@ -524,9 +536,6 @@
     </div>
 </footer>
 
-<script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
-<script src="https://files.bpcontent.cloud/2025/08/21/16/20250821163950-FM8TYRF1.js" defer></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
@@ -549,32 +558,6 @@
                 navbar.classList.remove('scrolled');
             }
         });
-    });
-
-    // PWA Installation
-    let deferredPrompt;
-    const installButton = document.getElementById('installPWAButton');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installButton.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installButton.style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
-    });
-
-    window.addEventListener('appinstalled', () => {
-        installButton.style.display = 'none';
-        deferredPrompt = null;
     });
 </script>
 
