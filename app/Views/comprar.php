@@ -102,7 +102,7 @@
         /* MODIFICACIÓN: Imagen más grande */
         .product-image-section img {
             width: 100%;
-            max-width: 450px; /* Aumentado el tamaño máximo */
+            max-width: 900px; /* Aumentado el tamaño máximo */
             height: auto;
             border-radius: 0.5rem;
             box-shadow: 0 8px 25px var(--shadow-dark);
