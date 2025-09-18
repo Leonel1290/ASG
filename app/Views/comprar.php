@@ -68,14 +68,12 @@
         }
 
         /* ------------------- CONTENEDOR PRINCIPAL ------------------- */
-        .checkout-container {
+        .checkout-wrapper { /* Nuevo contenedor para la imagen y los detalles */
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 2rem;
-            flex-direction: column; /* Nuevo: para apilar los elementos */
-            gap: 2rem; /* Nuevo: espacio entre los elementos */
         }
 
         .product-checkout-view {
@@ -85,33 +83,38 @@
             padding: 3rem;
             max-width: 900px;
             width: 100%;
-            display: flex;
+            display: flex; /* Contenedor principal para flexbox */
+            flex-direction: row; /* Imagen a la izquierda, detalles a la derecha por defecto */
             gap: 2rem;
             animation: fadeIn 1s ease-in-out;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
         }
 
         /* ------------------- SECCIONES DEL PRODUCTO ------------------- */
-        /* Eliminamos el estilo para el contenedor flex de la imagen, ya que no se usa */
+        .product-image-container { /* Nuevo contenedor para la imagen */
+            flex: 1; /* Permite que la imagen tome espacio */
+            min-width: 250px; /* Ancho mínimo para la imagen en columnas */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        /* MODIFICACIÓN: Estilo para la imagen fuera del contenedor */
-        .product-image {
+        .product-image-container img {
             width: 100%;
-            max-width: 900px; /* Tamaño máximo deseado */
+            max-width: 350px; /* Ajusta el tamaño máximo de la imagen según el diseño deseado */
             height: auto;
             border-radius: 0.5rem;
             box-shadow: 0 8px 25px var(--shadow-dark);
             transition: transform 0.4s ease-in-out;
-            margin-bottom: 2rem;
         }
 
-        .product-image:hover {
+        .product-image-container img:hover {
             transform: translateY(-10px) scale(1.05);
         }
         
         .product-details-section {
-            flex: 1; /* Hacemos que la sección de detalles ocupe el espacio completo */
-            min-width: 300px;
+            flex: 2; /* Permite que la sección de detalles ocupe más espacio */
+            min-width: 300px; /* Ancho mínimo para los detalles */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -256,26 +259,29 @@
         /* ------------------- RESPONSIVIDAD ------------------- */
         @media (max-width: 768px) {
             .product-checkout-view {
-                flex-direction: column;
+                flex-direction: column; /* Apila la imagen y los detalles en pantallas pequeñas */
                 padding: 1.5rem;
             }
             .trust-badges {
                 justify-content: center;
             }
             
-            /* Ajuste para móviles */
-            .product-image {
-                max-width: 300px;
+            .product-image-container {
+                margin-bottom: 1.5rem; /* Espacio debajo de la imagen cuando está arriba */
+            }
+
+            .product-image-container img {
+                max-width: 250px; /* Ajuste para móviles, la imagen puede ser un poco más pequeña */
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="checkout-container">
-        <img class="product-image" src="/imagenes/Sentinel.png" alt="Detector ASG">
-
-        <div class="product-checkout-view">
+    <div class="checkout-wrapper"> <div class="product-checkout-view">
+            <div class="product-image-container"> <img src="/imagenes/Sentinel.png" alt="Detector ASG">
+            </div>
+            
             <div class="product-details-section">
                 <h2>Confirmar Compra</h2>
                 <h1 class="mb-2">AgainSafeGas Sentinel</h1>
@@ -318,8 +324,7 @@
                     <i class="fas fa-arrow-left"></i> Volver
                 </button>
             </div>
-            
-            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
