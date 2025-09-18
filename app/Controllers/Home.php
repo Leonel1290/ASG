@@ -412,4 +412,9 @@ class Home extends BaseController
     {
         return view('simulacion');
     }
+
+    public function descarga()
+    {
+        return view('descarga');
+    }
 }
