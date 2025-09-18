@@ -1,638 +1,372 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ASG - Seguridad en tu Hogar</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Válvula | ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+    <meta name="mobile-web-app-capable" content="yes">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
-            /* Paleta de colores profesional azul oscuro */
-            --dark-blue: #0A1929;
-            --navy-blue: #132F4C;
-            --medium-blue: #1E4976;
-            --light-blue: #2A5C8F;
-            --accent-blue: #3B72AF;
-            --highlight: #4F93D9;
-            --text-light: #E6F1FF;
-            --text-muted: #A8C6FF;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FF9800;
-            --card-bg: rgba(19, 47, 76, 0.7);
-            --card-border: rgba(74, 144, 226, 0.2);
+            --primary-color: #2c73d2;
+            --success-color: #00b894;
+            --danger-color: #d62828;
+            --warning-color: #fca311;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #2c2c2c;
+            --text-secondary: #6c757d;
+            --border-radius: 20px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-
         body {
-            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--navy-blue) 100%);
+            background: linear-gradient(135deg, #e4e9f0 0%, #d5d7de 100%);
             font-family: 'Poppins', sans-serif;
-            color: var(--text-light);
-            margin: 0;
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        .navbar {
-            background: rgba(10, 25, 41, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 0.8rem 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .navbar-brand {
-            color: var(--text-light);
-            font-weight: 700;
-            font-size: 1.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        .navbar-brand span {
-            color: var(--highlight);
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--highlight);
-            background: rgba(59, 114, 175, 0.1);
-        }
-
-        .btn-custom {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--highlight) 100%);
-            border: none;
-            color: white;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 0.8rem 2.2rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 147, 217, 0.3);
-            letter-spacing: 0.5px;
-        }
-
-        .btn-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(79, 147, 217, 0.4);
-            background: linear-gradient(135deg, var(--light-blue) 0%, var(--accent-blue) 100%);
-        }
-
-        .btn-alert {
-            background: linear-gradient(135deg, var(--danger) 0%, #E53935 100%);
-            border: none;
-            color: white;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 0.8rem 2rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
-        }
-
-        .btn-alert:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
-            background: linear-gradient(135deg, #E53935 0%, #D32F2F 100%);
-        }
-
-        .hero {
-            padding: 5rem 0;
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .container.main-content { padding: 2rem 1rem; animation: fadeIn 0.8s ease-in-out; position: relative; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .card { border-radius: var(--border-radius); box-shadow: var(--box-shadow); background-color: var(--card-background); padding: 3.5rem; border: none; transition: var(--transition); }
+        h2.main-title { font-weight: 700; text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-color); }
+        .device-info { text-align: center; margin-bottom: 2rem; }
+        .device-info .name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
+        .device-info .location { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
+        
+        /* Estilos mejorados para el velocímetro */
+        .gauge-container {
             position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 3rem;
+        }
+        .gauge {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: #f0f0f0;
             overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
         }
-
-        .hero::before {
-            content: '';
+        .gauge-fill {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(79, 147, 217, 0.1) 0%, transparent 70%);
-            animation: pulse 15s infinite linear;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, var(--success-color), var(--warning-color), var(--danger-color));
+            transition: height 1s ease-in-out;
+            transform-origin: center bottom;
         }
-
-        @keyframes pulse {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        .gauge-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background: var(--card-background);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
         }
-
-        .hero h1 {
-            font-size: 3rem;
-            color: var(--text-light);
+        .gas-level-value {
+            font-size: 2.5rem;
             font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 3;
+            transition: color 0.5s ease;
         }
-
-        .hero p.lead {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            font-weight: 400;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero-line {
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--highlight));
-            margin: 1.5rem auto 2rem;
-            border-radius: 2px;
-        }
-
-        .hero-img {
-            max-width: 90%;
-            height: auto;
-            margin-top: 2rem;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .features {
-            padding: 5rem 0;
-            position: relative;
-        }
-
-        .features::before {
-            content: '';
+        .gauge-markers {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(19, 47, 76, 0.5);
-            border-radius: 20px;
-            z-index: -1;
-        }
-
-        .features h2 {
-            color: var(--text-light);
-            font-weight: 700;
-            margin-bottom: 3rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .features h2::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--highlight));
-            border-radius: 2px;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 2.5rem 2rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            z-index: 1;
         }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border-color: rgba(74, 144, 226, 0.4);
-        }
-
-        .features i {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--highlight) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover i {
-            transform: scale(1.1);
-        }
-
-        .features h3 {
-            color: var(--text-light);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .features p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        .company-info {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 3.5rem;
-            color: var(--text-light);
-            margin: 3rem auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .company-info h2 {
-            color: var(--text-light);
-            font-weight: 700;
-            margin-bottom: 2.5rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .company-info h2::after {
-            content: '';
+        .gauge-marker {
             position: absolute;
-            bottom: -15px;
+            bottom: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            height: 10px;
+            width: 2px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .gauge-marker.major {
+            height: 15px;
+            width: 3px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .gauge-label {
+            position: absolute;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--highlight));
-            border-radius: 2px;
-        }
-
-        .company-info p {
-            margin-bottom: 0.75rem;
-            font-size: 1.05rem;
-            color: var(--text-muted);
-        }
-
-        .company-info strong {
-            color: var(--highlight);
+            font-size: 0.8rem;
             font-weight: 600;
+            color: var(--text-secondary);
         }
-
-        .company-info a {
-            color: var(--accent-blue);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .company-info a:hover {
-            color: var(--highlight);
-            text-decoration: underline;
-        }
-
-        footer {
-            background: rgba(10, 25, 41, 0.95);
-            text-align: center;
-            padding: 2.5rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: auto;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-            border-top: 1px solid var(--card-border);
-        }
-
-        .notification-permission {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 2.5rem;
-            margin: 3rem auto;
-            text-align: center;
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .notification-permission h3 {
-            color: var(--text-light);
-            margin-bottom: 1.2rem;
-            font-weight: 600;
-        }
-
-        .notification-permission p {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            font-size: 1.05rem;
-        }
-
-        .test-notification {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .test-notification p {
-            margin-bottom: 1.2rem;
-        }
-
-        .navbar-toggler {
-            border: 1px solid rgba(79, 147, 217, 0.3);
-            padding: 0.4rem 0.6rem;
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28166, 200, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 0.2rem rgba(79, 147, 217, 0.25);
-            border-color: var(--accent-blue);
-        }
-
-        /* Responsive adjustments */
-        @media (min-width: 768px) {
-            .hero h1 {
-                font-size: 3.5rem;
-            }
-            .hero-img {
-                max-width: 100%;
-            }
-            .features, .company-info, .notification-permission {
-                max-width: 85%;
-                margin: 5rem auto;
-            }
-            .feature-card {
-                padding: 3rem 2rem;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .hero {
-                padding: 3rem 0;
-            }
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            .hero p.lead {
-                font-size: 1rem;
-            }
-            .features, .company-info, .notification-permission {
-                max-width: 95%;
-                margin: 3rem auto;
-            }
-            .company-info {
-                padding: 2rem;
-            }
+        
+        .valve-status { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; }
+        .valve-status-text { font-size: 1.2rem; font-weight: 600; color: var(--text-color); }
+        .status-led { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: background-color 0.5s ease; }
+        .status-led.abierta { background-color: var(--success-color); box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color); }
+        .status-led.cerrada { background-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color); }
+        .btn-group-actions { display: flex; flex-direction: column; gap: 1.2rem; justify-content: center; }
+        .btn { padding: 1.2rem; border-radius: 15px; font-size: 1.1rem; font-weight: 600; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .btn-success { background-color: var(--success-color); color: #fff; }
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .btn-secondary-custom { background-color: var(--text-secondary); color: #fff; }
+        
+        @media (prefers-color-scheme: dark) {
+            :root { --background-color: #121212; --card-background: #1e1e1e; --text-color: #f5f5f5; --text-secondary: #aaa; }
+            body { background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%); }
+            .card { box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03); }
+            .btn { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); }
+            .btn-secondary-custom { background-color: #555; }
+            .gauge { background: #2a2a2a; }
+            .gauge-center { background: var(--card-background); }
         }
     </style>
 </head>
-
 <body>
 
-<div id="explosionOverlay" class="explosion-animation-overlay">
-    <div class="explosion-image-container"></div>
+<div class="container main-content">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h2 class="main-title">Control de Válvula</h2>
+            <div class="card">
+                <div class="card-body">
+                    <?php if (isset($error_message)): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i> <?= esc($error_message) ?>
+                        </div>
+                    <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
+                        <div class="device-info">
+                            <div class="name">Dispositivo: <?= esc($dispositivo->nombre) ?></div>
+                            <div class="location">Ubicación: <?= esc($dispositivo->ubicacion) ?></div>
+                        </div>
+                        
+                        <!-- Velocímetro mejorado -->
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-fill" id="gasLevelFill"></div>
+                                <div class="gauge-markers" id="gaugeMarkers"></div>
+                                <div class="gauge-center">
+                                    <div class="gas-level-value" id="gasLevel">0%</div>
+                                </div>
+                            </div>
+                            <div class="gauge-label">Nivel de Gas</div>
+                        </div>
+
+                        <div class="valve-status">
+                            <div class="valve-status-text">Estado actual:</div>
+                            <div class="status-led" id="statusLed"></div>
+                        </div>
+                        
+                        <div class="btn-group-actions" role="group">
+                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
+                                <i class="fas fa-play"></i> Abrir Válvula
+                            </button>
+                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
+                                <i class="fas fa-stop"></i> Cerrar Válvula
+                            </button>
+                            <button type="button" class="btn btn-secondary-custom" id="btn-perfil" aria-label="Volver al perfil de usuario">
+                                <i class="fas fa-arrow-left"></i> Volver al Perfil
+                            </button>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle"></i> No se pudo cargar el dispositivo.
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<header>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="#"><span>ASG</span> Security</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#company">Contacto</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
-
-<main>
-    <section class="hero d-flex align-items-center" id="inicio">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <h1>Protege lo que más importa</h1>
-                    <div class="hero-line"></div>
-                    <p class="lead">Tu hogar seguro con ASG. Detección precisa de fugas de gas en tiempo real.</p>
-                    <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom mt-3">Inicia Sesión</a>
-                </div>
-                <div class="col-md-6 text-center mt-5 mt-md-0">
-                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp"
-                         alt="Ilustración de fuga de gas"
-                         class="hero-img img-fluid"
-                         loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="features py-5 text-center">
-        <div class="container">
-            <h2>Características Principales</h2>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-4 col-sm-6">
-                    <div class="feature-card">
-                        <i class="fas fa-shield-alt"></i>
-                        <h3>Seguridad Total</h3>
-                        <p>Sistema de cierre automático de válvulas para una protección eficaz.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>Monitoreo Remoto</h3>
-                        <p>Control desde tu celular a través de nuestra app segura.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="feature-card">
-                        <i class="fas fa-bell"></i>
-                        <h3>Alertas en Tiempo Real</h3>
-                        <p>Notificaciones inmediatas ante cualquier fuga detectada.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="notification-permission">
-        <div class="container">
-            <h3>Notificaciones de Seguridad</h3>
-            <p>Activa las notificaciones para recibir alertas inmediatas en caso de fuga de gas.</p>
-            <button id="enableNotifications" class="btn btn-custom">Activar Notificaciones</button>
-            <div class="test-notification">
-                <p>¿Quieres probar cómo funcionarían las alertas?</p>
-                <button id="testNotification" class="btn btn-alert">Probar Notificación de Alerta</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-5" id="company">
-        <div class="container">
-            <div class="company-info">
-                <h2>Sobre Nosotros</h2>
-                <address class="mb-0">
-                    <p><strong>Empresa:</strong> AgainSafeGas</p>
-                    <p><strong>Dirección:</strong> Río Tercero, Córdoba</p>
-                    <p><strong>Teléfono:</strong> <a href="tel:+543571623889">3571-623889</a></p>
-                    <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com">againsafegas.ascii@gmail.com</a></p>
-                    <p><strong>Sitio Web:</strong> <a href="https://www.gassafe.com" target="_blank">www.AgainSafeGas.com</a></p>
-                </address>
-            </div>
-        </div>
-    </section>
-</main>
-
-<footer>
-    <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function(){
-        // Smooth scroll para enlaces internos
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            const target = $($(this).attr('href'));
-            if(target.length) {
-                const offset = $('.navbar').outerHeight() + 10;
-                $('html, body').animate({ scrollTop: target.offset().top - offset }, 500);
-            }
-        });
+<?php if (isset($dispositivo) && $dispositivo !== null): ?>
+$(document).ready(function() {
+    const mac = '<?= esc($dispositivo->MAC) ?>';
+    const macUrl = encodeURIComponent(mac);
+    const statusLed = $('#statusLed');
+    const gasLevelSpan = $('#gasLevel');
+    const gasLevelFill = $('#gasLevelFill');
+    const btnAbrir = $('#btn-abrir');
+    const btnCerrar = $('#btn-cerrar');
+    const gaugeMarkers = $('#gaugeMarkers');
 
-        // Ocultar overlay de animación al cargar la página
-        $(window).on('load', function() {
-            $('#explosionOverlay').addClass('fade-out');
-        });
+    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
+    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-        // Solicitar permiso para notificaciones
-        $('#enableNotifications').on('click', function() {
-            if ('Notification' in window) {
-                Notification.requestPermission().then(function(permission) {
-                    if (permission === 'granted') {
-                        alert('Notificaciones activadas. Recibirás alertas en caso de fuga de gas.');
-                    } else {
-                        alert('Has bloqueado las notificaciones. No podrás recibir alertas de seguridad.');
-                    }
+    // Crear marcadores para el velocímetro
+    function createGaugeMarkers() {
+        gaugeMarkers.empty();
+        for (let i = 0; i <= 10; i++) {
+            const angle = (i * 18) - 90; // 0-100% en 180 grados
+            const marker = $('<div>').addClass(i % 5 === 0 ? 'gauge-marker major' : 'gauge-marker');
+            marker.css({
+                transform: `rotate(${angle}deg) translateX(-50%)`
+            });
+            gaugeMarkers.append(marker);
+            
+            // Añadir etiquetas para los marcadores principales
+            if (i % 5 === 0) {
+                const labelAngle = angle;
+                const radius = 85;
+                const x = 100 + radius * Math.cos(labelAngle * Math.PI / 180);
+                const y = 100 + radius * Math.sin(labelAngle * Math.PI / 180);
+                
+                const label = $('<div>').addClass('gauge-value-label').text(i * 10);
+                label.css({
+                    position: 'absolute',
+                    left: x + 'px',
+                    top: y + 'px',
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '10px',
+                    color: 'var(--text-secondary)'
                 });
-            } else {
-                alert('Tu navegador no soporta notificaciones. Actualízalo o usa uno más moderno.');
+                gaugeMarkers.append(label);
             }
-        });
+        }
+    }
+    
+    createGaugeMarkers();
 
-        // Probar notificación de alerta
-        $('#testNotification').on('click', function() {
-            showGasLeakAlert('Prueba de notificación', 'Esta es una simulación de alerta por fuga de gas.');
-        });
-    });
-
-    // Función para mostrar notificación de fuga de gas
-    function showGasLeakAlert(title, message) {
-        if ('Notification' in window && Notification.permission === 'granted') {
-            // Crear notificación
-            const notification = new Notification(title, {
-                body: message,
-                icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp',
-                badge: 'https://cdn3d.iconscout.com/3d/premium/thumb/fuga-de-gas-8440307-6706766.png?f=webp',
-                tag: 'gas-leak-alert',
-                requireInteraction: true,
-                vibrate: [200, 100, 200, 100, 200, 100, 200] // Patrón de vibración para alertas
-            });
-
-            // Acción al hacer clic en la notificación
-            notification.onclick = function() {
-                window.focus();
-                notification.close();
-            };
-
-            // Cerrar automáticamente después de 10 segundos
-            setTimeout(function() {
-                notification.close();
-            }, 10000);
-        } else if ('Notification' in window && Notification.permission !== 'denied') {
-            // Si no tenemos permiso, solicitarlo
-            Notification.requestPermission().then(function(permission) {
-                if (permission === 'granted') {
-                    showGasLeakAlert(title, message);
-                }
-            });
+    function actualizarEstadoUI(estado) {
+        if (estado) {
+            statusLed.removeClass('cerrada').addClass('abierta');
+            btnAbrir.prop('disabled', true).css('opacity', 0.6);
+            btnCerrar.prop('disabled', false).css('opacity', 1);
         } else {
-            // Fallback para navegadores sin soporte o que han denegado permisos
-            alert('ALERTA: ' + title + ' - ' + message);
+            statusLed.removeClass('abierta').addClass('cerrada');
+            btnAbrir.prop('disabled', false).css('opacity', 1);
+            btnCerrar.prop('disabled', true).css('opacity', 0.6);
         }
     }
 
-    // Simular una alerta de fuga de gas (esto normalmente vendría del servidor)
-    // function simulateGasLeak() {
-    //     setTimeout(function() {
-    //         showGasLeakAlert('¡ALERTA DE FUGA DE GAS!', 'Se ha detectado una fuga de gas en la cocina. Ventile el área y evite fuentes de ignición.');
-    //     }, 10000); // Simular alerta después de 10 segundos
-    // }
-    // simulateGasLeak(); // Descomenta para probar una alerta automática
-</script>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
-                .then(registration => {
-                    console.log('ServiceWorker registrado con éxito:', registration.scope);
-                   
-                    // Suscribirse a push notifications después de registrar el service worker
-                    if ('PushManager' in window) {
-                        // Aquí iría la lógica para suscribirse al servicio de push notifications
-                        // Esto requiere un servidor con claves VAPID y configuración adicional
-                    }
-                })
-                .catch(error => {
-                    console.log('Fallo el registro de ServiceWorker:', error);
-                });
+    function updateGauge(level) {
+        level = Math.max(0, Math.min(100, parseFloat(level)));
+        const height = (level / 100) * 100;
+        gasLevelFill.css('height', `${height}%`);
+        gasLevelSpan.text(`${level.toFixed(1)}%`);
+        
+        // Cambiar color según el nivel
+        if (level < 30) {
+            gasLevelSpan.css('color', 'var(--success-color)');
+        } else if (level < 70) {
+            gasLevelSpan.css('color', 'var(--warning-color)');
+        } else {
+            gasLevelSpan.css('color', 'var(--danger-color)');
+            if (level > 80 && !statusLed.hasClass('cerrada')) {
+                showGasAlert(level);
+            }
+        }
+    }
+
+    function fetchDeviceState() {
+        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) {
+            if (response.status === 'success') {
+                actualizarEstadoUI(response.estado_valvula); 
+                updateGauge(response.nivel_gas || 0); 
+            } else {
+                console.error('Error al obtener estado:', response.message);
+                // En caso de error, intentar nuevamente en 2 segundos
+                setTimeout(fetchDeviceState, 2000);
+            }
+        }).fail(function(xhr, status, error) {
+            console.error('Error de conexión con el servidor:', error);
+            console.log('URL intentada:', '/lecturas/obtenerUltimaLectura/' + macUrl);
+            // Reintentar en caso de error de conexión
+            setTimeout(fetchDeviceState, 2000);
         });
     }
-</script>
 
+    function showGasAlert(level) {
+        Swal.fire({
+            title: '¡Nivel de Gas Peligroso!',
+            text: `El nivel de gas ha alcanzado ${level.toFixed(1)}%. Se recomienda cerrar la válvula.`,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: 'var(--danger-color)',
+            backdrop: `rgba(214, 40, 40, 0.15)`,
+            allowOutsideClick: false
+        });
+    }
+
+    $('#btn-abrir').click(function() {
+        controlarServo(mac, 1, 'Válvula abierta');
+    });
+    
+    $('#btn-cerrar').click(function() {
+        controlarServo(mac, 0, 'Válvula cerrada');
+    });
+
+    $('#btn-perfil').click(function() {
+        window.location.href = '<?= base_url('perfil') ?>';
+    });
+    
+    function controlarServo(mac, estado, successMessage) {
+        const postData = {
+            mac: mac,
+            estado: estado
+        };
+        if (csrfName && csrfHash) {
+            postData[csrfName] = csrfHash;
+        }
+        const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
+        buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+        
+        $.post('/servo/actualizarEstado', postData)
+            .done(function(response) {
+                if (response.status === 'success') {
+                    actualizarEstadoUI(response.estado);
+                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: successMessage, timer: 2000, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Error al actualizar' });
+                }
+            })
+            .fail(function() {
+                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo comunicar con el servidor.' });
+            })
+            .always(function() {
+                buttons[0].html(estado ? '<i class="fas fa-play"></i> Abrir Válvula' : '<i class="fas fa-stop"></i> Cerrar Válvula');
+                fetchDeviceState();
+            });
+    }
+    
+    // Inicializar
+    fetchDeviceState();
+    const intervalId = setInterval(fetchDeviceState, 5000);
+    $(window).on('beforeunload', function() { clearInterval(intervalId); });
+});
+<?php endif; ?>
+</script>
 </body>
 </html>
