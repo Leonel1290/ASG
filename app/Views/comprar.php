@@ -74,6 +74,8 @@
             align-items: center;
             justify-content: center;
             padding: 2rem;
+            flex-direction: column; /* Nuevo: para apilar los elementos */
+            gap: 2rem; /* Nuevo: espacio entre los elementos */
         }
 
         .product-checkout-view {
@@ -90,32 +92,25 @@
         }
 
         /* ------------------- SECCIONES DEL PRODUCTO ------------------- */
-        .product-image-section {
-            flex: 1;
-            min-width: 300px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        /* Eliminamos el estilo para el contenedor flex de la imagen, ya que no se usa */
 
-        /* MODIFICACIÓN: Imagen más grande */
-        .product-image-section img {
+        /* MODIFICACIÓN: Estilo para la imagen fuera del contenedor */
+        .product-image {
             width: 100%;
-            max-width: 900px; /* Aumentado el tamaño máximo */
+            max-width: 900px; /* Tamaño máximo deseado */
             height: auto;
             border-radius: 0.5rem;
             box-shadow: 0 8px 25px var(--shadow-dark);
             transition: transform 0.4s ease-in-out;
-            margin: 0 auto; /* Centrar la imagen */
+            margin-bottom: 2rem;
         }
 
-        .product-image-section img:hover {
-            transform: translateY(-10px) scale(1.05); /* Efecto de zoom al hacer hover */
+        .product-image:hover {
+            transform: translateY(-10px) scale(1.05);
         }
         
         .product-details-section {
-            flex: 1.5;
+            flex: 1; /* Hacemos que la sección de detalles ocupe el espacio completo */
             min-width: 300px;
             display: flex;
             flex-direction: column;
@@ -268,8 +263,8 @@
                 justify-content: center;
             }
             
-            /* Ajuste para móviles: imagen más pequeña */
-            .product-image-section img {
+            /* Ajuste para móviles */
+            .product-image {
                 max-width: 300px;
             }
         }
@@ -278,6 +273,8 @@
 
 <body>
     <div class="checkout-container">
+        <img class="product-image" src="/imagenes/Sentinel.png" alt="Detector ASG">
+
         <div class="product-checkout-view">
             <div class="product-details-section">
                 <h2>Confirmar Compra</h2>
@@ -322,10 +319,7 @@
                 </button>
             </div>
             
-            <div class="product-image-section">
-                <img src="/imagenes/Sentinel.png" alt="Detector ASG">
             </div>
-        </div>
     </div>
 
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
