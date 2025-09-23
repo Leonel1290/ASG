@@ -408,7 +408,7 @@
                     </li>
                     <li class="nav-item ms-lg-3">
                         <div class="d-flex flex-column flex-lg-row align-items-center btn-group-mobile">
-                            <a class="btn btn-custom mb-2 mb-lg-0 me-lg-2" href="#">
+                            <a href="<?= base_url('/comprar') ?>" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
                                 <i class="fas fa-shopping-cart me-1"></i>Comprar
                             </a>
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
