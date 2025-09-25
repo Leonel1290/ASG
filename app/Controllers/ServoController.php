@@ -3,106 +3,87 @@
 namespace App\Controllers;
 
 use App\Models\DispositivoModel;
-use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\RESTful\ResourceController;
 
-class ServoController extends BaseController
+class ServoController extends ResourceController
 {
-    use ResponseTrait;
-
     protected $dispositivoModel;
+    private $apiValveBaseUrl = 'https://pwa-1s1m.onrender.com';
+    private $apiValveKey = 'YOUR_SUPER_SECRET_API_KEY_HERE';
 
     public function __construct()
     {
         $this->dispositivoModel = new DispositivoModel();
-        helper('url');
     }
 
     /**
-     * Obtiene el estado actual de la válvula - CORREGIDO
+     * Obtiene el estado actual de la válvula
      */
-    public function obtenerEstado($mac = null)
+    public function obtenerEstado($mac)
     {
-        try {
-            // Verificar que se proporcionó la MAC
-            if (empty($mac)) {
-                return $this->fail('MAC no proporcionada', 400);
-            }
+        // Decodificar la MAC si viene codificada en URL
+        $mac = urldecode($mac);
+        
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
-            // Decodificar la MAC (los %3A se convierten a :)
-            $mac = urldecode($mac);
-            $mac = str_replace('%3A', ':', $mac);
-            
-            log_message('debug', 'MAC recibida: ' . $mac);
-
-            // Validar formato básico de MAC
-            if (!preg_match('/^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/', $mac)) {
-                return $this->fail('Formato de MAC inválido: ' . $mac, 400);
-            }
-
-            // Buscar el dispositivo
-            $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-
-            if ($dispositivo) {
-                return $this->respond([
-                    'status' => 'success',
-                    'estado_valvula' => (bool)$dispositivo['estado_valvula'],
-                    'mensaje' => 'Estado obtenido correctamente'
-                ]);
-            } else {
-                return $this->fail('Dispositivo no encontrado para MAC: ' . $mac, 404);
-            }
-        } catch (\Exception $e) {
-            log_message('error', 'Error en obtenerEstado: ' . $e->getMessage());
-            return $this->failServerError('Error interno del servidor: ' . $e->getMessage());
+        if ($dispositivo) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'estado_valvula' => (bool)$dispositivo['estado_valvula'],
+                'nivel_gas' => (float)$dispositivo['ultimo_nivel_gas']
+            ]);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status' => 'error', 
+                'message' => 'Dispositivo no encontrado.'
+            ]);
         }
     }
 
     /**
-     * Actualiza el estado de la válvula - CORREGIDO
+     * Actualiza el estado de la válvula y notifica al ESP32
      */
     public function actualizarEstado()
     {
+        // Verificar CSRF token
+        if (!csrf_filter()) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'Token CSRF inválido.'
+            ]);
+        }
+
+        $mac = $this->request->getPost('mac');
+        $estado = $this->request->getPost('estado');
+
+        // Validaciones
+        if (empty($mac)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 
+                'message' => 'MAC no proporcionada.'
+            ]);
+        }
+
+        if ($estado === null) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 
+                'message' => 'Estado no proporcionado.'
+            ]);
+        }
+
+        // Convertir a booleano
+        $estado = (bool)$estado;
+
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+        if (!$dispositivo) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status' => 'error', 
+                'message' => 'Dispositivo no encontrado.'
+            ]);
+        }
+
         try {
-            // Verificar método HTTP
-            if (!$this->request->is('post')) {
-                return $this->fail('Método no permitido', 405);
-            }
-
-            // Verificar CSRF token
-            if (!csrf_filter()) {
-                return $this->fail('Token CSRF inválido', 403);
-            }
-
-            // Obtener datos del POST
-            $mac = $this->request->getPost('mac');
-            $estado = $this->request->getPost('estado');
-
-            // Validaciones
-            if (empty($mac)) {
-                return $this->fail('MAC no proporcionada', 400);
-            }
-
-            if ($estado === null) {
-                return $this->fail('Estado no proporcionado', 400);
-            }
-
-            // Limpiar y validar MAC
-            $mac = str_replace('%3A', ':', $mac);
-            if (!preg_match('/^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/', $mac)) {
-                return $this->fail('Formato de MAC inválido', 400);
-            }
-
-            // Convertir a booleano
-            $estado = (bool)$estado;
-
-            // Buscar dispositivo
-            $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-
-            if (!$dispositivo) {
-                return $this->fail('Dispositivo no encontrado', 404);
-            }
-
-            // Actualizar estado
             $data = [
                 'estado_valvula' => $estado,
                 'updated_at' => date('Y-m-d H:i:s')
@@ -111,20 +92,74 @@ class ServoController extends BaseController
             $updated = $this->dispositivoModel->update($dispositivo['id'], $data);
 
             if ($updated) {
-                log_message('info', "Válvula " . ($estado ? "ABIERTA" : "CERRADA") . " para MAC: {$mac}");
+                // NOTIFICAR AL ESP32 mediante su API
+                $this->notificarESP32($mac, $estado);
                 
-                return $this->respond([
+                return $this->response->setJSON([
                     'status' => 'success', 
-                    'message' => 'Válvula ' . ($estado ? 'abierta' : 'cerrada') . ' correctamente', 
-                    'estado' => $estado,
-                    'timestamp' => date('Y-m-d H:i:s')
+                    'message' => 'Estado de válvula actualizado.', 
+                    'estado' => $estado
                 ]);
             } else {
-                return $this->fail('Error al actualizar el estado de la válvula', 500);
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Error al actualizar el estado de la válvula.'
+                ]);
             }
         } catch (\Exception $e) {
-            log_message('error', 'Error en actualizarEstado: ' . $e->getMessage());
-            return $this->failServerError('Error interno del servidor');
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 
+                'message' => 'Error interno del servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Notifica al ESP32 del cambio de estado mediante su API
+     */
+    private function notificarESP32($mac, $estado)
+    {
+        try {
+            $client = \Config\Services::curlrequest();
+            
+            $url = $this->apiValveBaseUrl . '/api/valve_status';
+            $data = [
+                'mac' => $mac,
+                'api_key' => $this->apiValveKey,
+                'estado' => $estado ? 1 : 0
+            ];
+            
+            $response = $client->post($url, [
+                'form_params' => $data,
+                'timeout' => 5
+            ]);
+            
+            log_message('info', "ESP32 notificado - MAC: {$mac}, Estado: " . ($estado ? 'Abierta' : 'Cerrada'));
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Error al notificar ESP32: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Endpoint para que el ESP32 consulte el estado actual
+     */
+    public function estadoValvula($mac)
+    {
+        $mac = urldecode($mac);
+        $apiKey = $this->request->getGet('api_key');
+        
+        // Validar API key
+        if ($apiKey !== $this->apiValveKey) {
+            return $this->response->setStatusCode(401)->setBody('Unauthorized');
+        }
+        
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+        
+        if ($dispositivo) {
+            return $this->response->setBody((string)(int)$dispositivo['estado_valvula']);
+        } else {
+            return $this->response->setStatusCode(404)->setBody('Dispositivo no encontrado');
         }
     }
 }
