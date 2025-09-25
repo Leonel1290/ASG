@@ -87,15 +87,4 @@ $routes->get('prueba', function() {
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
-// RUTA CORREGIDA: Cambiado 'estado_valvula' a 'valve_status' para que coincida con la solicitud del ESP
-$routes->get('api/valve_status', 'ApiEspController::estadoValvula');
-
-// --- RUTAS PARA DISPOSITIVOS Y DETALLES ---
-// Esta ruta muestra la página de detalles, apuntando a tu EnlaceController.
-$routes->get('/dispositivos/detalles/(:any)', 'EnlaceController::detalles/$1', ['filter' => 'auth']);
-
-// Esta ruta es para la llamada AJAX que actualiza el nivel de gas y el estado de la válvula.
-$routes->get('/lecturas/obtenerUltimaLectura/(:any)', 'LecturasController::obtenerUltimaLectura/$1', ['filter' => 'auth']);
-
-// Esta ruta es para la llamada AJAX que abre o cierra la válvula.
-$routes->post('/servo/actualizarEstado', 'ServoController::actualizarEstado', ['filter' => 'auth']);
+$routes->get('lecturas/obtenerUltimaLectura/(:any)', 'Lecturas::obtenerUltimaLectura/$1');
