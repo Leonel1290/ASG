@@ -222,7 +222,7 @@ class PerfilController extends BaseController
                     'La contraseña es demasiado común. Elige una más segura.'
                 ],
             ],
-        ],
+        ]
 
             
 
