@@ -1,7 +1,15 @@
+# Esto es para servidores Apache. Render a menudo usa Nginx o una configuración
+# personalizada, pero esta es la configuración estándar de CodeIgniter 4
+# que generalmente es compatible o te da una idea de lo que necesitas.
+
 <IfModule mod_rewrite.c>
+    # Activa el motor de reescritura
     RewriteEngine On
-    RewriteBase /login2/public/
+
+    # Si la solicitud no es a un archivo real o un directorio real...
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+
+    # ...entonces, reenvía la solicitud a index.php
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>

@@ -84,5 +84,8 @@ $routes->get('prueba', function() {
 });
 
 
-// ESTA ES LA RUTA QUE FALTABA PARA GUARDAR LA COMPRA CON PAYPAL
-$routes->post('/home/guardar_compra', 'Home::guardar_compra');
+$routes->post('paypal/create-order', 'CompraController::createOrder');
+$routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
+
+// En routes.php (CodeIgniter 4)
+$routes->get('descarga', 'Home::descarga');
