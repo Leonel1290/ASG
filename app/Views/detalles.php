@@ -8,31 +8,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ASG">
-    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-    <meta name="mobile-web-app-capable" content="yes">
-
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-        /* --- Tu CSS original --- */
         :root {
-            --primary-color: #2c73d2;
             --success-color: #00b894;
             --danger-color: #d62828;
-            --warning-color: #fca311;
             --background-color: #f0f2f5;
             --card-background: #ffffff;
             --text-color: #2c2c2c;
-            --text-secondary: #6c757d;
             --border-radius: 20px;
-            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         body {
             background: linear-gradient(135deg, #e4e9f0 0%, #d5d7de 100%);
@@ -44,40 +31,72 @@
             margin: 0;
             color: var(--text-color);
         }
-        .container.main-content { padding: 2rem 1rem; animation: fadeIn 0.8s ease-in-out; position: relative; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .card { border-radius: var(--border-radius); box-shadow: var(--box-shadow); background-color: var(--card-background); padding: 3.5rem; border: none; transition: var(--transition); }
-        h2.main-title { font-weight: 700; text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-color); }
-        .device-info { text-align: center; margin-bottom: 2rem; }
-        .device-info .name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
-        .device-info .location { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
-        .gas-level-bubble { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 3rem; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1); transition: var(--transition); }
-        .bubble-fill { position: absolute; bottom: 0; left: 0; width: 100%; background-color: transparent; border-bottom-left-radius: 150px; border-bottom-right-radius: 150px; transition: height 1s ease-in-out, background-color 0.5s ease; }
-        .gas-level-value { font-size: 2.5rem; font-weight: 700; color: var(--text-color); position: relative; z-index: 2; }
-        .valve-status { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; }
-        .valve-status-text { font-size: 1.2rem; font-weight: 600; color: var(--text-color); }
-        .status-led { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: background-color 0.5s ease; }
-        .status-led.abierta { background-color: var(--success-color); box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color); }
-        .status-led.cerrada { background-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color); }
-        .btn-group-actions { display: flex; flex-direction: column; gap: 1.2rem; justify-content: center; }
-        .btn { padding: 1.2rem; border-radius: 15px; font-size: 1.1rem; font-weight: 600; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .card { 
+            border-radius: var(--border-radius); 
+            background-color: var(--card-background); 
+            padding: 2rem; 
+            border: none; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        h2.main-title { 
+            font-weight: 700; 
+            text-align: center; 
+            margin-bottom: 2rem; 
+        }
+        .device-info { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+        }
+        .valve-status { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 2rem; 
+        }
+        .status-led { 
+            width: 15px; 
+            height: 15px; 
+            border-radius: 50%; 
+            transition: background-color 0.5s ease; 
+        }
+        .status-led.abierta { 
+            background-color: var(--success-color); 
+            box-shadow: 0 0 10px var(--success-color); 
+        }
+        .status-led.cerrada { 
+            background-color: var(--danger-color); 
+            box-shadow: 0 0 10px var(--danger-color); 
+        }
+        .btn-group-actions { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+        .btn { 
+            padding: 1rem; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            border: none; 
+        }
         .btn-success { background-color: var(--success-color); color: #fff; }
         .btn-danger { background-color: var(--danger-color); color: #fff; }
-        .btn-secondary-custom { background-color: var(--text-secondary); color: #fff; }
-        @media (prefers-color-scheme: dark) {
-            :root { --background-color: #121212; --card-background: #1e1e1e; --text-color: #f5f5f5; --text-secondary: #aaa; }
-            body { background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%); }
-            .card { box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03); }
-            .btn { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); }
-            .btn-secondary-custom { background-color: #555; }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
 
-<div class="container main-content">
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-6">
             <h2 class="main-title">Control de Válvula</h2>
             <div class="card">
                 <div class="card-body">
@@ -87,30 +106,25 @@
                         </div>
                     <?php elseif (isset($dispositivo) && $dispositivo !== null): ?>
                         <div class="device-info">
-                            <div class="name">Dispositivo: <?= esc($dispositivo->nombre) ?></div>
-                            <div class="location">Ubicación: <?= esc($dispositivo->ubicacion) ?></div>
-                        </div>
-                        
-                        <div class="gas-level-bubble">
-                            <div class="bubble-fill" id="gasLevelFill"></div>
-                            <div class="gas-level-value" id="gasLevel">0%</div>
+                            <div class="name"><strong><?= esc($dispositivo->nombre) ?></strong></div>
+                            <div class="location"><?= esc($dispositivo->ubicacion) ?></div>
                         </div>
 
                         <div class="valve-status">
-                            <div class="valve-status-text">Estado actual:</div>
+                            <div class="valve-status-text">Estado: <span id="valveStatusText">Cargando...</span></div>
                             <div class="status-led" id="statusLed"></div>
                         </div>
                         
                         <div class="btn-group-actions" role="group">
-                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
+                            <button type="button" class="btn btn-success" id="btn-abrir">
                                 <i class="fas fa-play"></i> Abrir Válvula
                             </button>
-                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
+                            <button type="button" class="btn btn-danger" id="btn-cerrar">
                                 <i class="fas fa-stop"></i> Cerrar Válvula
                             </button>
-                            <button type="button" class="btn btn-secondary-custom" id="btn-perfil" aria-label="Volver al perfil de usuario">
+                            <a href="<?= base_url('perfil') ?>" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Volver al Perfil
-                            </button>
+                            </a>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info" role="alert">
@@ -129,118 +143,137 @@
 <?php if (isset($dispositivo) && $dispositivo !== null): ?>
 $(document).ready(function() {
     const mac = '<?= esc($dispositivo->MAC) ?>';
-    const macUrl = mac.replace(/:/g, '-'); // <-- CORRECCIÓN PRINCIPAL
     const statusLed = $('#statusLed');
-    const gasLevelSpan = $('#gasLevel');
-    const gasLevelFill = $('#gasLevelFill');
     const btnAbrir = $('#btn-abrir');
     const btnCerrar = $('#btn-cerrar');
+    const valveStatusText = $('#valveStatusText');
 
-    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
-    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
+    const csrfName = $('meta[name="csrf-name"]').attr('content');
+    const csrfHash = $('meta[name="csrf-token"]').attr('content');
 
+    // Función para actualizar la interfaz según el estado
     function actualizarEstadoUI(estado) {
         if (estado) {
             statusLed.removeClass('cerrada').addClass('abierta');
-            btnAbrir.prop('disabled', true).css('opacity', 0.6);
-            btnCerrar.prop('disabled', false).css('opacity', 1);
+            valveStatusText.text('Abierta');
+            btnAbrir.prop('disabled', true);
+            btnCerrar.prop('disabled', false);
         } else {
             statusLed.removeClass('abierta').addClass('cerrada');
-            btnAbrir.prop('disabled', false).css('opacity', 1);
-            btnCerrar.prop('disabled', true).css('opacity', 0.6);
+            valveStatusText.text('Cerrada');
+            btnAbrir.prop('disabled', false);
+            btnCerrar.prop('disabled', true);
         }
     }
 
-    function updateGauge(level) {
-        level = Math.max(0, Math.min(100, parseFloat(level)));
-        const height = (level / 100) * 100;
-        gasLevelFill.css('height', `${height}%`);
-        gasLevelSpan.text(`${level.toFixed(1)}%`);
+    // Función para obtener el estado actual de la válvula
+    function obtenerEstadoValvula() {
+        $.ajax({
+            url: '/servo/obtenerEstado/' + encodeURIComponent(mac),
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    actualizarEstadoUI(response.estado_valvula);
+                }
+            },
+            error: function() {
+                console.error('Error al obtener el estado de la válvula');
+            }
+        });
+    }
+
+    // Función para controlar la válvula
+    function controlarValvula(accion, estado, mensaje) {
+        const boton = accion === 'abrir' ? btnAbrir : btnCerrar;
+        const textoOriginal = boton.html();
         
-        if (level < 30) {
-            gasLevelFill.css('background-color', 'var(--success-color)');
-            gasLevelSpan.css('color', 'var(--success-color)');
-        } else if (level < 70) {
-            gasLevelFill.css('background-color', 'var(--warning-color)');
-            gasLevelSpan.css('color', 'var(--warning-color)');
-        } else {
-            gasLevelFill.css('background-color', 'var(--danger-color)');
-            gasLevelSpan.css('color', 'var(--danger-color)');
-            if (level > 80 && !statusLed.hasClass('cerrada')) {
-                showGasAlert(level);
-            }
-        }
-    }
-
-    function fetchDeviceState() {
-        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) { // <-- usa macUrl
-            if (response.status === 'success') {
-                actualizarEstadoUI(response.estado_valvula); 
-                updateGauge(response.nivel_gas || 0); 
-            } else {
-                console.error('Error al obtener estado:', response.message);
-            }
-        }).fail(function() {
-            console.error('Error de conexión con el servidor');
-        });
-    }
-
-    function showGasAlert(level) {
-        Swal.fire({
-            title: '¡Nivel de Gas Peligroso!',
-            text: `El nivel de gas ha alcanzado ${level.toFixed(1)}%. Se recomienda cerrar la válvula.`,
-            icon: 'error',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: 'var(--danger-color)',
-            backdrop: `rgba(214, 40, 40, 0.15)`,
-            allowOutsideClick: false
-        });
-    }
-
-    $('#btn-abrir').click(function() {
-        controlarServo(mac, 1, 'Válvula abierta');
-    });
-    
-    $('#btn-cerrar').click(function() {
-        controlarServo(mac, 0, 'Válvula cerrada');
-    });
-
-    $('#btn-perfil').click(function() {
-        window.location.href = '<?= base_url('perfil') ?>';
-    });
-    
-    function controlarServo(mac, estado, successMessage) {
-        const postData = {
+        boton.html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+        
+        const datos = {
             mac: mac,
             estado: estado
         };
-        if (csrfName && csrfHash) {
-            postData[csrfName] = csrfHash;
-        }
-        const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
-        buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
         
-        $.post('/servo/actualizarEstado', postData)
-            .done(function(response) {
+        if (csrfName && csrfHash) {
+            datos[csrfName] = csrfHash;
+        }
+        
+        $.ajax({
+            url: '/servo/actualizarEstado',
+            method: 'POST',
+            data: datos,
+            success: function(response) {
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado);
-                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: successMessage, timer: 2000, showConfirmButton: false });
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: mensaje,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Error al actualizar' });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Error al actualizar la válvula'
+                    });
                 }
-            })
-            .fail(function() {
-                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo comunicar con el servidor.' });
-            })
-            .always(function() {
-                buttons[0].html(estado ? '<i class="fas fa-play"></i> Abrir Válvula' : '<i class="fas fa-stop"></i> Cerrar Válvula');
-                fetchDeviceState();
-            });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'No se pudo comunicar con el servidor'
+                });
+            },
+            complete: function() {
+                boton.html(textoOriginal);
+                obtenerEstadoValvula(); // Actualizar estado después de la acción
+            }
+        });
     }
+
+    // Event listeners para los botones
+    btnAbrir.click(function() {
+        Swal.fire({
+            title: '¿Abrir válvula?',
+            text: '¿Está seguro de que desea abrir la válvula?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#00b894',
+            cancelButtonColor: '#d62828',
+            confirmButtonText: 'Sí, abrir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                controlarValvula('abrir', 1, 'Válvula abierta correctamente');
+            }
+        });
+    });
     
-    fetchDeviceState();
-    const intervalId = setInterval(fetchDeviceState, 5000);
-    $(window).on('beforeunload', function() { clearInterval(intervalId); });
+    btnCerrar.click(function() {
+        Swal.fire({
+            title: '¿Cerrar válvula?',
+            text: '¿Está seguro de que desea cerrar la válvula?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d62828',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, cerrar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                controlarValvula('cerrar', 0, 'Válvula cerrada correctamente');
+            }
+        });
+    });
+
+    // Inicializar
+    obtenerEstadoValvula();
+    
+    // Actualizar estado cada 5 segundos
+    setInterval(obtenerEstadoValvula, 5000);
 });
 <?php endif; ?>
 </script>

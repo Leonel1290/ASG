@@ -19,27 +19,32 @@ class ServoController extends ResourceController
      */
     public function obtenerEstado($mac)
     {
-        // Decodificar la MAC si viene codificada en URL
-        $mac = urldecode($mac);
-        
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+        try {
+            $mac = urldecode($mac);
+            
+            $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
-        if ($dispositivo) {
-            return $this->response->setJSON([
-                'status' => 'success',
-                'estado_valvula' => (bool)$dispositivo['estado_valvula'],
-                'nivel_gas' => (float)$dispositivo['ultimo_nivel_gas']
-            ]);
-        } else {
-            return $this->response->setStatusCode(404)->setJSON([
+            if ($dispositivo) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'estado_valvula' => (bool)$dispositivo['estado_valvula']
+                ]);
+            } else {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Dispositivo no encontrado.'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON([
                 'status' => 'error', 
-                'message' => 'Dispositivo no encontrado.'
+                'message' => 'Error interno del servidor.'
             ]);
         }
     }
 
     /**
-     * Actualiza el estado de la válvula
+     * Actualiza el estado de la válvula (solo control manual)
      */
     public function actualizarEstado()
     {
@@ -54,7 +59,7 @@ class ServoController extends ResourceController
         $mac = $this->request->getPost('mac');
         $estado = $this->request->getPost('estado');
 
-        // Validaciones
+        // Validaciones básicas
         if (empty($mac)) {
             return $this->response->setStatusCode(400)->setJSON([
                 'status' => 'error', 
@@ -69,9 +74,6 @@ class ServoController extends ResourceController
             ]);
         }
 
-        // Convertir a booleano
-        $estado = (bool)$estado;
-
         $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
         if (!$dispositivo) {
@@ -82,6 +84,8 @@ class ServoController extends ResourceController
         }
 
         try {
+            $estado = (bool)$estado;
+            
             $data = [
                 'estado_valvula' => $estado,
                 'updated_at' => date('Y-m-d H:i:s')
@@ -92,7 +96,7 @@ class ServoController extends ResourceController
             if ($updated) {
                 return $this->response->setJSON([
                     'status' => 'success', 
-                    'message' => 'Estado de válvula actualizado.', 
+                    'message' => 'Válvula ' . ($estado ? 'abierta' : 'cerrada') . ' correctamente.', 
                     'estado' => $estado
                 ]);
             } else {
@@ -104,7 +108,7 @@ class ServoController extends ResourceController
         } catch (\Exception $e) {
             return $this->response->setStatusCode(500)->setJSON([
                 'status' => 'error', 
-                'message' => 'Error interno del servidor: ' . $e->getMessage()
+                'message' => 'Error interno del servidor.'
             ]);
         }
     }
