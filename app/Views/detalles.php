@@ -32,7 +32,6 @@
             --border-radius: 20px;
             --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --offline-color: #95a5a6;
         }
         body {
             background: linear-gradient(135deg, #e4e9f0 0%, #d5d7de 100%);
@@ -51,128 +50,26 @@
         .device-info { text-align: center; margin-bottom: 2rem; }
         .device-info .name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
         .device-info .location { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
-        .device-status { text-align: center; margin-bottom: 1rem; }
-        .device-status .status { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; }
-        .status.online { background-color: rgba(0, 184, 148, 0.1); color: var(--success-color); }
-        .status.offline { background-color: rgba(149, 165, 166, 0.1); color: var(--offline-color); }
-        
-        /* Estilos para el velocímetro */
-        .gauge-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 3rem;
-        }
-        .gauge {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            background: #f0f0f0;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        .gauge.offline {
-            opacity: 0.6;
-            filter: grayscale(70%);
-        }
-        .gauge-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(to top, var(--success-color), var(--warning-color), var(--danger-color));
-            transition: height 1s ease-in-out;
-            transform-origin: center bottom;
-        }
-        .gauge-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: 70%;
-            background: var(--card-background);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 2;
-        }
-        .gas-level-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            z-index: 3;
-            transition: color 0.5s ease;
-        }
-        .gauge-markers {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        .gauge-marker {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform-origin: bottom center;
-            height: 10px;
-            width: 2px;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .gauge-marker.major {
-            height: 15px;
-            width: 3px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        .gauge-label {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        
+        .gas-level-bubble { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 3rem; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1); transition: var(--transition); }
+        .bubble-fill { position: absolute; bottom: 0; left: 0; width: 100%; background-color: transparent; border-bottom-left-radius: 150px; border-bottom-right-radius: 150px; transition: height 1s ease-in-out, background-color 0.5s ease; }
+        .gas-level-value { font-size: 2.5rem; font-weight: 700; color: var(--text-color); position: relative; z-index: 2; }
+        .gas-level-value.sin-datos { color: var(--text-secondary) !important; font-size: 1.5rem; }
         .valve-status { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; }
         .valve-status-text { font-size: 1.2rem; font-weight: 600; color: var(--text-color); }
         .status-led { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: background-color 0.5s ease; }
         .status-led.abierta { background-color: var(--success-color); box-shadow: 0 0 10px var(--success-color), 0 0 20px var(--success-color); }
         .status-led.cerrada { background-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color); }
-        .status-led.offline { background-color: var(--offline-color); box-shadow: 0 0 10px var(--offline-color), 0 0 20px var(--offline-color); }
-        
         .btn-group-actions { display: flex; flex-direction: column; gap: 1.2rem; justify-content: center; }
         .btn { padding: 1.2rem; border-radius: 15px; font-size: 1.1rem; font-weight: 600; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
         .btn-success { background-color: var(--success-color); color: #fff; }
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary-custom { background-color: var(--text-secondary); color: #fff; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .connection-status {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
         @media (prefers-color-scheme: dark) {
-            :root { 
-                --background-color: #121212; 
-                --card-background: #1e1e1e; 
-                --text-color: #f5f5f5; 
-                --text-secondary: #aaa; 
-                --offline-color: #7f8c8d;
-            }
+            :root { --background-color: #121212; --card-background: #1e1e1e; --text-color: #f5f5f5; --text-secondary: #aaa; }
             body { background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%); }
             .card { box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03); }
             .btn { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); }
             .btn-secondary-custom { background-color: #555; }
-            .gauge { background: #2a2a2a; }
-            .gauge-center { background: var(--card-background); }
         }
     </style>
 </head>
@@ -194,43 +91,26 @@
                             <div class="location">Ubicación: <?= esc($dispositivo->ubicacion) ?></div>
                         </div>
                         
-                        <div class="device-status">
-                            <div class="status offline" id="deviceStatus">
-                                <i class="fas fa-plug"></i> <span id="statusText">Desconectado</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Velocímetro -->
-                        <div class="gauge-container">
-                            <div class="gauge offline" id="gauge">
-                                <div class="gauge-fill" id="gasLevelFill"></div>
-                                <div class="gauge-markers" id="gaugeMarkers"></div>
-                                <div class="gauge-center">
-                                    <div class="gas-level-value" id="gasLevel">--%</div>
-                                </div>
-                            </div>
-                            <div class="gauge-label">Nivel de Gas</div>
+                        <div class="gas-level-bubble">
+                            <div class="bubble-fill" id="gasLevelFill"></div>
+                            <div class="gas-level-value" id="gasLevel">0%</div>
                         </div>
 
                         <div class="valve-status">
                             <div class="valve-status-text">Estado actual:</div>
-                            <div class="status-led offline" id="statusLed"></div>
+                            <div class="status-led" id="statusLed"></div>
                         </div>
                         
                         <div class="btn-group-actions" role="group">
-                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas" disabled>
+                            <button type="button" class="btn btn-success" id="btn-abrir" aria-label="Abrir válvula de gas">
                                 <i class="fas fa-play"></i> Abrir Válvula
                             </button>
-                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas" disabled>
+                            <button type="button" class="btn btn-danger" id="btn-cerrar" aria-label="Cerrar válvula de gas">
                                 <i class="fas fa-stop"></i> Cerrar Válvula
                             </button>
                             <button type="button" class="btn btn-secondary-custom" id="btn-perfil" aria-label="Volver al perfil de usuario">
                                 <i class="fas fa-arrow-left"></i> Volver al Perfil
                             </button>
-                        </div>
-                        
-                        <div class="connection-status" id="connectionStatus">
-                            <i class="fas fa-sync-alt fa-spin"></i> Intentando conectar con el dispositivo...
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info" role="alert">
@@ -255,64 +135,9 @@ $(document).ready(function() {
     const gasLevelFill = $('#gasLevelFill');
     const btnAbrir = $('#btn-abrir');
     const btnCerrar = $('#btn-cerrar');
-    const gaugeMarkers = $('#gaugeMarkers');
-    const gauge = $('#gauge');
-    const deviceStatus = $('#deviceStatus');
-    const statusText = $('#statusText');
-    const connectionStatus = $('#connectionStatus');
-    
-    let isOnline = false;
-    let retryCount = 0;
-    const maxRetries = 10;
 
     const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
     const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
-
-    // Crear marcadores para el velocímetro
-    function createGaugeMarkers() {
-        gaugeMarkers.empty();
-        for (let i = 0; i <= 10; i++) {
-            const angle = (i * 18) - 90;
-            const marker = $('<div>').addClass(i % 5 === 0 ? 'gauge-marker major' : 'gauge-marker');
-            marker.css({
-                transform: `rotate(${angle}deg) translateX(-50%)`
-            });
-            gaugeMarkers.append(marker);
-        }
-    }
-    
-    createGaugeMarkers();
-
-    function setDeviceOnline(online) {
-        isOnline = online;
-        if (online) {
-            deviceStatus.removeClass('offline').addClass('online');
-            statusText.html('<i class="fas fa-wifi"></i> Conectado');
-            gauge.removeClass('offline');
-            statusLed.removeClass('offline');
-            connectionStatus.html('<i class="fas fa-wifi"></i> Conectado al dispositivo');
-            retryCount = 0;
-            
-            // Habilitar botones
-            btnAbrir.prop('disabled', false);
-            btnCerrar.prop('disabled', false);
-        } else {
-            deviceStatus.removeClass('online').addClass('offline');
-            statusText.html('<i class="fas fa-plug"></i> Desconectado');
-            gauge.addClass('offline');
-            statusLed.addClass('offline');
-            
-            // Deshabilitar botones
-            btnAbrir.prop('disabled', true);
-            btnCerrar.prop('disabled', true);
-            
-            if (retryCount < maxRetries) {
-                connectionStatus.html(`<i class="fas fa-sync-alt fa-spin"></i> Intentando reconectar... (${retryCount + 1}/${maxRetries})`);
-            } else {
-                connectionStatus.html('<i class="fas fa-exclamation-triangle"></i> Dispositivo no disponible. Verifica la conexión.');
-            }
-        }
-    }
 
     function actualizarEstadoUI(estado) {
         if (estado) {
@@ -327,16 +152,28 @@ $(document).ready(function() {
     }
 
     function updateGauge(level) {
+        if (level === null || level === undefined) {
+            gasLevelSpan.text('Sin datos');
+            gasLevelSpan.addClass('sin-datos');
+            gasLevelFill.css('height', '0%');
+            gasLevelFill.css('background-color', 'var(--text-secondary)');
+            return;
+        }
+        
+        gasLevelSpan.removeClass('sin-datos');
         level = Math.max(0, Math.min(100, parseFloat(level)));
         const height = (level / 100) * 100;
         gasLevelFill.css('height', `${height}%`);
         gasLevelSpan.text(`${level.toFixed(1)}%`);
         
         if (level < 30) {
+            gasLevelFill.css('background-color', 'var(--success-color)');
             gasLevelSpan.css('color', 'var(--success-color)');
         } else if (level < 70) {
+            gasLevelFill.css('background-color', 'var(--warning-color)');
             gasLevelSpan.css('color', 'var(--warning-color)');
         } else {
+            gasLevelFill.css('background-color', 'var(--danger-color)');
             gasLevelSpan.css('color', 'var(--danger-color)');
             if (level > 80 && !statusLed.hasClass('cerrada')) {
                 showGasAlert(level);
@@ -344,31 +181,39 @@ $(document).ready(function() {
         }
     }
 
+    function mostrarIndicadorSinConexion() {
+        gasLevelSpan.text('Sin datos');
+        gasLevelSpan.addClass('sin-datos');
+        gasLevelFill.css('background-color', 'var(--text-secondary)');
+    }
+
     function fetchDeviceState() {
-        $.ajax({
-            url: '<?= base_url() ?>' + 'lecturas/obtenerUltimaLectura/' + macUrl,
-            method: 'GET',
-            dataType: 'json',
-            timeout: 8000,
-            success: function(response) {
-                if (response.status === 'success') {
-                    setDeviceOnline(true);
-                    actualizarEstadoUI(response.estado_valvula); 
-                    updateGauge(response.nivel_gas || 0);
-                } else {
-                    setDeviceOnline(false);
-                    console.warn('Dispositivo sin datos:', response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                setDeviceOnline(false);
-                retryCount++;
-                
-                if (retryCount >= maxRetries) {
-                    console.warn('Dispositivo offline después de múltiples intentos');
-                    clearInterval(intervalId);
-                }
+        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) {
+            if (response.status === 'success') {
+                actualizarEstadoUI(response.estado_valvula); 
+                updateGauge(response.nivel_gas || 0); 
+            } else {
+                console.warn('No se pudo obtener lectura reciente:', response.message);
+                obtenerNivelDesdeDispositivo();
             }
+        }).fail(function(xhr, status, error) {
+            console.error('Error de conexión con el servidor:', error);
+            obtenerNivelDesdeDispositivo();
+        });
+    }
+
+    function obtenerNivelDesdeDispositivo() {
+        $.get('/dispositivo/obtenerEstado/' + macUrl, function(response) {
+            if (response.status === 'success' && response.ultimo_nivel_gas !== null) {
+                actualizarEstadoUI(response.estado_valvula);
+                updateGauge(response.ultimo_nivel_gas);
+            } else {
+                updateGauge(0);
+                mostrarIndicadorSinConexion();
+            }
+        }).fail(function() {
+            updateGauge(0);
+            mostrarIndicadorSinConexion();
         });
     }
 
@@ -397,16 +242,6 @@ $(document).ready(function() {
     });
     
     function controlarServo(mac, estado, successMessage) {
-        if (!isOnline) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Dispositivo offline',
-                text: 'No se puede controlar la válvula mientras el dispositivo esté desconectado.',
-                confirmButtonText: 'Entendido'
-            });
-            return;
-        }
-        
         const postData = {
             mac: mac,
             estado: estado
@@ -414,11 +249,10 @@ $(document).ready(function() {
         if (csrfName && csrfHash) {
             postData[csrfName] = csrfHash;
         }
-        
         const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
         buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
         
-        $.post('<?= base_url() ?>' + 'servo/actualizarEstado', postData)
+        $.post('/servo/actualizarEstado', postData)
             .done(function(response) {
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado);
@@ -436,13 +270,6 @@ $(document).ready(function() {
             });
     }
     
-    // Inicializar con estado offline
-    setDeviceOnline(false);
-    updateGauge(0);
-    gasLevelSpan.text('--%');
-    gasLevelSpan.css('color', 'var(--offline-color)');
-    
-    // Intentar conectar
     fetchDeviceState();
     const intervalId = setInterval(fetchDeviceState, 5000);
     $(window).on('beforeunload', function() { clearInterval(intervalId); });
