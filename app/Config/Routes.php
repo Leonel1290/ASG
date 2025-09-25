@@ -87,8 +87,5 @@ $routes->get('prueba', function() {
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
+// RUTA CORREGIDA: Cambiado 'estado_valvula' a 'valve_status' para que coincida con la solicitud del ESP
 $routes->get('api/valve_status', 'ApiEspController::estadoValvula');
-
-// Rutas para el control de válvulas
-$routes->get('api/valve_status', 'ServoController::estadoValvula');
-$routes->post('api/valve_status', 'ServoController::actualizarEstadoAPI');
