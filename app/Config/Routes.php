@@ -89,3 +89,11 @@ $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1'
 
 $routes->get('api/valve_status', 'ApiEspController::estadoValvula');
 
+// AGREGAR ESTAS RUTAS PARA EL CONTROL DE VÁLVULA
+$routes->group('servo', function($routes) {
+    $routes->post('actualizarEstado', 'ServoController::actualizarEstado');
+    $routes->get('obtenerEstado/(:segment)', 'ServoController::obtenerEstado/$1');
+});
+
+// También asegura que esta ruta exista para las lecturas
+$routes->get('lecturas/obtenerUltimaLectura/(:segment)', 'LecturasController::obtenerUltimaLectura/$1');
