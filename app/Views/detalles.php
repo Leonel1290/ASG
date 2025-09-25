@@ -151,6 +151,10 @@ $(document).ready(function() {
     const csrfName = $('meta[name="csrf-name"]').attr('content');
     const csrfHash = $('meta[name="csrf-token"]').attr('content');
 
+    // Estado inicial
+    actualizarEstadoUI(false);
+    obtenerEstadoValvula();
+
     // Función para actualizar la interfaz según el estado
     function actualizarEstadoUI(estado) {
         if (estado) {
@@ -166,23 +170,40 @@ $(document).ready(function() {
         }
     }
 
-    // Función para obtener el estado actual de la válvula
+    // Función para obtener el estado actual de la válvula - CORREGIDA
     function obtenerEstadoValvula() {
+        // Codificar la MAC para URL (reemplazar : por %3A)
+        const macEncoded = encodeURIComponent(mac);
+        
         $.ajax({
-            url: '/servo/obtenerEstado/' + encodeURIComponent(mac),
+            url: '<?= base_url() ?>' + '/servo/obtenerEstado/' + macEncoded,
             method: 'GET',
+            dataType: 'json',
+            timeout: 10000,
             success: function(response) {
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado_valvula);
+                } else {
+                    console.error('Error en respuesta:', response.message);
+                    mostrarError('Error al obtener estado: ' + (response.message || 'Error desconocido'));
                 }
             },
-            error: function() {
-                console.error('Error al obtener el estado de la válvula');
+            error: function(xhr, status, error) {
+                console.error('Error en petición:', status, error);
+                if (status === 'timeout') {
+                    mostrarError('Timeout al conectar con el servidor');
+                } else if (xhr.status === 404) {
+                    mostrarError('Dispositivo no encontrado');
+                } else if (xhr.status === 500) {
+                    mostrarError('Error interno del servidor');
+                } else {
+                    mostrarError('Error de conexión: ' + (error || 'Desconocido'));
+                }
             }
         });
     }
 
-    // Función para controlar la válvula
+    // Función para controlar la válvula - CORREGIDA
     function controlarValvula(accion, estado, mensaje) {
         const boton = accion === 'abrir' ? btnAbrir : btnCerrar;
         const textoOriginal = boton.html();
@@ -194,14 +215,17 @@ $(document).ready(function() {
             estado: estado
         };
         
+        // Agregar CSRF token
         if (csrfName && csrfHash) {
             datos[csrfName] = csrfHash;
         }
         
         $.ajax({
-            url: '/servo/actualizarEstado',
+            url: '<?= base_url() ?>' + '/servo/actualizarEstado',
             method: 'POST',
             data: datos,
+            dataType: 'json',
+            timeout: 15000,
             success: function(response) {
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado);
@@ -220,18 +244,32 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                let mensajeError = 'Error de conexión';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    mensajeError = xhr.responseJSON.message;
+                } else if (status === 'timeout') {
+                    mensajeError = 'Timeout al conectar con el servidor';
+                }
+                
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error de conexión',
-                    text: 'No se pudo comunicar con el servidor'
+                    title: 'Error',
+                    text: mensajeError
                 });
             },
             complete: function() {
                 boton.html(textoOriginal);
-                obtenerEstadoValvula(); // Actualizar estado después de la acción
+                // Reintentar obtener estado después de 1 segundo
+                setTimeout(obtenerEstadoValvula, 1000);
             }
         });
+    }
+
+    // Función para mostrar errores no críticos
+    function mostrarError(mensaje) {
+        console.error(mensaje);
+        // No mostrar alertas para errores de obtención de estado (solo log)
     }
 
     // Event listeners para los botones
@@ -269,11 +307,8 @@ $(document).ready(function() {
         });
     });
 
-    // Inicializar
-    obtenerEstadoValvula();
-    
-    // Actualizar estado cada 5 segundos
-    setInterval(obtenerEstadoValvula, 5000);
+    // Actualizar estado cada 10 segundos
+    setInterval(obtenerEstadoValvula, 10000);
 });
 <?php endif; ?>
 </script>
