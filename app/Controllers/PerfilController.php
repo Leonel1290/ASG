@@ -222,9 +222,9 @@ class PerfilController extends BaseController
                     'La contraseña es demasiado común. Elige una más segura.'
                 ],
             ],
-        ]
+        ];
 
-            
+             
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
