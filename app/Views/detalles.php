@@ -50,10 +50,85 @@
         .device-info { text-align: center; margin-bottom: 2rem; }
         .device-info .name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color); }
         .device-info .location { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
-        .gas-level-bubble { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 3rem; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1); transition: var(--transition); }
-        .bubble-fill { position: absolute; bottom: 0; left: 0; width: 100%; background-color: transparent; border-bottom-left-radius: 150px; border-bottom-right-radius: 150px; transition: height 1s ease-in-out, background-color 0.5s ease; }
-        .gas-level-value { font-size: 2.5rem; font-weight: 700; color: var(--text-color); position: relative; z-index: 2; }
-        .gas-level-value.sin-datos { color: var(--text-secondary) !important; font-size: 1.5rem; }
+        
+        /* Estilos mejorados para el velocímetro */
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 3rem;
+        }
+        .gauge {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: #f0f0f0;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .gauge-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, var(--success-color), var(--warning-color), var(--danger-color));
+            transition: height 1s ease-in-out;
+            transform-origin: center bottom;
+        }
+        .gauge-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background: var(--card-background);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+        .gas-level-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            z-index: 3;
+            transition: color 0.5s ease;
+        }
+        .gauge-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .gauge-marker {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            height: 10px;
+            width: 2px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .gauge-marker.major {
+            height: 15px;
+            width: 3px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .gauge-label {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
         .valve-status { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 2rem; }
         .valve-status-text { font-size: 1.2rem; font-weight: 600; color: var(--text-color); }
         .status-led { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: background-color 0.5s ease; }
@@ -64,17 +139,6 @@
         .btn-success { background-color: var(--success-color); color: #fff; }
         .btn-danger { background-color: var(--danger-color); color: #fff; }
         .btn-secondary-custom { background-color: var(--text-secondary); color: #fff; }
-        .btn:disabled { cursor: not-allowed; }
-        
-        /* Estilos para debug */
-        .debug-info { 
-            background: #f8f9fa; 
-            border-radius: 10px; 
-            padding: 15px; 
-            margin-top: 20px; 
-            font-size: 0.9rem; 
-            border-left: 4px solid var(--primary-color);
-        }
         
         @media (prefers-color-scheme: dark) {
             :root { --background-color: #121212; --card-background: #1e1e1e; --text-color: #f5f5f5; --text-secondary: #aaa; }
@@ -82,7 +146,8 @@
             .card { box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03); }
             .btn { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05); }
             .btn-secondary-custom { background-color: #555; }
-            .debug-info { background: #2d2d2d; color: #f5f5f5; }
+            .gauge { background: #2a2a2a; }
+            .gauge-center { background: var(--card-background); }
         }
     </style>
 </head>
@@ -104,15 +169,21 @@
                             <div class="location">Ubicación: <?= esc($dispositivo->ubicacion) ?></div>
                         </div>
                         
-                        <div class="gas-level-bubble">
-                            <div class="bubble-fill" id="gasLevelFill"></div>
-                            <div class="gas-level-value" id="gasLevel">0%</div>
+                        <!-- Velocímetro mejorado -->
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-fill" id="gasLevelFill"></div>
+                                <div class="gauge-markers" id="gaugeMarkers"></div>
+                                <div class="gauge-center">
+                                    <div class="gas-level-value" id="gasLevel">0%</div>
+                                </div>
+                            </div>
+                            <div class="gauge-label">Nivel de Gas</div>
                         </div>
 
                         <div class="valve-status">
                             <div class="valve-status-text">Estado actual:</div>
                             <div class="status-led" id="statusLed"></div>
-                            <span id="valveStatusText">-</span>
                         </div>
                         
                         <div class="btn-group-actions" role="group">
@@ -126,16 +197,6 @@
                                 <i class="fas fa-arrow-left"></i> Volver al Perfil
                             </button>
                         </div>
-
-                        <!-- Información de depuración -->
-                        <div class="debug-info">
-                            <h6>Información de Depuración:</h6>
-                            <p><strong>MAC:</strong> <span id="debug-mac"><?= esc($dispositivo->MAC) ?></span></p>
-                            <p><strong>Estado Actual:</strong> <span id="debug-status"><?= $dispositivo->estado_valvula ? 'Abierta' : 'Cerrada' ?></span></p>
-                            <p><strong>Nivel Gas:</strong> <span id="debug-gas"><?= $dispositivo->ultimo_nivel_gas ?? 'N/A' ?>%</span></p>
-                            <p><strong>Última Actualización:</strong> <span id="debug-time"><?= date('H:i:s') ?></span></p>
-                        </div>
-
                     <?php else: ?>
                         <div class="alert alert-info" role="alert">
                             <i class="fas fa-info-circle"></i> No se pudo cargar el dispositivo.
@@ -159,128 +220,91 @@ $(document).ready(function() {
     const gasLevelFill = $('#gasLevelFill');
     const btnAbrir = $('#btn-abrir');
     const btnCerrar = $('#btn-cerrar');
-    const valveStatusText = $('#valveStatusText');
+    const gaugeMarkers = $('#gaugeMarkers');
 
-    // Elementos de debug
-    const debugStatus = $('#debug-status');
-    const debugGas = $('#debug-gas');
-    const debugTime = $('#debug-time');
+    const csrfName = $('meta[name="csrf-name"]').attr('content') || '<?= csrf_token() ?>';
+    const csrfHash = $('meta[name="csrf-token"]').attr('content') || '<?= csrf_hash() ?>';
 
-    // Debug inicial
-    console.log('Inicializando control de válvula para MAC:', mac);
-    console.log('MAC codificada para URL:', macUrl);
+    // Crear marcadores para el velocímetro
+    function createGaugeMarkers() {
+        gaugeMarkers.empty();
+        for (let i = 0; i <= 10; i++) {
+            const angle = (i * 18) - 90; // 0-100% en 180 grados
+            const marker = $('<div>').addClass(i % 5 === 0 ? 'gauge-marker major' : 'gauge-marker');
+            marker.css({
+                transform: `rotate(${angle}deg) translateX(-50%)`
+            });
+            gaugeMarkers.append(marker);
+            
+            // Añadir etiquetas para los marcadores principales
+            if (i % 5 === 0) {
+                const labelAngle = angle;
+                const radius = 85;
+                const x = 100 + radius * Math.cos(labelAngle * Math.PI / 180);
+                const y = 100 + radius * Math.sin(labelAngle * Math.PI / 180);
+                
+                const label = $('<div>').addClass('gauge-value-label').text(i * 10);
+                label.css({
+                    position: 'absolute',
+                    left: x + 'px',
+                    top: y + 'px',
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '10px',
+                    color: 'var(--text-secondary)'
+                });
+                gaugeMarkers.append(label);
+            }
+        }
+    }
+    
+    createGaugeMarkers();
 
     function actualizarEstadoUI(estado) {
-        console.log('Actualizando UI - Estado válvula:', estado);
-        
         if (estado) {
             statusLed.removeClass('cerrada').addClass('abierta');
             btnAbrir.prop('disabled', true).css('opacity', 0.6);
             btnCerrar.prop('disabled', false).css('opacity', 1);
-            valveStatusText.text('Abierta').css('color', 'var(--success-color)');
-            debugStatus.text('Abierta').css('color', 'var(--success-color)');
         } else {
             statusLed.removeClass('abierta').addClass('cerrada');
             btnAbrir.prop('disabled', false).css('opacity', 1);
             btnCerrar.prop('disabled', true).css('opacity', 0.6);
-            valveStatusText.text('Cerrada').css('color', 'var(--danger-color)');
-            debugStatus.text('Cerrada').css('color', 'var(--danger-color)');
         }
-        
-        debugTime.text(new Date().toLocaleTimeString());
     }
 
     function updateGauge(level) {
-        if (level === null || level === undefined || isNaN(level)) {
-            gasLevelSpan.text('Sin datos');
-            gasLevelSpan.addClass('sin-datos');
-            gasLevelFill.css('height', '0%');
-            gasLevelFill.css('background-color', 'var(--text-secondary)');
-            debugGas.text('N/A');
-            return;
-        }
-        
-        gasLevelSpan.removeClass('sin-datos');
         level = Math.max(0, Math.min(100, parseFloat(level)));
         const height = (level / 100) * 100;
         gasLevelFill.css('height', `${height}%`);
         gasLevelSpan.text(`${level.toFixed(1)}%`);
-        debugGas.text(`${level.toFixed(1)}%`);
         
+        // Cambiar color según el nivel
         if (level < 30) {
-            gasLevelFill.css('background-color', 'var(--success-color)');
             gasLevelSpan.css('color', 'var(--success-color)');
         } else if (level < 70) {
-            gasLevelFill.css('background-color', 'var(--warning-color)');
             gasLevelSpan.css('color', 'var(--warning-color)');
         } else {
-            gasLevelFill.css('background-color', 'var(--danger-color)');
             gasLevelSpan.css('color', 'var(--danger-color)');
             if (level > 80 && !statusLed.hasClass('cerrada')) {
                 showGasAlert(level);
             }
         }
-        
-        debugTime.text(new Date().toLocaleTimeString());
-    }
-
-    function mostrarIndicadorSinConexion() {
-        gasLevelSpan.text('Sin datos');
-        gasLevelSpan.addClass('sin-datos');
-        gasLevelFill.css('background-color', 'var(--text-secondary)');
-        debugGas.text('Sin conexión');
-        debugTime.text(new Date().toLocaleTimeString() + ' (Error)');
     }
 
     function fetchDeviceState() {
-        console.log('Solicitando estado del dispositivo...');
-        
-        $.ajax({
-            url: '/lecturas/obtenerUltimaLectura/' + macUrl,
-            type: 'GET',
-            dataType: 'json',
-            timeout: 8000
-        })
-        .done(function(response) {
-            console.log('Respuesta de lecturas:', response);
+        $.get('/lecturas/obtenerUltimaLectura/' + macUrl, function(response) {
             if (response.status === 'success') {
                 actualizarEstadoUI(response.estado_valvula); 
                 updateGauge(response.nivel_gas || 0); 
             } else {
-                console.warn('No se pudo obtener lectura reciente:', response.message);
-                obtenerNivelDesdeDispositivo();
+                console.error('Error al obtener estado:', response.message);
+                // En caso de error, intentar nuevamente en 2 segundos
+                setTimeout(fetchDeviceState, 2000);
             }
-        })
-        .fail(function(xhr, status, error) {
-            console.error('Error de conexión con lecturas:', error);
-            obtenerNivelDesdeDispositivo();
-        });
-    }
-
-    function obtenerNivelDesdeDispositivo() {
-        console.log('Obteniendo estado desde dispositivo...');
-        
-        $.ajax({
-            url: '/servo/obtenerEstado/' + macUrl,
-            type: 'GET',
-            dataType: 'json',
-            timeout: 8000
-        })
-        .done(function(response) {
-            console.log('Respuesta de servo:', response);
-            if (response.status === 'success') {
-                actualizarEstadoUI(response.estado_valvula);
-                updateGauge(response.nivel_gas);
-            } else {
-                console.warn('Error en respuesta servo:', response.message);
-                updateGauge(0);
-                mostrarIndicadorSinConexion();
-            }
-        })
-        .fail(function(xhr, status, error) {
-            console.error('Error de conexión con servo:', error);
-            updateGauge(0);
-            mostrarIndicadorSinConexion();
+        }).fail(function(xhr, status, error) {
+            console.error('Error de conexión con el servidor:', error);
+            console.log('URL intentada:', '/lecturas/obtenerUltimaLectura/' + macUrl);
+            // Reintentar en caso de error de conexión
+            setTimeout(fetchDeviceState, 2000);
         });
     }
 
@@ -296,93 +320,52 @@ $(document).ready(function() {
         });
     }
 
-    function controlarServo(mac, estado, successMessage) {
-        console.log('Enviando comando - MAC:', mac, 'Estado:', estado);
-        
-        const postData = {
-            mac: mac,
-            estado: estado,
-            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-        };
-
-        const button = estado ? btnAbrir : btnCerrar;
-        const originalHtml = button.html();
-        
-        button.html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
-
-        $.ajax({
-            url: '<?= base_url('servo/actualizarEstado') ?>',
-            type: 'POST',
-            data: postData,
-            dataType: 'json',
-            timeout: 10000
-        })
-        .done(function(response) {
-            console.log('Respuesta del servidor:', response);
-            if (response.status === 'success') {
-                actualizarEstadoUI(response.estado);
-                Swal.fire({ 
-                    icon: 'success', 
-                    title: '¡Éxito!', 
-                    text: successMessage, 
-                    timer: 2000, 
-                    showConfirmButton: false 
-                });
-            } else {
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'Error', 
-                    text: response.message || 'Error al actualizar' 
-                });
-            }
-        })
-        .fail(function(xhr, status, error) {
-            console.error('Error en la petición:', status, error);
-            Swal.fire({ 
-                icon: 'error', 
-                title: 'Error de conexión', 
-                text: 'No se pudo comunicar con el servidor. Verifica tu conexión.' 
-            });
-        })
-        .always(function() {
-            button.html(originalHtml).prop('disabled', false);
-            // Actualizar el estado después de un breve delay
-            setTimeout(fetchDeviceState, 1000);
-        });
-    }
-
-    // Asignar eventos de click
-    btnAbrir.click(function() {
-        if (!$(this).prop('disabled')) {
-            controlarServo(mac, 1, 'Válvula abierta correctamente');
-        }
+    $('#btn-abrir').click(function() {
+        controlarServo(mac, 1, 'Válvula abierta');
     });
     
-    btnCerrar.click(function() {
-        if (!$(this).prop('disabled')) {
-            controlarServo(mac, 0, 'Válvula cerrada correctamente');
-        }
+    $('#btn-cerrar').click(function() {
+        controlarServo(mac, 0, 'Válvula cerrada');
     });
 
     $('#btn-perfil').click(function() {
         window.location.href = '<?= base_url('perfil') ?>';
     });
     
-    // Inicializar estado
-    actualizarEstadoUI(<?= $dispositivo->estado_valvula ? 'true' : 'false' ?>);
-    updateGauge(<?= $dispositivo->ultimo_nivel_gas ?? 0 ?>);
+    function controlarServo(mac, estado, successMessage) {
+        const postData = {
+            mac: mac,
+            estado: estado
+        };
+        if (csrfName && csrfHash) {
+            postData[csrfName] = csrfHash;
+        }
+        const buttons = estado ? [btnAbrir, btnCerrar] : [btnCerrar, btnAbrir];
+        buttons[0].html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+        
+        $.post('/servo/actualizarEstado', postData)
+            .done(function(response) {
+                if (response.status === 'success') {
+                    actualizarEstadoUI(response.estado);
+                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: successMessage, timer: 2000, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Error al actualizar' });
+                }
+            })
+            .fail(function() {
+                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo comunicar con el servidor.' });
+            })
+            .always(function() {
+                buttons[0].html(estado ? '<i class="fas fa-play"></i> Abrir Válvula' : '<i class="fas fa-stop"></i> Cerrar Válvula');
+                fetchDeviceState();
+            });
+    }
     
-    // Actualizar periódicamente
+    // Inicializar
     fetchDeviceState();
     const intervalId = setInterval(fetchDeviceState, 5000);
-    
-    // Limpiar intervalo al salir
-    $(window).on('beforeunload', function() { 
-        clearInterval(intervalId); 
-    });
+    $(window).on('beforeunload', function() { clearInterval(intervalId); });
 });
-<?php else: ?>
-console.log('Dispositivo no disponible para inicializar el control');
 <?php endif; ?>
 </script>
 </body>
