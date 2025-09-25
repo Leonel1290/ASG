@@ -441,7 +441,7 @@
                     </p>
                     <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
                         <a href="#" class="btn btn-custom">
-                            <i class="fas fa-store me-1"></i>Comprar Ahora
+                            <i href="<?= base_url('/comprar') ?>"></i>Comprar Ahora
                         </a>
                         <a href="#company" class="btn btn-outline-custom">
                             <i class="fas fa-info-circle me-1"></i>Más Información
