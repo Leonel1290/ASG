@@ -1,21 +1,3 @@
-Conversación abierta. 1 mensaje no leído.
-
-Ir al contenido
-Cómo usar Correo de Instituto Técnico Río Tercero con lectores de pantalla
-
-1 de 1,017
-(sin asunto)
-Usuarios externos
-Recibidos
-
-manuel urrutia
-Adjuntos
-1:46 p.m. (hace 0 minutos)
-para mí
-
-
- 4 archivos adjuntos
-  •  Analizado por Gmail
 <!DOCTYPE html>
 <html lang="es">
 <head>
