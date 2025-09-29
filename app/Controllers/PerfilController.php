@@ -187,20 +187,44 @@ class PerfilController extends BaseController
                 ]
             ],
             'new_password' => [
-                'rules'  => 'required|min_length[8]',
+                'rules' => [
+                    'required',
+                    'min_length[6]',
+                    'max_length[255]',
+                    'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
+                    function ($password) {
+                        return !$this->userModel->isCommonPassword($password);
+                    }
+                ],
                 'errors' => [
-                    'required'   => 'La nueva contraseña es requerida.',
-                    'min_length' => 'La nueva contraseña debe tener al menos 8 caracteres.'
-                ]
+                    'required' => 'El campo contraseña es obligatorio.',
+                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
+                    'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
+                    'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
+                    'La contraseña es demasiado común. Elige una más segura.'
+                ],
             ],
             'confirm_password' => [
-                'rules'  => 'required|matches[new_password]',
-                'errors' => [
-                    'required' => 'La confirmación de la contraseña es requerida.',
-                    'matches'  => 'Las contraseñas no coinciden.'
-                ]
+                'rules' => [
+                    'required',
+                    'min_length[6]',
+                    'max_length[255]',
+                    'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
+                    function ($password) {
+                        return !$this->userModel->isCommonPassword($password);
+                    }
+                ],
+                  'errors' => [
+                    'required' => 'El campo contraseña es obligatorio.',
+                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
+                    'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
+                    'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
+                    'La contraseña es demasiado común. Elige una más segura.'
+                ],
             ],
         ];
+
+             
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
