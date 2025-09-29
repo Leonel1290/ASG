@@ -160,13 +160,12 @@
 
         /* Animación mejorada para la imagen */
         @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            33% { transform: translateY(-15px) rotate(1deg); }
-            66% { transform: translateY(10px) rotate(-1deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
         .hero-img {
-            animation: float 6s ease-in-out infinite;
+            animation: float 4s ease-in-out infinite;
             max-width: 90%;
             filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.2));
         }
@@ -506,12 +505,19 @@
                             <p><strong>Teléfono:</strong> <a href="tel:+543571623889">+54 3571-623889</a></p>
                             <p><strong>Email:</strong> <a href="mailto:againsafegas.ascii@gmail.com">againsafegas.ascii@gmail.com</a></p>
                         </address>
+                        
                         <div class="social-links mt-4">
-                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+            </a>
+                 <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                    </a>
+                        <a href="https://x.com/" target="_blank" aria-label="x">
+                            <i class="fab fa-x"></i>
+                            </a>
                         </div>
+
                     </div>
                 </div>
             </div>
