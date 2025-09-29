@@ -439,8 +439,8 @@
                         Tu hogar seguro con ASG. Sistema de detección precisa de fugas de gas con monitoreo en tiempo real y control remoto.
                     </p>
                     <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
-                        <a href="#" class="btn btn-custom">
-                            <i href="<?= base_url('/comprar') ?>"></i>Comprar Ahora
+                        <a href="<?= base_url('/comprar') ?>">
+                            <i class="btn btn-custom"></i>Comprar Ahora 
                         </a>
                         <a href="#company" class="btn btn-outline-custom">
                             <i class="fas fa-info-circle me-1"></i>Más Información
@@ -526,7 +526,7 @@
 </main>
 
 <footer>
-        <p>&copy; 2025 AgainSafeGas Solutions | Todos los derechos reservados.</p>
+        <p>&copy; 2025 Again Safe Gas | Todos los derechos reservados.</p>
     </div>
 </footer>
 
