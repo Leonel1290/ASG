@@ -8,6 +8,8 @@
 </head>
 <body class="bg-light">
 
+<?php $estado_valvula = $estado_valvula ?? 0; ?>
+
 <div class="container mt-5">
     <h2 class="text-center mb-4">Control de Válvula</h2>
 

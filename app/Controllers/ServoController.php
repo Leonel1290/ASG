@@ -17,18 +17,27 @@ class ServoController extends Controller
     // Mostrar vista
     public function index()
     {
-        $mac = session()->get('MAC'); // suponemos que el usuario tiene asociada una MAC
+        // Intentamos obtener la MAC del usuario
+        $mac = session()->get('MAC');
+
+        // Si no hay MAC en sesión, usamos una de prueba
+        if (!$mac) {
+            $mac = "CC:7B:5C:A8:0F:50"; 
+        }
+
+        // Obtener estado actual de la válvula
         $estado = $this->servoModel->getEstadoValvula($mac);
 
+        // Pasamos la variable siempre con un valor por defecto
         return view('detalles', [
-            'estado_valvula' => $estado
+            'estado_valvula' => $estado ?? 0
         ]);
     }
 
     // Abrir válvula
     public function abrir()
     {
-        $mac = session()->get('MAC');
+        $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
         $this->servoModel->updateEstadoValvula($mac, 0); // 0 = abierta
         return redirect()->to('/servo');
     }
@@ -36,7 +45,7 @@ class ServoController extends Controller
     // Cerrar válvula
     public function cerrar()
     {
-        $mac = session()->get('MAC');
+        $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
         $this->servoModel->updateEstadoValvula($mac, 1); // 1 = cerrada
         return redirect()->to('/servo');
     }
@@ -47,12 +56,12 @@ class ServoController extends Controller
         $mac = $this->request->getGet('mac');
         $apiKey = $this->request->getGet('api_key');
 
-        // validación de api_key (pon tu clave real)
+        // Validación de api_key (pon tu clave real aquí)
         if ($apiKey !== "YOUR_SUPER_SECRET_API_KEY_HERE") {
             return $this->response->setStatusCode(403, 'API Key inválida');
         }
 
         $estado = $this->servoModel->getEstadoValvula($mac);
-        return $this->response->setBody((string) $estado);
+        return $this->response->setBody((string) ($estado ?? 0));
     }
 }
