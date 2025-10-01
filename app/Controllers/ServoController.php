@@ -2,56 +2,59 @@
 
 namespace App\Controllers;
 
-use App\Models\ServoModel;
-use App\Models\DispositivoModel; // Necesario para la lógica de estado_valvula
-use App\Controllers\BaseController; // CAMBIO CLAVE: Extender de BaseController
+use App\Models\DispositivoModel; // Necesario para gestionar el estado_valvula
+use App\Controllers\BaseController; // Extender de BaseController
 
 class ServoController extends BaseController
 {
-    protected $servoModel;
-    protected $dispositivoModel; // Nuevo modelo para estado y lecturas
+    protected $dispositivoModel;
+    // Se elimina ServoModel si su única función era actualizar estado_valvula
+    // (el cual está en la tabla 'dispositivos').
 
     public function __construct()
     {
-        // Instancia los modelos
-        $this->servoModel = new ServoModel();
-        $this->dispositivoModel = new DispositivoModel(); // Instancia el modelo de Dispositivo
+        $this->dispositivoModel = new DispositivoModel();
     }
 
-    // 1. Mostrar vista (index)
+    // 1. Mostrar vista de detalles (GET /servo)
     public function index()
     {
-        // ... Mantiene la lógica original del usuario ...
+        // Si el usuario llega a /servo, asumimos que tiene una MAC en sesión.
         $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50"; 
         
-        // Obtener estado actual de la válvula (usando el método del modelo original)
-        $estado = $this->servoModel->getEstadoValvula($mac); 
-
+        $dispositivo = $this->dispositivoModel->getDispositivoByMac($mac);
+        
         return view('detalles', [
-            'estado_valvula' => $estado ?? 0
+            'estado_valvula' => $dispositivo->estado_valvula ?? 0 // Usar el estado de la DB
         ]);
     }
 
-    // 2. Abrir válvula
+    // 2. Abrir válvula (POST /servo/abrir)
     public function abrir()
     {
         $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
-        // NOTA: Asegúrate que ServoModel::updateEstadoValvula actualice la tabla `dispositivos`
-        $this->servoModel->updateEstadoValvula($mac, 0); // 0 = abierta
-        return redirect()->to('/servo');
+        
+        // CORRECCIÓN CLAVE: 1 = Abierta
+        $this->dispositivoModel->updateDispositivoByMac($mac, ['estado_valvula' => 1]); 
+        
+        // Redirigir a la vista de detalles del dispositivo
+        return redirect()->to('/detalles/' . $mac)->with('success', 'Válvula programada para abrirse.');
     }
 
-    // 3. Cerrar válvula
+    // 3. Cerrar válvula (POST /servo/cerrar)
     public function cerrar()
     {
         $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
-        // NOTA: Asegúrate que ServoModel::updateEstadoValvula actualice la tabla `dispositivos`
-        $this->servoModel->updateEstadoValvula($mac, 1); // 1 = cerrada
-        return redirect()->to('/servo');
+        
+        // CORRECCIÓN CLAVE: 0 = Cerrada
+        $this->dispositivoModel->updateDispositivoByMac($mac, ['estado_valvula' => 0]); 
+        
+        // Redirigir a la vista de detalles del dispositivo
+        return redirect()->to('/detalles/' . $mac)->with('success', 'Válvula programada para cerrarse.');
     }
-    
+
     // =================================================================
-    // MÉTODOS AJAX CORREGIDOS (obtenerEstado y actualizarEstado)
+    // MÉTODOS AJAX (Usados por el frontend)
     // =================================================================
 
     /**
@@ -64,15 +67,14 @@ class ServoController extends BaseController
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Falta la dirección MAC.']);
         }
         
-        // Buscar dispositivo en la DB (usa DispositivoModel)
         $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
         if ($dispositivo) {
-            // Devolver respuesta JSON con los tipos de datos correctos
             return $this->response->setJSON([
                 'status' => 'success',
-                'estado_valvula' => (bool)($dispositivo->estado_valvula ?? 0), // 0 o 1
-                'ultimo_nivel_gas' => (float)($dispositivo->ultimo_nivel_gas ?? 0.0), // Número con decimales
+                // El frontend espera un booleano, y 1=true, 0=false, lo cual es correcto.
+                'estado_valvula' => (bool)($dispositivo->estado_valvula ?? 0), 
+                'ultimo_nivel_gas' => (float)($dispositivo->ultimo_nivel_gas ?? 0.0),
             ]);
         } else {
             return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'Dispositivo no encontrado.']);
@@ -86,39 +88,32 @@ class ServoController extends BaseController
     public function actualizarEstado()
     {
         $mac = $this->request->getPost('mac');
-        $estado = $this->request->getPost('estado');
+        $estado_int = $this->request->getPost('estado'); // Estado recibido (0 o 1)
 
-        if ($mac === null || $estado === null) {
+        if ($mac === null || $estado_int === null) {
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'MAC o estado no proporcionados.']);
         }
         
         // Asegurar que el estado es un valor válido (0 o 1)
-        $estado = in_array((int)$estado, [0, 1]) ? (int)$estado : null;
-        if ($estado === null) {
+        $estado_int = in_array((int)$estado_int, [0, 1]) ? (int)$estado_int : null;
+        if ($estado_int === null) {
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'El valor de estado es inválido (debe ser 0 o 1).']);
         }
 
         $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
         if ($dispositivo) {
-            // Actualizar el estado en la tabla 'dispositivos'
-            $updated = $this->dispositivoModel->where('MAC', $mac)->set('estado_valvula', $estado)->update();
+            // Se usa el valor de estado_int (0 o 1) directamente ya que el frontend ya lo envía.
+            $this->dispositivoModel->where('MAC', $mac)->set('estado_valvula', $estado_int)->update();
 
-            // Si $updated es falso, puede que el valor ya fuera el mismo, lo tratamos como éxito.
             return $this->response->setJSON([
                 'status' => 'success', 
                 'message' => 'Estado de válvula actualizado.', 
-                'estado' => (bool)$estado
+                // Devolvemos el estado como booleano para el frontend
+                'estado' => (bool)$estado_int
             ]);
         } else {
             return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'Dispositivo no encontrado.']);
         }
-    }
-    
-    // 4. API para ESP32 (consultar estado) - Mantenido
-    public function obtenerEstadoValvula()
-    {
-        // Aunque tienes un ApiEspController, mantengo esta ruta como estaba.
-        return $this->response->setStatusCode(200)->setJSON(['message' => 'Endpoint de válvula. Se recomienda usar ApiEspController para la API del dispositivo.']);
     }
 }
