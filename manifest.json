@@ -2,18 +2,18 @@
     "name": "Control de Válvula de Gas",
     "short_name": "Válvula Gas",
     "description": "Controla el estado de una válvula de gas conectada a un ESP32 vía backend PHP.",
-    "start_url": "/",
+    "start_url": "https://pwa-1s1m.onrender.com",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2196F3",
     "icons": [
         {
-            "src": "/imagenes/Logo.png",
+        "src": "https://asg-rxnu.onrender.com/imagenes/Logo.png"
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/imagenes/Logo.png",
+        "src": "https://asg-rxnu.onrender.com/imagenes/Logo.png"
             "sizes": "512x512",
             "type": "image/png"
         }

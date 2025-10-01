@@ -6,28 +6,50 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+$routes->get('simulacion', 'Home::simulacion');
+// --- REGISTRATION AND LOGIN ROUTES (ADJUSTED FOR VERIFICATION) ---
 
-// --- RUTAS DE REGISTRO Y LOGIN ---
+// Route to display the registration form
 $routes->get('/register', 'registerController::index');
+
+// Route to process the registration form
+// POST /register/store (Matches the form action in register.php)
 $routes->post('/register/store', 'registerController::store');
+
+// Route to display the page telling the user to check their email after registration
 $routes->get('/register/check-email', 'registerController::checkEmail');
+
+// Route to verify the token received by email for REGISTRATION
 $routes->get('/register/verify-email/(:segment)', 'registerController::verifyEmailToken/$1');
+
+// Route to process the login form
 $routes->post('/login', 'Home::login');
+
+$routes->get('/login', 'Home::login');
+
+// Route to display the login form (if you use loginobtener for this)
 $routes->get('/loginobtener', 'Home::loginobtener');
+
+// Route to log out (using POST for better security)
 $routes->post('/logout', 'Home::logout');
 
-// RECUPERACION DE CONTRASEÑA
-$routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword');
-$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword');
 
-// Perfil (Agrupamos rutas relacionadas con PerfilController)
+// PASSWORD RECOVERY
+$routes->get('/forgotpassword', 'Home::forgotpassword');
+$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
+$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
+$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+
+
+// Rutas para el perfil y dispositivos (PerfilController)
 $routes->group('perfil', function($routes) {
-    $routes->get('/', 'PerfilController::index'); // Esta es la ruta principal para el perfil
+    $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
+    $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
+    $routes->post('eliminar-cuenta', 'PerfilController::eliminarCuenta');
     $routes->get('config_form', 'PerfilController::configForm');
     $routes->post('actualizar', 'PerfilController::actualizar');
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
@@ -35,34 +57,40 @@ $routes->group('perfil', function($routes) {
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
-// --- FIN RUTAS DE LA API ---
 
+$routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 
-// --- OTRAS RUTAS DE LA APLICACIÓN ---
+$routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
-// La siguiente ruta ha sido comentada, ya que receiveSensorData está en ServoController.
-// $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
-
-
-// Vista para enlazar dispositivos (formulario para ingresar MAC)
 $routes->get('/enlace', 'EnlaceController::index');
+
 $routes->post('/enlace/store', 'EnlaceController::store');
 
-// Detalles del dispositivo (mostrar lecturas, etc.)
-$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
 
-// Ruta para la vista de "comprar"
+$routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
+
+
 $routes->get('/comprar', 'Home::comprar');
 
-// Ruta para la PWA
-$routes->get('/instalar-pwa', 'Home::instalarPWA');
+// NUEVAS RUTAS AÑADIDAS
+$routes->group('registros-gas', function($routes) {
+    $routes->get('/', 'RegistrosGasController::index');
+    $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
+});
 
 
+$routes->get('prueba', function() {
+    return '¡Ruta de prueba funcionando!';
+});
 
-$routes->get('servo/obtenerEstado/(:any)', 'ServoController::obtenerEstado/$1');
-$routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado');
 
-$routes->get('/detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->post('paypal/create-order', 'CompraController::createOrder');
+$routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
-// RUTA CORREGIDA: Cambiado 'estado_valvula' a 'valve_status' para que coincida con la solicitud del ESP
-$routes->get('api/valve_status', 'ApiEspController::estadoValvula');
+$routes->get('lecturas/obtenerUltimaLectura/(:any)', 'Lecturas::obtenerUltimaLectura/$1');
+
+
+$routes->get('/servo', 'ServoController::index');
+$routes->post('/servo/abrir', 'ServoController::abrir');
+$routes->post('/servo/cerrar', 'ServoController::cerrar');
+$routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvula');
