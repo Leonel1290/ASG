@@ -36,19 +36,13 @@ $routes->post('/logout', 'Home::logout');
 
 // PASSWORD RECOVERY
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
+$routes->post('/forgotpassword1', 'Home::forgotPPassword');
+$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1'); 
+$routes->post('/reset-password', 'Home::resetPassword'); 
 
-// CORRECCIÓN 1: No es necesario cambiar (:any) ya que el token no lleva ':'
-$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
-
-// CORRECCIÓN 2: Cambiado (:any) a (.+) para permitir la MAC con ':'
-$routes->get('detalles/(.+)', 'DetalleController::detalles/$1');
-
-
-// Rutas para el perfil y dispositivos (PerfilController)
+// Perfil (Agrupamos rutas relacionadas con PerfilController)
 $routes->group('perfil', function($routes) {
-    $routes->get('/', 'PerfilController::index');
+    $routes->get('/', 'PerfilController::index'); // Esta es la ruta principal para el perfil
     $routes->get('configuracion', 'PerfilController::configuracion');
     $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
     $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
@@ -62,25 +56,34 @@ $routes->group('perfil', function($routes) {
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
+
+// Ruta para cambiar el idioma
 $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 
+// Ruta para guardar lecturas de gas
 $routes->post('/lecturas_gas/guardar', 'LecturasController::guardar');
 
-$routes->get('/enlace', 'EnlaceController::index');
 
+// Vista para enlazar dispositivos (formulario para ingresar MAC)
+$routes->get('/enlace', 'EnlaceController::index');
 $routes->post('/enlace/store', 'EnlaceController::store');
 
+// Detalles del dispositivo (mostrar lecturas, etc.)
+// CORRECCIÓN CLAVE 1: Usamos (.+) para permitir la MAC con ':'
+$routes->get('/detalles/(.+)', 'DetalleController::detalles/$1');
 
-$routes->get('/dispositivo/(:segment)', 'LecturasController::detalle/$1');
-
-
+// Ruta para la vista de "comprar"
 $routes->get('/comprar', 'Home::comprar');
 
-// NUEVAS RUTAS AÑADIDAS
+// Ruta para la PWA
+$routes->get('/instalar-pwa', 'Home::instalarPWA');
+
+
+// NUEVAS RUTAS AÑADIDAS (registros-gas)
 $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
-    // CORRECCIÓN 3: Cambiado (:any) a (.+) para permitir la MAC con ':'
-    $routes->get('(.+)', 'RegistrosGasController::verDispositivo/$1');
+    // CORRECCIÓN CLAVE 2: Usar (.+) para la MAC
+    $routes->get('(.+)', 'RegistrosGasController::verDispositivo/$1'); 
 });
 
 
@@ -92,16 +95,21 @@ $routes->get('prueba', function() {
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
-// CORRECCIÓN 4: Cambiado (:any) a (.+) para permitir la MAC con ':'
+
+// CORRECCIÓN CLAVE 3: Usar (.+) para la MAC en obtenerUltimaLectura
 $routes->get('lecturas/obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
 
-// RUTAS DE SERVOS (AGREGAMOS LAS FALTANTES QUE CAUSABAN 404 EN AJAX)
-$routes->get('/servo', 'ServoController::index');
-$routes->post('/servo/abrir', 'ServoController::abrir');
-$routes->post('/servo/cerrar', 'ServoController::cerrar');
-// RUTA AÑADIDA: Para obtener el estado (el 404 que reportaste en tu último mensaje)
-// CORRECCIÓN 5: Usamos (.+) para aceptar la MAC con ':'
-$routes->get('servo/obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1'); 
-// RUTA AÑADIDA: Para actualizar el estado (el 404 que reportaste en tu penúltimo mensaje)
-$routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado'); 
-$routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvula');
+
+// RUTAS DE SERVOS (Interfaz de Usuario/AJAX - Agrupadas y Corregidas)
+$routes->group('servo', function($routes) {
+    $routes->get('/', 'ServoController::index');
+    $routes->post('abrir', 'ServoController::abrir');
+    $routes->post('cerrar', 'ServoController::cerrar');
+    // CORRECCIÓN CLAVE 4: Usamos (.+) para la MAC en obtenerEstado
+    $routes->get('obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1'); 
+    $routes->post('actualizarEstado', 'ServoController::actualizarEstado');
+});
+
+// RUTA DEDICADA PARA EL DISPOSITIVO (ESP32) 🔑
+// CORRECCIÓN CLAVE 5: Apuntamos la API al controlador seguro ApiEspController
+$routes->get('/api/valve_status', 'ApiEspController::estadoValvula');
