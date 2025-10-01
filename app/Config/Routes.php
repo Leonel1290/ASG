@@ -37,9 +37,13 @@ $routes->post('/logout', 'Home::logout');
 // PASSWORD RECOVERY
 $routes->get('/forgotpassword', 'Home::forgotpassword');
 $routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
+
+// CORRECCIÓN 1: No es necesario cambiar (:any) ya que el token no lleva ':'
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+
+// CORRECCIÓN 2: Cambiado (:any) a (.+) para permitir la MAC con ':'
+$routes->get('detalles/(.+)', 'DetalleController::detalles/$1');
 
 
 // Rutas para el perfil y dispositivos (PerfilController)
@@ -75,7 +79,8 @@ $routes->get('/comprar', 'Home::comprar');
 // NUEVAS RUTAS AÑADIDAS
 $routes->group('registros-gas', function($routes) {
     $routes->get('/', 'RegistrosGasController::index');
-    $routes->get('(:any)', 'RegistrosGasController::verDispositivo/$1');
+    // CORRECCIÓN 3: Cambiado (:any) a (.+) para permitir la MAC con ':'
+    $routes->get('(.+)', 'RegistrosGasController::verDispositivo/$1');
 });
 
 
@@ -87,10 +92,16 @@ $routes->get('prueba', function() {
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
-$routes->get('lecturas/obtenerUltimaLectura/(:any)', 'Lecturas::obtenerUltimaLectura/$1');
+// CORRECCIÓN 4: Cambiado (:any) a (.+) para permitir la MAC con ':'
+$routes->get('lecturas/obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
 
-
+// RUTAS DE SERVOS (AGREGAMOS LAS FALTANTES QUE CAUSABAN 404 EN AJAX)
 $routes->get('/servo', 'ServoController::index');
 $routes->post('/servo/abrir', 'ServoController::abrir');
 $routes->post('/servo/cerrar', 'ServoController::cerrar');
+// RUTA AÑADIDA: Para obtener el estado (el 404 que reportaste en tu último mensaje)
+// CORRECCIÓN 5: Usamos (.+) para aceptar la MAC con ':'
+$routes->get('servo/obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1'); 
+// RUTA AÑADIDA: Para actualizar el estado (el 404 que reportaste en tu penúltimo mensaje)
+$routes->post('servo/actualizarEstado', 'ServoController::actualizarEstado'); 
 $routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvula');
