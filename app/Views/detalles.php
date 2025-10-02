@@ -130,11 +130,11 @@
         
         <?php if (isset($dispositivo)): ?>
             <!-- Banner de alerta según nivel de gas -->
-            <?php if ($dispositivo['ultimo_nivel_gas'] >= 400): ?>
+            <?php if ($dispositivo->ultimo_nivel_gas >= 400): ?>
                 <div class="alert-banner alert-danger">
                     ⚠️ ALERTA: Nivel de gas peligroso detectado
                 </div>
-            <?php elseif ($dispositivo['ultimo_nivel_gas'] >= 300): ?>
+            <?php elseif ($dispositivo->ultimo_nivel_gas >= 300): ?>
                 <div class="alert-banner alert-warning">
                     ⚠️ Advertencia: Nivel de gas elevado
                 </div>
@@ -147,12 +147,12 @@
             <div class="device-info">
                 <div class="info-card">
                     <h4>Información del Dispositivo</h4>
-                    <p><strong>Nombre:</strong> <?= esc($dispositivo['nombre']) ?></p>
-                    <p><strong>MAC:</strong> <?= esc($dispositivo['MAC']) ?></p>
-                    <p><strong>Ubicación:</strong> <?= esc($dispositivo['ubicacion']) ?></p>
+                    <p><strong>Nombre:</strong> <?= esc($dispositivo->nombre) ?></p>
+                    <p><strong>MAC:</strong> <?= esc($dispositivo->MAC) ?></p>
+                    <p><strong>Ubicación:</strong> <?= esc($dispositivo->ubicacion) ?></p>
                     <p><strong>Estado:</strong> 
-                        <span class="status <?= $dispositivo['estado_dispositivo'] === 'en_uso' ? 'status-open' : 'status-closed' ?>">
-                            <?= esc(ucfirst(str_replace('_', ' ', $dispositivo['estado_dispositivo']))) ?>
+                        <span class="status <?= $dispositivo->estado_dispositivo === 'en_uso' ? 'status-open' : 'status-closed' ?>">
+                            <?= esc(ucfirst(str_replace('_', ' ', $dispositivo->estado_dispositivo))) ?>
                         </span>
                     </p>
                 </div>
@@ -161,17 +161,17 @@
                     <h4>Estado Actual</h4>
                     <div class="valve-control">
                         <span>Válvula:</span>
-                        <span class="status <?= $dispositivo['estado_valvula'] ? 'status-closed' : 'status-open' ?>" id="valve-status">
-                            <?= $dispositivo['estado_valvula'] ? 'CERRADA' : 'ABIERTA' ?>
+                        <span class="status <?= $dispositivo->estado_valvula ? 'status-closed' : 'status-open' ?>" id="valve-status">
+                            <?= $dispositivo->estado_valvula ? 'CERRADA' : 'ABIERTA' ?>
                         </span>
                     </div>
                     
-                    <div class="gas-level <?= getGasLevelClass($dispositivo['ultimo_nivel_gas']) ?>" id="gas-level">
-                        Nivel de Gas: <?= $dispositivo['ultimo_nivel_gas'] ?> ppm
+                    <div class="gas-level <?= getGasLevelClass($dispositivo->ultimo_nivel_gas) ?>" id="gas-level">
+                        Nivel de Gas: <?= $dispositivo->ultimo_nivel_gas ?> ppm
                     </div>
                     
                     <div class="last-update" id="last-update">
-                        Última actualización: <?= $dispositivo['ultima_actualizacion'] ?>
+                        Última actualización: <?= $dispositivo->ultima_actualizacion ?>
                     </div>
                 </div>
             </div>
@@ -184,13 +184,13 @@
                     <button class="btn btn-open" 
                             onclick="controlValvula(0)"
                             id="btn-open"
-                            <?= $dispositivo['estado_valvula'] == 0 ? 'disabled' : '' ?>>
+                            <?= $dispositivo->estado_valvula == 0 ? 'disabled' : '' ?>>
                         Abrir Válvula
                     </button>
                     <button class="btn btn-close" 
                             onclick="controlValvula(1)"
                             id="btn-close"
-                            <?= $dispositivo['estado_valvula'] == 1 ? 'disabled' : '' ?>>
+                            <?= $dispositivo->estado_valvula == 1 ? 'disabled' : '' ?>>
                         Cerrar Válvula
                     </button>
                 </div>
@@ -221,14 +221,14 @@
                                 <?php foreach ($lecturas as $lectura): ?>
                                     <tr>
                                         <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
-                                            <?= date('d/m/Y H:i', strtotime($lectura['fecha'])) ?>
+                                            <?= date('d/m/Y H:i', strtotime($lectura->fecha ?? $lectura['fecha'])) ?>
                                         </td>
                                         <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
-                                            <?= $lectura['nivel_gas'] ?>
+                                            <?= $lectura->nivel_gas ?? $lectura['nivel_gas'] ?>
                                         </td>
                                         <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
-                                            <span class="<?= getGasLevelClass($lectura['nivel_gas']) ?>">
-                                                <?= getGasStatusText($lectura['nivel_gas']) ?>
+                                            <span class="<?= getGasLevelClass($lectura->nivel_gas ?? $lectura['nivel_gas']) ?>">
+                                                <?= getGasStatusText($lectura->nivel_gas ?? $lectura['nivel_gas']) ?>
                                             </span>
                                         </td>
                                     </tr>
@@ -302,7 +302,7 @@
 
         // Función para controlar la válvula
         async function controlValvula(accion) {
-            const mac = '<?= $dispositivo['MAC'] ?? '' ?>';
+            const mac = '<?= $dispositivo->MAC ?? '' ?>';
             const endpoint = accion === 1 ? '/servo/cerrar' : '/servo/abrir';
             const messageDiv = document.getElementById('message-valve');
             
@@ -408,7 +408,7 @@
 
         // Actualizar estados automáticamente cada 10 segundos
         document.addEventListener('DOMContentLoaded', function() {
-            const mac = '<?= $dispositivo['MAC'] ?? '' ?>';
+            const mac = '<?= $dispositivo->MAC ?? '' ?>';
             if (mac) {
                 obtenerEstado(mac);
                 
