@@ -115,3 +115,5 @@ $routes->group('servo', function($routes) {
 $routes->get('/api/valve_status', 'ApiEspController::estadoValvula');
 
 $routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvulaPlano');
+
+$routes->post('valve/control', 'ValveController::controlValve');
