@@ -59,43 +59,21 @@
                     </div>
                 </div>
 
-                <!-- Formulario para Abrir -->
-<form method="POST" action="/valve/control">
-    <input type="hidden" name="mac" value="<?= esc($dispositivo->MAC) ?>">
-    <input type="hidden" name="action" value="open">
-    <button type="submit">Abrir Válvula</button>
-</form>
-
-<!-- Formulario para Cerrar -->
-<form method="POST" action="/valve/control">
-    <input type="hidden" name="mac" value="<?= esc($dispositivo->MAC) ?>">
-    <input type="hidden" name="action" value="close">
-    <button type="submit">Cerrar Válvula</button>
-</form>
-
-<!-- JavaScript opcional para AJAX (sin recargar página) -->
-<script>
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            try {
-                const response = await fetch('/valve/control', {
-                    method: 'POST',
-                    body: formData
-                });
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta');
-                }
-                const result = await response.json();
-                alert(result.message);
-                // Opcional: Actualiza la UI con result.new_state
-            } catch (error) {
-                alert('Error: No se pudo conectar con el servidor.');
-            }
-        });
-    });
-</script>
+                <div class="col-md-6 mb-4">
+                    <div class="card gas-level-container p-4 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-door-closed fa-3x mb-3" id="icono-valvula"></i>
+                            <h5 class="card-title">Estado de la Válvula</h5>
+                            <p class="card-text display-4 mb-3" id="estado-valvula-texto">Cerrada</p>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-danger btn-lg" id="btn-cerrar">
+                                    <i class="fas fa-stop"></i> Cerrar Válvula
+                                </button>
+                                <button class="btn btn-success btn-lg" id="btn-abrir" disabled>
+                                    <i class="fas fa-fan"></i> Abrir Válvula
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
