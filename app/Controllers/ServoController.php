@@ -81,6 +81,29 @@ class ServoController extends BaseController
         }
     }
 
+
+            public function obtenerEstadoValvulaPlano()
+    {
+        $mac = $this->request->getGet('mac');
+        $apiKey = $this->request->getGet('api_key');
+
+        if ($apiKey !== 'SUPER_SECRET_API_MLUS') {
+            return $this->response->setStatusCode(403)->setBody('Unauthorized');
+        }
+
+        if (empty($mac)) {
+            return $this->response->setStatusCode(400)->setBody('-1');
+        }
+
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+        if ($dispositivo) {
+            return $this->response->setBody((string)$dispositivo->estado_valvula);
+        } else {
+            return $this->response->setStatusCode(404)->setBody('-1');
+        }
+    }
+
     /**
      * @POST /servo/actualizarEstado
      * Actualiza el estado de la válvula.

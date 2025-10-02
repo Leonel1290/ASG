@@ -113,3 +113,5 @@ $routes->group('servo', function($routes) {
 // RUTA DEDICADA PARA EL DISPOSITIVO (ESP32) 🔑
 // CORRECCIÓN CLAVE 5: Apuntamos la API al controlador seguro ApiEspController
 $routes->get('/api/valve_status', 'ApiEspController::estadoValvula');
+
+$routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvulaPlano');
