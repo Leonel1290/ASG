@@ -2,12 +2,11 @@
 
 namespace App\Controllers;
 
-use App\Models\DispositivoModel; // Asegúrate de que este use esté presente
+use App\Models\DispositivoModel;
 use App\Models\EnlaceModel;
-use CodeIgniter\Controller; // Asegúrate de extender de Controller o BaseController
+use CodeIgniter\Controller;
 
-// Si extiendes de BaseController, cambia 'extends Controller' a 'extends BaseController'
-class EnlaceController extends BaseController // Asumo que extiendes de BaseController
+class ServoController extends BaseController
 {
     protected $dispositivoModel;
     protected $enlaceModel;
@@ -24,55 +23,314 @@ class EnlaceController extends BaseController // Asumo que extiendes de BaseCont
         helper(['form', 'url']);
     }
 
-
-    // Método para mostrar la vista del formulario de enlace (GET /enlace)
+    /**
+     * Interfaz principal para control de válvulas
+     */
     public function index()
     {
-        // Asegúrate de que la vista 'enlace_mac' exista en app/Views/
-        return view('enlace_mac');
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return redirect()->to('/loginobtener');
+        }
+
+        $usuarioId = $session->get('id');
+        
+        // Obtener dispositivos enlazados al usuario (igual que en tu EnlaceController)
+        $dispositivos = $this->enlaceModel
+            ->select('dispositivos.*')
+            ->join('dispositivos', 'dispositivos.MAC = enlace.MAC')
+            ->where('enlace.id_usuario', $usuarioId)
+            ->findAll();
+
+        return view('servo/index', [
+            'dispositivos' => $dispositivos
+        ]);
     }
 
-    // Método para procesar el formulario de enlace (POST /enlace/store)
-    public function store()
+    /**
+     * Abrir válvula - API para frontend
+     */
+    public function abrir()
     {
-        // Obtener la MAC del formulario y convertirla a mayúsculas
-        $mac = strtoupper($this->request->getPost('mac'));
-
-        // Validar el formato de la MAC (ej. XX:XX:XX:XX:XX:XX o XX-XX-XX-XX-XX-XX)
-        if (!preg_match('/^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/', $mac)) {
-            // Si el formato es inválido, redirigir de vuelta con mensaje de error
-            return redirect()->back()->with('error', 'Formato de MAC inválido');
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error', 
+                'message' => 'No autorizado'
+            ]);
         }
 
-        // Buscar el dispositivo en la tabla 'dispositivos' por la MAC
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-
-        // Verificar si el dispositivo existe en la base de datos
-        if (!$dispositivo) {
-            // Si no existe, redirigir de vuelta con mensaje de error
-            return redirect()->back()->with('error', 'La dirección MAC ingresada es incorrecta.');
+        $mac = $this->request->getPost('mac');
+        
+        if (!$mac) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 
+                'message' => 'MAC requerida'
+            ]);
         }
 
-        // Obtener el ID del usuario logueado desde la sesión
-        $idUsuario = session()->get('id');
-
-        // Verificar si el usuario ya está enlazado a esta MAC en la tabla 'enlace'
-        $yaExiste = $this->enlaceModel
-            ->where('id_usuario', $idUsuario)
+        // Verificar que el usuario tiene acceso a este dispositivo (igual que en tu EnlaceController)
+        $acceso = $this->enlaceModel
+            ->where('id_usuario', $session->get('id'))
             ->where('MAC', $mac)
             ->first();
 
-        // Si el enlace no existe, crearlo
-        if (!$yaExiste) {
-            $this->enlaceModel->insert([
-                'id_usuario' => $idUsuario, // ID del usuario logueado
-                'MAC' => $mac // MAC del dispositivo
+        if (!$acceso) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'No tienes acceso a este dispositivo'
             ]);
-             // Redirigir a la vista de perfil con un mensaje de éxito
-            return redirect()->to('/perfil')->with('success', 'MAC enlazada correctamente');
-        } else {
-             // Si el enlace ya existe, redirigir de vuelta con un mensaje de error
-             return redirect()->back()->with('error', 'Esta MAC ya está enlazada a tu cuenta.');
+        }
+
+        // Actualizar estado en la base de datos (usando el mismo approach que tu store())
+        try {
+            $result = $this->dispositivoModel
+                ->where('MAC', $mac)
+                ->set([
+                    'estado_valvula' => 0, // 0 = abierta
+                    'ultima_actualizacion' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+
+            if ($result) {
+                return $this->response->setJSON([
+                    'status' => 'success', 
+                    'message' => 'Válvula abierta correctamente',
+                    'estado_valvula' => 0
+                ]);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Error al actualizar la base de datos'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 
+                'message' => 'Error del servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Cerrar válvula - API para frontend
+     */
+    public function cerrar()
+    {
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error', 
+                'message' => 'No autorizado'
+            ]);
+        }
+
+        $mac = $this->request->getPost('mac');
+        
+        if (!$mac) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 
+                'message' => 'MAC requerida'
+            ]);
+        }
+
+        // Verificar que el usuario tiene acceso a este dispositivo
+        $acceso = $this->enlaceModel
+            ->where('id_usuario', $session->get('id'))
+            ->where('MAC', $mac)
+            ->first();
+
+        if (!$acceso) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'No tienes acceso a este dispositivo'
+            ]);
+        }
+
+        // Actualizar estado en la base de datos
+        try {
+            $result = $this->dispositivoModel
+                ->where('MAC', $mac)
+                ->set([
+                    'estado_valvula' => 1, // 1 = cerrada
+                    'ultima_actualizacion' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+
+            if ($result) {
+                return $this->response->setJSON([
+                    'status' => 'success', 
+                    'message' => 'Válvula cerrada correctamente',
+                    'estado_valvula' => 1
+                ]);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Error al actualizar la base de datos'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 
+                'message' => 'Error del servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Obtener estado actual de la válvula - API para frontend
+     */
+    public function obtenerEstado($mac)
+    {
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error', 
+                'message' => 'No autorizado'
+            ]);
+        }
+
+        // Decodificar la MAC (puede venir con %3A en lugar de :)
+        $mac = urldecode($mac);
+
+        // Verificar que el usuario tiene acceso a este dispositivo
+        $acceso = $this->enlaceModel
+            ->where('id_usuario', $session->get('id'))
+            ->where('MAC', $mac)
+            ->first();
+
+        if (!$acceso) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'No tienes acceso a este dispositivo'
+            ]);
+        }
+
+        try {
+            $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+            if ($dispositivo) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'estado_valvula' => (int)$dispositivo->estado_valvula,
+                    'nivel_gas' => (float)$dispositivo->ultimo_nivel_gas,
+                    'ultima_actualizacion' => $dispositivo->ultima_actualizacion
+                ]);
+            } else {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Dispositivo no encontrado'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 
+                'message' => 'Error del servidor: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Actualizar estado de la válvula - API para ESP32
+     * Esta es la API que consulta tu código Python
+     */
+    public function obtenerEstadoValvulaPlano()
+    {
+        $mac = $this->request->getGet('mac');
+        $apiKey = $this->request->getGet('api_key');
+
+        // Validar API key
+        $validApiKey = 'SUPER_SECRET_API_MLUS'; // Debe coincidir con tu código ESP32
+        if ($apiKey !== $validApiKey) {
+            return $this->response->setStatusCode(401)->setBody('0');
+        }
+
+        if (!$mac) {
+            return $this->response->setStatusCode(400)->setBody('0');
+        }
+
+        try {
+            $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+            if ($dispositivo) {
+                // Devolver solo el estado como texto plano (0 o 1)
+                return $this->response->setBody((string)$dispositivo->estado_valvula);
+            } else {
+                return $this->response->setStatusCode(404)->setBody('0');
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setBody('0');
+        }
+    }
+
+    /**
+     * Actualizar estado desde el frontend
+     */
+    public function actualizarEstado()
+    {
+        $session = session();
+        
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error', 
+                'message' => 'No autorizado'
+            ]);
+        }
+
+        $mac = $this->request->getPost('mac');
+        $estado = $this->request->getPost('estado');
+        
+        if (!$mac || $estado === null) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 
+                'message' => 'Datos incompletos'
+            ]);
+        }
+
+        // Verificar acceso
+        $acceso = $this->enlaceModel
+            ->where('id_usuario', $session->get('id'))
+            ->where('MAC', $mac)
+            ->first();
+
+        if (!$acceso) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 
+                'message' => 'No tienes acceso a este dispositivo'
+            ]);
+        }
+
+        try {
+            // Actualizar estado
+            $result = $this->dispositivoModel
+                ->where('MAC', $mac)
+                ->set([
+                    'estado_valvula' => (int)$estado,
+                    'ultima_actualizacion' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+
+            if ($result) {
+                return $this->response->setJSON([
+                    'status' => 'success', 
+                    'message' => 'Estado actualizado correctamente',
+                    'estado_valvula' => (int)$estado
+                ]);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error', 
+                    'message' => 'Error al actualizar estado en la base de datos'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 
+                'message' => 'Error del servidor: ' . $e->getMessage()
+            ]);
         }
     }
 }
