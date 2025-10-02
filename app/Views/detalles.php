@@ -6,130 +6,230 @@
     <title>Detalles del Dispositivo - ASG</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* BASE & TIPOGRAFÍA */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f7f9; /* Fondo muy claro */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+        h1, h3, h4 {
+            color: #2c3e50; /* Color oscuro para títulos */
+            margin-top: 0;
+        }
+
+        /* LAYOUT PRINCIPAL */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px 20px; /* Más padding */
         }
+
+        /* TARJETAS GENERALES */
         .device-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #f9f9f9;
+            background: #fff; /* Fondo blanco para las tarjetas */
+            border-radius: 12px; /* Bordes más redondeados */
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra más pronunciada */
+            transition: box-shadow 0.3s ease;
         }
-        .valve-control {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin: 15px 0;
+        .device-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         }
+
+        /* BOTONES */
         .btn {
-            padding: 10px 20px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px; /* Bordes redondeados modernos */
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600; /* Un poco más de peso a la fuente */
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn:active {
+            transform: translateY(1px);
         }
         .btn-open {
-            background-color: #28a745;
+            background-color: #1abc9c; /* Verde aqua moderno */
             color: white;
+        }
+        .btn-open:hover {
+            background-color: #16a085;
         }
         .btn-close {
-            background-color: #dc3545;
+            background-color: #e74c3c; /* Rojo más saturado */
             color: white;
+        }
+        .btn-close:hover {
+            background-color: #c0392b;
         }
         .btn:disabled {
-            background-color: #6c757d;
+            background-color: #bdc3c7; /* Gris claro */
+            color: #7f8c8d;
             cursor: not-allowed;
+            box-shadow: none;
         }
+
+        /* ESTADOS DE VÁLVULA Y DISPOSITIVO */
         .status {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85em;
         }
         .status-open {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #d1f2eb;
+            color: #1abc9c;
         }
         .status-closed {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #f7e0e0;
+            color: #e74c3c;
         }
-        .gas-level {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .gas-safe { color: #28a745; }
-        .gas-warning { color: #ffc107; }
-        .gas-danger { color: #dc3545; }
-        .last-update {
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        .chart-container {
-            margin-top: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .back-button:hover {
-            background-color: #0056b3;
-        }
+        
+        /* TARJETAS DE INFORMACIÓN (INFO-CARDS) */
         .device-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Mínimo 300px */
+            gap: 20px;
+            margin-bottom: 25px;
         }
         .info-card {
-            background: white;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #007bff;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db; /* Azul corporativo */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        .alert-banner {
-            padding: 15px;
+        .info-card h4 {
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        /* CONTROL DE VÁLVULA */
+        .valve-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap; /* Para responsividad */
+        }
+        .valve-control > span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* NIVEL DE GAS */
+        .gas-level {
+            font-size: 1.6em; /* Más grande y destacado */
+            font-weight: 700;
+            margin: 15px 0;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ecf0f1;
+        }
+        .gas-safe { color: #1abc9c; }
+        .gas-warning { color: #f39c12; } /* Amarillo-naranja */
+        .gas-danger { color: #e74c3c; }
+
+        .last-update {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* GRÁFICO */
+        .chart-container {
+            margin-top: 30px;
+            /* Hereda estilos de .device-card */
+        }
+
+        /* BOTÓN DE VOLVER */
+        .back-button {
+            display: inline-flex; /* Usar flex para centrar el icono/texto */
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
             border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* BANNER DE ALERTA */
+        .alert-banner {
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: #fbecec;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
         }
         .alert-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background-color: #fcf8e3;
+            color: #f39c12;
+            border: 1px solid #f1c40f;
         }
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: #e8f8f5;
+            color: #16a085;
+            border: 1px solid #1abc9c;
         }
+        
+        /* TABLA DE LECTURAS */
+        .lecturas-table-container {
+            max-height: 400px; /* Más espacio para la tabla */
+            overflow-y: auto;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+        }
+        .lecturas-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .lecturas-table thead tr {
+            background-color: #ecf0f1; /* Fondo de la cabecera */
+            color: #2c3e50;
+            position: sticky; /* Fija la cabecera al hacer scroll */
+            top: 0;
+            z-index: 10;
+        }
+        .lecturas-table th, .lecturas-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .lecturas-table tbody tr:hover {
+            background-color: #f9f9f9; /* Efecto hover */
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/perfil" class="back-button">← Volver al Perfil</a>
+        <a href="/perfil" class="back-button">
+            <span style="font-size: 1.2em;">&larr;</span> Volver al Perfil
+        </a>
         
         <h1>Detalles del Dispositivo</h1>
         
         <?php if (isset($dispositivo)): ?>
-            <!-- Banner de alerta según nivel de gas -->
             <?php if ($dispositivo->ultimo_nivel_gas >= 400): ?>
                 <div class="alert-banner alert-danger">
                     ⚠️ ALERTA: Nivel de gas peligroso detectado
@@ -146,9 +246,9 @@
 
             <div class="device-info">
                 <div class="info-card">
-                    <h4>Información del Dispositivo</h4>
+                    <h4>Información General</h4>
                     <p><strong>Nombre:</strong> <?= esc($dispositivo->nombre) ?></p>
-                    <p><strong>MAC:</strong> <?= esc($dispositivo->MAC) ?></p>
+                    <p><strong>MAC:</strong> <code style="background-color: #ecf0f1; padding: 2px 5px; border-radius: 3px;"><?= esc($dispositivo->MAC) ?></code></p>
                     <p><strong>Ubicación:</strong> <?= esc($dispositivo->ubicacion) ?></p>
                     <p><strong>Estado:</strong> 
                         <span class="status <?= $dispositivo->estado_dispositivo === 'en_uso' ? 'status-open' : 'status-closed' ?>">
@@ -158,16 +258,16 @@
                 </div>
 
                 <div class="info-card">
-                    <h4>Estado Actual</h4>
-                    <div class="valve-control">
-                        <span>Válvula:</span>
+                    <h4>Estado Operacional</h4>
+                    <div class="valve-control" style="margin-top: 5px; margin-bottom: 5px;">
+                        <span>Estado de Válvula:</span>
                         <span class="status <?= $dispositivo->estado_valvula ? 'status-closed' : 'status-open' ?>" id="valve-status">
                             <?= $dispositivo->estado_valvula ? 'CERRADA' : 'ABIERTA' ?>
                         </span>
                     </div>
                     
                     <div class="gas-level <?= getGasLevelClass($dispositivo->ultimo_nivel_gas) ?>" id="gas-level">
-                        Nivel de Gas: <?= $dispositivo->ultimo_nivel_gas ?> ppm
+                        Nivel de Gas: <?= $dispositivo->ultimo_nivel_gas ?> <small>ppm</small>
                     </div>
                     
                     <div class="last-update" id="last-update">
@@ -176,7 +276,6 @@
                 </div>
             </div>
 
-            <!-- Control de Válvula -->
             <div class="device-card">
                 <h3>Control de Válvula</h3>
                 
@@ -185,48 +284,46 @@
                             onclick="controlValvula(0)"
                             id="btn-open"
                             <?= $dispositivo->estado_valvula == 0 ? 'disabled' : '' ?>>
-                        Abrir Válvula
+                        <span style="margin-right: 5px;">&#x2714;</span> Abrir Válvula
                     </button>
                     <button class="btn btn-close" 
                             onclick="controlValvula(1)"
                             id="btn-close"
                             <?= $dispositivo->estado_valvula == 1 ? 'disabled' : '' ?>>
-                        Cerrar Válvula
+                        <span style="margin-right: 5px;">&#x2716;</span> Cerrar Válvula
                     </button>
                 </div>
 
-                <div id="message-valve"></div>
+                <div id="message-valve" style="margin-top: 15px; font-weight: 600;"></div>
             </div>
 
-            <!-- Gráfico de Lecturas -->
-            <div class="chart-container">
+            <div class="device-card chart-container">
                 <h3>Historial de Niveles de Gas</h3>
                 <canvas id="gasChart" width="400" height="200"></canvas>
             </div>
 
-            <!-- Lista de Lecturas Recientes -->
             <div class="device-card">
                 <h3>Lecturas Recientes</h3>
                 <?php if (!empty($lecturas)): ?>
-                    <div style="max-height: 300px; overflow-y: auto;">
-                        <table style="width: 100%; border-collapse: collapse;">
+                    <div class="lecturas-table-container">
+                        <table class="lecturas-table">
                             <thead>
-                                <tr style="background-color: #f8f9fa;">
-                                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Fecha</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Nivel de Gas (ppm)</th>
-                                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Estado</th>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Nivel de Gas (ppm)</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($lecturas as $lectura): ?>
                                     <tr>
-                                        <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
+                                        <td>
                                             <?= date('d/m/Y H:i', strtotime($lectura->fecha ?? $lectura['fecha'])) ?>
                                         </td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
+                                        <td>
                                             <?= $lectura->nivel_gas ?? $lectura['nivel_gas'] ?>
                                         </td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #dee2e6;">
+                                        <td>
                                             <span class="<?= getGasLevelClass($lectura->nivel_gas ?? $lectura['nivel_gas']) ?>">
                                                 <?= getGasStatusText($lectura->nivel_gas ?? $lectura['nivel_gas']) ?>
                                             </span>
@@ -242,7 +339,7 @@
             </div>
 
         <?php else: ?>
-            <div class="alert alert-danger">
+            <div class="alert-banner alert-danger">
                 Dispositivo no encontrado o no tienes acceso a este dispositivo.
             </div>
         <?php endif; ?>
@@ -258,8 +355,8 @@
                 datasets: [{
                     label: 'Nivel de Gas (ppm)',
                     data: <?= json_encode($datosGrafico['niveles'] ?? []) ?>,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderColor: '#3498db', /* Color de línea ajustado */
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)', /* Color de fondo ajustado */
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4
@@ -284,7 +381,7 @@
                             text: 'Nivel de Gas (ppm)'
                         },
                         grid: {
-                            color: 'rgba(0,0,0,0.1)'
+                            color: '#ecf0f1' /* Líneas de grid más suaves */
                         }
                     },
                     x: {
@@ -293,63 +390,21 @@
                             text: 'Hora'
                         },
                         grid: {
-                            color: 'rgba(0,0,0,0.1)'
+                            color: '#ecf0f1'
                         }
                     }
                 }
             }
         });
 
-        // Función para controlar la válvula
-        async function controlValvula(accion) {
-            const mac = '<?= $dispositivo->MAC ?? '' ?>';
-            const endpoint = accion === 1 ? '/servo/cerrar' : '/servo/abrir';
-            const messageDiv = document.getElementById('message-valve');
-            
-            try {
-                messageDiv.innerHTML = '<div style="color: blue;">Procesando...</div>';
-                
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `mac=${encodeURIComponent(mac)}`
-                });
-
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    messageDiv.innerHTML = `<div style="color: green;">${data.message}</div>`;
-                    updateUI(data.estado_valvula);
-                    // Actualizar estado automáticamente después de 2 segundos
-                    setTimeout(() => obtenerEstado(mac), 2000);
-                } else {
-                    messageDiv.innerHTML = `<div style="color: red;">Error: ${data.message}</div>`;
-                }
-            } catch (error) {
-                messageDiv.innerHTML = `<div style="color: red;">Error de conexión: ${error.message}</div>`;
-            }
+        // Función para determinar la clase CSS del nivel de gas (Duplicada desde PHP, pero necesaria en JS)
+        function getGasLevelClass(nivel) {
+            if (nivel < 300) return 'gas-safe';
+            if (nivel < 400) return 'gas-warning';
+            return 'gas-danger';
         }
 
-        // Función para obtener el estado actual
-        async function obtenerEstado(mac) {
-            try {
-                const response = await fetch(`/servo/obtenerEstado/${encodeURIComponent(mac)}`);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    updateUI(data.estado_valvula, data.nivel_gas, data.ultima_actualizacion);
-                    
-                    // Actualizar banner de alerta
-                    updateAlertBanner(data.nivel_gas);
-                }
-            } catch (error) {
-                console.error('Error al obtener estado:', error);
-            }
-        }
-
-        // Función para actualizar la interfaz
+        // Función para actualizar la interfaz (Se mantiene la lógica, se actualizan las clases CSS)
         function updateUI(estadoValvula, nivelGas = null, ultimaActualizacion = null) {
             // Actualizar estado de la válvula
             const statusElement = document.getElementById('valve-status');
@@ -371,7 +426,7 @@
             // Actualizar nivel de gas si se proporciona
             if (nivelGas !== null) {
                 const gasLevelElement = document.getElementById('gas-level');
-                gasLevelElement.textContent = `Nivel de Gas: ${nivelGas} ppm`;
+                gasLevelElement.innerHTML = `Nivel de Gas: ${nivelGas} <small>ppm</small>`;
                 gasLevelElement.className = `gas-level ${getGasLevelClass(nivelGas)}`;
             }
             
@@ -382,7 +437,7 @@
             }
         }
 
-        // Función para actualizar el banner de alerta
+        // Función para actualizar el banner de alerta (Se mantiene la lógica, se actualizan las clases CSS)
         function updateAlertBanner(nivelGas) {
             const alertContainer = document.querySelector('.alert-banner');
             if (!alertContainer) return;
@@ -399,14 +454,57 @@
             }
         }
 
-        // Función para determinar la clase CSS del nivel de gas
-        function getGasLevelClass(nivel) {
-            if (nivel < 300) return 'gas-safe';
-            if (nivel < 400) return 'gas-warning';
-            return 'gas-danger';
+        // --- LAS FUNCIONES controlValvula() y obtenerEstado() SE MANTIENEN LITERALMENTE SIN CAMBIOS DE LÓGICA ---
+
+        // Función para controlar la válvula (Lógica inalterada)
+        async function controlValvula(accion) {
+            const mac = '<?= $dispositivo->MAC ?? '' ?>';
+            const endpoint = accion === 1 ? '/servo/cerrar' : '/servo/abrir';
+            const messageDiv = document.getElementById('message-valve');
+            
+            try {
+                messageDiv.innerHTML = '<div style="color: #3498db;">Procesando...</div>'; /* Color azul corporativo */
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `mac=${encodeURIComponent(mac)}`
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    messageDiv.innerHTML = `<div style="color: #1abc9c;">${data.message}</div>`; /* Color verde success */
+                    updateUI(data.estado_valvula);
+                    // Actualizar estado automáticamente después de 2 segundos
+                    setTimeout(() => obtenerEstado(mac), 2000);
+                } else {
+                    messageDiv.innerHTML = `<div style="color: #e74c3c;">Error: ${data.message}</div>`; /* Color rojo error */
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div style="color: #e74c3c;">Error de conexión: ${error.message}</div>`;
+            }
         }
 
-        // Actualizar estados automáticamente cada 10 segundos
+        // Función para obtener el estado actual (Lógica inalterada)
+        async function obtenerEstado(mac) {
+            try {
+                const response = await fetch(`/servo/obtenerEstado/${encodeURIComponent(mac)}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    updateUI(data.estado_valvula, data.nivel_gas, data.ultima_actualizacion);
+                    // Actualizar banner de alerta
+                    updateAlertBanner(data.nivel_gas);
+                }
+            } catch (error) {
+                console.error('Error al obtener estado:', error);
+            }
+        }
+        
+        // Ejecución al cargar (Lógica inalterada)
         document.addEventListener('DOMContentLoaded', function() {
             const mac = '<?= $dispositivo->MAC ?? '' ?>';
             if (mac) {
@@ -422,14 +520,14 @@
 </html>
 
 <?php
-// Función helper para determinar la clase del nivel de gas
+// Función helper para determinar la clase del nivel de gas (Lógica inalterada)
 function getGasLevelClass($nivel) {
     if ($nivel < 300) return 'gas-safe';
     if ($nivel < 400) return 'gas-warning';
     return 'gas-danger';
 }
 
-// Función helper para obtener el texto del estado del gas
+// Función helper para obtener el texto del estado del gas (Lógica inalterada)
 function getGasStatusText($nivel) {
     if ($nivel < 300) return 'Seguro';
     if ($nivel < 400) return 'Advertencia';
