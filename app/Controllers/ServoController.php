@@ -39,7 +39,7 @@ class ServoController extends BaseController
             ->where('enlace.id_usuario', $usuarioId)
             ->findAll();
 
-        return view('detalles', [
+        return view('servo/index', [
             'dispositivos' => $dispositivos
         ]);
     }
