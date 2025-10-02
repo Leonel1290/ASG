@@ -114,4 +114,14 @@ $routes->group('servo', function($routes) {
 // CORRECCIÓN CLAVE 5: Apuntamos la API al controlador seguro ApiEspController
 $routes->get('/api/valve_status', 'ApiEspController::estadoValvula');
 
+// RUTAS DE SERVOS (Control de Válvulas)
+$routes->group('servo', function($routes) {
+    $routes->get('/', 'ServoController::index');
+    $routes->post('abrir', 'ServoController::abrir');
+    $routes->post('cerrar', 'ServoController::cerrar');
+    $routes->get('obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1');
+    $routes->post('actualizarEstado', 'ServoController::actualizarEstado');
+});
+
+// API para ESP32 (mantener esta ruta)
 $routes->get('/api/valve_status', 'ServoController::obtenerEstadoValvulaPlano');

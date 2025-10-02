@@ -3,260 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Válvula de Gas | ASG</title>
-    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ASG">
-    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <meta name="csrf-token" content="<?= csrf_hash() ?>">
-    <meta name="csrf-name" content="<?= csrf_token() ?>">
-
+    <title>Control de Válvulas - ASG</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Tu CSS (Lo mantengo por brevedad, asumiendo que está bien) */
-        .gas-level-container {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .valve-status-open {
-            color: #28a745; /* Verde */
+        .device-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
         }
-        .valve-status-closed {
-            color: #dc3545; /* Rojo */
+        .valve-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-open {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-close {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-open {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-closed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .gas-level {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .gas-safe { color: #28a745; }
+        .gas-warning { color: #ffc107; }
+        .gas-danger { color: #dc3545; }
+        .last-update {
+            font-size: 0.9em;
+            color: #6c757d;
         }
     </style>
 </head>
 <body>
-    
-    <div class="container my-5">
-        <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?= esc($error_message) ?>
+    <div class="container">
+        <h1>Control de Válvulas de Gas</h1>
+        
+        <?php if (empty($dispositivos)): ?>
+            <div class="alert alert-warning">
+                No tienes dispositivos enlazados. <a href="/enlace">Enlaza un dispositivo</a> para comenzar.
             </div>
-        <?php elseif ($dispositivo): ?>
-            <h1 class="text-center mb-4">
-                <i class="fas fa-microchip"></i>
-                Detalles del Dispositivo: **<?= esc($dispositivo->nombre) ?>**
-            </h1>
-            <p class="text-center text-muted">MAC: <?= esc($dispositivo->MAC) ?></p>
-
-            <div class="row justify-content-center">
-                
-                <div class="col-md-6 mb-4">
-                    <div class="card gas-level-container p-4 text-center">
-                        <div class="card-body">
-                            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
-                            <h5 class="card-title">Nivel de Gas Actual</h5>
-                            <p class="card-text display-4 mb-1" id="nivel-gas">--</p>
-                            <p class="text-muted"><small>Última actualización: <span id="ultima-actualizacion">--</span></small></p>
+        <?php else: ?>
+            <div class="devices-grid">
+                <?php foreach ($dispositivos as $dispositivo): ?>
+                    <div class="device-card" id="device-<?= str_replace(':', '-', $dispositivo['MAC']) ?>">
+                        <h3><?= esc($dispositivo['nombre']) ?></h3>
+                        <p><strong>MAC:</strong> <?= esc($dispositivo['MAC']) ?></p>
+                        <p><strong>Ubicación:</strong> <?= esc($dispositivo['ubicacion']) ?></p>
+                        
+                        <div class="valve-control">
+                            <span>Estado de la válvula:</span>
+                            <span class="status <?= $dispositivo['estado_valvula'] ? 'status-closed' : 'status-open' ?>" id="status-<?= str_replace(':', '-', $dispositivo['MAC']) ?>">
+                                <?= $dispositivo['estado_valvula'] ? 'CERRADA' : 'ABIERTA' ?>
+                            </span>
                         </div>
-                    </div>
-                </div>
 
-                <div class="col-md-6 mb-4">
-                    <div class="card gas-level-container p-4 text-center">
-                        <div class="card-body">
-                            <i class="fas fa-door-closed fa-3x mb-3" id="icono-valvula"></i>
-                            <h5 class="card-title">Estado de la Válvula</h5>
-                            <p class="card-text display-4 mb-3" id="estado-valvula-texto">Cerrada</p>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-danger btn-lg" id="btn-cerrar">
-                                    <i class="fas fa-stop"></i> Cerrar Válvula
-                                </button>
-                                <button class="btn btn-success btn-lg" id="btn-abrir" disabled>
-                                    <i class="fas fa-fan"></i> Abrir Válvula
-                                </button>
+                        <div class="valve-control">
+                            <button class="btn btn-open" 
+                                    onclick="controlValvula('<?= $dispositivo['MAC'] ?>', 0)"
+                                    id="btn-open-<?= str_replace(':', '-', $dispositivo['MAC']) ?>"
+                                    <?= $dispositivo['estado_valvula'] == 0 ? 'disabled' : '' ?>>
+                                Abrir Válvula
+                            </button>
+                            <button class="btn btn-close" 
+                                    onclick="controlValvula('<?= $dispositivo['MAC'] ?>', 1)"
+                                    id="btn-close-<?= str_replace(':', '-', $dispositivo['MAC']) ?>"
+                                    <?= $dispositivo['estado_valvula'] == 1 ? 'disabled' : '' ?>>
+                                Cerrar Válvula
+                            </button>
+                        </div>
+
+                        <div class="gas-info">
+                            <div class="gas-level <?= getGasLevelClass($dispositivo['ultimo_nivel_gas']) ?>" 
+                                 id="gas-level-<?= str_replace(':', '-', $dispositivo['MAC']) ?>">
+                                Nivel de Gas: <?= $dispositivo['ultimo_nivel_gas'] ?> ppm
+                            </div>
+                            <div class="last-update" id="last-update-<?= str_replace(':', '-', $dispositivo['MAC']) ?>">
+                                Última actualización: <?= $dispositivo['ultima_actualizacion'] ?>
                             </div>
                         </div>
+
+                        <div id="message-<?= str_replace(':', '-', $dispositivo['MAC']) ?>"></div>
                     </div>
-                </div>
-
+                <?php endforeach; ?>
             </div>
-
         <?php endif; ?>
     </div>
 
-    <div aria-live="polite" aria-atomic="true" class="bg-dark position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
-        <div id="toast-container"></div>
-    </div>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-    $(document).ready(function() {
-        
-        // **CORRECCIÓN CLAVE:** Almacenamos la MAC correcta del dispositivo que se está viendo.
-        // PHP imprime la MAC solo una vez al cargar la página.
-        const currentMac = '<?= $dispositivo->MAC ?? "" ?>';
-        
-        // --- Funciones de Utilidad ---
-        function showToast(message, type = 'success') {
-            const toastHtml = `
-                <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>`;
-            const toastContainer = $('#toast-container');
-            toastContainer.append(toastHtml);
-            const toastEl = toastContainer.children().last();
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-            // Eliminar el toast del DOM después de que se oculte
-            toastEl.on('hidden.bs.toast', function () {
-                $(this).remove();
-            });
-        }
+        // Función para controlar la válvula
+        async function controlValvula(mac, accion) {
+            const endpoint = accion === 1 ? '/servo/cerrar' : '/servo/abrir';
+            const messageDiv = document.getElementById(`message-${mac.replace(/:/g, '-')}`);
+            
+            try {
+                messageDiv.innerHTML = '<div style="color: blue;">Procesando...</div>';
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `mac=${encodeURIComponent(mac)}`
+                });
 
-        function showSuccessToast(message) {
-            showToast(message, 'success');
-        }
-
-        function showErrorToast(message) {
-            showToast(message, 'danger');
-        }
-
-        function actualizarEstadoUI(estado) {
-            const $icono = $('#icono-valvula');
-            const $texto = $('#estado-valvula-texto');
-            const $btnCerrar = $('#btn-cerrar');
-            const $btnAbrir = $('#btn-abrir');
-
-            // 1 es Abierta, 0 es Cerrada (según tu descripción inicial)
-            if (estado === 1) {
-                $icono.removeClass('fa-door-closed valve-status-closed').addClass('fa-door-open valve-status-open');
-                $texto.text('Abierta').removeClass('valve-status-closed').addClass('valve-status-open');
-                $btnCerrar.prop('disabled', false);
-                $btnAbrir.prop('disabled', true);
-            } else {
-                $icono.removeClass('fa-door-open valve-status-open').addClass('fa-door-closed valve-status-closed');
-                $texto.text('Cerrada').removeClass('valve-status-open').addClass('valve-status-closed');
-                $btnCerrar.prop('disabled', true);
-                $btnAbrir.prop('disabled', false);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    messageDiv.innerHTML = `<div style="color: green;">${data.message}</div>`;
+                    updateUI(mac, data.estado_valvula);
+                    // Actualizar estado automáticamente después de 2 segundos
+                    setTimeout(() => obtenerEstado(mac), 2000);
+                } else {
+                    messageDiv.innerHTML = `<div style="color: red;">Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div style="color: red;">Error de conexión: ${error.message}</div>`;
             }
         }
-        
-        // --- Lógica de la Válvula ---
 
-        /**
-         * Obtiene el estado actual de la válvula y el nivel de gas.
-         */
-        function fetchDeviceState() {
-            if (!currentMac) return; // No hacer nada si no hay MAC
-            
-            $.get(`/servo/obtenerEstado/${currentMac}`)
-                .done(function(response) {
-                    if (response.status === 'success') {
-                        // Actualizar UI de la válvula
-                        actualizarEstadoUI(response.estado_valvula);
-                        
-                        // Actualizar UI de nivel de gas
-                        $('#nivel-gas').text(response.nivel_gas + ' PPM'); // Asumo que son Partes Por Millón
-                        
-                        // Formatear fecha (si existe)
-                        if (response.ultima_actualizacion) {
-                            const date = new Date(response.ultima_actualizacion);
-                            $('#ultima-actualizacion').text(date.toLocaleString());
-                        } else {
-                            $('#ultima-actualizacion').text('--');
-                        }
-                    } else {
-                        console.error('Error al obtener estado:', response.message);
-                    }
-                })
-                .fail(function(jqXHR) {
-                    console.error('Error de conexión al obtener estado:', jqXHR.responseText);
-                });
+        // Función para obtener el estado actual
+        async function obtenerEstado(mac) {
+            try {
+                const response = await fetch(`/servo/obtenerEstado/${encodeURIComponent(mac)}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    updateUI(mac, data.estado_valvula, data.nivel_gas, data.ultima_actualizacion);
+                }
+            } catch (error) {
+                console.error('Error al obtener estado:', error);
+            }
         }
 
-        /**
-         * Actualiza el estado de la válvula en el servidor.
-         * @param {number} estado El nuevo estado (1 para abrir, 0 para cerrar).
-         * @param {string} mac La dirección MAC del dispositivo a controlar.
-         */
-        function actualizarEstadoValvula(estado, mac) {
-            if (!mac) return;
-
-            const btnCerrar = $('#btn-cerrar');
-            const btnAbrir = $('#btn-abrir');
-            const successMessage = (estado === 1) ? 'Válvula abierta correctamente' : 'Válvula cerrada correctamente';
-
-            const csrfName = $('meta[name="csrf-name"]').attr('content');
-            const csrfHash = $('meta[name="csrf-token"]').attr('content');
+        // Función para actualizar la interfaz
+        function updateUI(mac, estadoValvula, nivelGas = null, ultimaActualizacion = null) {
+            const macId = mac.replace(/:/g, '-');
             
-            // **CORRECCIÓN CLAVE:** La MAC se recibe como argumento 'mac'
-            const postData = {
-                [csrfName]: csrfHash,
-                mac: mac, // Usamos el argumento 'mac'
-                estado: estado
-            };
-
-            // Determinar qué botón deshabilitar y qué loader mostrar
-            const targetButton = (estado === 1) ? btnAbrir : btnCerrar;
-            const otherButton = (estado === 1) ? btnCerrar : btnAbrir;
-
-            targetButton.html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
-            otherButton.prop('disabled', true); // Deshabilita el otro botón mientras procesa
+            // Actualizar estado de la válvula
+            const statusElement = document.getElementById(`status-${macId}`);
+            const btnOpen = document.getElementById(`btn-open-${macId}`);
+            const btnClose = document.getElementById(`btn-close-${macId}`);
             
-            $.post('/servo/actualizarEstado', postData)
-                .done(function(response) {
-                    if (response.status === 'success') {
-                        actualizarEstadoUI(response.estado ? 1 : 0); // La respuesta debe ser 1 o 0
-                        showSuccessToast(successMessage);
-                    } else {
-                        showErrorToast(response.message || 'Error al actualizar el estado');
-                    }
-                })
-                .fail(function(jqXHR) {
-                    showErrorToast('Error de conexión con el servidor o error interno: ' + jqXHR.statusText);
-                })
-                .always(function() {
-                    // Restaurar textos y re-habilitar según el nuevo estado (se hace en fetchDeviceState)
-                    targetButton.html(estado ? 
-                        '<i class="fas fa-fan"></i> Abrir Válvula' : 
-                        '<i class="fas fa-stop"></i> Cerrar Válvula');
-                    
-                    // Llama a fetchDeviceState para asegurar el estado final correcto y habilitar/deshabilitar
-                    fetchDeviceState();
-                });
+            if (estadoValvula === 1) {
+                statusElement.textContent = 'CERRADA';
+                statusElement.className = 'status status-closed';
+                btnOpen.disabled = false;
+                btnClose.disabled = true;
+            } else {
+                statusElement.textContent = 'ABIERTA';
+                statusElement.className = 'status status-open';
+                btnOpen.disabled = true;
+                btnClose.disabled = false;
+            }
+            
+            // Actualizar nivel de gas si se proporciona
+            if (nivelGas !== null) {
+                const gasLevelElement = document.getElementById(`gas-level-${macId}`);
+                gasLevelElement.textContent = `Nivel de Gas: ${nivelGas} ppm`;
+                gasLevelElement.className = `gas-level ${getGasLevelClass(nivelGas)}`;
+            }
+            
+            // Actualizar última actualización si se proporciona
+            if (ultimaActualizacion) {
+                document.getElementById(`last-update-${macId}`).textContent = 
+                    `Última actualización: ${ultimaActualizacion}`;
+            }
         }
 
-        // --- Eventos de Clic ---
+        // Función para determinar la clase CSS del nivel de gas
+        function getGasLevelClass(nivel) {
+            if (nivel < 300) return 'gas-safe';
+            if (nivel < 400) return 'gas-warning';
+            return 'gas-danger';
+        }
 
-        // **CORRECCIÓN APLICADA AQUÍ:** Pasamos la variable 'currentMac'
-        $('#btn-cerrar').on('click', function() {
-            actualizarEstadoValvula(0, currentMac); // 0 para Cerrar
+        // Actualizar estados automáticamente cada 10 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php foreach ($dispositivos as $dispositivo): ?>
+                obtenerEstado('<?= $dispositivo['MAC'] ?>');
+            <?php endforeach; ?>
+            
+            setInterval(() => {
+                <?php foreach ($dispositivos as $dispositivo): ?>
+                    obtenerEstado('<?= $dispositivo['MAC'] ?>');
+                <?php endforeach; ?>
+            }, 10000);
         });
-
-        $('#btn-abrir').on('click', function() {
-            actualizarEstadoValvula(1, currentMac); // 1 para Abrir
-        });
-
-
-        // --- Inicialización ---
-
-        // Cargar el estado la primera vez que se carga la página
-        fetchDeviceState();
-        
-        // Actualizar cada 5 segundos
-        const intervalId = setInterval(fetchDeviceState, 5000);
-        
-        // Limpiar intervalo al salir de la página
-        $(window).on('beforeunload', function() {
-            clearInterval(intervalId);
-        });
-    });
     </script>
 </body>
 </html>
+
+<?php
+// Función helper para determinar la clase del nivel de gas
+function getGasLevelClass($nivel) {
+    if ($nivel < 300) return 'gas-safe';
+    if ($nivel < 400) return 'gas-warning';
+    return 'gas-danger';
+}
+?>
