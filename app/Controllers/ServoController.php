@@ -58,26 +58,31 @@ class ServoController extends ResourceController
      * @param string $mac La dirección MAC del dispositivo.
      * @return \CodeIgniter\HTTP\ResponseInterface Una respuesta JSON con el estado de la válvula y el nivel de gas.
      */
-    public function obtenerEstado($mac)
-    {
-        // Buscar el dispositivo en la base de datos usando la MAC
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-
-        // Verificar si el dispositivo fue encontrado
-        if ($dispositivo) {
-            // Si se encuentra, devolver el estado de la válvula y el último nivel de gas.
-            // Es importante castear a (bool) para estado_valvula y (float) para nivel_gas
-            // para asegurar el tipo de dato correcto en la respuesta JSON.
-            return $this->response->setJSON([
-                'status' => 'success', // ¡Asegúrate de incluir este campo!
-                'estado_valvula' => (bool)$dispositivo['estado_valvula'],
-                'nivel_gas' => (float)$dispositivo['ultimo_nivel_gas'] // ¡Este es el valor que el velocímetro usará!
-            ]);
-        } else {
-            // Si el dispositivo no se encuentra, devolver un error 404
-            return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'Dispositivo no encontrado.']);
-        }
+    public function obtenerEstado(string $mac)
+{
+    // 1. Validar la MAC
+    if (empty($mac)) {
+        return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Falta la MAC.']);
     }
+
+    // 2. Buscar el dispositivo
+    $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+    if ($dispositivo) {
+        // 3. Devolver el estado actual (0 o 1)
+        return $this->response->setJSON([
+            'status' => 'success',
+            // Asegúrate de que 'estado_valvula' es el nombre de la columna en tu DB
+            'estado' => (int)$dispositivo->estado_valvula 
+        ]);
+    } else {
+        // 4. Dispositivo no encontrado
+        return $this->response->setStatusCode(404)->setJSON([
+            'status' => 'error',
+            'message' => 'Dispositivo no encontrado.'
+        ]);
+    }
+}
 
     /**
      * Actualiza el estado de la válvula para una MAC específica.
