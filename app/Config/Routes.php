@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // ===================================================================
-// 🌐 RUTAS DE LA APLICACIÓN WEB 🌐
+// 🌐 RUTAS DE LA APLICACIÓN WEB (Limpias y Agrupadas) 🌐
 // ===================================================================
 
 // --- HOME / SIMULACIÓN ---
@@ -22,12 +22,12 @@ $routes->get('/register/verify-email/(:segment)', 'RegisterController::verifyEma
 
 $routes->get('/login', 'Home::login'); // Vista de Login
 $routes->post('/login', 'Home::login'); // Procesar Login
-$routes->get('/loginobtener', 'Home::loginobtener'); // Si la usas como alternativa a /login
+$routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
 
 // --- PASSWORD RECOVERY ---
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Asumo 'forgotPPassword' es correcto
+$routes->post('/forgotpassword1', 'Home::forgotPPassword');
 $routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
 $routes->post('/reset-password', 'Home::resetPassword');
 
@@ -51,10 +51,10 @@ $routes->group('perfil', function($routes) {
 $routes->get('/enlace', 'EnlaceController::index');
 $routes->post('/enlace/store', 'EnlaceController::store');
 
-// --- DETALLES DE DISPOSITIVO (Usamos (.+) para aceptar la MAC completa) ---
-$routes->get('/detalles/(.+)', 'DetalleController::detalles/$1'); // Más robusto para la MAC
+// --- DETALLES DE DISPOSITIVO (Usamos (.+) para aceptar la MAC) ---
+$routes->get('/detalles/(.+)', 'DetalleController::detalles/$1');
 
-// --- LECTURAS (Solo la ruta web, la API se define más abajo) ---
+// --- LECTURAS ---
 $routes->get('lecturas/obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
 
 // --- REGISTROS DE GAS (AGRUPADAS) ---
@@ -71,8 +71,8 @@ $routes->group('servo', function($routes) {
     $routes->get('/', 'ServoController::index');
     $routes->post('abrir', 'ServoController::abrir');
     $routes->post('cerrar', 'ServoController::cerrar');
-    $routes->get('obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1'); // Más robusto para la MAC
-    $routes->post('actualizarEstado', 'ServoController::actualizarEstado'); // Actualización desde la UI
+    $routes->get('obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1');
+    $routes->post('actualizarEstado', 'ServoController::actualizarEstado');
 });
 
 // --- COMPRA / PWA / OTROS ---
@@ -87,21 +87,16 @@ $routes->get('prueba', function() {
 
 
 // ===================================================================
-// 🤖 RUTAS DE API PARA EL ESP32 (Solución al problema) 🤖
+// 🤖 RUTAS DE API PARA EL ESP32 (¡CORREGIDAS!) 🤖
 // ===================================================================
 
-// 1. SOLUCIÓN CLAVE (Error 404): La ruta que el ESP32 estaba buscando manualmente.
-// Apunta a tu controlador de API seguro.
-$routes->get('api/get_valve_status', 'App\\Controllers\\ApiEspController::estadoValvula');
+// CORRECCIÓN CLAVE 1: Ruta para ENVIAR la lectura de gas (POST /api/send_gas_data)
+// Se eliminó el namespace 'App\\Controllers\\' para evitar la duplicación que causaba el 404.
+$routes->post('api/send_gas_data', 'LecturasController::guardar');
 
-// 2. Ruta para OBTENER el estado de la válvula (Alternativa/Oficial de tu código).
-// Mantenemos esta ya que el controlador ApiEspController está diseñado para esto.
-$routes->get('api/valve_status', 'App\\Controllers\\ApiEspController::estadoValvula');
 
-// 3. Ruta para ENVIAR la lectura de gas (Alineada con el código Python).
-$routes->post('api/send_gas_data', 'App\\Controllers\\LecturasController::guardar');
-// Eliminamos la ruta duplicada o antigua: /lecturas_gas/guardar
+$routes->get('api/get_valve_status', 'ApiEspController::estadoValvula');
 
-// ===================================================================
-// FIN DE RUTAS
-// ===================================================================
+
+$routes->get('api/valve_status', 'ApiEspController::estadoValvula');
+
