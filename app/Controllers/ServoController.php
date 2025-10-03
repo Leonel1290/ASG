@@ -31,27 +31,21 @@ class ServoController extends BaseController
 
     // 2. Abrir válvula (POST /servo/abrir)
     public function abrir()
-    {
-        $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
-        
-        // CORRECCIÓN CLAVE: 1 = Abierta
-        $this->dispositivoModel->updateDispositivoByMac($mac, ['estado_valvula' => 1]); 
-        
-        // Redirigir a la vista de detalles del dispositivo
-        return redirect()->to('/detalles/' . $mac)->with('success', 'Válvula programada para abrirse.');
-    }
+{
+    $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
+    // CORRECCIÓN CLAVE: 1 = Abierta
+    $this->dispositivoModel->where('MAC', $mac)->set('estado_valvula', 1)->update(); 
+    return redirect()->to('/servo');
+}
 
     // 3. Cerrar válvula (POST /servo/cerrar)
     public function cerrar()
-    {
-        $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
-        
-        // CORRECCIÓN CLAVE: 0 = Cerrada
-        $this->dispositivoModel->updateDispositivoByMac($mac, ['estado_valvula' => 0]); 
-        
-        // Redirigir a la vista de detalles del dispositivo
-        return redirect()->to('/detalles/' . $mac)->with('success', 'Válvula programada para cerrarse.');
-    }
+{
+    $mac = session()->get('MAC') ?? "CC:7B:5C:A8:0F:50";
+    // CORRECCIÓN CLAVE: 0 = Cerrada
+    $this->dispositivoModel->where('MAC', $mac)->set('estado_valvula', 0)->update(); 
+    return redirect()->to('/servo');
+}
 
     // =================================================================
     // MÉTODOS AJAX (Usados por el frontend)
