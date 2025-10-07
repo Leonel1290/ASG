@@ -7,7 +7,6 @@ use App\Models\EnlaceModel;
 use App\Models\LecturasGasModel;
 use App\Models\UserModel;
 use App\Models\DispositivoModel;
-use App\Models\Catalogo_Model; // <-- LÍNEA AÑADIDA: Importar el nuevo modelo
 use CodeIgniter\I18n\Time;
 
 class PerfilController extends BaseController
@@ -16,7 +15,6 @@ class PerfilController extends BaseController
     protected $enlaceModel;
     protected $lecturasGasModel;
     protected $dispositivoModel;
-    protected $catalogoModel; // <-- LÍNEA AÑADIDA: Propiedad para el nuevo modelo
 
 
     public function __construct()
@@ -28,7 +26,6 @@ class PerfilController extends BaseController
         $this->enlaceModel = new EnlaceModel();
         $this->lecturasGasModel = new LecturasGasModel();
         $this->dispositivoModel = new DispositivoModel();
-        $this->catalogoModel = new Catalogo_Model(); // <-- LÍNEA AÑADIDA: Instanciar el nuevo modelo
 
 
         // --- CARGAR HELPERS ---
@@ -64,8 +61,8 @@ class PerfilController extends BaseController
         $dispositivosEnlazados = [];
         if (!empty($macs)) {
             $dispositivosEnlazados = $this->dispositivoModel
-                                            ->whereIn('MAC', $macs)
-                                            ->findAll();
+                                        ->whereIn('MAC', $macs)
+                                        ->findAll();
         }
 
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
@@ -84,12 +81,6 @@ class PerfilController extends BaseController
                 }
             }
         }
-        
-        // ===============================================================
-        //  LÓGICA AÑADIDA: Obtener el catálogo de otros dispositivos
-        // ===============================================================
-        $modelos_catalogo = $this->catalogoModel->obtenerModelosCatalogo();
-        // ===============================================================
 
         // --- LOGGING PARA DEBUGGING ---
         log_message('debug', 'PerfilController::index() - Dispositivos enlazados obtenidos: ' . json_encode($dispositivosEnlazados));
@@ -100,8 +91,7 @@ class PerfilController extends BaseController
         // Pasar los datos a la vista.
         return view('perfil', [
             'dispositivosEnlazados' => $dispositivosEnlazados,
-            'lecturasPorMac' => $lecturasPorMac,
-            'modelos_catalogo' => $modelos_catalogo // <-- VARIABLE AÑADIDA A LA VISTA
+            'lecturasPorMac' => $lecturasPorMac
         ]);
     }
 
@@ -119,7 +109,7 @@ class PerfilController extends BaseController
 
         $userData = $this->userModel->find($loggedInUserId);
 
-          if (!$userData) {
+         if (!$userData) {
             $session->destroy();
             return redirect()->to('/login')->with('error', 'Usuario no encontrado. Por favor, inicia sesión de nuevo.');
         }
@@ -203,7 +193,7 @@ class PerfilController extends BaseController
         $session = session();
         $loggedInUserId = $session->get('id');
 
-          if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
              if ($loggedInUserId) {
                  return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de acceder a la configuración.');
              } else {
@@ -213,12 +203,12 @@ class PerfilController extends BaseController
 
         $userData = $this->userModel->find($loggedInUserId);
 
-          if (!$userData) {
+         if (!$userData) {
             $session->destroy();
             return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
         }
 
-          $data['userData'] = [
+         $data['userData'] = [
             'nombre' => $userData['nombre'] ?? '',
             'email' => $userData['email'] ?? ''
         ];
@@ -231,7 +221,7 @@ class PerfilController extends BaseController
         $session = session();
         $loggedInUserId = $session->get('id');
 
-          if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
+         if (!$loggedInUserId || !$session->get('email_verified_for_config')) {
              if ($loggedInUserId) {
                  return redirect()->to('/perfil/configuracion')->with('error', 'Por favor, verifica tu email antes de actualizar tu perfil.');
              } else {
