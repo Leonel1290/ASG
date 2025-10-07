@@ -1,7 +1,10 @@
 <?php
-// Ensure these variables are set, even if empty arrays, to avoid undefined variable errors
+// Asegura que estas variables estén definidas
 $dispositivosEnlazados = $dispositivosEnlazados ?? [];
-$lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in the provided code, but keep the null coalesce operator just in case.
+$lecturasPorMac = $lecturasPorMac ?? [];
+// Define una ruta simulada para la imagen del dispositivo
+// ASEGÚRATE DE QUE LA IMAGEN image_1c4f29.jpg ESTÉ EN LA CARPETA 'imagenes/' Y RENOMBRADA A 'ASG_SENTINEL.jpg' o ajusta la ruta.
+$device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -12,7 +15,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
     <title>Mi Perfil - ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs->cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* General body styles */
         body {
@@ -248,55 +251,149 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             margin-top: 1.5rem;
         }
 
-        /* Device List and Item styles (kept as is, they look good) */
-        .device-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
 
-        .device-item {
-            background-color: #2d3748;
-            border: 1px solid #4a5568;
+        .product-card {
+            background-color: #2d3748; /* Fondo de tarjeta similar a .card */
+            color: #fff;
+            border: none;
             border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image-container {
+            padding: 1rem;
+            height: 300px; /* Altura fija para la imagen */
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
+            justify-content: center;
+            background-color: #2d3748; /* Fondo claro para destacar el dispositivo */
         }
 
-        .device-item:hover {
-            box-shadow: 0 0 10px rgba(66, 153, 225, 0.4);
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
-        .device-info {
-            flex-grow: 1;
-            margin-right: 1rem;
+        .product-body {
+            padding: 1rem;
         }
 
-        .device-name {
-            font-size: 1.1rem;
+        .product-name {
+            font-size: 1.25rem;
             font-weight: bold;
             color: #edf2f7;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            min-height: 50px; /* Altura mínima para el nombre */
         }
 
-        .device-details {
+        .product-details {
             font-size: 0.9rem;
             color: #a0aec0;
+            margin-bottom: 1rem;
+            line-height: 1.4;
         }
 
-        .device-actions {
+        /* CONTENEDOR DE ACCIONES: Oculto por defecto y transiciona */
+        .product-actions {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            border-top: 1px solid #4a5568;
+            background-color: #4a5568; /* Barra de acciones más oscura */
+            /* OCULTAR POR DEFECTO */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
         }
 
-        /* Custom Checkbox styles for dark theme */
+        /* MOSTRAR EN HOVER DE LA TARJETA */
+        .product-card:hover .product-actions {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .action-button {
+            flex: 1; /* Esto asegura la división 50/50 */
+            padding: 0.75rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white; /* Color del texto del botón */
+            transition: background-color 0.2s ease;
+            border-radius: 0; /* Sin bordes redondeados */
+            /* AÑADIDO: Centrar el contenido de ambos botones */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        /* Botón Ver Detalles (ahora 50%) */
+        .action-button.details-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: #4299e1; /* Color info/azul */
+            border-left: 1px solid #4a5568;
+            /* Se han removido las propiedades de ancho fijo */
+        }
+        .action-button.details-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Botón Editar (ahora 50%) */
+        .action-button.edit-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: rgba(1, 44, 85, 1);
+        }
+        .action-button.edit-btn:hover {
+            background-color: rgba(4, 72, 136, 1);
+        }
+
+        /* Elemento de precio simulado/MAC */
+        .price-section {
+            color: #48bb78; /* Color verde/éxito */
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .old-price {
+            color: #718096;
+            font-size: 0.8rem;
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        /* Ribbon de Dispositivo (simulado) */
+        .discount-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0; 
+            background-color: #000000ff; 
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-bottom-right-radius: 0.5rem; 
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        /* Custom Checkbox styles for dark theme (posicionado sobre la tarjeta) */
         .delete-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px; 
+            z-index: 10;
             width: 1.2em;
             height: 1.2em;
             vertical-align: middle;
@@ -306,7 +403,6 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             border-radius: 0.25em;
             appearance: none;
             -webkit-appearance: none;
-            position: relative;
             flex-shrink: 0;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
@@ -334,54 +430,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             transform: translate(-50%, -50%);
         }
 
-        /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO Y RIBBON *** */
-        .product-card {
-            background-color: #2d3748;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            overflow: hidden;
-            position: relative; /* Necesario para el ribbon absoluto */
-            margin-bottom: 2rem;
-            height: 100%; /* Para que las columnas tengan la misma altura */
-        }
-
-        .discount-ribbon {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #4299e1; /* Color para destacar */
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-bottom-right-radius: 0.5rem;
-            font-weight: bold;
-            font-size: 0.9rem;
-            z-index: 10;
-            cursor: pointer; /* <-- IMPORTANTE: Hace que sea clickeable */
-            transition: background-color 0.2s;
-        }
-
-        .discount-ribbon:hover {
-            background-color: #2b6cb0;
-        }
-
-        .product-image-container {
-            padding: 1rem;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .product-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        /* *** FIN: ESTILOS DE TARJETA DE PRODUCTO Y RIBBON *** */
-
+        /* *** FIN: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
 
         /* Modal styles (kept as is, fit dark theme) */
         .modal-content {
@@ -417,8 +466,6 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
         .modal-header .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
-
-
     </style>
 
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
@@ -492,27 +539,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             </button>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-md-4 col-lg-3">
-                <div class="product-card">
-                    <div class="discount-ribbon" data-bs-toggle="modal" data-bs-target="#otherDevicesModal">
-                        ASG Sentinel
-                    </div>
 
-                    <div class="product-image-container">
-                        <img src="<?= base_url('/imagenes/ASG_SENTINEL.jpg') ?>" class="product-image" alt="ASG Sentinel">
-                    </div>
-
-                    <div class="card-body p-3">
-                        <h5 class="card-title text-center" style="color: #4299e1;">ASG Sentinel</h5>
-                        <p class="card-text text-muted" style="font-size: 0.9rem;">
-                            Dispositivo de monitoreo avanzado para seguridad perimetral. (Ejemplo Estático)
-                        </p>
-                        <a href="#" class="btn btn-info btn-sm w-100 mt-2">Ver Información</a>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div id="add-mac-form" style="display: none;">
             <form action="<?= base_url('/enlace/store') ?>" method="post">
                 <?= csrf_field() ?>
@@ -531,59 +558,56 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
         <?php else: ?>
             <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
                 <?= csrf_field() ?>
-                <button type="button" id="delete-selected-btn" class="btn btn-danger mb-3">
+                <button type="button" id="delete-selected-btn" class="btn btn-danger mb-4">
                     <i class="fas fa-trash-alt me-2"></i> Eliminar Seleccionados
                 </button>
 
-                <ul class="device-list">
+                <div class="row">
                     <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
-                        <li class="device-item">
-                            <div class="device-info">
-                                <div class="device-name"><?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?></div>
-                                <div class="device-details">
-                                    MAC: <?= esc($dispositivo->MAC ?? 'Desconocida') ?> |
-                                    Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="product-card">
+                                <div class="discount-ribbon">ASG Sentinel</div>
+
+                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
+
+                                <div class="product-image-container">
+                                    <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
+                                </div>
+                                <div class="product-body">
+                                    <div class="product-name">
+                                        <?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?>
+                                    </div>
+                                    
+                                    <div class="price-section">
+                                        MAC: <?= esc(substr($dispositivo->MAC ?? 'Desconocida', -5)) ?>...
+                                        <span class="old-price">MAC Completa</span>
+                                    </div>
+
+                                    <div class="product-details">
+                                        Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button edit-btn" 
+                                       title="Editar Dispositivo">
+                                        <i class="fas fa-edit me-2"></i> Editar
+                                    </a>
+                                    
+                                    <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button details-btn" 
+                                       title="Ver Detalles">
+                                        <i class="fas fa-chart-bar me-2"></i> Detalles
+                                    </a>
                                 </div>
                             </div>
-                            <div class="device-actions">
-                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
-                                <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
-                                    <i class="fas fa-chart-bar"></i> Ver Detalles
-                                </a>
-                            </div>
-                        </li>
+                        </div>
                     <?php endforeach; ?>
-                </ul>
-
+                </div>
             </form>
         <?php endif; ?>
 
-        <div class="modal fade" id="otherDevicesModal" tabindex="-1" aria-labelledby="otherDevicesModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="otherDevicesModalLabel"><i class="fas fa-grip-horizontal me-2"></i> Otros Dispositivos ASG</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Descubre otros dispositivos de la línea ASG disponibles:</p>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" style="background-color: #2d3748; color: #fff; border-color: #4a5568;">ASG Medial</li>
-                            <li class="list-group-item" style="background-color: #2d3748; color: #fff; border-color: #4a5568;">ASG Uranus</li>
-                            <li class="list-group-item" style="background-color: #2d3748; color: #fff; border-color: #4a5568;">ASG Blaze</li>
-                            <li class="list-group-item" style="background-color: #2d3748; color: #fff; border-color: #4a5568;">ASG Aero</li>
-                            <li class="list-group-item" style="background-color: #2d3748; color: #fff; border-color: #4a5568;">ASG Cosma</li>
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
