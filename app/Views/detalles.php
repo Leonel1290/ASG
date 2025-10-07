@@ -1,3 +1,26 @@
+<?php
+// Initialize variables to prevent errors if they are not passed from the controller
+$mac = $mac ?? 'Desconocida';
+$nombreDispositivo = $nombreDispositivo ?? $mac; // Use MAC as default name if no name is passed
+$ubicacionDispositivo = $ubicacionDispositivo ?? 'Desconocida';
+$lecturas = $lecturas ?? []; // Array of readings for the table (expected DESC order)
+$labels = $labels ?? [];     // Date/time labels for the chart (expected ASC order)
+$data = $data ?? [];         // Gas levels for the chart (expected ASC order)
+$message = $message ?? null; // Optional messages
+
+// Get the latest gas level to display in the simple card
+// It's assumed that the $lecturas array is ordered in DESCENDING order (most recent first)
+$nivelGasActual = !empty($lecturas) && isset($lecturas[0]['nivel_gas']) ? (float)$lecturas[0]['nivel_gas'] : null;
+$nivelGasActualDisplay = $nivelGasActual !== null ? $nivelGasActual . ' PPM' : 'Sin datos';
+$nivelGasActualValue = $nivelGasActual ?? 0; // Default to 0 if no data
+
+// Helper function to escape HTML data (similar to CodeIgniter's esc())
+if (!function_exists('esc')) {
+    function esc($str) {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -296,6 +319,20 @@
             border-bottom: none;
         }
         
+        /* Gas level color coding */
+        .gas-level-safe {
+            color: var(--success-color);
+        }
+        .gas-level-warning {
+            color: var(--warning-color);
+        }
+        .gas-level-danger {
+            color: var(--danger-color);
+        }
+        .gas-level-unknown {
+            color: var(--secondary-color);
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .page-title {
@@ -336,7 +373,9 @@
             <div class="card h-100 text-center">
                 <div class="card-body">
                     <h2 class="card-title"><i class="fas fa-gas-pump"></i> Nivel de Gas Actual</h2>
-                    <p class="current-gas-value" id="currentGasLevelDisplay"><?= $nivelGasActualDisplay ?></p>
+                    <p class="current-gas-value <?= getGasLevelClass($nivelGasActual) ?>" id="currentGasLevelDisplay">
+                        <?= $nivelGasActualDisplay ?>
+                    </p>
                 </div>
             </div>
         </div>
@@ -664,3 +703,13 @@
 </script>
 </body>
 </html>
+
+<?php
+// Helper function to determine gas level class for color coding
+function getGasLevelClass($nivel) {
+    if ($nivel === null) return 'gas-level-unknown';
+    if ($nivel >= 500) return 'gas-level-danger';
+    if ($nivel >= 200) return 'gas-level-warning';
+    return 'gas-level-safe';
+}
+?>
