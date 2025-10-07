@@ -478,13 +478,10 @@
                         </address>
 
                         <div class="social-links mt-4">
-                            <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
+                            <a href="https://www.instagram.com/againsafegas_s.a/" target="_blank" aria-label="Instagram">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="https://x.com/" target="_blank" aria-label="X">
+                            <a href="https://x.com/againsafegas" target="_blank" aria-label="X">
                                 <i class="fab fa-x"></i>
                             </a>
                         </div>
