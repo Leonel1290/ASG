@@ -9,7 +9,7 @@ $port = 3306;
 
 // Clave API secreta: Se obtiene de las variables de entorno de Render
 // Asegúrate de que la variable de entorno 'API_KEY_SECRET' esté configurada en Render.
-$api_key_expected = getenv('API_KEY_SECRET'); 
+$api_key_expected = 'API_KEY_SECRET'; 
 
 // ----------------------------------------------------
 // CÓDIGOS DE RESPUESTA PARA EL ESP32 (Errores internos)
