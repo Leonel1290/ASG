@@ -12,13 +12,14 @@
     
     <style>
         /* ------------------------------------------------------------------ */
-        /* ESTILOS MEJORADOS                         */
+        /* ESTILOS MEJORADOS (MANTENIDOS)             */
         /* ------------------------------------------------------------------ */
         :root {
             --primary-color: #007bff; /* Azul primario */
             --success-color: #28a745; /* Verde para abierto */
             --danger-color: #dc3545; /* Rojo para cerrado */
             --warning-color: #ffc107; /* Amarillo para cargando/procesando */
+            --info-color: #6c757d; /* Gris para volver/neutro */
             --text-color: #333;
             --bg-color: #f4f7f6;
             --card-bg: #ffffff;
@@ -44,7 +45,7 @@
             border: 1px solid var(--border-color); 
             border-radius: 12px; 
             background-color: var(--card-bg);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
             transition: transform 0.3s ease-in-out;
         }
         
@@ -70,7 +71,7 @@
         .status { 
             font-weight: 600; 
             margin: 20px 0; 
-            font-size: 1.5em; /* Tamaño más grande */
+            font-size: 1.5em; 
             padding: 15px;
             border-radius: 8px;
             text-align: center;
@@ -80,22 +81,43 @@
 
         .status strong {
             display: block;
-            font-size: 0.7em; /* "Estado Actual" más pequeño */
+            font-size: 0.7em; 
             font-weight: normal;
             color: #6c757d;
             margin-bottom: 5px;
         }
 
-        /* Contenedor de botones para centrar y espaciar */
+        /* Contenedor de botones: Ahora usa más espacio para 3 botones */
         .button-group {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between; /* Ajustado para espaciar 3 elementos */
             gap: 10px;
             margin-top: 25px;
         }
+        
+        /* Botones de control (Abrir/Cerrar) - más grandes */
+        #btn-abrir, #btn-cerrar {
+            flex-grow: 1; 
+            min-width: 110px; /* Asegura un ancho mínimo */
+        }
+        
+        /* Botón de Volver - más pequeño y neutro */
+        #btn-volver {
+            flex-grow: 0; /* No crece */
+            padding: 12px 15px; /* Ajuste para ser más compacto */
+            min-width: 80px;
+            background-color: var(--info-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        #btn-volver:hover:not(:disabled) { 
+            background-color: #5a6268; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(108, 117, 125, 0.3);
+        }
 
         button { 
-            flex-grow: 1; /* Para que ocupen el espacio disponible */
             padding: 12px 20px; 
             margin: 0; 
             cursor: pointer; 
@@ -104,7 +126,6 @@
             font-size: 1em;
             font-weight: bold;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .open { 
@@ -112,7 +133,7 @@
             color: white; 
         } 
         .open:hover:not(:disabled) { 
-            background-color: #218838; /* Oscurecer en hover */
+            background-color: #218838; 
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(40, 167, 69, 0.3);
         }
@@ -122,7 +143,7 @@
             color: white; 
         } 
         .closed:hover:not(:disabled) { 
-            background-color: #c82333; /* Oscurecer en hover */
+            background-color: #c82333; 
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(220, 53, 69, 0.3);
         }
@@ -165,6 +186,7 @@
     </div>
 
     <div class="button-group">
+        <button id="btn-volver">Volver</button> 
         <button id="btn-abrir" class="open" data-estado="1" disabled>Abrir Válvula</button>
         <button id="btn-cerrar" class="closed" data-estado="0" disabled>Cerrar Válvula</button>
     </div>
@@ -173,8 +195,6 @@
 </div>
 
 <script>
-    // Las variables y la funcionalidad JavaScript se mantienen intactas.
-
     const MAC_ADDRESS = '<?= esc($mac) ?>';
     
     // Obtener datos de CSRF del meta tag
@@ -183,6 +203,7 @@
     
     const $btnAbrir = $('#btn-abrir');
     const $btnCerrar = $('#btn-cerrar');
+    const $btnVolver = $('#btn-volver'); // Nueva referencia al botón
     const $statusDisplay = $('#valve-status-display');
 
     // 1. Función para actualizar la interfaz de usuario (UI) según el estado (0 o 1)
@@ -211,9 +232,10 @@
         const processingMessage = (estadoInt === 1) ? 'Abriendo...' : 'Cerrando...';
         const successMessage = (estadoInt === 1) ? '¡Válvula Abierta!' : '¡Válvula Cerrada!';
         
-        // Deshabilitar botones y mostrar estado de procesamiento
+        // Deshabilitar botones de control y mostrar estado de procesamiento
         $btnAbrir.prop('disabled', true);
         $btnCerrar.prop('disabled', true);
+        // NO deshabilitamos "Volver"
         $statusDisplay.text(processingMessage).css('color', 'var(--warning-color)');
 
         const postData = {
@@ -228,14 +250,14 @@
                 console.log('Respuesta del servidor al control:', response);
                 if (response.status === 'success') {
                     actualizarEstadoUI(response.estado);
-                    alert(successMessage); // Reemplazo de showSuccessToast
+                    alert(successMessage); 
                 } else {
-                    alert('Error: ' + (response.message || 'Error al actualizar el estado')); // Reemplazo de showErrorToast
+                    alert('Error: ' + (response.message || 'Error al actualizar el estado')); 
                 }
             })
             .fail(function(jqXHR) {
                 console.error('Error en la petición POST:', jqXHR.responseText);
-                alert('Error de conexión con el servidor (código ' + jqXHR.status + ')'); // Reemplazo de showErrorToast
+                alert('Error de conexión con el servidor (código ' + jqXHR.status + ')'); 
             })
             .always(function() {
                 // Forzar una consulta de estado después de la acción
@@ -263,12 +285,20 @@
                 $btnCerrar.prop('disabled', true);
             });
     }
+    
+    // Función de Volver
+    function goBack() {
+        window.history.back();
+    }
 
     // 4. Inicialización y Event Listeners
     $(document).ready(function() {
-        // Asignar el controlador a los botones
+        // Asignar el controlador a los botones de control
         $btnAbrir.on('click', function() { controlValve(1); });
         $btnCerrar.on('click', function() { controlValve(0); });
+        
+        // Asignar el controlador al botón de Volver
+        $btnVolver.on('click', goBack); 
 
         // Iniciar la consulta del estado
         fetchDeviceState();

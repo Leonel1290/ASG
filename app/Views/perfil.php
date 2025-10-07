@@ -1,7 +1,10 @@
 <?php
-// Ensure these variables are set, even if empty arrays, to avoid undefined variable errors
+// Asegura que estas variables estén definidas
 $dispositivosEnlazados = $dispositivosEnlazados ?? [];
-$lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in the provided code, but keep the null coalesce operator just in case.
+$lecturasPorMac = $lecturasPorMac ?? [];
+// Define una ruta simulada para la imagen del dispositivo
+// ASEGÚRATE DE QUE LA IMAGEN image_1c4f29.jpg ESTÉ EN LA CARPETA 'imagenes/' Y RENOMBRADA A 'ASG_SENTINEL.jpg' o ajusta la ruta.
+$device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -248,55 +251,141 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             margin-top: 1.5rem;
         }
 
-        /* Device List and Item styles (kept as is, they look good) */
-        .device-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
 
-        .device-item {
-            background-color: #2d3748;
-            border: 1px solid #4a5568;
+        /* Eliminando los estilos anteriores de .device-list y .device-item */
+        /*
+        .device-list, .device-item, .device-info, .device-name, .device-details, .device-actions {
+            ... (eliminado o ignorado) ...
+        }
+        */
+
+        .product-card {
+            background-color: #2d3748; /* Fondo de tarjeta similar a .card */
+            color: #fff;
+            border: none;
             border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image-container {
+            padding: 1rem;
+            height: 200px; /* Altura fija para la imagen */
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
+            justify-content: center;
+            background-color: #f7fafc; /* Fondo claro para destacar el dispositivo */
         }
 
-        .device-item:hover {
-            box-shadow: 0 0 10px rgba(66, 153, 225, 0.4);
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
-        .device-info {
-            flex-grow: 1;
-            margin-right: 1rem;
+        .product-body {
+            padding: 1rem;
         }
 
-        .device-name {
-            font-size: 1.1rem;
+        .product-name {
+            font-size: 1.25rem;
             font-weight: bold;
             color: #edf2f7;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            min-height: 50px; /* Altura mínima para el nombre */
         }
 
-        .device-details {
+        .product-details {
             font-size: 0.9rem;
             color: #a0aec0;
+            margin-bottom: 1rem;
+            line-height: 1.4;
         }
 
-        .device-actions {
+        .product-actions {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            border-top: 1px solid #4a5568;
+            background-color: #4a5568; /* Barra de acciones más oscura */
         }
 
-        /* Custom Checkbox styles for dark theme */
+        .action-button {
+            flex: 1;
+            padding: 0.75rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white; /* Color del texto del botón */
+            transition: background-color 0.2s ease;
+            border-radius: 0; /* Sin bordes redondeados */
+        }
+
+        /* Botón Ver Detalles (imita la flecha/compartir) */
+        .action-button.details-btn {
+            flex-grow: 0;
+            width: 60px;
+            background-color: #4299e1; /* Color info/azul */
+            border-left: 1px solid #4a5568;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .action-button.details-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Botón Editar (imita Add to Cart) */
+        .action-button.edit-btn {
+            background-color: #e33e88; /* Color similar al 'Add to Cart' rosa */
+        }
+        .action-button.edit-btn:hover {
+            background-color: #b7326b;
+        }
+
+        /* Elemento de precio simulado/MAC */
+        .price-section {
+            color: #48bb78; /* Color verde/éxito */
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .old-price {
+            color: #718096;
+            font-size: 0.8rem;
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        /* Ribbon de Descuento (simulado) */
+        .discount-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0; /* Cambiado a la izquierda como el primer ejemplo */
+            background-color: #e53e3e; /* Rojo/danger */
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-bottom-right-radius: 0.5rem; /* Esquina opuesta */
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        /* Custom Checkbox styles for dark theme (posicionado sobre la tarjeta) */
         .delete-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Movido a la derecha */
+            z-index: 10;
             width: 1.2em;
             height: 1.2em;
             vertical-align: middle;
@@ -306,7 +395,6 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             border-radius: 0.25em;
             appearance: none;
             -webkit-appearance: none;
-            position: relative;
             flex-shrink: 0;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
@@ -334,6 +422,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
             transform: translate(-50%, -50%);
         }
 
+        /* *** FIN: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
 
         /* Modal styles (kept as is, fit dark theme) */
         .modal-content {
@@ -369,8 +458,6 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
         .modal-header .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
-
-
     </style>
 
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
@@ -463,38 +550,53 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
         <?php else: ?>
             <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
                 <?= csrf_field() ?>
-                <button type="button" id="delete-selected-btn" class="btn btn-danger mb-3">
+                <button type="button" id="delete-selected-btn" class="btn btn-danger mb-4">
                     <i class="fas fa-trash-alt me-2"></i> Eliminar Seleccionados
                 </button>
 
-                <ul class="device-list">
+                <div class="row">
                     <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
-                        <li class="device-item">
-                            <div class="device-info">
-                                <!-- CAMBIADO: Acceso a propiedades con -> en lugar de [] -->
-                                <div class="device-name"><?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?></div>
-                                <div class="device-details">
-                                    <!-- CAMBIADO: Acceso a propiedades con -> en lugar de [] -->
-                                    MAC: <?= esc($dispositivo->MAC ?? 'Desconocida') ?> |
-                                    Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="product-card">
+                                <div class="discount-ribbon">ASG Sentinel</div>
+
+                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
+
+                                <div class="product-image-container">
+                                    <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
+                                </div>
+                                <div class="product-body">
+                                    <div class="product-name">
+                                        <?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?>
+                                    </div>
+                                    
+                                    <div class="price-section">
+                                        MAC: <?= esc(substr($dispositivo->MAC ?? 'Desconocida', -5)) ?>...
+                                        <span class="old-price">MAC Completa</span>
+                                    </div>
+
+                                    <div class="product-details">
+                                        Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button edit-btn" 
+                                       title="Editar Dispositivo">
+                                        <i class="fas fa-edit me-2"></i> Editar
+                                    </a>
+                                    
+                                    <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button details-btn" 
+                                       title="Ver Detalles">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
                                 </div>
                             </div>
-                            <div class="device-actions">
-                                <!-- CAMBIADO: Acceso a propiedades con -> en lugar de [] -->
-                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
-                                <!-- CAMBIADO: Acceso a propiedades con -> en lugar de [] -->
-                                <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" class="btn btn-primary btn-sm" title="Editar Dispositivo">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <!-- CAMBIADO: Acceso a propiedades con -> en lugar de [] -->
-                                <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" class="btn btn-info btn-sm" title="Ver Detalles">
-                                    <i class="fas fa-chart-bar"></i> Ver Detalles
-                                </a>
-                            </div>
-                        </li>
+                        </div>
                     <?php endforeach; ?>
-                </ul>
-
+                </div>
             </form>
         <?php endif; ?>
 
