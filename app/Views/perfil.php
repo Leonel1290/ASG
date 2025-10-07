@@ -345,10 +345,10 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
 
         /* Botón Editar (imita Add to Cart) */
         .action-button.edit-btn {
-            background-color: #e33e88; /* Color similar al 'Add to Cart' rosa */
+            background-color: rgba(1, 44, 85, 1); /* Color similar al 'Add to Cart' rosa */
         }
         .action-button.edit-btn:hover {
-            background-color: #b7326b;
+            background-color: rgba(4, 72, 136, 1);
         }
 
         /* Elemento de precio simulado/MAC */
@@ -563,7 +563,7 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
                                 <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
 
                                 <div class="product-image-container">
-                                    <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
+                                    <img src="<?= base_url('/imagenes/ASG_SENTINEL.jpg') ?>" class="product-image" alt="ASG Sentinel Device">
                                 </div>
                                 <div class="product-body">
                                     <div class="product-name">
