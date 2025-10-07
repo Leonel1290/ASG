@@ -15,7 +15,7 @@ class ApiEspController extends ResourceController
         // 2. Leer la clave API desde variable de entorno
         // Asegúrate de que esta variable de entorno esté configurada en Render
         // con el nombre 'API_KEY_SECRET' y su valor correspondiente.
-        $apiKeyExpected = getenv('SUPER_SECRET_API_MLUS'); // MODIFICADO: Usar 'API_KEY_SECRET'
+        $apiKeyExpected = 'SUPER_SECRET_API_MLUS';
 
         // 3. Validar la clave API
         if (empty($apiKeyExpected) || $apiKeyReceived !== $apiKeyExpected) {

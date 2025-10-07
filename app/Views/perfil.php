@@ -710,5 +710,4 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
     </script>
 
 </body>
-
 </html>
