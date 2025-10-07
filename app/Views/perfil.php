@@ -280,11 +280,11 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
 
         .product-image-container {
             padding: 1rem;
-            height: 200px; /* Altura fija para la imagen */
+            height: 300px; /* Altura fija para la imagen */
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f7fafc; /* Fondo claro para destacar el dispositivo */
+            background-color: #2d3748; /* Fondo claro para destacar el dispositivo */
         }
 
         .product-image {
@@ -371,7 +371,7 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
             position: absolute;
             top: 0;
             left: 0; /* Cambiado a la izquierda como el primer ejemplo */
-            background-color: #e53e3e; /* Rojo/danger */
+            background-color: #000000ff; /* Rojo/danger */
             color: white;
             padding: 0.25rem 0.5rem;
             border-bottom-right-radius: 0.5rem; /* Esquina opuesta */
