@@ -11,13 +11,139 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <style>
-        /* Estilos CSS mínimos */
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .control-panel { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 3px; }
-        .open { background-color: #28a745; color: white; } /* Verde */
-        .closed { background-color: #dc3545; color: white; } /* Rojo */
-        .status { font-weight: bold; margin-bottom: 15px; font-size: 1.2em; }
+        /* ------------------------------------------------------------------ */
+        /* ESTILOS MEJORADOS                         */
+        /* ------------------------------------------------------------------ */
+        :root {
+            --primary-color: #007bff; /* Azul primario */
+            --success-color: #28a745; /* Verde para abierto */
+            --danger-color: #dc3545; /* Rojo para cerrado */
+            --warning-color: #ffc107; /* Amarillo para cargando/procesando */
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .control-panel { 
+            max-width: 420px; 
+            width: 100%;
+            padding: 30px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            background-color: var(--card-bg);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .control-panel:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .status { 
+            font-weight: 600; 
+            margin: 20px 0; 
+            font-size: 1.5em; /* Tamaño más grande */
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border: 1px dashed var(--border-color);
+        }
+
+        .status strong {
+            display: block;
+            font-size: 0.7em; /* "Estado Actual" más pequeño */
+            font-weight: normal;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        /* Contenedor de botones para centrar y espaciar */
+        .button-group {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button { 
+            flex-grow: 1; /* Para que ocupen el espacio disponible */
+            padding: 12px 20px; 
+            margin: 0; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .open { 
+            background-color: var(--success-color); 
+            color: white; 
+        } 
+        .open:hover:not(:disabled) { 
+            background-color: #218838; /* Oscurecer en hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .closed { 
+            background-color: var(--danger-color); 
+            color: white; 
+        } 
+        .closed:hover:not(:disabled) { 
+            background-color: #c82333; /* Oscurecer en hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .note {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* FIN ESTILOS MEJORADOS                        */
+        /* ------------------------------------------------------------------ */
     </style>
 </head>
 <body>
@@ -34,18 +160,21 @@
     <p>MAC: <strong><?= esc($mac) ?></strong></p>
     
     <div class="status">
-        Estado Actual: <span id="valve-status-display">Cargando...</span>
+        <strong>Estado Actual:</strong>
+        <span id="valve-status-display">Cargando...</span>
     </div>
 
-    <div>
+    <div class="button-group">
         <button id="btn-abrir" class="open" data-estado="1" disabled>Abrir Válvula</button>
         <button id="btn-cerrar" class="closed" data-estado="0" disabled>Cerrar Válvula</button>
     </div>
     
-    <p>Nota: Los mensajes de error/éxito aparecerán como alertas básicas del navegador (alert).</p>
+    <p class="note">Nota: Los mensajes de error/éxito aparecerán como alertas básicas del navegador (alert).</p>
 </div>
 
 <script>
+    // Las variables y la funcionalidad JavaScript se mantienen intactas.
+
     const MAC_ADDRESS = '<?= esc($mac) ?>';
     
     // Obtener datos de CSRF del meta tag
@@ -58,12 +187,15 @@
 
     // 1. Función para actualizar la interfaz de usuario (UI) según el estado (0 o 1)
     function actualizarEstadoUI(estado) {
+        // Remover clases de color anteriores para asegurar una única clase
+        $statusDisplay.removeClass('text-open text-closed text-unknown text-processing');
+        
         if (estado === 1) {
-            $statusDisplay.text('ABIERTA').css('color', 'green');
+            $statusDisplay.text('ABIERTA').css('color', 'var(--success-color)');
             $btnAbrir.prop('disabled', true);
             $btnCerrar.prop('disabled', false);
         } else if (estado === 0) {
-            $statusDisplay.text('CERRADA').css('color', 'red');
+            $statusDisplay.text('CERRADA').css('color', 'var(--danger-color)');
             $btnAbrir.prop('disabled', false);
             $btnCerrar.prop('disabled', true);
         } else {
@@ -82,7 +214,7 @@
         // Deshabilitar botones y mostrar estado de procesamiento
         $btnAbrir.prop('disabled', true);
         $btnCerrar.prop('disabled', true);
-        $statusDisplay.text(processingMessage).css('color', 'orange');
+        $statusDisplay.text(processingMessage).css('color', 'var(--warning-color)');
 
         const postData = {
             [CSRF_NAME]: CSRF_TOKEN,
