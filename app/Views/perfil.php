@@ -253,13 +253,6 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
 
         /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
 
-        /* Eliminando los estilos anteriores de .device-list y .device-item */
-        /*
-        .device-list, .device-item, .device-info, .device-name, .device-details, .device-actions {
-            ... (eliminado o ignorado) ...
-        }
-        */
-
         .product-card {
             background-color: #2d3748; /* Fondo de tarjeta similar a .card */
             color: #fff;
@@ -312,14 +305,27 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
             line-height: 1.4;
         }
 
+        /* CONTENEDOR DE ACCIONES: Oculto por defecto y transiciona */
         .product-actions {
             display: flex;
             border-top: 1px solid #4a5568;
             background-color: #4a5568; /* Barra de acciones más oscura */
+            /* OCULTAR POR DEFECTO */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        /* MOSTRAR EN HOVER DE LA TARJETA */
+        .product-card:hover .product-actions {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
         .action-button {
-            flex: 1;
+            flex: 1; /* Esto asegura la división 50/50 */
             padding: 0.75rem 0;
             font-size: 1rem;
             font-weight: bold;
@@ -327,25 +333,27 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
             color: white; /* Color del texto del botón */
             transition: background-color 0.2s ease;
             border-radius: 0; /* Sin bordes redondeados */
+            /* AÑADIDO: Centrar el contenido de ambos botones */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
         }
 
-        /* Botón Ver Detalles (imita la flecha/compartir) */
+        /* Botón Ver Detalles (ahora 50%) */
         .action-button.details-btn {
-            flex-grow: 0;
-            width: 60px;
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
             background-color: #4299e1; /* Color info/azul */
             border-left: 1px solid #4a5568;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            /* Se han removido las propiedades de ancho fijo */
         }
         .action-button.details-btn:hover {
             background-color: #2b6cb0;
         }
 
-        /* Botón Editar (imita Add to Cart) */
+        /* Botón Editar (ahora 50%) */
         .action-button.edit-btn {
-            background-color: rgba(1, 44, 85, 1); /* Color similar al 'Add to Cart' rosa */
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: rgba(1, 44, 85, 1);
         }
         .action-button.edit-btn:hover {
             background-color: rgba(4, 72, 136, 1);
@@ -366,15 +374,15 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
             font-weight: normal;
         }
 
-        /* Ribbon de Descuento (simulado) */
+        /* Ribbon de Dispositivo (simulado) */
         .discount-ribbon {
             position: absolute;
             top: 0;
-            left: 0; /* Cambiado a la izquierda como el primer ejemplo */
-            background-color: #000000ff; /* Rojo/danger */
+            left: 0; 
+            background-color: #000000ff; 
             color: white;
             padding: 0.25rem 0.5rem;
-            border-bottom-right-radius: 0.5rem; /* Esquina opuesta */
+            border-bottom-right-radius: 0.5rem; 
             font-weight: bold;
             font-size: 0.8rem;
             z-index: 10;
@@ -384,7 +392,7 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
         .delete-checkbox {
             position: absolute;
             top: 10px;
-            right: 10px; /* Movido a la derecha */
+            right: 10px; 
             z-index: 10;
             width: 1.2em;
             height: 1.2em;
@@ -563,7 +571,7 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
                                 <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
 
                                 <div class="product-image-container">
-                                    <img src="<?= base_url('/imagenes/ASG_SENTINEL.jpg') ?>" class="product-image" alt="ASG Sentinel Device">
+                                    <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
                                 </div>
                                 <div class="product-body">
                                     <div class="product-name">
@@ -590,7 +598,7 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
                                     <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" 
                                        class="action-button details-btn" 
                                        title="Ver Detalles">
-                                        <i class="fas fa-chart-bar"></i>
+                                        <i class="fas fa-chart-bar me-2"></i> Detalles
                                     </a>
                                 </div>
                             </div>
