@@ -485,7 +485,6 @@
                                 <i class="fab fa-x"></i>
                             </a>
                         </div>
-
                     </div>
                 </div>
             </div>
