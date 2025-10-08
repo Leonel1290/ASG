@@ -48,7 +48,6 @@ class Home extends BaseController
         log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
 
         $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel(); // Asegúrate de que el namespace sea correcto
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
@@ -64,13 +63,7 @@ class Home extends BaseController
 
             if (password_verify($password, $user['password'])) {
                 // Contraseña correcta, iniciar sesión
-                $ultimaLectura = $lecturasGasModel
-                    ->orderBy('id', 'DESC')
-                    ->where(['usuario_id' => $user['id']])
-                    ->asArray()
-                    ->first();
-
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null; // Esto no se usa para la sesión, pero lo mantengo si es parte de tu lógica
+                // Consulta de lecturas eliminada: no es necesaria para iniciar la sesión y causaba error si la columna no existe.
 
                 $sessionData = [
                     'id'        => $user['id'],
