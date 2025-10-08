@@ -54,6 +54,9 @@ $routes->post('/enlace/store', 'EnlaceController::store');
 // --- DETALLES DE DISPOSITIVO (Usamos (.+) para aceptar la MAC) ---
 $routes->get('/detalles/(.+)', 'DetalleController::detalles/$1');
 
+// --- HISTORIAL DE ALERTAS ---
+$routes->get('/alertas', 'AlertasController::index');
+
 // --- LECTURAS ---
 $routes->get('lecturas/obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
 

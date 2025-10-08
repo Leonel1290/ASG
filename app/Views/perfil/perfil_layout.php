@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - ASG</title>
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General body styles */
+        body {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR IMPROVEMENTS --- */
+        .navbar {
+            background-color: #2d3748 !important;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: bold;
+            font-size: 1.4rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: #cbd5e0 !important;
+            font-size: 1.1rem;
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+        }
+        /* --- END NAVBAR IMPROVEMENTS --- */
+
+
+        /* --- BUTTON IMPROVEMENTS (using Bootstrap classes and tailoring where needed) --- */
+
+        /* Logout Button (already decent, kept custom styles for outline variant) */
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+        .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
+        /* Override Bootstrap default colors to match dark theme palette */
+        .btn-primary {
+            background-color: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #38a169;
+            border-color: #38a169;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+            color: white;
+        }
+
+        /* Specific style for the add MAC form button - using btn-success */
+        #add-mac-form .btn-success {
+            margin-top: 0.5rem;
+        }
+
+        /* --- END BUTTON IMPROVEMENTS --- */
+
+
+        /* Contenedor principal del contenido */
+        .container {
+            flex: 1;
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card styles (kept as is, they fit the dark theme) */
+        .card {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #4a5568;
+            color: #edf2f7;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2d3748;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Alert styles (kept as is) */
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .alert-success {
+            background-color: #c6f6d5;
+            color: #1a202c;
+            border-color: #a7f3d0;
+        }
+
+        .alert-danger {
+            background-color: #fed7d7;
+            color: #1a202c;
+            border-color: #fbcbcb;
+        }
+
+        .alert-info {
+            background-color: #bee3f8;
+            color: #1a202c;
+            border-color: #90cdf4;
+        }
+
+        /* Devices Section Title (kept as is) */
+        .devices-section-title {
+            color: #edf2f7;
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a5568;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .devices-section-title i {
+            margin-right: 0.5rem;
+        }
+
+        /* Add MAC Form (kept most styles, added Bootstrap form control style) */
+        #add-mac-form {
+            background-color: #4a5568;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #add-mac-form label {
+            color: #edf2f7;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Ensure Bootstrap form-control styles apply */
+        #add-mac-form .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2d3748;
+            border: 1px solid #718096;
+            border-radius: 0.375rem;
+            color: #edf2f7;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        /* Style for Bootstrap's default focus ring in dark mode */
+        #add-mac-form .form-control:focus {
+            background-color: #2d3748;
+            color: #edf2f7;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+
+        /* Delete Devices Form wrapper */
+        #delete-devices-form {
+            margin-top: 1.5rem;
+        }
+
+        /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
+
+        .product-card {
+            background-color: #2d3748; /* Fondo de tarjeta similar a .card */
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image-container {
+            padding: 1rem;
+            height: 300px; /* Altura fija para la imagen */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2d3748; /* Fondo claro para destacar el dispositivo */
+        }
+
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-body {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #edf2f7;
+            margin-bottom: 0.5rem;
+            min-height: 50px; /* Altura mínima para el nombre */
+        }
+
+        .product-details {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* CONTENEDOR DE ACCIONES: Oculto por defecto y transiciona */
+        .product-actions {
+            display: flex;
+            border-top: 1px solid #4a5568;
+            background-color: #4a5568; /* Barra de acciones más oscura */
+            /* OCULTAR POR DEFECTO */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        /* MOSTRAR EN HOVER DE LA TARJETA */
+        .product-card:hover .product-actions {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .action-button {
+            flex: 1; /* Esto asegura la división 50/50 */
+            padding: 0.75rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white; /* Color del texto del botón */
+            transition: background-color 0.2s ease;
+            border-radius: 0; /* Sin bordes redondeados */
+            /* AÑADIDO: Centrar el contenido de ambos botones */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        /* Botón Ver Detalles (ahora 50%) */
+        .action-button.details-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: #4299e1; /* Color info/azul */
+            border-left: 1px solid #4a5568;
+            /* Se han removido las propiedades de ancho fijo */
+        }
+        .action-button.details-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Botón Editar (ahora 50%) */
+        .action-button.edit-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: rgba(1, 44, 85, 1);
+        }
+        .action-button.edit-btn:hover {
+            background-color: rgba(4, 72, 136, 1);
+        }
+
+        /* Elemento de precio simulado/MAC */
+        .price-section {
+            color: #48bb78; /* Color verde/éxito */
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .old-price {
+            color: #718096;
+            font-size: 0.8rem;
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        /* Ribbon de Dispositivo (simulado) */
+        .discount-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0; 
+            background-color: #000000ff; 
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-bottom-right-radius: 0.5rem; 
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        /* Custom Checkbox styles for dark theme (posicionado sobre la tarjeta) */
+        .delete-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px; 
+            z-index: 10;
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: #4a5568;
+            border: 1px solid #718096;
+            border-radius: 0.25em;
+            appearance: none;
+            -webkit-appearance: none;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .delete-checkbox:checked {
+            background-color: #48bb78;
+            border-color: #48bb78;
+        }
+
+        .delete-checkbox:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+        /* Add custom checkmark using Font Awesome */
+        .delete-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 0.8em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* *** FIN: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
+
+        /* Modal styles (kept as is, fit dark theme) */
+        .modal-content {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #2d3748;
+            color: #edf2f7;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #2d3748;
+        }
+
+        .modal-footer .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: white;
+        }
+
+        .modal-footer .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+            color: white;
+        }
+
+        /* Ensure close button color is visible in dark modal header */
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+    </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link <?= (uri_string() == 'perfil') ? 'active' : '' ?>" href="<?= base_url('/perfil') ?>">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= (uri_string() == 'alertas') ? 'active' : '' ?>" href="<?= base_url('/alertas') ?>">Historial de Alertas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                        </li>
+                    </ul>
+
+                    <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <?= $this->renderSection('content') ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <?= $this->renderSection('scripts') ?>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
+
+</body>
+</html>
