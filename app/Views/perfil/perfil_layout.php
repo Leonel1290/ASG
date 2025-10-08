@@ -486,9 +486,6 @@
                             <a class="nav-link <?= (uri_string() == 'perfil') ? 'active' : '' ?>" href="<?= base_url('/perfil') ?>">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?= (uri_string() == 'alertas') ? 'active' : '' ?>" href="<?= base_url('/alertas') ?>">Historial de Alertas</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
                         </li>
                     </ul>
