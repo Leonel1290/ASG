@@ -26,9 +26,14 @@
 
     <div class="devices-section-title">
         <h2 style="margin: 0;"><i class="fas fa-microchip me-2"></i> Mis Dispositivos Enlazados</h2>
-        <button id="show-add-mac-form" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo
-        </button>
+        <div>
+            <button id="show-add-mac-form" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo
+            </button>
+            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#alertasModal">
+                <i class="fas fa-history me-2"></i> Ver Historial de Alertas
+            </button>
+        </div>
     </div>
 
 
@@ -118,38 +123,46 @@
         </div>
     </div>
 
-    <!-- Nueva sección para mostrar lecturas que superaron el umbral -->
-    <div class="card mt-5">
-        <div class="card-header">
-            <h5 class="card-title"><i class="fas fa-exclamation-triangle me-2"></i> Historial de Alertas de Gas</h5>
-        </div>
-        <div class="card-body">
-            <?php if (empty($lecturasSuperaronUmbral)): ?>
-                <p>No hay registros de alertas de gas.</p>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Dispositivo</th>
-                                <th>MAC</th>
-                                <th>Nivel de Gas</th>
-                                <th>Fecha y Hora</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($lecturasSuperaronUmbral as $lectura): ?>
-                                <tr>
-                                    <td><?= esc($lectura['nombre_dispositivo']) ?></td>
-                                    <td><?= esc($lectura['MAC']) ?></td>
-                                    <td><span class="badge bg-danger"><?= esc($lectura['nivel_gas']) ?></span></td>
-                                    <td><?= esc($lectura['fecha']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+    <!-- Modal de Historial de Alertas -->
+    <div class="modal fade" id="alertasModal" tabindex="-1" aria-labelledby="alertasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertasModalLabel"><i class="fas fa-exclamation-triangle me-2"></i> Historial de Alertas de Gas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            <?php endif; ?>
+                <div class="modal-body">
+                    <?php if (empty($lecturasSuperaronUmbral)): ?>
+                        <p>No hay registros de alertas de gas.</p>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Dispositivo</th>
+                                        <th>MAC</th>
+                                        <th>Nivel de Gas</th>
+                                        <th>Fecha y Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($lecturasSuperaronUmbral as $lectura): ?>
+                                        <tr>
+                                            <td><?= esc($lectura['nombre_dispositivo']) ?></td>
+                                            <td><?= esc($lectura['MAC']) ?></td>
+                                            <td><span class="badge bg-danger"><?= esc($lectura['nivel_gas']) ?></span></td>
+                                            <td><?= esc($lectura['fecha']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
