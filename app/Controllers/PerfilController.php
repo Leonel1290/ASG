@@ -39,57 +39,50 @@ class PerfilController extends BaseController
         $session = session();
         $usuarioId = $session->get('id');
 
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'PerfilController::index() - Estado de la sesión al inicio: ' . json_encode($session->get()));
-        log_message('debug', 'PerfilController::index() - Usuario ID de la sesión: ' . ($usuarioId ?? 'null'));
-        // --- FIN LOGGING ---
-
-        // Redirigir si el usuario no está logueado
         if (!$usuarioId) {
-            log_message('debug', 'PerfilController::index() - Usuario ID no encontrado en sesión, redirigiendo a login.');
             return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
         }
 
-        // Obtener las direcciones MAC enlazadas al usuario actual desde la tabla 'enlace'
-        $enlaces = $this->enlaceModel
-                        ->select('MAC')
-                        ->where('id_usuario', $usuarioId)
-                        ->findAll();
-
+        // 1. Obtener las MACs del usuario desde la tabla 'enlace'
+        $enlaces = $this->enlaceModel->where('id_usuario', $usuarioId)->findAll();
         $macs = array_column($enlaces, 'MAC');
 
         $dispositivosEnlazados = [];
+        $allLecturas = [];
+        $lecturasPorMac = [];
+        $lecturasSuperaronUmbral = [];
+
         if (!empty($macs)) {
+            // 2. Obtener los detalles de los dispositivos enlazados
             $dispositivosEnlazados = $this->dispositivoModel
                                         ->whereIn('MAC', $macs)
                                         ->findAll();
+
+            // 3. Obtener todas las lecturas para esas MACs
+            $allLecturas = $this->lecturasGasModel
+                                ->whereIn('MAC', $macs)
+                                ->orderBy('fecha', 'DESC')
+                                ->findAll();
         }
 
-        // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
-        $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
-
-        // Definir el umbral de gas y filtrar lecturas que lo superan
-        $umbralGas = 400;
-        $lecturasSuperaronUmbral = [];
+        // 4. Filtrar lecturas que superaron el umbral
+        $umbralGas = 300; // Umbral corregido a 300 ppm
         if (!empty($allLecturas)) {
-            // Crear un mapa de MAC a nombre de dispositivo para búsqueda rápida
-            $deviceNames = [];
-            foreach ($dispositivosEnlazados as $dispositivo) {
-                $deviceNames[$dispositivo->MAC] = $dispositivo->nombre;
-            }
+            // Crear un mapa de MAC a nombre de dispositivo para una búsqueda eficiente
+            $deviceNames = array_column($dispositivosEnlazados, 'nombre', 'MAC');
 
             foreach ($allLecturas as $lectura) {
                 if (isset($lectura['nivel_gas']) && $lectura['nivel_gas'] > $umbralGas) {
+                    // Añadir el nombre del dispositivo a la lectura para mostrarlo en la vista
                     $lectura['nombre_dispositivo'] = $deviceNames[$lectura['MAC']] ?? 'Desconocido';
                     $lecturasSuperaronUmbral[] = $lectura;
                 }
             }
         }
 
-        // Procesar las lecturas para agruparlas por MAC
-        $lecturasPorMac = [];
+        // 5. Agrupar todas las lecturas por MAC (si es necesario para otras secciones)
         if (!empty($allLecturas)) {
-             foreach ($allLecturas as $lectura) {
+            foreach ($allLecturas as $lectura) {
                 if (isset($lectura['MAC']) && $lectura['MAC']) {
                     $currentMac = $lectura['MAC'];
                     if (!isset($lecturasPorMac[$currentMac])) {
@@ -100,17 +93,11 @@ class PerfilController extends BaseController
             }
         }
 
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'PerfilController::index() - Dispositivos enlazados obtenidos: ' . json_encode($dispositivosEnlazados));
-        log_message('debug', 'PerfilController::index() - Lecturas por MAC procesadas: ' . json_encode($lecturasPorMac));
-        // --- FIN LOGGING ---
-
-
-        // Pasar los datos a la vista.
+        // 6. Pasar todos los datos a la vista
         return view('perfil', [
             'dispositivosEnlazados' => $dispositivosEnlazados,
-            'lecturasPorMac' => $lecturasPorMac,
-            'userEmail' => $session->get('email'), // Pasar el email a la vista
+            'lecturasPorMac' => $lecturasPorMac, // Se mantiene por si es usado en otro lugar
+            'userEmail' => $session->get('email'),
             'lecturasSuperaronUmbral' => $lecturasSuperaronUmbral
         ]);
     }
