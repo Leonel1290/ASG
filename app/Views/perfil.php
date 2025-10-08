@@ -76,8 +76,7 @@
                                 </div>
                                 
                                 <div class="price-section">
-                                    MAC: <?= esc(substr($dispositivo->MAC ?? 'Desconocida', -5)) ?>...
-                                    <span class="old-price">MAC Completa</span>
+                                    MAC: <?= esc($dispositivo->MAC ?? 'Desconocida') ?>
                                 </div>
 
                                 <div class="product-details">
