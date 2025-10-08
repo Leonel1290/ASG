@@ -58,7 +58,6 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
         // --- FIN LOGGING ---
 
         $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
@@ -74,13 +73,7 @@ class Home extends BaseController // Asegúrate de extender de BaseController si
 
             if (password_verify($password, $user['password'])) {
                 // Contraseña correcta, iniciar sesión
-                $ultimaLectura = $lecturasGasModel
-                    ->orderBy('id', 'DESC')
-                    ->where(['usuario_id' => $user['id']])
-                    ->asArray()
-                    ->first();
-
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
+                // Se elimina consulta a lecturas_gas: no es necesaria para login y evita error si la columna no existe.
 
                 $sessionData = [
                     'id'        => $user['id'],
