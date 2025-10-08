@@ -568,34 +568,34 @@ $device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
                             <div class="product-card">
                                 <div class="discount-ribbon">ASG Sentinel</div>
 
-                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
+                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo['MAC']) ?>" class="delete-checkbox">
 
                                 <div class="product-image-container">
                                     <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
                                 </div>
                                 <div class="product-body">
                                     <div class="product-name">
-                                        <?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?>
+                                        <?= esc($dispositivo['nombre'] ?: 'Dispositivo sin nombre') ?>
                                     </div>
                                     
                                     <div class="price-section">
-                                        MAC: <?= esc(substr($dispositivo->MAC ?? 'Desconocida', -5)) ?>...
+                                        MAC: <?= esc(substr($dispositivo['MAC'] ?? 'Desconocida', -5)) ?>...
                                         <span class="old-price">MAC Completa</span>
                                     </div>
 
                                     <div class="product-details">
-                                        Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                                        Ubicación: <?= esc($dispositivo['ubicacion'] ?: 'Desconocida') ?>
                                     </div>
                                 </div>
                                 
                                 <div class="product-actions">
-                                    <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" 
+                                    <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo['MAC'])) ?>" 
                                        class="action-button edit-btn" 
                                        title="Editar Dispositivo">
                                         <i class="fas fa-edit me-2"></i> Editar
                                     </a>
                                     
-                                    <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" 
+                                    <a href="<?= base_url('/detalles/' . esc($dispositivo['MAC'])) ?>" 
                                        class="action-button details-btn" 
                                        title="Ver Detalles">
                                         <i class="fas fa-chart-bar me-2"></i> Detalles
