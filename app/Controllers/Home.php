@@ -7,95 +7,58 @@ use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
-class Home extends BaseController // Asegúrate de extender de BaseController si es tu estructura
+class Home extends BaseController
 {
-    // Puedes instanciar modelos aquí si los usas en múltiples métodos
-    // protected $userModel;
-    // protected $lecturasGasModel;
+    protected $userModel;
+    protected $session;
 
     public function __construct()
     {
-        // Llama al constructor de la clase padre si es necesario
-        // parent::__construct();
-
-        // Instanciar modelos si se usan en el constructor o en varios métodos
-        // $this->userModel = new UserModel();
-        // $this->lecturasGasModel = new LecturasGasModel();
+        $this->userModel = new UserModel();
+        $this->session = session();
     }
 
     public function index()
     {
-        // Carga la vista de inicio
         return view('inicio');
     }
 
     public function inicio()
     {
-        $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::inicio() - Estado de la sesión: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        // Si el usuario no está logueado, redirige a la página de login
-        if (!$session->get('logged_in')) {
-            log_message('debug', 'Home::inicio() - Usuario no logueado, redirigiendo a login.');
+        if (!$this->session->get('logged_in')) {
             return view('login');
         }
-
-        log_message('debug', 'Home::inicio() - Usuario logueado, mostrando vista inicio.');
-        // Si está logueado, muestra la vista de inicio
         return view('inicio');
     }
 
-    // Método de Login (POST /login) - Maneja el envío del formulario de login
     public function login()
     {
-        $session = session();
-
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
-
-        $userModel = new UserModel();
-
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
 
-        $user = $userModel->where('email', $email)->first();
+        $user = $this->userModel->where('email', $email)->first();
 
         if ($user) {
             if (!$user['is_active']) {
-                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
-                log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
+                $this->session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
                 return redirect()->back()->withInput();
             }
 
             if (password_verify($password, $user['password'])) {
-                // Contraseña correcta, iniciar sesión
-                // Se elimina consulta a lecturas_gas: no es necesaria para login y evita error si la columna no existe.
-
                 $sessionData = [
                     'id'        => $user['id'],
                     'nombre'    => $user['nombre'],
                     'email'     => $user['email'],
                     'logged_in' => true,
                 ];
-                $session->set($sessionData);
-
-                // --- LOGGING PARA DEBUGGING ---
-                log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
-                // --- FIN LOGGING ---
-
+                $this->session->set($sessionData);
                 return redirect()->to('/perfil');
             } else {
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
-                log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
+                $this->session->setFlashdata('error', 'Contraseña incorrecta.');
                 return redirect()->back()->withInput();
             }
         } else {
-            $session->setFlashdata('error', 'Email no encontrado.');
-            log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
+            $this->session->setFlashdata('error', 'Email no encontrado.');
             return redirect()->back()->withInput();
         }
     }

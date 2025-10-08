@@ -20,7 +20,7 @@
         </div>
         <div class="card-body">
             <p><strong>Nombre:</strong> <?= esc(session()->get('nombre')) ?></p>
-            <p><strong>Email:</strong> <?= esc(session()->get('email')) ?></p>
+            <p><strong>Email:</strong> <?= esc($userEmail) ?></p>
         </div>
     </div>
 
@@ -115,6 +115,41 @@
                     <button type="button" class="btn btn-danger" id="confirm-delete-btn">Eliminar</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Nueva sección para mostrar lecturas que superaron el umbral -->
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5 class="card-title"><i class="fas fa-exclamation-triangle me-2"></i> Historial de Alertas de Gas</h5>
+        </div>
+        <div class="card-body">
+            <?php if (empty($lecturasSuperaronUmbral)): ?>
+                <p>No hay registros de alertas de gas.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Dispositivo</th>
+                                <th>MAC</th>
+                                <th>Nivel de Gas</th>
+                                <th>Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($lecturasSuperaronUmbral as $lectura): ?>
+                                <tr>
+                                    <td><?= esc($lectura['nombre_dispositivo']) ?></td>
+                                    <td><?= esc($lectura['MAC']) ?></td>
+                                    <td><span class="badge bg-danger"><?= esc($lectura['nivel_gas']) ?></span></td>
+                                    <td><?= esc($lectura['fecha']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -68,6 +68,24 @@ class PerfilController extends BaseController
         // Obtener lecturas por usuario (usando tu método existente en LecturasGasModel)
         $allLecturas = $this->lecturasGasModel->getLecturasPorUsuario($usuarioId);
 
+        // Definir el umbral de gas y filtrar lecturas que lo superan
+        $umbralGas = 400;
+        $lecturasSuperaronUmbral = [];
+        if (!empty($allLecturas)) {
+            // Crear un mapa de MAC a nombre de dispositivo para búsqueda rápida
+            $deviceNames = [];
+            foreach ($dispositivosEnlazados as $dispositivo) {
+                $deviceNames[$dispositivo->MAC] = $dispositivo->nombre;
+            }
+
+            foreach ($allLecturas as $lectura) {
+                if (isset($lectura['nivel_gas']) && $lectura['nivel_gas'] > $umbralGas) {
+                    $lectura['nombre_dispositivo'] = $deviceNames[$lectura['MAC']] ?? 'Desconocido';
+                    $lecturasSuperaronUmbral[] = $lectura;
+                }
+            }
+        }
+
         // Procesar las lecturas para agruparlas por MAC
         $lecturasPorMac = [];
         if (!empty($allLecturas)) {
@@ -91,7 +109,9 @@ class PerfilController extends BaseController
         // Pasar los datos a la vista.
         return view('perfil', [
             'dispositivosEnlazados' => $dispositivosEnlazados,
-            'lecturasPorMac' => $lecturasPorMac
+            'lecturasPorMac' => $lecturasPorMac,
+            'userEmail' => $session->get('email'), // Pasar el email a la vista
+            'lecturasSuperaronUmbral' => $lecturasSuperaronUmbral
         ]);
     }
 
