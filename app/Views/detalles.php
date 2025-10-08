@@ -1,312 +1,712 @@
+<?php
+// Asegura que estas variables estén definidas
+$dispositivosEnlazados = $dispositivosEnlazados ?? [];
+$lecturasPorMac = $lecturasPorMac ?? [];
+// Define una ruta simulada para la imagen del dispositivo
+// ASEGÚRATE DE QUE LA IMAGEN image_1c4f29.jpg ESTÉ EN LA CARPETA 'imagenes/' Y RENOMBRADA A 'ASG_SENTINEL.jpg' o ajusta la ruta.
+$device_image_path = base_url('/imagenes/ASG_SENTINEL.jpg');
+?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Válvula de Gas Básico</title>
-
-    <meta name="csrf-token" content="<?= csrf_hash() ?>">
-    <meta name="csrf-name" content="<?= csrf_token() ?>">
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+    <title>Mi Perfil - ASG</title>
+    <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ------------------------------------------------------------------ */
-        /* ESTILOS MEJORADOS (MANTENIDOS)             */
-        /* ------------------------------------------------------------------ */
-        :root {
-            --primary-color: #007bff; /* Azul primario */
-            --success-color: #28a745; /* Verde para abierto */
-            --danger-color: #dc3545; /* Rojo para cerrado */
-            --warning-color: #ffc107; /* Amarillo para cargando/procesando */
-            --info-color: #6c757d; /* Gris para volver/neutro */
-            --text-color: #333;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --border-color: #e0e0e0;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        /* General body styles */
+        body {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
-        }
-        
-        .control-panel { 
-            max-width: 420px; 
-            width: 100%;
-            padding: 30px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            background-color: var(--card-bg);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .control-panel:hover {
-            transform: translateY(-5px);
-        }
-
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-top: 0;
-            font-size: 1.8em;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        p {
-            margin: 8px 0;
-            font-size: 0.95em;
-        }
-
-        .status { 
-            font-weight: 600; 
-            margin: 20px 0; 
-            font-size: 1.5em; 
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            background-color: #f8f9fa;
-            border: 1px dashed var(--border-color);
-        }
-
-        .status strong {
-            display: block;
-            font-size: 0.7em; 
-            font-weight: normal;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-
-        /* Contenedor de botones: Ahora usa más espacio para 3 botones */
-        .button-group {
+            padding: 0;
             display: flex;
-            justify-content: space-between; /* Ajustado para espaciar 3 elementos */
-            gap: 10px;
-            margin-top: 25px;
-        }
-        
-        /* Botones de control (Abrir/Cerrar) - más grandes */
-        #btn-abrir, #btn-cerrar {
-            flex-grow: 1; 
-            min-width: 110px; /* Asegura un ancho mínimo */
-        }
-        
-        /* Botón de Volver - más pequeño y neutro */
-        #btn-volver {
-            flex-grow: 0; /* No crece */
-            padding: 12px 15px; /* Ajuste para ser más compacto */
-            min-width: 80px;
-            background-color: var(--info-color);
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        #btn-volver:hover:not(:disabled) { 
-            background-color: #5a6268; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(108, 117, 125, 0.3);
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        button { 
-            padding: 12px 20px; 
-            margin: 0; 
-            cursor: pointer; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 1em;
+        /* --- NAVBAR IMPROVEMENTS --- */
+        .navbar {
+            background-color: #2d3748 !important;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
             font-weight: bold;
-            transition: all 0.2s ease;
+            font-size: 1.4rem;
         }
 
-        .open { 
-            background-color: var(--success-color); 
-            color: white; 
-        } 
-        .open:hover:not(:disabled) { 
-            background-color: #218838; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(40, 167, 69, 0.3);
+        .navbar-nav .nav-link {
+            color: #cbd5e0 !important;
+            font-size: 1.1rem;
+            padding-top: .75rem;
+            padding-bottom: .75rem;
         }
 
-        .closed { 
-            background-color: var(--danger-color); 
-            color: white; 
-        } 
-        .closed:hover:not(:disabled) { 
-            background-color: #c82333; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(220, 53, 69, 0.3);
-        }
-        
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-            box-shadow: none;
-            transform: none;
+        .navbar-nav .nav-link.active {
+            color: #4299e1 !important;
+            font-weight: bold;
         }
 
-        .note {
-            margin-top: 20px;
-            font-size: 0.8em;
-            color: #6c757d;
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+        }
+        /* --- END NAVBAR IMPROVEMENTS --- */
+
+
+        /* --- BUTTON IMPROVEMENTS (using Bootstrap classes and tailoring where needed) --- */
+
+        /* Logout Button (already decent, kept custom styles for outline variant) */
+        .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+        .btn-outline-secondary:hover {
+            color: #1a202c;
+            background-color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
+        /* Override Bootstrap default colors to match dark theme palette */
+        .btn-primary {
+            background-color: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #38a169;
+            border-color: #38a169;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #2b6cb0;
+            border-color: #2b6cb0;
+            color: white;
+        }
+
+        /* Specific style for the add MAC form button - using btn-success */
+        #add-mac-form .btn-success {
+            margin-top: 0.5rem;
+        }
+
+        /* --- END BUTTON IMPROVEMENTS --- */
+
+
+        /* Contenedor principal del contenido */
+        .container {
+            flex: 1;
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card styles (kept as is, they fit the dark theme) */
+        .card {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #4a5568;
+            color: #edf2f7;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2d3748;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            margin-right: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Alert styles (kept as is) */
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .alert-success {
+            background-color: #c6f6d5;
+            color: #1a202c;
+            border-color: #a7f3d0;
+        }
+
+        .alert-danger {
+            background-color: #fed7d7;
+            color: #1a202c;
+            border-color: #fbcbcb;
+        }
+
+        .alert-info {
+            background-color: #bee3f8;
+            color: #1a202c;
+            border-color: #90cdf4;
+        }
+
+        /* Devices Section Title (kept as is) */
+        .devices-section-title {
+            color: #edf2f7;
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a5568;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .devices-section-title i {
+            margin-right: 0.5rem;
+        }
+
+        /* Add MAC Form (kept most styles, added Bootstrap form control style) */
+        #add-mac-form {
+            background-color: #4a5568;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #add-mac-form label {
+            color: #edf2f7;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Ensure Bootstrap form-control styles apply */
+        #add-mac-form .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2d3748;
+            border: 1px solid #718096;
+            border-radius: 0.375rem;
+            color: #edf2f7;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        /* Style for Bootstrap's default focus ring in dark mode */
+        #add-mac-form .form-control:focus {
+            background-color: #2d3748;
+            color: #edf2f7;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+
+        /* Delete Devices Form wrapper */
+        #delete-devices-form {
+            margin-top: 1.5rem;
+        }
+
+        /* *** INICIO: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
+
+        .product-card {
+            background-color: #2d3748; /* Fondo de tarjeta similar a .card */
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
             text-align: center;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* ------------------------------------------------------------------ */
-        /* FIN ESTILOS MEJORADOS                        */
-        /* ------------------------------------------------------------------ */
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image-container {
+            padding: 1rem;
+            height: 300px; /* Altura fija para la imagen */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2d3748; /* Fondo claro para destacar el dispositivo */
+        }
+
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-body {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #edf2f7;
+            margin-bottom: 0.5rem;
+            min-height: 50px; /* Altura mínima para el nombre */
+        }
+
+        .product-details {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* CONTENEDOR DE ACCIONES: Oculto por defecto y transiciona */
+        .product-actions {
+            display: flex;
+            border-top: 1px solid #4a5568;
+            background-color: #4a5568; /* Barra de acciones más oscura */
+            /* OCULTAR POR DEFECTO */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        /* MOSTRAR EN HOVER DE LA TARJETA */
+        .product-card:hover .product-actions {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .action-button {
+            flex: 1; /* Esto asegura la división 50/50 */
+            padding: 0.75rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white; /* Color del texto del botón */
+            transition: background-color 0.2s ease;
+            border-radius: 0; /* Sin bordes redondeados */
+            /* AÑADIDO: Centrar el contenido de ambos botones */
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        /* Botón Ver Detalles (ahora 50%) */
+        .action-button.details-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: #4299e1; /* Color info/azul */
+            border-left: 1px solid #4a5568;
+            /* Se han removido las propiedades de ancho fijo */
+        }
+        .action-button.details-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Botón Editar (ahora 50%) */
+        .action-button.edit-btn {
+            /* flex: 1; -> Hereda flex: 1 de .action-button */
+            background-color: rgba(1, 44, 85, 1);
+        }
+        .action-button.edit-btn:hover {
+            background-color: rgba(4, 72, 136, 1);
+        }
+
+        /* Elemento de precio simulado/MAC */
+        .price-section {
+            color: #48bb78; /* Color verde/éxito */
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .old-price {
+            color: #718096;
+            font-size: 0.8rem;
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        /* Ribbon de Dispositivo (simulado) */
+        .discount-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0; 
+            background-color: #000000ff; 
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-bottom-right-radius: 0.5rem; 
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        /* Custom Checkbox styles for dark theme (posicionado sobre la tarjeta) */
+        .delete-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px; 
+            z-index: 10;
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: #4a5568;
+            border: 1px solid #718096;
+            border-radius: 0.25em;
+            appearance: none;
+            -webkit-appearance: none;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .delete-checkbox:checked {
+            background-color: #48bb78;
+            border-color: #48bb78;
+        }
+
+        .delete-checkbox:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+        }
+
+        /* Add custom checkmark using Font Awesome */
+        .delete-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 0.8em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* *** FIN: ESTILOS DE TARJETA DE PRODUCTO MODIFICADOS *** */
+
+        /* Modal styles (kept as is, fit dark theme) */
+        .modal-content {
+            background-color: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #2d3748;
+            color: #edf2f7;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #2d3748;
+        }
+
+        .modal-footer .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: white;
+        }
+
+        .modal-footer .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+            color: white;
+        }
+
+        /* Ensure close button color is visible in dark modal header */
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ASG">
+    <link rel="apple-touch-icon" href="<?= base_url('imagenes/Logo.png') ?>">
+
 </head>
+
 <body>
 
-<?php 
-    // Aseguramos que las variables existan para evitar errores de PHP
-    $mac = $dispositivo->MAC ?? 'MAC_NO_DISPONIBLE'; 
-    $nombre = $dispositivo->nombre ?? 'Dispositivo Desconocido'; 
-?>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="<?= base_url('/perfil') ?>">ASG</a>
 
-<div class="control-panel">
-    <h1>Control Básico de Válvula</h1>
-    <p>Dispositivo: <strong><?= esc($nombre) ?></strong></p>
-    <p>MAC: <strong><?= esc($mac) ?></strong></p>
-    
-    <div class="status">
-        <strong>Estado Actual:</strong>
-        <span id="valve-status-display">Cargando...</span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil') ?>">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Configuración</a>
+                        </li>
+                    </ul>
+
+                    <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-5">
+
+        <?php if (session('success')): ?>
+            <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> <?= session('success') ?></div>
+        <?php endif; ?>
+        <?php if (session('error')): ?>
+            <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i> <?= session('error') ?></div>
+        <?php endif; ?>
+        <?php if (session('info')): ?>
+            <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i> <?= session('info') ?></div>
+        <?php endif; ?>
+
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title"><i class="fas fa-user-circle me-2"></i> Mi Perfil</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> <?= esc(session()->get('nombre')) ?></p>
+                <p><strong>Email:</strong> <?= esc(session()->get('email')) ?></p>
+            </div>
+        </div>
+
+        <div class="devices-section-title">
+            <h2 style="margin: 0;"><i class="fas fa-microchip me-2"></i> Mis Dispositivos Enlazados</h2>
+            <button id="show-add-mac-form" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo
+            </button>
+        </div>
+
+
+        <div id="add-mac-form" style="display: none;">
+            <form action="<?= base_url('/enlace/store') ?>" method="post">
+                <?= csrf_field() ?>
+                <div class="mb-3">
+                    <label for="mac">Dirección MAC:</label>
+                    <input type="text" class="form-control" id="mac" name="mac" placeholder="Ej: XX:XX:XX:XX:XX:XX" required>
+                </div>
+                <button type="submit" class="btn btn-success"><i class="fas fa-link me-2"></i> Enlazar Dispositivo</button>
+            </form>
+            <hr class="my-4" style="border-color: #4a5568;">
+        </div>
+
+
+        <?php if (empty($dispositivosEnlazados)): ?>
+            <p>No tienes dispositivos enlazados aún.</p>
+        <?php else: ?>
+            <form id="delete-devices-form" action="<?= base_url('/perfil/eliminar-dispositivos') ?>" method="post">
+                <?= csrf_field() ?>
+                <button type="button" id="delete-selected-btn" class="btn btn-danger mb-4">
+                    <i class="fas fa-trash-alt me-2"></i> Eliminar Seleccionados
+                </button>
+
+                <div class="row">
+                    <?php foreach ($dispositivosEnlazados as $dispositivo): ?>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="product-card">
+                                <div class="discount-ribbon">ASG Sentinel</div>
+
+                                <input type="checkbox" name="macs[]" value="<?= esc($dispositivo->MAC) ?>" class="delete-checkbox">
+
+                                <div class="product-image-container">
+                                    <img src="<?= $device_image_path ?>" class="product-image" alt="ASG Sentinel Device">
+                                </div>
+                                <div class="product-body">
+                                    <div class="product-name">
+                                        <?= esc($dispositivo->nombre ?: 'Dispositivo sin nombre') ?>
+                                    </div>
+                                    
+                                    <div class="price-section">
+                                        MAC: <?= esc($dispositivo->MAC ?? 'Desconocida') ?>
+                                    </div>
+
+                                    <div class="product-details">
+                                        Ubicación: <?= esc($dispositivo->ubicacion ?: 'Desconocida') ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-actions">
+                                    <a href="<?= base_url('/perfil/dispositivo/editar/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button edit-btn" 
+                                       title="Editar Dispositivo">
+                                        <i class="fas fa-edit me-2"></i> Editar
+                                    </a>
+                                    
+                                    <a href="<?= base_url('/detalles/' . esc($dispositivo->MAC)) ?>" 
+                                       class="action-button details-btn" 
+                                       title="Ver Detalles">
+                                        <i class="fas fa-chart-bar me-2"></i> Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </form>
+        <?php endif; ?>
+
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas desenlazar los dispositivos seleccionados?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
-    <div class="button-group">
-        <button id="btn-volver">Volver</button> 
-        <button id="btn-abrir" class="open" data-estado="1" disabled>Abrir Válvula</button>
-        <button id="btn-cerrar" class="closed" data-estado="0" disabled>Cerrar Válvula</button>
-    </div>
-    
-    <p class="note">Nota: Los mensajes de error/éxito aparecerán como alertas básicas del navegador (alert).</p>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    const MAC_ADDRESS = '<?= esc($mac) ?>';
-    
-    // Obtener datos de CSRF del meta tag
-    const CSRF_NAME = $('meta[name="csrf-name"]').attr('content');
-    const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-    
-    const $btnAbrir = $('#btn-abrir');
-    const $btnCerrar = $('#btn-cerrar');
-    const $btnVolver = $('#btn-volver'); // Nueva referencia al botón
-    const $statusDisplay = $('#valve-status-display');
+    <script>
+        // Script para manejar la visibilidad del formulario de añadir MAC y el modal de eliminación
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const deleteDevicesForm = document.getElementById('delete-devices-form');
+            const confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
+            const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalElement); // Get Bootstrap modal instance
+            const addMacForm = document.getElementById('add-mac-form');
+            const showAddMacFormButton = document.getElementById('show-add-mac-form');
 
-    // 1. Función para actualizar la interfaz de usuario (UI) según el estado (0 o 1)
-    function actualizarEstadoUI(estado) {
-        // Remover clases de color anteriores para asegurar una única clase
-        $statusDisplay.removeClass('text-open text-closed text-unknown text-processing');
-        
-        if (estado === 1) {
-            $statusDisplay.text('ABIERTA').css('color', 'var(--success-color)');
-            $btnAbrir.prop('disabled', true);
-            $btnCerrar.prop('disabled', false);
-        } else if (estado === 0) {
-            $statusDisplay.text('CERRADA').css('color', 'var(--danger-color)');
-            $btnAbrir.prop('disabled', false);
-            $btnCerrar.prop('disabled', true);
-        } else {
-             $statusDisplay.text('ESTADO DESCONOCIDO').css('color', 'gray');
-             $btnAbrir.prop('disabled', true);
-             $btnCerrar.prop('disabled', true);
+            // Mostrar/ocultar formulario de añadir MAC
+            if (showAddMacFormButton && addMacForm) { // Check if both elements exist
+                showAddMacFormButton.addEventListener('click', function () {
+                    if (addMacForm.style.display === "none" || addMacForm.style.display === "") {
+                        addMacForm.style.display = "block"; // Show
+                        this.innerHTML = '<i class="fas fa-minus-circle me-2"></i> Ocultar Formulario'; // Change text
+                    } else {
+                        addMacForm.style.display = "none"; // Hide
+                        this.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Añadir Dispositivo'; // Change text
+                    }
+                });
+            }
+
+
+            // Mostrar modal de confirmación al hacer clic en "Eliminar Seleccionados"
+            if (deleteSelectedBtn && confirmDeleteModalElement) { // Check if button and modal element exist
+                deleteSelectedBtn.addEventListener('click', function () {
+                    const checkedDevices = document.querySelectorAll('#delete-devices-form .delete-checkbox:checked');
+                    if (checkedDevices.length > 0) {
+                        confirmDeleteModal.show(); // Use Bootstrap's show method
+                    } else {
+                        // Reemplazado alert() con un modal de mensaje simple
+                        const messageModalContent = document.querySelector('#confirmDeleteModal .modal-body');
+                        const messageModalTitle = document.querySelector('#confirmDeleteModal .modal-title');
+                        const messageModalFooter = document.querySelector('#confirmDeleteModal .modal-footer');
+
+                        if (messageModalContent && messageModalTitle && messageModalFooter) {
+                            messageModalTitle.textContent = "Atención";
+                            messageModalContent.textContent = 'Por favor, selecciona al menos un dispositivo para eliminar.';
+                            // Ocultar botones de acción y mostrar solo el de cerrar si no hay selección
+                            messageModalFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>';
+                            confirmDeleteModal.show();
+                        } else {
+                             // Fallback si los elementos del modal no se encuentran
+                            console.error("No se pudieron encontrar elementos del modal de mensaje.");
+                             // Evita alert() en producción
+                        }
+                    }
+                });
+            }
+
+
+            // Enviar el formulario de eliminación cuando se confirma en el modal
+            if (confirmDeleteBtn && deleteDevicesForm && confirmDeleteModalElement) { // Check if all elements exist
+                confirmDeleteBtn.addEventListener('click', function () {
+                    confirmDeleteModal.hide(); // Use Bootstrap's hide method
+                    deleteDevicesForm.submit();
+                });
+            }
+
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
         }
-    }
-
-    // 2. Función principal para enviar el comando de control al servidor
-    function controlValve(estado) {
-        const estadoInt = parseInt(estado, 10);
-        const processingMessage = (estadoInt === 1) ? 'Abriendo...' : 'Cerrando...';
-        const successMessage = (estadoInt === 1) ? '¡Válvula Abierta!' : '¡Válvula Cerrada!';
-        
-        // Deshabilitar botones de control y mostrar estado de procesamiento
-        $btnAbrir.prop('disabled', true);
-        $btnCerrar.prop('disabled', true);
-        // NO deshabilitamos "Volver"
-        $statusDisplay.text(processingMessage).css('color', 'var(--warning-color)');
-
-        const postData = {
-            [CSRF_NAME]: CSRF_TOKEN,
-            mac: MAC_ADDRESS,
-            estado: estadoInt
-        };
-
-        // Petición POST al endpoint del controlador: /servo/actualizarEstado
-        $.post('/servo/actualizarEstado', postData)
-            .done(function(response) {
-                console.log('Respuesta del servidor al control:', response);
-                if (response.status === 'success') {
-                    actualizarEstadoUI(response.estado);
-                    alert(successMessage); 
-                } else {
-                    alert('Error: ' + (response.message || 'Error al actualizar el estado')); 
-                }
-            })
-            .fail(function(jqXHR) {
-                console.error('Error en la petición POST:', jqXHR.responseText);
-                alert('Error de conexión con el servidor (código ' + jqXHR.status + ')'); 
-            })
-            .always(function() {
-                // Forzar una consulta de estado después de la acción
-                fetchDeviceState();
-            });
-    }
-
-    // 3. Función para obtener el estado actual de la válvula desde el servidor
-    function fetchDeviceState() {
-        // Petición GET al endpoint del controlador: /servo/obtenerEstado/(MAC)
-        $.get(`/servo/obtenerEstado/${MAC_ADDRESS}`)
-            .done(function(response) {
-                if (response.status === 'success') {
-                    actualizarEstadoUI(response.estado);
-                } else {
-                    $statusDisplay.text(response.message || 'Error al obtener estado').css('color', 'gray');
-                    $btnAbrir.prop('disabled', true);
-                    $btnCerrar.prop('disabled', true);
-                }
-            })
-            .fail(function(jqXHR) {
-                console.error('Error al obtener estado:', jqXHR.responseText);
-                $statusDisplay.text('Error de conexión o 500').css('color', 'red');
-                $btnAbrir.prop('disabled', true);
-                $btnCerrar.prop('disabled', true);
-            });
-    }
-    
-    // Función de Volver
-    function goBack() {
-        window.history.back();
-    }
-
-    // 4. Inicialización y Event Listeners
-    $(document).ready(function() {
-        // Asignar el controlador a los botones de control
-        $btnAbrir.on('click', function() { controlValve(1); });
-        $btnCerrar.on('click', function() { controlValve(0); });
-        
-        // Asignar el controlador al botón de Volver
-        $btnVolver.on('click', goBack); 
-
-        // Iniciar la consulta del estado
-        fetchDeviceState();
-
-        // Actualizar el estado cada 5 segundos
-        setInterval(fetchDeviceState, 5000);
-    });
-</script>
+    </script>
 
 </body>
 </html>
