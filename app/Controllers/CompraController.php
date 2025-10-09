@@ -167,6 +167,9 @@ class CompraController extends Controller
                     $surname = $result['payer']['name']['surname'] ?? '';
                     $payerName = trim($given . ' ' . $surname) ?: null;
                 }
+                
+                // Extraer email del pagador (si PayPal lo envía)
+                $payerEmail = $result['payer']['email_address'] ?? null;
 
                 $data = [
                     'order_id'   => $result['id'],
@@ -175,6 +178,7 @@ class CompraController extends Controller
                     'status'     => $result['status'],
                     'monto'      => $capture['amount']['value'] ?? null,
                     'nombre'     => $payerName,
+                    'email'      => $payerEmail,
                     'fecha_compra' => date('Y-m-d H:i:s')
                 ];
                 
