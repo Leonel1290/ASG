@@ -371,7 +371,7 @@ if (!function_exists('esc')) {
                                                     if ($nivel >= 500) {
                                                         $estado = 'Peligro';
                                                         $class = 'bg-danger';
-                                                    } elseif ($nivel >= 200) {
+                                                    } elseif ($nivel >= 350) {
                                                         $estado = 'Precaución';
                                                         $class = 'bg-warning text-dark';
                                                     } elseif ($nivel >= 0) {
