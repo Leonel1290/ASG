@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\ComprasModel;
-use App\Models\LecturasGasModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 use CodeIgniter\API\ResponseTrait;
@@ -66,7 +65,6 @@ class Home extends BaseController
         // --- FIN LOGGING ---
 
         $userModel = new UserModel();
-        $lecturasGasModel = new \App\Models\LecturasGasModel();
 
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
@@ -82,14 +80,6 @@ class Home extends BaseController
 
             if (password_verify($password, $user['password'])) {
                 // Contraseña correcta, iniciar sesión
-                $ultimaLectura = $lecturasGasModel
-                    ->orderBy('id', 'DESC')
-                    ->where(['usuario_id' => $user['id']])
-                    ->asArray()
-                    ->first();
-
-                $nivel_gas = $ultimaLectura['nivel_gas'] ?? null;
-
                 $sessionData = [
                     'id'        => $user['id'],
                     'nombre'    => $user['nombre'],
