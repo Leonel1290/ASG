@@ -15,6 +15,7 @@ class ComprasModel extends Model
         'status',
         'monto',
         'nombre', // Nombre del comprador (extraído de PayPal)
+        'email',  // Email del comprador
         'fecha_compra'
     ];
 
