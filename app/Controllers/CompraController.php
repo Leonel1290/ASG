@@ -119,104 +119,72 @@ class CompraController extends Controller
      * ✅ Capturar orden y guardar en BD (sin depender de usuario)
      */
     public function captureOrder($orderId)
-{
-    try {
-        $token = $this->getAccessToken();
+    {
+        try {
+            $token = $this->getAccessToken();
 
-        if (!$token) {
-            log_message('error', 'No se pudo obtener el token de acceso de PayPal para capturar orden');
-            return $this->response->setStatusCode(500)->setJSON(['error' => 'No se pudo obtener el token de PayPal']);
-        }
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->paypalApiUrl . "/v2/checkout/orders/{$orderId}/capture");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer $token",
-            "Content-Type: application/json",
-            "Prefer: return=representation"
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($httpCode !== 201) {
-            log_message('error', 'PayPal Capture Order Error: HTTP ' . $httpCode . ' - Response: ' . $response);
-            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error al capturar la orden en PayPal']);
-        }
-
-        $result = json_decode($response, true);
-
-        // ✅ Guardar en base de datos solo si fue exitoso
-        if (isset($result['status']) && $result['status'] === "COMPLETED") {
-            $purchaseUnit = $result['purchase_units'][0];
-            $capture = $purchaseUnit['payments']['captures'][0];
-            
-            $data = [
-                'order_id'   => $result['id'],
-                'payer_id'   => $result['payer']['payer_id'] ?? null,
-                'payment_id' => $capture['id'] ?? null,
-                'status'     => $result['status'],
-                'monto'      => $capture['amount']['value'] ?? null,
-                'fecha_compra' => date('Y-m-d H:i:s')
-            ];
-
-            // Guarda en BD
-            $this->comprasModel->insert($data);
-
-            // ✅ Enviar correo al comprador
-            $emailComprador = $result['payer']['email_address'] ?? null;
-            if ($emailComprador) {
-                $this->enviarCorreoConfirmacion($emailComprador, $data);
+            if (!$token) {
+                log_message('error', 'No se pudo obtener el token de acceso de PayPal para capturar orden');
+                return $this->response->setStatusCode(500)->setJSON(['error' => 'No se pudo obtener el token de PayPal']);
             }
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $this->paypalApiUrl . "/v2/checkout/orders/{$orderId}/capture");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Authorization: Bearer $token",
+                "Content-Type: application/json",
+                "Prefer: return=representation"
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            
+            if (curl_error($ch)) {
+                log_message('error', 'cURL Error capturing order: ' . curl_error($ch));
+            }
+            
+            curl_close($ch);
+
+            if ($httpCode !== 201) {
+                log_message('error', 'PayPal Capture Order Error: HTTP ' . $httpCode . ' - Response: ' . $response);
+                return $this->response->setStatusCode(500)->setJSON(['error' => 'Error al capturar la orden en PayPal']);
+            }
+
+            $result = json_decode($response, true);
+            log_message('debug', 'Orden capturada: ' . print_r($result, true));
+
+            // ✅ Guardar en base de datos solo si fue exitoso
+            if (isset($result['status']) && $result['status'] === "COMPLETED") {
+                $purchaseUnit = $result['purchase_units'][0];
+                $capture = $purchaseUnit['payments']['captures'][0];
+                
+                $data = [
+                    'order_id'   => $result['id'],
+                    'payer_id'   => $result['payer']['payer_id'] ?? null,
+                    'payment_id' => $capture['id'] ?? null,
+                    'status'     => $result['status'],
+                    'monto'      => $capture['amount']['value'] ?? null,
+                    'fecha_compra' => date('Y-m-d H:i:s')
+                ];
+                
+                log_message('debug', 'Datos a guardar: ' . print_r($data, true));
+                
+                try {
+                    $this->comprasModel->insert($data);
+                    log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
+                } catch (\Exception $e) {
+                    log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
+                    // No devolvemos error para no afectar la experiencia del usuario
+                }
+            }
+
+            return $this->response->setJSON($result);
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Exception in captureOrder: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error interno del servidor']);
         }
-
-        return $this->response->setJSON($result);
-        
-    } catch (\Exception $e) {
-        log_message('error', 'Exception in captureOrder: ' . $e->getMessage());
-        return $this->response->setStatusCode(500)->setJSON(['error' => 'Error interno del servidor']);
     }
-}
-
-/**
- * ✅ Envía correo de confirmación de compra al comprador
- */
-private function enviarCorreoConfirmacion($emailComprador, $data)
-{
-    $email = \Config\Services::email();
-
-    $email->setTo($emailComprador);
-    $email->setSubject('Confirmación de tu compra - AgainSafeGas Sentinel');
-
-    $mensaje = "
-        <h2>¡Gracias por tu compra!</h2>
-        <p>Tu pedido se ha procesado correctamente. A continuación los detalles de tu compra:</p>
-        <ul>
-            <li><strong>Producto:</strong> AgainSafeGas Sentinel</li>
-            <li><strong>Orden ID:</strong> {$data['order_id']}</li>
-            <li><strong>Monto pagado:</strong> USD {$data['monto']}</li>
-            <li><strong>Fecha:</strong> {$data['fecha_compra']}</li>
-        </ul>
-        <hr>
-        <h4>Información adicional:</h4>
-        <ul>
-            <li>📦 Envío: recibirás tu producto en un plazo de 3 a 5 días hábiles.</li>
-            <li>🛠️ Garantía: 6 meses por defectos de fabricación.</li>
-            <li>📞 Soporte: soporte@againsafegas.com</li>
-            <li>🌐 Sitio web: <a href='" . base_url() . "'>AgainSafeGas</a></li>
-        </ul>
-        <p>Gracias por confiar en <strong>AgainSafeGas</strong>.<br>Tu seguridad, nuestra prioridad.</p>
-    ";
-
-    $email->setMessage($mensaje);
-
-    if (!$email->send()) {
-        log_message('error', '❌ Error al enviar correo: ' . $email->printDebugger(['headers']));
-    } else {
-        log_message('info', '✅ Correo de confirmación enviado a ' . $emailComprador);
-    }
-}
 }
