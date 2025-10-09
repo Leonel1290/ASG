@@ -435,7 +435,7 @@ if (!function_exists('esc')) {
                 width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
                 levelText = 'Seguro';
                 barClass = 'bg-success';
-            } else if (safeValue < 500) {
+            } else if (safeValue < 350) {
                 width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
                 levelText = 'Precaución';
                 barClass = 'bg-warning text-dark'; // Added text-dark for visibility
