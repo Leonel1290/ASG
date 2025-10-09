@@ -89,3 +89,6 @@ $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1'
 
 // En routes.php (CodeIgniter 4)
 $routes->get('descarga', 'Home::descarga');
+
+// API para registrar MAC de dispositivos (POST)
+$routes->post('api/registrar_mac', 'Api\\DeviceApiController::registrarMac');

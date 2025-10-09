@@ -1,0 +1,49 @@
+/* Estilos ligeros para el portal de configuración del ESP32 */
+:root{
+  --bg1:#0072ff;--bg2:#00c6ff;--card-bg:#fff;--text:#1f2937;--muted:#6b7280;--primary:#0072ff;--primary-2:#005fd1;--border:#e5e7eb;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{
+  font-family:-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);background:linear-gradient(135deg,var(--bg1),var(--bg2));
+}
+.container{
+  min-height:100%;display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.card{
+  width:100%;max-width:420px;background:var(--card-bg);border-radius:14px;
+  box-shadow:0 6px 22px rgba(0,0,0,.18);padding:22px;
+}
+h3{margin:0 0 6px 0;color:var(--primary)}
+.subtitle,.muted{color:var(--muted);font-size:13px;margin:0 0 12px}
+
+/* Lista de SSIDs (cada label con radio) */
+form .ssid-list, form .list{max-height:220px;overflow:auto;border-top:1px solid var(--border);padding-top:8px;margin-top:8px}
+label{display:block;padding:8px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer}
+label:hover{background:#f9fafb}
+input[type="radio"]{accent-color:var(--primary);margin-right:6px}
+
+/* Campos y botón */
+input[type="password"], .input{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;
+}
+.btn{
+  width:100%;padding:10px 12px;margin-top:10px;border:0;border-radius:8px;
+  background:var(--primary);color:#fff;font-weight:600;cursor:pointer;transition:.2s;
+}
+.btn:hover{background:var(--primary-2)}
+
+/* Mensajes */
+.alert{margin:10px 0;padding:10px;border-radius:8px;font-size:14px}
+.alert.success{background:#e6ffed;border:1px solid #2ecc71;color:#176b3a}
+.alert.error{background:#ffecec;border:1px solid #e74c3c;color:#8a1f14}
+
+/* Fila pequeña de datos (MAC, etc.) */
+.kv{display:flex;gap:8px;align-items:center;margin:6px 0;color:var(--muted);font-size:13px}
+.kv b{color:#111827}
+
+/* Responsive menor */
+@media (max-width:360px){
+  .card{padding:16px;border-radius:10px}
+}
