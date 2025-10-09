@@ -160,12 +160,21 @@ class CompraController extends Controller
                 $purchaseUnit = $result['purchase_units'][0];
                 $capture = $purchaseUnit['payments']['captures'][0];
                 
+                // Extraer nombre del pagador si está disponible
+                $payerName = null;
+                if (isset($result['payer']['name'])) {
+                    $given = $result['payer']['name']['given_name'] ?? '';
+                    $surname = $result['payer']['name']['surname'] ?? '';
+                    $payerName = trim($given . ' ' . $surname) ?: null;
+                }
+
                 $data = [
                     'order_id'   => $result['id'],
                     'payer_id'   => $result['payer']['payer_id'] ?? null,
                     'payment_id' => $capture['id'] ?? null,
                     'status'     => $result['status'],
                     'monto'      => $capture['amount']['value'] ?? null,
+                    'nombre'     => $payerName,
                     'fecha_compra' => date('Y-m-d H:i:s')
                 ];
                 
