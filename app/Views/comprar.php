@@ -284,7 +284,7 @@
             
             <div class="product-details-section">
                 <h2>Confirmar Compra</h2>
-                <h1 class="mb-2">AgainSafeGas Sentinel</h1>
+                <h1 class="mb-2">ASG Sentinel</h1>
                 <p class="product-price">
                     $100 USD
                 </p>
