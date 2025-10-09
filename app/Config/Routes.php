@@ -6,11 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// ===================================================================
-// 🌐 RUTAS DE LA APLICACIÓN WEB (Limpias y Agrupadas) 🌐
-// ===================================================================
 
-// --- HOME / SIMULACIÓN ---
+// --- HOME ---
 $routes->get('/', 'Home::index');
 $routes->get('simulacion', 'Home::simulacion');
 
@@ -89,12 +86,7 @@ $routes->get('prueba', function() {
 });
 
 
-// ===================================================================
-// 🤖 RUTAS DE API PARA EL ESP32 (¡CORREGIDAS!) 🤖
-// ===================================================================
 
-// CORRECCIÓN CLAVE 1: Ruta para ENVIAR la lectura de gas (POST /api/send_gas_data)
-// Se eliminó el namespace 'App\\Controllers\\' para evitar la duplicación que causaba el 404.
 $routes->post('api/send_gas_data', 'LecturasController::guardar');
 
 
