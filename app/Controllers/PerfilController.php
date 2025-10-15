@@ -128,10 +128,13 @@ class PerfilController extends BaseController
 
         $emailService = \Config\Services::email();
 
+        $configEmail = config('Email');
+        $emailService->setFrom($configEmail->fromEmail, $configEmail->fromName);
         $emailService->setTo($email);
         $emailService->setSubject('Verificación de Email para Configuración de Perfil');
+        $emailService->setMailType('html');
         $verificationLink = base_url("perfil/verificar-email/{$token}");
-        $message = "Hola {$user['nombre']},\n\nHaz solicitado verificar tu email para acceder a la configuración de tu perfil.\n\nPor favor, haz clic en el siguiente enlace para verificar tu email:\n{$verificationLink}\n\nEste enlace expirará en 15 minutos.\n\nSi no solicitaste esta verificación, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
+        $message = "Hola {$user['nombre']},<br><br>Haz solicitado verificar tu email para acceder a la configuración de tu perfil.<br><br>Por favor, haz clic en el siguiente enlace para verificar tu email:<br><a href=\"{$verificationLink}\">{$verificationLink}</a><br><br>Este enlace expirará en 15 minutos.<br><br>Si no solicitaste esta verificación, puedes ignorar este correo.<br><br>Atentamente,<br>El equipo de ASG";
         $emailService->setMessage($message);
 
         if ($emailService->send()) {
