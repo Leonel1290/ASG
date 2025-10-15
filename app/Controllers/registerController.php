@@ -112,15 +112,17 @@ class registerController extends Controller
 
             // Configura el remitente. Es mejor configurar esto en app/Config/Email.php o .env
             // Si no está configurado globalmente, descomenta y ajusta las siguientes líneas:
-            // $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
+            $emailConfig = config('Email');
+            $emailService->setFrom($emailConfig->fromEmail, $emailConfig->fromName);
 
             $emailService->setTo($email);
             $emailService->setSubject('Verifica tu cuenta de ASG');
+            $emailService->setMailType('html');
 
             // Crear el enlace de verificación
             $verificationLink = base_url("register/verify-email/{$token}"); // <-- NUEVA RUTA
 
-            $message = "Hola {$nombre},\n\nGracias por registrarte en ASG.\n\nPor favor, haz clic en el siguiente enlace para verificar tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nSi no te registraste en ASG, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
+            $message = nl2br("Hola {$nombre},\n\nGracias por registrarte en ASG.\n\nPor favor, haz clic en el siguiente enlace para verificar tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nSi no te registraste en ASG, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG");
 
             $emailService->setMessage($message);
 

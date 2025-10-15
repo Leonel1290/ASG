@@ -57,6 +57,11 @@ class CompraController extends Controller
      */
     public function createOrder()
     {
+        // Requiere usuario autenticado
+        $session = session();
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'No autenticado. Debes registrarte o iniciar sesión para comprar.']);
+        }
         try {
             $token = $this->getAccessToken();
 
@@ -120,6 +125,11 @@ class CompraController extends Controller
      */
     public function captureOrder($orderId)
     {
+        // Requiere usuario autenticado
+        $session = session();
+        if (!$session->get('logged_in')) {
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'No autenticado. Debes registrarte o iniciar sesión para comprar.']);
+        }
         try {
             $token = $this->getAccessToken();
 

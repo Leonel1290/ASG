@@ -87,6 +87,11 @@ class Home extends BaseController
                 log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
                 // --- FIN LOGGING ---
 
+                $intended = $session->get('intended_url');
+                if (!empty($intended)) {
+                    $session->remove('intended_url');
+                    return redirect()->to($intended);
+                }
                 return redirect()->to('/perfil');
             } else {
                 $session->setFlashdata('error', 'Contraseña incorrecta.');
@@ -322,6 +327,13 @@ class Home extends BaseController
     {
         $session = session();
         log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
+
+        if (!$session->get('logged_in')) {
+            // Guardar la URL objetivo para volver después de autenticar
+            $session->set('intended_url', site_url('comprar'));
+            return redirect()->to('/loginobtener')->with('info', 'Debes iniciar sesión para continuar con la compra. Si no tienes cuenta, regístrate.');
+        }
+
         return view('comprar');
     }
 
