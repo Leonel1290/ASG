@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\ComprasModel;
 use CodeIgniter\Controller;
+use Config\Services;
 
 class CompraController extends Controller
 {
@@ -16,6 +17,97 @@ class CompraController extends Controller
     public function __construct()
     {
         $this->comprasModel = new ComprasModel();
+    }
+
+    /**
+     * Enviar correo de confirmación de compra al comprador
+     */
+    private function sendPurchaseEmail(string $to, array $data): void
+    {
+        try {
+            $email = Services::email();
+
+            $nombre = $data['nombre'] ?? 'Cliente';
+            $monto = isset($data['monto']) ? number_format((float) $data['monto'], 2) : '0.00';
+            $fecha = isset($data['fecha_compra']) ? date('d/m/Y H:i', strtotime($data['fecha_compra'])) : date('d/m/Y H:i');
+            $orderId = $data['order_id'] ?? '';
+            $paymentId = $data['payment_id'] ?? '';
+            $status = $data['status'] ?? '';
+            $emailCliente = $data['email'] ?? $to;
+
+            $html = <<<HTML
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Confirmación de compra</title>
+  </head>
+  <body style="font-family:Arial,Helvetica,sans-serif;background:#f6f8fa;padding:24px;">
+    <div style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+      <div style="background:#0d6efd;color:#fff;padding:16px 20px;">
+        <h2 style="margin:0;font-size:18px;">ASG - Confirmación de compra</h2>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 12px;">Hola {$nombre},</p>
+        <p style="margin:0 0 16px;">Gracias por tu compra. A continuación encontrarás el detalle de la transacción:</p>
+
+        <table role="presentation" cellspacing="0" cellpadding="8" style="width:100%;border-collapse:collapse;">
+          <tbody>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;width:35%;">Nombre</td>
+              <td style="border:1px solid #e5e7eb;">{$nombre}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Email</td>
+              <td style="border:1px solid #e5e7eb;">{$emailCliente}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Orden (Order ID)</td>
+              <td style="border:1px solid #e5e7eb;">{$orderId}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Pago (Payment ID)</td>
+              <td style="border:1px solid #e5e7eb;">{$paymentId}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Estado</td>
+              <td style="border:1px solid #e5e7eb;">{$status}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Monto</td>
+              <td style="border:1px solid #e5e7eb;">USD {$monto}</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #e5e7eb;background:#f9fafb;font-weight:bold;">Fecha</td>
+              <td style="border:1px solid #e5e7eb;">{$fecha}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="margin:16px 0 0;color:#6b7280;font-size:12px;">Si no reconoces esta compra, contáctanos respondiendo a este correo.</p>
+      </div>
+      <div style="background:#f3f4f6;color:#374151;padding:12px 20px;font-size:12px;text-align:center;">
+        © ASG. Todos los derechos reservados.
+      </div>
+    </div>
+  </body>
+</html>
+HTML;
+
+            $email->setTo($to);
+            $email->setSubject('Confirmación de compra - ASG');
+            $email->setMessage($html);
+
+            if (!$email->send()) {
+                // printDebugger can be verbose; limit sections
+                $debug = method_exists($email, 'printDebugger') ? $email->printDebugger(['headers', 'subject']) : 'No debug info';
+                log_message('error', 'Error enviando email de compra: ' . $debug);
+            } else {
+                log_message('debug', 'Email de compra enviado a ' . $to);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Excepción enviando email de compra: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -187,6 +279,12 @@ class CompraController extends Controller
                 try {
                     $this->comprasModel->insert($data);
                     log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
+
+                    if (!empty($payerEmail)) {
+                        $this->sendPurchaseEmail($payerEmail, $data);
+                    } else {
+                        log_message('warning', 'No se envió email: email del pagador no disponible.');
+                    }
                 } catch (\Exception $e) {
                     log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
                     // No devolvemos error para no afectar la experiencia del usuario
