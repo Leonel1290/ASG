@@ -283,7 +283,8 @@ HTML;
                 
                 try {
                     $this->comprasModel->insert($data);
-                    log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
+                    $compraId = (int) $this->comprasModel->getInsertID();
+                    log_message('debug', 'Compra guardada en BD con ID: ' . $compraId);
 
                     $recipient = $payerEmail ?: (session()->get('email') ?? null);
                     if (!empty($recipient)) {
@@ -291,6 +292,9 @@ HTML;
                     } else {
                         log_message('warning', 'No se envió email: email del pagador y email de sesión no disponibles.');
                     }
+
+                    // Adjuntar compra_id a la respuesta para frontend
+                    $result['compra_id'] = $compraId;
                 } catch (\Exception $e) {
                     log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
                     // No devolvemos error para no afectar la experiencia del usuario

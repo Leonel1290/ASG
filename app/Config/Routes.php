@@ -87,5 +87,10 @@ $routes->get('prueba', function() {
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
 
+// Direcciones de envío
+$routes->get('direccion/nueva/(:num)', 'DireccionController::create/$1');
+$routes->post('direccion/guardar', 'DireccionController::store');
+$routes->get('direccion/confirmacion/(:num)', 'DireccionController::confirmacion/$1');
+
 // En routes.php (CodeIgniter 4)
 $routes->get('descarga', 'Home::descarga');
