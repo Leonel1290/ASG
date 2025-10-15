@@ -16,7 +16,8 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'https://asg-rxnu.onrender.com/';
+    public string $baseURL = 'https://192.168.2.133/SanchezLeonel2024/login2/ASG-3';
+     
     
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
