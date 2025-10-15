@@ -156,8 +156,8 @@ class LecturasGasModel extends Model
      */
     protected function determinarEstado(float $nivelGas): string
     {
-        if ($nivelGas >= 500) return 'peligro';
-        if ($nivelGas >= 200) return 'precaucion';
+        if ($nivelGas >= 450) return 'peligro';
+        if ($nivelGas >= 300) return 'precaucion';
         return 'seguro';
     }
 }

@@ -9,12 +9,13 @@ class ComprasModel extends Model
     protected $table = 'compras';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'usuario_id', // Lo mantenemos por si acaso, pero no es obligatorio
         'order_id',
         'payer_id',
         'payment_id',
         'status',
         'monto',
+        'nombre', // Nombre del comprador (extraído de PayPal)
+        'email',  // Email del comprador
         'fecha_compra'
     ];
 
