@@ -94,9 +94,14 @@ class CompraController extends Controller
 </html>
 HTML;
 
+            $configEmail = config('Email');
+            $email->setFrom($configEmail->fromEmail, $configEmail->fromName);
             $email->setTo($to);
             $email->setSubject('Confirmación de compra - ASG');
+            $email->setMailType('html');
             $email->setMessage($html);
+
+            log_message('debug', 'Intentando enviar email de compra a ' . $to . ' (order_id=' . $orderId . ')');
 
             if (!$email->send()) {
                 // printDebugger can be verbose; limit sections
@@ -280,10 +285,11 @@ HTML;
                     $this->comprasModel->insert($data);
                     log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
 
-                    if (!empty($payerEmail)) {
-                        $this->sendPurchaseEmail($payerEmail, $data);
+                    $recipient = $payerEmail ?: (session()->get('email') ?? null);
+                    if (!empty($recipient)) {
+                        $this->sendPurchaseEmail($recipient, $data);
                     } else {
-                        log_message('warning', 'No se envió email: email del pagador no disponible.');
+                        log_message('warning', 'No se envió email: email del pagador y email de sesión no disponibles.');
                     }
                 } catch (\Exception $e) {
                     log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
