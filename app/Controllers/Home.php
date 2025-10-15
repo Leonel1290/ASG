@@ -158,11 +158,12 @@ class Home extends BaseController
             $resetLink = base_url("/reset-password/$token");
 
             $emailService = \Config\Services::email();
-            // Configura el remitente en app/Config/Email.php o .env
-            // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
+            $configEmail = config('Email');
+            $emailService->setFrom($configEmail->fromEmail, $configEmail->fromName);
             $emailService->setTo($user['email']);
             $emailService->setSubject('Recuperación de contraseña');
-            $emailService->setMessage("Haz clic en este enlace para recuperar tu contraseña: " . $resetLink);
+            $emailService->setMailType('html');
+            $emailService->setMessage("Haz clic en este enlace para recuperar tu contraseña: <a href=\"{$resetLink}\">{$resetLink}</a>");
 
             if (!$emailService->send()) {
                 $data = $emailService->printDebugger(['headers']);
