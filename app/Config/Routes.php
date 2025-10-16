@@ -6,7 +6,6 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-
 // ===================================================================
 // 🌐 RUTAS DE LA APLICACIÓN WEB (Limpias y Agrupadas) 🌐
 // ===================================================================
@@ -21,8 +20,8 @@ $routes->post('/register/store', 'RegisterController::store');
 $routes->get('/register/check-email', 'RegisterController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'RegisterController::verifyEmailToken/$1');
 
-$routes->get('/login', 'Home::login'); // Vista de Login
-$routes->post('/login', 'Home::login'); // Procesar Login
+$routes->get('/login', 'Home::login'); 
+$routes->post('/login', 'Home::login'); 
 $routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
 
@@ -47,7 +46,7 @@ $routes->group('dispositivos', function($routes) {
 });
 
 // --- DETALLES DE LECTURAS (UNIFICADA) ---
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1'); // Esta ruta llama a la vista detalles.php
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1'); 
 
 
 // --- LECTURAS (AGRUPADAS) ---
@@ -64,17 +63,25 @@ $routes->group('registros-gas', function($routes) {
 
 
 // ===================================================================
-// 💧 RUTAS DE VÁLVULA (CONTROL Y ESTADO UNIFICADO) 💧
+// 💧 RUTAS DE VÁLVULA (CONTROL Y ESTADO UNIFICADO EN ValveController) 💧
 // ===================================================================
 
-// Ruta principal para enviar la acción de control (POST /valve/control)
+// RUTA PARA CONTROL DESDE BOTONES WEB (POST)
 $routes->post('valve/control', 'ValveController::controlValve');
 
-// ✅ RUTA REEMPLAZADA: Obtener estado (reemplaza /servo/obtenerEstado/{MAC})
-$routes->get('valve/obtenerEstado/(.+)', 'ValveController::obtenerEstado/$1');
-
-// ✅ RUTA REEMPLAZADA: Actualizar estado (reemplaza /servo/actualizarEstado)
+// RUTA DE ACTUALIZACIÓN (JSON) - Usada por AJAX de botones (POST)
 $routes->post('valve/actualizarEstado', 'ValveController::actualizarEstado');
+
+
+// ===================================================================
+// 🤖 RUTAS DE API PARA EL ESP32 y PWA (¡LA CORRECCIÓN DEL 404!) 🤖
+// ===================================================================
+
+// RUTA CRÍTICA: /api/valve_status (GET) - Soluciona el 404 para el ESP32 y la PWA
+$routes->get('api/valve_status', 'ValveController::obtenerEstadoSimple'); 
+
+// Ruta para ENVIAR la lectura de gas (POST /api/send_gas_data)
+$routes->post('api/send_gas_data', 'LecturasController::guardar'); 
 
 
 // --- COMPRA / PWA / OTROS ---
@@ -86,17 +93,3 @@ $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
-
-
-// ===================================================================
-// 🤖 RUTAS DE API PARA EL ESP32 (MANTENER) 🤖
-// ===================================================================
-
-// Ruta para ENVIAR la lectura de gas (POST /api/send_gas_data)
-$routes->post('api/send_gas_data', 'LecturasController::guardar'); 
-
-// Ruta para CONSULTAR el estado de la válvula (GET /api/valve_status)
-// Esta ruta es manejada por el archivo get_valve_status.php y NO por un controlador de CodeIgniter.
-// La ruta DEBE seguir apuntando al archivo directamente.
-// Si esta ruta se define en Routes.php, CI intentará buscar un controlador. 
-// Asumo que tu configuración de CI en public/index.php permite que el archivo PHP se ejecute directamente.

@@ -32,7 +32,6 @@
             padding: 20px;
         }
         .control-panel { 
-            /* ... Tu CSS original ... */
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -122,9 +121,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Asumiendo que esta variable ya está disponible en PHP de alguna forma.
-        // La puse fija para la prueba que me enviaste.
+        
+        // **IMPORTANTE**: Asegúrate que esta MAC sea la que se pasa desde el controlador PHP
         const MAC_ADDRESS = 'CC:7B:5C:A8:0F:50'; 
+        const API_KEY = "SUPER_SECRET_API_MLUS"; // Clave del ESP32/API
+        
         const statusDisplay = document.getElementById('status-display');
         const btnAbrir = document.getElementById('btn-abrir');
         const btnCerrar = document.getElementById('btn-cerrar');
@@ -156,12 +157,12 @@
 
             const formData = new FormData();
             formData.append('mac', MAC_ADDRESS);
-            // El API ValveController::actualizarEstado espera 'estado' ('0' o '1')
+            // La DB tiene 1=Abierta, 0=Cerrada
             formData.append('estado', estado); 
             formData.append(csrfName, csrfToken);
 
             try {
-                // RUTA CORREGIDA: Apunta al nuevo ValveController.php
+                // RUTA CORREGIDA: Apunta al ValveController::actualizarEstado
                 const response = await fetch('<?= base_url('valve/actualizarEstado') ?>', {
                     method: 'POST',
                     body: formData
@@ -170,7 +171,6 @@
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    // Actualiza el estado después de una acción exitosa
                     actualizarEstadoUI(data.nuevo_estado);
                 } else {
                     throw new Error(data.message || 'Error desconocido al cambiar estado');
@@ -184,16 +184,15 @@
             }
         }
 
-        // 2. Obtiene el estado actual de la válvula desde el servidor (Función crucial)
+        // 2. Obtiene el estado actual de la válvula (Solución del error 404)
         async function fetchDeviceState() {
-            // **CLAVE DE LA SOLUCIÓN:** Usamos el endpoint simple que el ESP32 usa y que no da 404 en Render
-            const API_KEY = "SUPER_SECRET_API_MLUS"; // Clave del ESP32
+            // URL CRÍTICA: Ahora usa la ruta /api/valve_status, que apunta a ValveController::obtenerEstadoSimple()
             const url = '<?= base_url('api/valve_status?mac=') ?>' + MAC_ADDRESS + '&api_key=' + API_KEY; 
 
             try {
                 const response = await fetch(url);
                 
-                // response.text() maneja la respuesta simple de "1" o "0" del PHP.
+                // response.text() es CLAVE: Espera un string simple ("1", "0", "-1", etc.)
                 const estadoTexto = await response.text(); 
                 
                 if (response.ok) {
@@ -202,13 +201,13 @@
                     if (estado === 0 || estado === 1) {
                         actualizarEstadoUI(estado);
                     } else if (estado < 0) {
-                        // -1 (MAC no encontrada), -2 (Key inválida), -3 (Error DB)
-                        throw new Error('Error de DB/API. Código: ' + estado);
+                        // -1: No encontrado, -2: Key inválida, -3: Error DB, -4: Parámetros faltantes
+                        throw new Error('Error de API. Código: ' + estado);
                     } else {
                          throw new Error('Respuesta inválida.');
                     }
                 } else {
-                    // Error de conexión HTTP (ej. 404, 500 del servidor)
+                    // Si llega aquí, es un Error HTTP (404, 500)
                     throw new Error('Error de conexión HTTP: ' + response.status);
                 }
 
@@ -221,10 +220,9 @@
             }
         }
 
-        // Asignación de eventos: Cambiamos a controlValve(estado) y corregimos el orden
-        // La DB tiene 1=Abierta, 0=Cerrada, el control manda el estado deseado.
-        btnAbrir.addEventListener('click', () => controlValve(1)); // Abrir (Estado 1)
-        btnCerrar.addEventListener('click', () => controlValve(0)); // Cerrar (Estado 0)
+        // Asignación de eventos: Cambiamos a controlValve(estado)
+        btnAbrir.addEventListener('click', () => controlValve(1)); 
+        btnCerrar.addEventListener('click', () => controlValve(0)); 
         btnVolver.addEventListener('click', () => window.history.back());
 
         // Carga inicial y actualización periódica

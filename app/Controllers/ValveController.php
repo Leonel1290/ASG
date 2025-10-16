@@ -3,14 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\DispositivoModel;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Controller;
-use CodeIgniter\RESTful\ResourceController; // Usamos ResourceController para consistencia en la API
+use CodeIgniter\RESTful\ResourceController;
 
-// Cambiamos a ResourceController si maneja rutas RESTful, si no, mantenemos Controller, 
-// pero para simplificar, unificamos la lógica aquí.
-
-class ValveController extends ResourceController // Usamos ResourceController para mantener la estructura de API
+// Extiende de ResourceController para mantener la estructura de API
+class ValveController extends ResourceController
 {
     protected $dispositivoModel;
 
@@ -25,17 +21,13 @@ class ValveController extends ResourceController // Usamos ResourceController pa
 
     /**
      * Función principal para controlar la válvula (abrir/cerrar) desde la página web.
-     * Mantiene la lógica original con verificación de sesión/permisos.
      */
     public function controlValve()
     {
         $action = $this->request->getPost('action');
         $mac = $this->request->getPost('mac');
 
-        // ... (Tu lógica de validación de sesión y permisos aquí, si la tienes) ...
-
         if (empty($mac)) {
-             // Retorno de error si falta la MAC
             if ($this->request->isAJAX()) {
                 return $this->response->setStatusCode(400)->setJSON([
                     'status' => 'error',
@@ -44,15 +36,13 @@ class ValveController extends ResourceController // Usamos ResourceController pa
             }
         }
 
-        // Actualizar el estado de la válvula en la DB
-        $estado = ($action === 'open') ? 1 : 0; // 1 = abierta, 0 = cerrada 
+        $estado = ($action === 'open') ? 1 : 0; 
         $updated = $this->dispositivoModel->updateDispositivoByMac($mac, [
             'estado_valvula' => $estado,
             'ultima_actualizacion' => date('Y-m-d H:i:s')
         ]);
 
         if ($updated) {
-            // Respuesta exitosa
             if ($this->request->isAJAX()) {
                 return $this->response->setJSON([
                     'status' => 'success',
@@ -63,7 +53,6 @@ class ValveController extends ResourceController // Usamos ResourceController pa
                 return redirect()->to('/detalles/' . $mac)->with('success', 'Válvula ' . ($action === 'open' ? 'abierta' : 'cerrada') . ' correctamente.');
             }
         } else {
-            // Error en la actualización
             return $this->response->setStatusCode(500)->setJSON([
                 'status' => 'error',
                 'message' => 'Error al actualizar el estado de la válvula.'
@@ -71,47 +60,14 @@ class ValveController extends ResourceController // Usamos ResourceController pa
         }
     }
 
-
-    // ====================================================================
-    // 📊 MÉTODOS DE ESTADO (MOVIDOS DESDE ServoController) 📊
-    // ====================================================================
-
     /**
-     * Obtiene el estado actual de la válvula para una MAC específica.
-     * Mover a /valve/obtenerEstado/{mac}
-     * @param string $mac La dirección MAC del dispositivo.
-     */
-    public function obtenerEstado(string $mac)
-    {
-        if (empty($mac)) {
-            return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Falta la MAC.']);
-        }
-
-        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
-
-        if ($dispositivo) {
-            return $this->response->setJSON([
-                'status' => 'success',
-                'estado' => (int)$dispositivo->estado_valvula // Devuelve 0 o 1
-            ]);
-        } else {
-            return $this->response->setStatusCode(404)->setJSON([
-                'status' => 'error',
-                'message' => 'Dispositivo no encontrado.'
-            ]);
-        }
-    }
-
-    /**
-     * Actualiza el estado de la válvula para una MAC específica (Usado por los botones).
-     * Mover a /valve/actualizarEstado (POST)
+     * Actualiza el estado de la válvula para una MAC específica (Usado por los botones AJAX).
      */
     public function actualizarEstado()
     {
         $mac = $this->request->getPost('mac');
         $estado = $this->request->getPost('estado');
 
-        // Validar que los datos no estén vacíos
         if ($mac === null || !in_array($estado, ['0', '1'])) {
             return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'MAC o estado no válidos.']);
         }
@@ -119,7 +75,6 @@ class ValveController extends ResourceController // Usamos ResourceController pa
         $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
         if ($dispositivo) {
-            // Usamos updateDispositivoByMac si está definido en tu modelo, o la forma estándar:
             $updated = $this->dispositivoModel->where('MAC', $mac)->set(['estado_valvula' => $estado])->update();
 
             if ($updated) {
@@ -129,6 +84,45 @@ class ValveController extends ResourceController // Usamos ResourceController pa
             }
         } else {
             return $this->response->setStatusCode(404)->setJSON(['status' => 'error', 'message' => 'Dispositivo no encontrado.']);
+        }
+    }
+    
+    // ====================================================================
+    // 🤖 MÉTODO CRÍTICO: API PARA ESP32 Y PWA (TEXTO PLANO) 🤖
+    // ====================================================================
+
+    /**
+     * Maneja la ruta /api/valve_status (GET) para el ESP32 y el JavaScript de la PWA.
+     * Devuelve el estado en TEXTO PLANO (1, 0, -1, -2, -4).
+     */
+    public function obtenerEstadoSimple()
+    {
+        $mac = $this->request->getGet('mac');
+        $apiKey = $this->request->getGet('api_key');
+        
+        // **IMPORTANTE**: Clave API que usas en main.py y detalles.php
+        $API_KEY_EXPECTED = 'SUPER_SECRET_API_MLUS'; 
+
+        // 1. -4: Verificar parámetros
+        if (empty($mac) || empty($apiKey)) {
+            // Devolver estado 200 con cuerpo -4 (como hacía el PHP simple)
+            return $this->response->setBody("-4")->setStatusCode(200); 
+        }
+
+        // 2. -2: Verificar clave API
+        if ($apiKey !== $API_KEY_EXPECTED) {
+            return $this->response->setBody("-2")->setStatusCode(200);
+        }
+
+        // 3. Consultar DB
+        $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
+
+        if ($dispositivo) {
+            // Devolver estado (0 o 1)
+            return $this->response->setBody((string)$dispositivo->estado_valvula)->setStatusCode(200);
+        } else {
+            // -1: Dispositivo no encontrado
+            return $this->response->setBody("-1")->setStatusCode(200);
         }
     }
 }
