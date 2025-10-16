@@ -7,7 +7,11 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 
-// --- HOME ---
+// ===================================================================
+// 🌐 RUTAS DE LA APLICACIÓN WEB (Limpias y Agrupadas) 🌐
+// ===================================================================
+
+// --- HOME / SIMULACIÓN ---
 $routes->get('/', 'Home::index');
 $routes->get('simulacion', 'Home::simulacion');
 
@@ -32,30 +36,25 @@ $routes->post('/reset-password', 'Home::resetPassword');
 $routes->group('perfil', function($routes) {
     $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
-    $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
-    $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
-    $routes->post('eliminar-cuenta', 'PerfilController::eliminarCuenta');
-    $routes->get('config_form', 'PerfilController::configForm');
-    $routes->post('actualizar', 'PerfilController::actualizar');
-    $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
-    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
-    $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
-    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
+    $routes->get('logout', 'PerfilController::logout');
 });
 
-// --- ENLACE DE DISPOSITIVOS ---
-$routes->get('/enlace', 'EnlaceController::index');
-$routes->post('/enlace/store', 'EnlaceController::store');
+// --- DISPOSITIVOS (AGRUPADAS) ---
+$routes->group('dispositivos', function($routes) {
+    $routes->get('/', 'DispositivoController::index');
+    $routes->post('registrar', 'DispositivoController::registrarDispositivo');
+    $routes->post('eliminar', 'DispositivoController::eliminarDispositivo');
+});
 
-// --- DETALLES DE DISPOSITIVO (Usamos (.+) para aceptar la MAC) ---
-$routes->get('/detalles/(.+)', 'DetalleController::detalles/$1');
+// --- DETALLES DE LECTURAS (UNIFICADA) ---
+$routes->get('detalles/(:any)', 'DetalleController::detalles/$1'); // Esta ruta llama a la vista detalles.php
 
-// --- HISTORIAL DE ALERTAS ---
-$routes->get('/alertas', 'AlertasController::index');
 
-// --- LECTURAS ---
-$routes->get('lecturas/obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
+// --- LECTURAS (AGRUPADAS) ---
+$routes->group('lecturas', function($routes) {
+    $routes->get('/', 'Lecturas::index');
+    $routes->get('obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
+});
 
 // --- REGISTROS DE GAS (AGRUPADAS) ---
 $routes->group('registros-gas', function($routes) {
@@ -63,17 +62,20 @@ $routes->group('registros-gas', function($routes) {
     $routes->get('(.+)', 'RegistrosGasController::verDispositivo/$1');
 });
 
-// --- CONTROL DE VÁLVULA DESDE WEB (UI) ---
+
+// ===================================================================
+// 💧 RUTAS DE VÁLVULA (CONTROL Y ESTADO UNIFICADO) 💧
+// ===================================================================
+
+// Ruta principal para enviar la acción de control (POST /valve/control)
 $routes->post('valve/control', 'ValveController::controlValve');
 
-// --- SERVOS (AGRUPADAS) ---
-$routes->group('servo', function($routes) {
-    $routes->get('/', 'ServoController::index');
-    $routes->post('abrir', 'ServoController::abrir');
-    $routes->post('cerrar', 'ServoController::cerrar');
-    $routes->get('obtenerEstado/(.+)', 'ServoController::obtenerEstado/$1');
-    $routes->post('actualizarEstado', 'ServoController::actualizarEstado');
-});
+// ✅ RUTA REEMPLAZADA: Obtener estado (reemplaza /servo/obtenerEstado/{MAC})
+$routes->get('valve/obtenerEstado/(.+)', 'ValveController::obtenerEstado/$1');
+
+// ✅ RUTA REEMPLAZADA: Actualizar estado (reemplaza /servo/actualizarEstado)
+$routes->post('valve/actualizarEstado', 'ValveController::actualizarEstado');
+
 
 // --- COMPRA / PWA / OTROS ---
 $routes->get('/comprar', 'Home::comprar');
@@ -86,12 +88,15 @@ $routes->get('prueba', function() {
 });
 
 
+// ===================================================================
+// 🤖 RUTAS DE API PARA EL ESP32 (MANTENER) 🤖
+// ===================================================================
 
-$routes->post('api/send_gas_data', 'LecturasController::guardar');
+// Ruta para ENVIAR la lectura de gas (POST /api/send_gas_data)
+$routes->post('api/send_gas_data', 'LecturasController::guardar'); 
 
-
-$routes->get('api/get_valve_status', 'ApiEspController::estadoValvula');
-
-
-$routes->get('api/valve_status', 'ApiEspController::estadoValvula');
-
+// Ruta para CONSULTAR el estado de la válvula (GET /api/valve_status)
+// Esta ruta es manejada por el archivo get_valve_status.php y NO por un controlador de CodeIgniter.
+// La ruta DEBE seguir apuntando al archivo directamente.
+// Si esta ruta se define en Routes.php, CI intentará buscar un controlador. 
+// Asumo que tu configuración de CI en public/index.php permite que el archivo PHP se ejecute directamente.
