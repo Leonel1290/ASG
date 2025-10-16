@@ -428,12 +428,6 @@
                         processingModal.hide();
                         
                         if (details.status === "COMPLETED") {
-                            // Si backend adjuntó el ID de la compra, redirigir a formulario de dirección
-                            if (details.compra_id) {
-                                window.location.href = `/direccion/nueva/${details.compra_id}`;
-                                return;
-                            }
-                            // Fallback al modal si no viene compra_id
                             successModal.show();
                         } else {
                             showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
