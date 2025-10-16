@@ -100,29 +100,31 @@ class ValveController extends ResourceController
         $mac = $this->request->getGet('mac');
         $apiKey = $this->request->getGet('api_key');
         
-        // **IMPORTANTE**: Clave API que usas en main.py y detalles.php
         $API_KEY_EXPECTED = 'SUPER_SECRET_API_MLUS'; 
 
         // 1. -4: Verificar parámetros
         if (empty($mac) || empty($apiKey)) {
-            // Devolver estado 200 con cuerpo -4 (como hacía el PHP simple)
-            return $this->response->setBody("-4")->setStatusCode(200); 
+            $this->response->setBody("-4")->setStatusCode(200)->send();
+            exit; // ⬅️ CRÍTICO: Asegura que solo se envíe "-4"
         }
 
         // 2. -2: Verificar clave API
         if ($apiKey !== $API_KEY_EXPECTED) {
-            return $this->response->setBody("-2")->setStatusCode(200);
+            $this->response->setBody("-2")->setStatusCode(200)->send();
+            exit; // ⬅️ CRÍTICO: Asegura que solo se envíe "-2"
         }
 
         // 3. Consultar DB
         $dispositivo = $this->dispositivoModel->where('MAC', $mac)->first();
 
         if ($dispositivo) {
-            // Devolver estado (0 o 1)
-            return $this->response->setBody((string)$dispositivo->estado_valvula)->setStatusCode(200);
+            $estado = (string)$dispositivo->estado_valvula;
+            $this->response->setBody($estado)->setStatusCode(200)->send();
+            exit; // ⬅️ CRÍTICO: Asegura que solo se envíe "1" o "0"
         } else {
             // -1: Dispositivo no encontrado
-            return $this->response->setBody("-1")->setStatusCode(200);
+            $this->response->setBody("-1")->setStatusCode(200)->send();
+            exit; // ⬅️ CRÍTICO: Asegura que solo se envíe "-1"
         }
     }
 }
