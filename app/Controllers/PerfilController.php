@@ -127,53 +127,64 @@ class PerfilController extends BaseController
     }
 
     public function enviarVerificacion()
-    {
-        $session = session();
-        $usuarioId = $session->get('id');
+{
+    $session = session();
+    $usuarioId = $session->get('id');
 
-        if (!$usuarioId) {
-            return redirect()->to('/login')->with('error', 'Sesión expirada. Por favor, inicia sesión de nuevo.');
-        }
-
-        $user = $this->userModel->find($usuarioId);
-        
-        if (empty($user)) {
-            return redirect()->to('/perfil/configuracion')->with('error', 'Usuario no encontrado.');
-        }
-
-        $userEmail = $user['email'];
-
-        // --- LÓGICA DE RE-ENVÍO DE VERIFICACIÓN ---
-        
-        // 1. Generar un nuevo token de verificación.
-        // Reutilizamos el helper que probablemente usaste en RegisterController.
-        $verificationToken = bin2hex(random_bytes(32)); 
-        
-        // 2. Actualizar el token en la base de datos (asumiendo que tienes un campo 'activation_token')
-        $this->userModel->update($usuarioId, ['activation_token' => $verificationToken]);
-        
-        $verificationLink = base_url('register/verify-email/' . $verificationToken);
-
-        // 3. Enviar Email
-        $email = \Config\Services::email();
-        $email->setTo($userEmail);
-        $email->setSubject('Verificación de Email de Configuración (Reenvío)');
-        $email->setMessage(
-            "Hola {$user['nombre']},<br><br>" .
-            "Recibimos una solicitud para verificar tu email y acceder a la configuración de tu perfil.<br>" .
-            "Haz clic en el siguiente enlace para verificar tu cuenta: <a href=\"{$verificationLink}\">Verificar Email</a>" .
-            "<br><br>Si no solicitaste esto, ignora este correo."
-        );
-        $email->setMailType('html'); // Asegurar que el mensaje se envíe como HTML
-
-        if ($email->send()) {
-            return redirect()->to('/perfil/configuracion')->with('success', '✅ Se ha enviado un nuevo correo de verificación a tu email. Por favor, revísalo para continuar con la configuración.');
-        } else {
-            // Error de envío de email
-            log_message('error', 'Fallo el reenvío de email de verificación para: ' . $userEmail . ' - ' . $email->printDebugger(['headers']));
-            return redirect()->to('/perfil/configuracion')->with('error', '❌ Hubo un error al intentar enviar el correo de verificación. Por favor, revisa la configuración de tu email en CodeIgniter.');
-        }
+    if (!$usuarioId) {
+        return redirect()->to('/login')->with('error', 'Debes iniciar sesión.');
     }
+
+    // 1. Obtener los datos del usuario
+    $usuario = $this->userModel->find($usuarioId);
+
+    if (!$usuario) {
+        return redirect()->to('/perfil')->with('error', 'Usuario no encontrado.');
+    }
+
+    // 2. Generar el Token de Verificación
+    // Genera un token único y seguro (64 caracteres hexadecimales)
+    $verificationToken = bin2hex(random_bytes(32)); 
+
+    // 3. Guardar el Token en la nueva columna 'activation_token'
+    // Esta línea ahora funciona gracias a que agregaste la columna en la DB
+    // y la pusiste en $allowedFields.
+    $updated = $this->userModel->update($usuarioId, [
+        'activation_token' => $verificationToken
+    ]);
+
+    if (!$updated) {
+        return redirect()->to('/perfil')->with('error', 'Error al guardar el token de verificación. Inténtalo de nuevo.');
+    }
+
+    // 4. Preparar y Enviar el Correo de Verificación
+    $email = \Config\Services::email();
+    
+    // Configura tu correo electrónico aquí (Servidor SMTP, credenciales, etc.)
+    // La configuración idealmente va en app/Config/Email.php
+    
+    $linkVerificacion = base_url('register/verify-email/' . $verificationToken);
+
+    $mensaje = view('emails/email_verificacion', [
+        'nombre' => $usuario['nombre'],
+        'link'   => $linkVerificacion
+    ]);
+
+    $email->setTo($usuario['email']);
+    $email->setSubject('Verifica tu cuenta ASG');
+    $email->setMessage($mensaje);
+
+    if ($email->send()) {
+        // Redirigir a una vista de éxito o al perfil con un mensaje
+        return redirect()->to('/perfil')->with('success', '¡Correo de verificación enviado! Revisa tu bandeja de entrada y spam.');
+    } else {
+        // En caso de fallo en el envío, loguear el error para debug.
+        log_message('error', 'Fallo al enviar el correo de verificación: ' . $email->printDebugger(['headers']));
+        
+        // Mostrar un mensaje de error al usuario
+        return redirect()->to('/perfil')->with('error', 'El token se generó, pero falló el envío del correo. Por favor, contacta a soporte.');
+    }
+}
 
     public function verificarEmailToken($token = null)
     {
@@ -181,19 +192,14 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil/configuracion')->with('error', 'Token de verificación no proporcionado.');
         }
 
-        $user = $this->userModel->where('reset_token', $token)->first();
+        $user = $this->userModel->where('activation_token', $token)->first();
 
         if (!$user) {
-            return redirect()->to('/perfil/configuracion')->with('error', 'Token de verificación inválido.');
+            return redirect()->to('/perfil/configuracion')->with('error', 'Token de verificación inválido o ya utilizado.');
         }
-
-        $expires = Time::parse($user['reset_expires']);
-        if ($expires->isBefore(Time::now())) {
-            $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-            return redirect()->to('/perfil/configuracion')->with('error', 'El token de verificación ha expirado. Por favor, solicita uno nuevo.');
-        }
-
-        $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
+        
+        $this->userModel->update($user['id'], ['activation_token' => null]);
+        
         $session = session();
         $session->set('email_verified_for_config', true);
 
