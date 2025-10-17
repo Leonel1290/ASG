@@ -129,44 +129,49 @@ class PerfilController extends BaseController
     public function enviarVerificacion()
     {
         $session = session();
-        $loggedInUserId = $session->get('id');
+        $usuarioId = $session->get('id');
 
-        if (!$loggedInUserId) {
-            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para enviar el correo de verificación.');
+        if (!$usuarioId) {
+            return redirect()->to('/login')->with('error', 'Sesión expirada. Por favor, inicia sesión de nuevo.');
         }
 
-        $user = $this->userModel->find($loggedInUserId);
-
-        if (!$user) {
-            $session->destroy();
-            return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
+        $user = $this->userModel->find($usuarioId);
+        
+        if (empty($user)) {
+            return redirect()->to('/perfil/configuracion')->with('error', 'Usuario no encontrado.');
         }
 
-        $email = $user['email'];
-        $token = random_string('alnum', 32);
-        $expires = Time::now()->addMinutes(15);
+        $userEmail = $user['email'];
 
-        $this->userModel->update($loggedInUserId, [
-            'reset_token' => $token,
-            'reset_expires' => $expires->toDateTimeString(),
-        ]);
+        // --- LÓGICA DE RE-ENVÍO DE VERIFICACIÓN ---
+        
+        // 1. Generar un nuevo token de verificación.
+        // Reutilizamos el helper que probablemente usaste en RegisterController.
+        $verificationToken = bin2hex(random_bytes(32)); 
+        
+        // 2. Actualizar el token en la base de datos (asumiendo que tienes un campo 'activation_token')
+        $this->userModel->update($usuarioId, ['activation_token' => $verificationToken]);
+        
+        $verificationLink = base_url('register/verify-email/' . $verificationToken);
 
-        $emailService = \Config\Services::email();
-        // Configura el remitente en app/Config/Email.php o .env
-        // $emailService->setFrom('againsafegas.ascii@gmail.com', 'ASG');
+        // 3. Enviar Email
+        $email = \Config\Services::email();
+        $email->setTo($userEmail);
+        $email->setSubject('Verificación de Email de Configuración (Reenvío)');
+        $email->setMessage(
+            "Hola {$user['nombre']},<br><br>" .
+            "Recibimos una solicitud para verificar tu email y acceder a la configuración de tu perfil.<br>" .
+            "Haz clic en el siguiente enlace para verificar tu cuenta: <a href=\"{$verificationLink}\">Verificar Email</a>" .
+            "<br><br>Si no solicitaste esto, ignora este correo."
+        );
+        $email->setMailType('html'); // Asegurar que el mensaje se envíe como HTML
 
-        $emailService->setTo($email);
-        $emailService->setSubject('Verificación de Email para Configuración de Perfil');
-        $verificationLink = base_url("perfil/verificar-email/{$token}");
-        $message = "Hola {$user['nombre']},\n\nHaz solicitado verificar tu email para acceder a la configuración de tu perfil.\n\nPor favor, haz clic en el siguiente enlace para verificar tu email:\n{$verificationLink}\n\nEste enlace expirará en 15 minutos.\n\nSi no solicitaste esta verificación, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
-        $emailService->setMessage($message);
-
-        if ($emailService->send()) {
-            log_message('debug', 'Correo de verificación de configuración enviado a: ' . $email);
-            return redirect()->to('/perfil/configuracion')->with('success', 'Se ha enviado un correo de verificación a tu email actual. Por favor, revisa tu bandeja de entrada.');
+        if ($email->send()) {
+            return redirect()->to('/perfil/configuracion')->with('success', '✅ Se ha enviado un nuevo correo de verificación a tu email. Por favor, revísalo para continuar con la configuración.');
         } else {
-            log_message('error', 'Error al enviar correo de verificación de configuración a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
-            return redirect()->to('/perfil/configuracion')->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
+            // Error de envío de email
+            log_message('error', 'Fallo el reenvío de email de verificación para: ' . $userEmail . ' - ' . $email->printDebugger(['headers']));
+            return redirect()->to('/perfil/configuracion')->with('error', '❌ Hubo un error al intentar enviar el correo de verificación. Por favor, revisa la configuración de tu email en CodeIgniter.');
         }
     }
 

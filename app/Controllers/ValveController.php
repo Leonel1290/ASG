@@ -60,9 +60,6 @@ class ValveController extends ResourceController
         }
     }
 
-    /**
-     * Actualiza el estado de la válvula para una MAC específica (Usado por los botones AJAX).
-     */
     public function actualizarEstado()
     {
         $mac = $this->request->getPost('mac');
@@ -87,14 +84,6 @@ class ValveController extends ResourceController
         }
     }
     
-    // ====================================================================
-    // 🤖 MÉTODO CRÍTICO: API PARA ESP32 Y PWA (TEXTO PLANO) 🤖
-    // ====================================================================
-
-    /**
-     * Maneja la ruta /api/valve_status (GET) para el ESP32 y el JavaScript de la PWA.
-     * Devuelve el estado en TEXTO PLANO (1, 0, -1, -2, -4).
-     */
     public function obtenerEstadoSimple()
     {
         $mac = $this->request->getGet('mac');

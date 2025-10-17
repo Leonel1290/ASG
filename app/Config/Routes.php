@@ -20,8 +20,8 @@ $routes->post('/register/store', 'RegisterController::store');
 $routes->get('/register/check-email', 'RegisterController::checkEmail');
 $routes->get('/register/verify-email/(:segment)', 'RegisterController::verifyEmailToken/$1');
 
-$routes->get('/login', 'Home::login'); 
-$routes->post('/login', 'Home::login'); 
+$routes->get('/login', 'Home::login'); // Vista de Login
+$routes->post('/login', 'Home::login'); // Procesar Login
 $routes->get('/loginobtener', 'Home::loginobtener');
 $routes->post('/logout', 'Home::logout');
 
@@ -35,24 +35,13 @@ $routes->post('/reset-password', 'Home::resetPassword');
 $routes->group('perfil', function($routes) {
     $routes->get('/', 'PerfilController::index');
     $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->get('logout', 'PerfilController::logout');
-});
-
-// --- DISPOSITIVOS (AGRUPADAS) ---
-$routes->group('dispositivos', function($routes) {
-    $routes->get('/', 'DispositivoController::index');
-    $routes->post('registrar', 'DispositivoController::registrarDispositivo');
-    $routes->post('eliminar', 'DispositivoController::eliminarDispositivo');
-});
-
-// --- DETALLES DE LECTURAS (UNIFICADA) ---
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1'); 
-
-
-// --- LECTURAS (AGRUPADAS) ---
-$routes->group('lecturas', function($routes) {
-    $routes->get('/', 'Lecturas::index');
-    $routes->get('obtenerUltimaLectura/(.+)', 'Lecturas::obtenerUltimaLectura/$1');
+    
+    // ✅ CORRECCIÓN: RUTA AÑADIDA para manejar el formulario POST
+    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion'); 
+    
+    $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editarDispositivo/$1');
+    $routes->post('dispositivo/actualizar', 'PerfilController::actualizarDispositivo');
+    $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
 });
 
 // --- REGISTROS DE GAS (AGRUPADAS) ---
@@ -74,7 +63,7 @@ $routes->post('valve/actualizarEstado', 'ValveController::actualizarEstado');
 
 
 // ===================================================================
-// 🤖 RUTAS DE API PARA EL ESP32 y PWA (¡LA CORRECCIÓN DEL 404!) 🤖
+// 🤖 RUTAS DE API PARA EL ESP32 y PWA 🤖
 // ===================================================================
 
 // RUTA CRÍTICA: /api/valve_status (GET) - Soluciona el 404 para el ESP32 y la PWA
@@ -93,3 +82,6 @@ $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
 $routes->get('prueba', function() {
     return '¡Ruta de prueba funcionando!';
 });
+
+// Nota: Puedes eliminar las rutas 'servo' que has unificado en ValveController
+// $routes->group('servo', function($routes) { ... });
