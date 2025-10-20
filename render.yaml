@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: sentinel-gas-alarm
+    env: python
+    plan: free
+    branch: Aplicacion
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
