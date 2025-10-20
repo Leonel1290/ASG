@@ -508,7 +508,7 @@ class PerfilController extends BaseController
         'direcciones' => $direcciones
     ];
 
-    return view('perfil/mis_compras', $data);
+    return view('/mis_compras', $data);
 }
 
 //Nuevo
