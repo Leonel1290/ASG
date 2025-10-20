@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Sentinel Gas Alarm</string>
+    <string name="status_loading">Cargando...</string>
+    <string name="status_normal">SISTEMA NORMAL</string>
+    <string name="status_alarm">ALARMA ACTIVA</string>
+    <string name="silence_button">SILENCIAR ALARMA</string>
+    <string name="last_update">Última actualización: %s</string>
+</resources>
