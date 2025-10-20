@@ -409,7 +409,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                         </li>
                         <li class="nav-item">
                     <a class="nav-link" href="#misComprasSection" onclick="event.preventDefault(); document.getElementById('misComprasSection').scrollIntoView({ behavior: 'smooth' });">
-                        <i class="fas fa-shopping-cart me-1"></i> Mis Compras
+                        <a class="nav-link" href="<?= base_url('/perfil/mis-compras') ?>"> Mis Compras
                     </a>
                 </li>
                     </ul>
