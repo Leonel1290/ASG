@@ -91,5 +91,5 @@ $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1'
 $routes->get('descarga', 'Home::descarga');
 
 //Comprasid
-$routes->get('perfil/mis_compras', 'PerfilController::misCompras');
+$routes->get('/mis_compras', 'PerfilController::misCompras');
 $routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDireccionEnvio');
