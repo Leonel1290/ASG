@@ -495,13 +495,17 @@ class PerfilController extends BaseController
         return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
     }
 
-    // Obtener compras del usuario
-    $comprasModel = new \App\Models\ComprasModel();
-    $compras = $comprasModel->where('email', session()->get('email'))->findAll();
-    
-    // Obtener direcciones de envío existentes
+    // Obtener direcciones de envío existentes del usuario
     $direccionesModel = new \App\Models\DireccionesEnvioModel();
     $direcciones = $direccionesModel->where('id_usuario', $usuarioId)->findAll();
+
+    // Obtener las compras asociadas a las direcciones
+    $compras = [];
+    if (!empty($direcciones)) {
+        $comprasModel = new \App\Models\ComprasModel();
+        $compraIds = array_column($direcciones, 'compra_id');
+        $compras = $comprasModel->whereIn('id', $compraIds)->findAll();
+    }
 
     $data = [
         'compras' => $compras,
@@ -577,7 +581,7 @@ public function guardarDireccionEnvio()
     ];
 
     if ($direccionesModel->insert($data)) {
-        return redirect()->back()->with('success', 'Dirección de envío guardada correctamente');
+        return redirect()->to('/mis_compras')->with('success', 'Dirección de envío guardada correctamente. Tu orden de compra ahora aparece en la lista.');
     } else {
         return redirect()->back()->with('error', 'Error al guardar la dirección de envío');
     }

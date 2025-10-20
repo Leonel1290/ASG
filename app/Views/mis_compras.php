@@ -200,53 +200,66 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
             </div>
 
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i> Mis Compras</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($compras)): ?>
-                            <p class="text-center">No tienes compras registradas</p>
-                        <?php else: ?>
-                            <?php foreach ($compras as $compra): ?>
-                                <div class="border-bottom pb-3 mb-3">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>Order ID: <?= esc($compra['order_id']) ?></strong>
-                                        <span class="badge bg-success"><?= esc($compra['status']) ?></span>
-                                    </div>
-                                    <div>Payment ID: <?= esc($compra['payment_id']) ?></div>
-                                    <div>Monto: $<?= number_format($compra['monto'], 2) ?></div>
-                                    <div>Fecha: <?= date('d/m/Y H:i', strtotime($compra['fecha_compra'])) ?></div>
-                                    
-                                    <?php 
-                                    $direccionEnvio = array_filter($direcciones, function($dir) use ($compra) {
-                                        return $dir['compra_id'] == $compra['id'];
-                                    });
-                                    $direccionEnvio = !empty($direccionEnvio) ? reset($direccionEnvio) : null;
-                                    ?>
-                                    
-                                    <?php if ($direccionEnvio): ?>
-                                        <div class="mt-2 p-2 bg-dark rounded">
-                                            <small>
-                                                <strong>Dirección de envío:</strong><br>
-                                                <?= esc($direccionEnvio['calle']) ?> <?= esc($direccionEnvio['numero']) ?><br>
-                                                <?= esc($direccionEnvio['ciudad']) ?>, <?= esc($direccionEnvio['provincia']) ?><br>
-                                                C.P. <?= esc($direccionEnvio['codigo_postal']) ?>
-                                            </small>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="mt-2">
-                                            <small class="text-warning">Sin dirección de envío registrada</small>
-                                        </div>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i> Mis Órdenes de Compra</h5>
+        </div>
+        <div class="card-body">
+            <?php if (empty($compras)): ?>
+                <p class="text-center text-muted">
+                    <i class="fas fa-shopping-cart fa-2x mb-3"></i><br>
+                    No tienes órdenes de compra registradas.<br>
+                    <small>Agrega un Payment ID válido para ver tu orden aquí.</small>
+                </p>
+            <?php else: ?>
+                <?php foreach ($compras as $compra): ?>
+                    <?php 
+                    // Encontrar la dirección asociada a esta compra
+                    $direccionEnvio = null;
+                    foreach ($direcciones as $direccion) {
+                        if ($direccion['compra_id'] == $compra['id']) {
+                            $direccionEnvio = $direccion;
+                            break;
+                        }
+                    }
+                    ?>
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>Orden: <?= esc($compra['order_id']) ?></strong>
+                                <div class="small text-muted">Payment ID: <?= esc($compra['payment_id']) ?></div>
+                            </div>
+                            <span class="badge bg-success"><?= esc($compra['status']) ?></span>
+                        </div>
+                        
+                        <div class="mt-2">
+                            <div><strong>Monto:</strong> $<?= number_format($compra['monto'], 2) ?></div>
+                            <div><strong>Fecha:</strong> <?= date('d/m/Y H:i', strtotime($compra['fecha_compra'])) ?></div>
+                        </div>
+                        
+                        <?php if ($direccionEnvio): ?>
+                            <div class="mt-2 p-2 bg-dark rounded">
+                                <small>
+                                    <strong><i class="fas fa-truck me-1"></i> Dirección de envío:</strong><br>
+                                    <?= esc($direccionEnvio['nombre']) ?> <?= esc($direccionEnvio['apellido']) ?><br>
+                                    <?= esc($direccionEnvio['calle']) ?> <?= esc($direccionEnvio['numero']) ?>
+                                    <?= $direccionEnvio['piso'] ? ', Piso ' . esc($direccionEnvio['piso']) : '' ?>
+                                    <?= $direccionEnvio['depto'] ? ', Depto ' . esc($direccionEnvio['depto']) : '' ?><br>
+                                    <?= esc($direccionEnvio['ciudad']) ?>, <?= esc($direccionEnvio['provincia']) ?><br>
+                                    <?= esc($direccionEnvio['pais']) ?> - C.P. <?= esc($direccionEnvio['codigo_postal']) ?><br>
+                                    <strong>Teléfono:</strong> <?= esc($direccionEnvio['telefono']) ?>
+                                    <?php if ($direccionEnvio['referencias']): ?>
+                                        <br><strong>Referencias:</strong> <?= esc($direccionEnvio['referencias']) ?>
                                     <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
+                                </small>
+                            </div>
                         <?php endif; ?>
                     </div>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
