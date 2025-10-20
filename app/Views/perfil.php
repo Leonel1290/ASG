@@ -408,9 +408,9 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Mi Perfil</a>
                         </li>
                         <li class="nav-item">
-                    <a class="nav-link" href="#misComprasSection" onclick="event.preventDefault(); document.getElementById('misComprasSection').scrollIntoView({ behavior: 'smooth' });">
-                        <a class="nav-link" href="<?= base_url('/perfil/mis-compras') ?>"> Mis Compras
-                    </a>
+                     <a class="nav-link" href="<?= base_url('/perfil/mis-compras') ?>">
+                        <i class="fas fa-shopping-cart me-1"></i> Mis Compras
+                      </a>
                 </li>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
