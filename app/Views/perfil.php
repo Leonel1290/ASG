@@ -408,7 +408,7 @@ $lecturasPorMac = $lecturasPorMac ?? []; // This variable doesn't seem used in t
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Mi Perfil</a>
                         </li>
                         <li class="nav-item">
-                     <a class="nav-link" href="<?= base_url('/perfil/mis-compras') ?>">
+                     <a class="nav-link" href="<?= base_url('/perfil/mis_compras') ?>">
                         <i class="fas fa-shopping-cart me-1"></i> Mis Compras
                       </a>
                 </li>
