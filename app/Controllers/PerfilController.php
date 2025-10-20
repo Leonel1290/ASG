@@ -486,4 +486,100 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
     }
+    public function misCompras()
+{
+    $session = session();
+    $usuarioId = $session->get('id');
+
+    if (!$usuarioId) {
+        return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
+    }
+
+    // Obtener compras del usuario
+    $comprasModel = new \App\Models\ComprasModel();
+    $compras = $comprasModel->where('email', session()->get('email'))->findAll();
+    
+    // Obtener direcciones de envío existentes
+    $direccionesModel = new \App\Models\DireccionesEnvioModel();
+    $direcciones = $direccionesModel->where('id_usuario', $usuarioId)->findAll();
+
+    $data = [
+        'compras' => $compras,
+        'direcciones' => $direcciones
+    ];
+
+    return view('perfil/mis_compras', $data);
+}
+
+//Nuevo
+public function guardarDireccionEnvio()
+{
+    $session = session();
+    $userId = $session->get('id');
+
+    if (!$userId) {
+        return redirect()->to('/login')->with('error', 'Debes iniciar sesión para realizar esta acción.');
+    }
+
+    $validation = \Config\Services::validation();
+    $validation->setRules([
+        'payment_id' => 'required',
+        'nombre' => 'required',
+        'apellido' => 'required',
+        'telefono' => 'required',
+        'pais' => 'required',
+        'provincia' => 'required',
+        'ciudad' => 'required',
+        'calle' => 'required',
+        'numero' => 'required',
+        'codigo_postal' => 'required'
+    ]);
+
+    if (!$validation->withRequest($this->request)->run()) {
+        return redirect()->back()->with('error', 'Por favor complete todos los campos obligatorios');
+    }
+
+    $comprasModel = new \App\Models\ComprasModel();
+    $compra = $comprasModel->where('payment_id', $this->request->getPost('payment_id'))->first();
+
+    if (!$compra) {
+        return redirect()->back()->with('error', 'El payment_id no existe o no es válido');
+    }
+
+    // Verificar que el payment_id pertenezca al usuario logueado
+    if ($compra['email'] !== session()->get('email')) {
+        return redirect()->back()->with('error', 'El payment_id no pertenece a su cuenta');
+    }
+
+    $direccionesModel = new \App\Models\DireccionesEnvioModel();
+    
+    // Verificar si ya existe una dirección para esta compra
+    $direccionExistente = $direccionesModel->where('compra_id', $compra['id'])->first();
+    if ($direccionExistente) {
+        return redirect()->back()->with('error', 'Ya existe una dirección de envío registrada para esta compra');
+    }
+
+    $data = [
+        'compra_id' => $compra['id'],
+        'id_usuario' => $userId,
+        'nombre' => $this->request->getPost('nombre'),
+        'apellido' => $this->request->getPost('apellido'),
+        'telefono' => $this->request->getPost('telefono'),
+        'pais' => $this->request->getPost('pais'),
+        'provincia' => $this->request->getPost('provincia'),
+        'ciudad' => $this->request->getPost('ciudad'),
+        'calle' => $this->request->getPost('calle'),
+        'numero' => $this->request->getPost('numero'),
+        'piso' => $this->request->getPost('piso'),
+        'depto' => $this->request->getPost('depto'),
+        'codigo_postal' => $this->request->getPost('codigo_postal'),
+        'referencias' => $this->request->getPost('referencias')
+    ];
+
+    if ($direccionesModel->insert($data)) {
+        return redirect()->back()->with('success', 'Dirección de envío guardada correctamente');
+    } else {
+        return redirect()->back()->with('error', 'Error al guardar la dirección de envío');
+    }
+}
 }
