@@ -507,7 +507,7 @@
                         
                         if (details.status === "COMPLETED") {
                             // Mostrar el payment_id en el modal
-                            if (details.payment_id) {
+                            if (details.payment_id) { 
                                 document.getElementById('payment-id-display').textContent = details.payment_id;
                             }
                             successModal.show();
