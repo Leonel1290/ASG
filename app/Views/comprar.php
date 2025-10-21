@@ -341,32 +341,37 @@
         </div>
     </div>
 
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!</p>
-                    <div class="alert alert-info mt-3">
-                        <strong>Tu ID de compra:</strong>
-                        <div class="d-flex align-items-center mt-2">
-                            <code id="payment-id-display" class="bg-dark text-light p-2 rounded flex-grow-1 code-display" style="font-size: 0.9rem;"></code>
-                            <button class="btn btn-sm btn-outline-light ms-2" id="copy-payment-id-btn">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <small class="text-muted d-block mt-2">Guarda este ID para vincular tu dispositivo luego</small>
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!</p>
+                <div class="alert alert-info mt-3">
+                    <strong>Tu ID de compra:</strong>
+                    <div class="d-flex align-items-center mt-2">
+                        <code id="payment-id-display" class="bg-dark text-light p-2 rounded flex-grow-1 code-display" style="font-size: 0.9rem;">
+                            Cargando...
+                        </code>
+                        <button class="btn btn-sm btn-outline-light ms-2" id="copy-payment-id-btn">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">Guarda este ID para vincular tu dispositivo luego</small>
+                    <div id="payment-id-warning" class="text-warning mt-2" style="display: none;">
+                        <small><i class="fas fa-exclamation-triangle"></i> Si no ves el ID, revisa tu email o contacta con soporte</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <a href="/" class="btn btn-primary">Continuar al Inicio</a>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="/" class="btn btn-primary">Continuar al Inicio</a>
             </div>
         </div>
     </div>
+</div>
 
     <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
         <div class="modal-dialog">

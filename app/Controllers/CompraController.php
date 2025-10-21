@@ -268,36 +268,51 @@ HTML;
                 // Extraer email del pagador (si PayPal lo envía)
                 $payerEmail = $result['payer']['email_address'] ?? null;
 
-                $data = [
-                    'order_id'   => $result['id'],
-                    'payer_id'   => $result['payer']['payer_id'] ?? null,
-                    'payment_id' => $capture['id'] ?? null,
-                    'status'     => $result['status'],
-                    'monto'      => $capture['amount']['value'] ?? null,
-                    'nombre'     => $payerName,
-                    'email'      => $payerEmail,
-                    'fecha_compra' => date('Y-m-d H:i:s')
-                ];
-                
-                log_message('debug', 'Datos a guardar: ' . print_r($data, true));
-                
-                try {
-                    $this->comprasModel->insert($data);
-                    log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
+    $data = [
+        'order_id'   => $result['id'],
+        'payer_id'   => $result['payer']['payer_id'] ?? null,
+        'payment_id' => $capture['id'] ?? null,
+        'status'     => $result['status'],
+        'monto'      => $capture['amount']['value'] ?? null,
+        'nombre'     => $payerName,
+        'email'      => $payerEmail,
+        'fecha_compra' => date('Y-m-d H:i:s')
+    ];
+    
+    log_message('debug', 'Datos a guardar: ' . print_r($data, true));
+    
+    try {
+        $this->comprasModel->insert($data);
+        log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
 
-                    $recipient = $payerEmail ?: (session()->get('email') ?? null);
-                    if (!empty($recipient)) {
-                        $this->sendPurchaseEmail($recipient, $data);
-                    } else {
-                        log_message('warning', 'No se envió email: email del pagador y email de sesión no disponibles.');
-                    }
-                } catch (\Exception $e) {
-                    log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
-                    // No devolvemos error para no afectar la experiencia del usuario
-                }
-            }
+        $recipient = $payerEmail ?: (session()->get('email') ?? null);
+        if (!empty($recipient)) {
+            $this->sendPurchaseEmail($recipient, $data);
+        } else {
+            log_message('warning', 'No se envió email: email del pagador y email de sesión no disponibles.');
+        }
+    } catch (\Exception $e) {
+        log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
+        // No devolvemos error para no afectar la experiencia del usuario
+    }
 
-            return $this->response->setJSON($result);
+    // ✅ MODIFICACIÓN: Devolver respuesta personalizada con payment_id
+    $responseData = [
+        'status' => 'COMPLETED',
+        'payment_id' => $capture['id'] ?? null, // ← Esto es lo que necesita el frontend
+        'order_id' => $result['id'],
+        'payer_id' => $result['payer']['payer_id'] ?? null,
+        'message' => 'Compra procesada exitosamente'
+    ];
+    
+    log_message('debug', 'Enviando respuesta al frontend: ' . print_r($responseData, true));
+    
+    return $this->response->setJSON($responseData);
+}
+
+// Si no fue COMPLETED, devolver la respuesta original de PayPal
+return $this->response->setJSON($result);
+
             
         } catch (\Exception $e) {
             log_message('error', 'Exception in captureOrder: ' . $e->getMessage());
