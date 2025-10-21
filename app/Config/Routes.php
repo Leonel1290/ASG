@@ -93,3 +93,8 @@ $routes->get('descarga', 'Home::descarga');
 //Comprasid
 $routes->get('/mis_compras', 'PerfilController::misCompras');
 $routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDireccionEnvio');
+
+
+// Rutas para probar emails
+$routes->get('test-email', 'TestEmail::index');
+$routes->get('test-email-simple', 'TestEmail::simpleTest');
