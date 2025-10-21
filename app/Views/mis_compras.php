@@ -200,6 +200,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
             </div>
 
             <div class="col-md-6">
+    <div class="col-md-6">
     <div class="card">
         <div class="card-header">
             <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i> Mis Órdenes de Compra</h5>
@@ -213,16 +214,6 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                 </p>
             <?php else: ?>
                 <?php foreach ($compras as $compra): ?>
-                    <?php 
-                    // Encontrar la dirección asociada a esta compra
-                    $direccionEnvio = null;
-                    foreach ($direcciones as $direccion) {
-                        if ($direccion['compra_id'] == $compra['id']) {
-                            $direccionEnvio = $direccion;
-                            break;
-                        }
-                    }
-                    ?>
                     <div class="border-bottom pb-3 mb-3">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
@@ -235,9 +226,12 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                         <div class="mt-2">
                             <div><strong>Monto:</strong> $<?= number_format($compra['monto'], 2) ?></div>
                             <div><strong>Fecha:</strong> <?= date('d/m/Y H:i', strtotime($compra['fecha_compra'])) ?></div>
+                            <div><strong>Email de compra:</strong> <?= esc($compra['email']) ?></div>
                         </div>
                         
-                        <?php if ($direccionEnvio): ?>
+                        <?php if (isset($direccionesIndexadas[$compra['id']])): 
+                            $direccionEnvio = $direccionesIndexadas[$compra['id']];
+                        ?>
                             <div class="mt-2 p-2 bg-dark rounded">
                                 <small>
                                     <strong><i class="fas fa-truck me-1"></i> Dirección de envío:</strong><br>
@@ -251,6 +245,13 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                     <?php if ($direccionEnvio['referencias']): ?>
                                         <br><strong>Referencias:</strong> <?= esc($direccionEnvio['referencias']) ?>
                                     <?php endif; ?>
+                                </small>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-2">
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Sin dirección de envío registrada
                                 </small>
                             </div>
                         <?php endif; ?>

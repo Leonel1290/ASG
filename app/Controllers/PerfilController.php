@@ -495,22 +495,25 @@ class PerfilController extends BaseController
         return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
     }
 
+    // Obtener compras directamente del usuario
+    $comprasModel = new \App\Models\ComprasModel();
+    $compras = $comprasModel->getComprasByUsuario($usuarioId);
+
     // Obtener direcciones de envío existentes del usuario
     $direccionesModel = new \App\Models\DireccionesEnvioModel();
     $direcciones = $direccionesModel->where('id_usuario', $usuarioId)->findAll();
 
-    // Obtener las compras asociadas a las direcciones
-    $compras = [];
-    if (!empty($direcciones)) {
-        $comprasModel = new \App\Models\ComprasModel();
-        $compraIds = array_column($direcciones, 'compra_id');
-        $compras = $comprasModel->whereIn('id', $compraIds)->findAll();
+    // Crear un array indexado por compra_id para fácil acceso
+    $direccionesIndexadas = [];
+    foreach ($direcciones as $direccion) {
+        $direccionesIndexadas[$direccion['compra_id']] = $direccion;
     }
 
     $data = [
         'compras' => $compras,
-        'direcciones' => $direcciones
+        'direccionesIndexadas' => $direccionesIndexadas
     ];
+
 
     return view('/mis_compras', $data);
 }
@@ -550,9 +553,9 @@ public function guardarDireccionEnvio()
         return redirect()->back()->with('error', 'El payment_id no existe o no es válido');
     }
 
-    // Verificar que el payment_id pertenezca al usuario logueado
-    if ($compra['email'] !== session()->get('email')) {
-        return redirect()->back()->with('error', 'El payment_id no pertenece a su cuenta');
+    // Verificar si la compra ya está asignada a otro usuario
+    if ($compra['id_usuario'] !== null && $compra['id_usuario'] != $userId) {
+        return redirect()->back()->with('error', 'Esta compra ya está asignada a otro usuario.');
     }
 
     $direccionesModel = new \App\Models\DireccionesEnvioModel();
@@ -561,6 +564,11 @@ public function guardarDireccionEnvio()
     $direccionExistente = $direccionesModel->where('compra_id', $compra['id'])->first();
     if ($direccionExistente) {
         return redirect()->back()->with('error', 'Ya existe una dirección de envío registrada para esta compra');
+    }
+
+    // Asignar el usuario a la compra (si no está asignado)
+    if ($compra['id_usuario'] === null) {
+        $comprasModel->asignarUsuario($this->request->getPost('payment_id'), $userId);
     }
 
     $data = [

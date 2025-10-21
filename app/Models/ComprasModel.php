@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use CodeIgniter\Model;
@@ -9,23 +8,26 @@ class ComprasModel extends Model
     protected $table = 'compras';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'order_id',
-        'payer_id',
-        'payment_id',
-        'status',
-        'monto',
-        'nombre', // Nombre del comprador (extraído de PayPal)
-        'email',  // Email del comprador
-        'fecha_compra'
+        'nombre', 'email', 'order_id', 'payer_id', 'payment_id', 
+        'status', 'monto', 'fecha_compra', 'id_usuario'
     ];
-
     protected $useTimestamps = false;
-    protected $createdField  = 'fecha_compra';
-    protected $updatedField  = null;
     
-    public function __construct()
+    /**
+     * Obtener compras por ID de usuario
+     */
+    public function getComprasByUsuario($userId)
     {
-        parent::__construct();
-        $this->useTimestamps = false;
+        return $this->where('id_usuario', $userId)->findAll();
+    }
+    
+    /**
+     * Asignar usuario a una compra por payment_id
+     */
+    public function asignarUsuario($paymentId, $userId)
+    {
+        return $this->where('payment_id', $paymentId)
+                    ->set('id_usuario', $userId)
+                    ->update();
     }
 }
