@@ -463,7 +463,6 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center pt-0 pb-4">
-                <a href="/perfil/mis_compras" class="btn btn-back me-2"><i class="fas fa-receipt me-1"></i> Ver Mis Compras</a>
                 <a href="/" class="btn btn-primary"><i class="fas fa-home me-1"></i> Continuar al Inicio</a>
             </div>
         </div>

@@ -9,16 +9,18 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Compras - ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* Variables de color adaptadas de inicio.php */
         :root {
-            --color-bg-primary: #1a202c; /* Fondo principal */
+            --color-bg-primary: #0D1F23; /* Fondo principal */
             --color-bg-secondary: #132E35; /* Fondo de tarjetas */
-            --color-bg-tertiary:rgb(21, 56, 85); /* Header de tarjetas / Elementos de acento */
+            --color-bg-tertiary: #2D4A53; /* Header de tarjetas / Elementos de acento */
             --color-text-primary: #AFB3B7; /* Texto claro principal */
             --color-text-secondary: #698180; /* Texto de acento / Botón hover */
             --color-accent: #698180; /* Color de acento (verde azulado) */
@@ -34,12 +36,21 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
             color: var(--color-text-primary);
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
+            /* Añadir padding para compensar el navbar fijo */
+            padding-top: 70px;
         }
         
-        /* Navbar */
+        /* Navbar - Adaptado a Fixed + Blur Effect de inicio.php */
         .navbar {
-            background-color: var(--color-bg-primary) !important;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            /* #0D1F23 es rgb(13, 31, 35) */
+            background-color: rgba(13, 31, 35, 0.9) !important; 
+            backdrop-filter: blur(8px); /* Efecto de vidrio esmerilado */
             border-bottom: 1px solid var(--color-border);
+            transition: background-color 0.3s ease; /* Transición sutil */
         }
 
         .navbar-brand, .nav-link {
@@ -372,7 +383,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                         </div>
                                         
                                         <?php if (isset($direccionesIndexadas[$compra['id']])): 
-                                            $direccionEnvio = $direccionesIndexadas[$compra['id']];
+                                                $direccionEnvio = $direccionesIndexadas[$compra['id']];
                                         ?>
                                             <div class="address-box">
                                                 <strong><i class="fas fa-truck me-1"></i> Dirección de Envío:</strong><br>
@@ -403,6 +414,22 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Asegúrate de que base_url('service-worker.js') apunte a la ruta correcta en Render
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
