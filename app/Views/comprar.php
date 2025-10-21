@@ -354,7 +354,7 @@
                         <strong>Tu ID de compra:</strong>
                         <div class="d-flex align-items-center mt-2">
                             <code id="payment-id-display" class="bg-dark text-light p-2 rounded flex-grow-1 code-display" style="font-size: 0.9rem;"></code>
-                            <button class="btn btn-sm btn-outline-light ms-2" onclick="copyPaymentId()">
+                            <button class="btn btn-sm btn-outline-light ms-2" id="copy-payment-id-btn">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -401,20 +401,53 @@
             errorDiv.innerText = message;
         }
 
+        // Función corregida para copiar el payment_id
         function copyPaymentId() {
             const paymentId = document.getElementById('payment-id-display').textContent;
+            if (!paymentId) return;
+            
             navigator.clipboard.writeText(paymentId).then(() => {
                 // Mostrar feedback visual
-                const copyBtn = event.target.closest('button');
+                const copyBtn = document.getElementById('copy-payment-id-btn');
                 const originalHTML = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.classList.remove('btn-outline-light');
                 copyBtn.classList.add('btn-success');
+                
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-outline-light');
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+                // Fallback para navegadores más antiguos
+                const tempInput = document.createElement('input');
+                tempInput.value = paymentId;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                // Mostrar feedback visual incluso con fallback
+                const copyBtn = document.getElementById('copy-payment-id-btn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.classList.remove('btn-outline-light');
+                copyBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-outline-light');
                 }, 2000);
             });
         }
+
+        // Agregar event listener después de que el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('copy-payment-id-btn').addEventListener('click', copyPaymentId);
+        });
 
         if (typeof paypal === 'undefined') {
             showErrorMessage("⚠️ Error: El SDK de PayPal no se ha cargado correctamente.");
