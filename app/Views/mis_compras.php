@@ -71,7 +71,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                             <a class="nav-link" href="<?= base_url('/perfil/configuracion') ?>">Mi Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="<?= base_url('/perfil/mis-compras') ?>">Mis Compras</a>
+                            <a class="nav-link active" href="<?= base_url('/mis_compras') ?>">Mis Compras</a>
                         </li>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
