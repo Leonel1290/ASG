@@ -16,9 +16,9 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
     <style>
         /* Variables de color adaptadas de inicio.php */
         :root {
-            --color-bg-primary: #0D1F23; /* Fondo principal */
+            --color-bg-primary: #1a202c; /* Fondo principal */
             --color-bg-secondary: #132E35; /* Fondo de tarjetas */
-            --color-bg-tertiary: #2D4A53; /* Header de tarjetas / Elementos de acento */
+            --color-bg-tertiary:rgb(21, 56, 85); /* Header de tarjetas / Elementos de acento */
             --color-text-primary: #AFB3B7; /* Texto claro principal */
             --color-text-secondary: #698180; /* Texto de acento / Botón hover */
             --color-accent: #698180; /* Color de acento (verde azulado) */
