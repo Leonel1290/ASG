@@ -239,6 +239,18 @@
             animation: spin 1s ease-in-out infinite;
             margin-right: 10px;
         }
+
+        /* Estilos para el payment_id */
+        .alert-info {
+            background-color: #0c2d6b;
+            border-color: #58a6ff;
+            color: #c9d1d9;
+        }
+
+        .code-display {
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
         
         /* ------------------- ANIMACIONES ------------------- */
         @keyframes fadeIn {
@@ -278,8 +290,10 @@
 </head>
 
 <body>
-    <div class="checkout-wrapper"> <div class="product-checkout-view">
-            <div class="product-image-container"> <img src="/imagenes/Sentinel.png" alt="Detector ASG">
+    <div class="checkout-wrapper"> 
+        <div class="product-checkout-view">
+            <div class="product-image-container"> 
+                <img src="/imagenes/Sentinel.png" alt="Detector ASG">
             </div>
             
             <div class="product-details-section">
@@ -335,7 +349,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!
+                    <p>Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!</p>
+                    <div class="alert alert-info mt-3">
+                        <strong>Tu ID de compra:</strong>
+                        <div class="d-flex align-items-center mt-2">
+                            <code id="payment-id-display" class="bg-dark text-light p-2 rounded flex-grow-1 code-display" style="font-size: 0.9rem;"></code>
+                            <button class="btn btn-sm btn-outline-light ms-2" onclick="copyPaymentId()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-2">Guarda este ID para vincular tu dispositivo luego</small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <a href="/" class="btn btn-primary">Continuar al Inicio</a>
@@ -343,6 +367,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content border-0">
@@ -374,6 +399,21 @@
         function showErrorMessage(message) {
             const errorDiv = document.getElementById('error-message');
             errorDiv.innerText = message;
+        }
+
+        function copyPaymentId() {
+            const paymentId = document.getElementById('payment-id-display').textContent;
+            navigator.clipboard.writeText(paymentId).then(() => {
+                // Mostrar feedback visual
+                const copyBtn = event.target.closest('button');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.classList.add('btn-success');
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('btn-success');
+                }, 2000);
+            });
         }
 
         if (typeof paypal === 'undefined') {
@@ -428,6 +468,10 @@
                         processingModal.hide();
                         
                         if (details.status === "COMPLETED") {
+                            // Mostrar el payment_id en el modal
+                            if (details.payment_id) {
+                                document.getElementById('payment-id-display').textContent = details.payment_id;
+                            }
                             successModal.show();
                         } else {
                             showErrorMessage("⚠️ Hubo un problema al procesar el pago.");
@@ -436,8 +480,7 @@
                     .catch(err => {
                         console.error("Error al capturar la orden:", err);
                         processingModal.hide();
-                        successModal.show();
-                        console.log("Pago exitoso pero posible error al guardar en BD");
+                        showErrorMessage("⚠️ Error al procesar la compra: " + err.message);
                     });
                 },
                 onCancel: () => {
