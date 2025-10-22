@@ -180,7 +180,26 @@ class App extends BaseConfig
      * @var array<string, string>
      */
     public array $proxyIPs = [];
+/**
+     * --------------------------------------------------------------------------
+     * Configuración de la Sesión
+     * --------------------------------------------------------------------------
+     *
+     * Estas configuraciones controlan la forma en que funcionan las sesiones.
+     * Puedes copiar el resto de las propiedades del archivo original de la
+     * librería (System/Config/App.php) si quieres más control.
+     */
+    public string $sessionDriver = 'CodeIgniter\Session\Handlers\FileHandler';
+    public string $sessionCookieName = 'ci_session';
+    
+    // ** ESTA ES LA CLAVE: Duración de la sesión en segundos. **
+    // Por ejemplo: 7 días = 604800 segundos (7 * 24 * 60 * 60)
+    public int $sessionExpiration = ; 86400
 
+    public string $sessionSavePath = WRITEPATH . 'session';
+    public bool $sessionMatchIP = false;
+    public int $sessionTimeToUpdate = 300;
+    public bool $sessionRegenerateDestroy = false;
     /**
      * --------------------------------------------------------------------------
      * Content Security Policy
