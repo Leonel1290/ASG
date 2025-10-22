@@ -194,7 +194,7 @@ class App extends BaseConfig
     
     // ** ESTA ES LA CLAVE: Duración de la sesión en segundos. **
     // Por ejemplo: 7 días = 604800 segundos (7 * 24 * 60 * 60)
-    public int $sessionExpiration = ; 86400
+    public int $sessionExpiration = 15; 
 
     public string $sessionSavePath = WRITEPATH . 'session';
     public bool $sessionMatchIP = false;
