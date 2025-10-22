@@ -16,105 +16,119 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Variables de color adaptadas de inicio.php */
+        /* Paleta de la vista de referencia (Tailwind CSS Dark-Gray/Blue) */
         :root {
-            --color-bg-primary: #0D1F23; /* Fondo principal */
-            --color-bg-secondary: #132E35; /* Fondo de tarjetas */
-            --color-bg-tertiary: #2D4A53; /* Header de tarjetas / Elementos de acento */
-            --color-text-primary: #AFB3B7; /* Texto claro principal */
-            --color-text-secondary: #698180; /* Texto de acento / Botón hover */
-            --color-accent: #698180; /* Color de acento (verde azulado) */
-            --color-accent-dark: #2D4A53;
-            --color-border: #334e56; /* Borde sutil */
-            --color-success: #38a169; /* Verde más oscuro y corporativo */
-            --color-danger: #e53e3e;
-            --color-warning: #ecc94b;
+            --color-bg-primary: #1a202c; /* Fondo principal (body) */
+            --color-bg-secondary: #2d3748; /* Fondo de tarjetas/Contenedores */
+            --color-bg-tertiary: #4a5568; /* Header de tarjetas/Acentos */
+            --color-text-primary: #cbd5e0; /* Texto claro principal */
+            --color-text-secondary: #a0aec0; /* Texto de acento/Secundario */
+            --color-accent: #4299e1; /* Color de acento (Azul) */
+            --color-accent-dark: #2b6cb0; /* Azul oscuro para hover */
+            --color-border: #4a5568; /* Borde sutil */
+            --color-success: #48bb78; /* Verde para éxito */
+            --color-danger: #e53e3e; /* Rojo para peligro */
+            --color-warning: #ecc94b; /* Amarillo para advertencia */
+            --color-text-dark: #1a202c; /* Color de texto oscuro para advertencias */
         }
 
         body {
-            background: linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary));
+            background-color: var(--color-bg-primary); /* Fondo principal simple */
             color: var(--color-text-primary);
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            /* Añadir padding para compensar el navbar fijo */
             padding-top: 70px;
         }
         
-        /* Navbar - Adaptado a Fixed + Blur Effect de inicio.php */
+        /* Navbar - Simplificado */
         .navbar {
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1030;
-            /* #0D1F23 es rgb(13, 31, 35) */
-            background-color: rgba(13, 31, 35, 0.9) !important; 
-            backdrop-filter: blur(8px); /* Efecto de vidrio esmerilado */
-            border-bottom: 1px solid var(--color-border);
-            transition: background-color 0.3s ease; /* Transición sutil */
+            background-color: var(--color-bg-secondary) !important; /* Usar el fondo de tarjetas */
+            /* Eliminar el blur y el borde inferior para igualar la referencia */
+            backdrop-filter: none;
+            border-bottom: none; 
+            transition: none;
         }
 
-        .navbar-brand, .nav-link {
+        .navbar-brand {
+            color: #fff !important; /* Blanco para el brand */
+            font-size: 1.4rem;
+        }
+        .nav-link {
             color: var(--color-text-primary) !important;
+            font-size: 1.1rem;
+            padding-top: .75rem;
+            padding-bottom: .75rem;
         }
 
         .nav-link.active {
             color: var(--color-accent) !important;
-            border-bottom: 2px solid var(--color-accent);
-            padding-bottom: 0.25rem;
+            border-bottom: none; /* Eliminar el borde azul inferior */
+            font-weight: bold;
+        }
+        
+        .nav-link:hover {
+            color: #fff !important; /* Blanco en hover */
         }
 
+        /* Botón Outline */
         .btn-outline-secondary {
-            color: var(--color-text-secondary);
-            border-color: var(--color-border);
+            color: var(--color-text-primary);
+            border-color: var(--color-text-primary);
             transition: all 0.2s;
         }
 
         .btn-outline-secondary:hover {
-            color: #fff;
-            background-color: var(--color-accent-dark);
-            border-color: var(--color-accent-dark);
+            color: var(--color-bg-primary);
+            background-color: var(--color-text-primary);
+            border-color: var(--color-text-primary);
         }
 
-        /* Cards y Formularios */
+        /* Cards */
         .card {
             background-color: var(--color-bg-secondary);
             color: var(--color-text-primary);
-            border: 1px solid var(--color-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: none; /* Sin borde explícito */
+            border-radius: 0.5rem; /* Ajustar radio al de referencia */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1); /* Sombra más sutil de referencia */
         }
         
         .card-header {
             background-color: var(--color-bg-tertiary);
             color: #fff; /* Título en blanco para mejor contraste */
-            border-bottom: 1px solid var(--color-border);
-            border-radius: 0.75rem 0.75rem 0 0;
-            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--color-bg-secondary); /* Borde más suave */
+            border-radius: 0.5rem 0.5rem 0 0; /* Ajustar radio */
+            padding: 1rem 1.5rem; /* Ajustar padding */
         }
         
+        /* Formularios */
         .form-label {
             color: var(--color-text-primary);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
+            font-weight: bold; /* Hacer la etiqueta más destacada como en la referencia */
+            margin-bottom: 0.5rem; /* Aumentar espacio */
         }
 
         .form-control, .form-control:focus {
-            background-color: var(--color-bg-primary); 
+            background-color: var(--color-bg-secondary); /* Usar el color de tarjeta para los inputs */
             border: 1px solid var(--color-border);
             color: var(--color-text-primary);
-            border-radius: 0.5rem;
+            border-radius: 0.375rem; /* Ligeramente más pequeño que antes */
             padding: 0.75rem 1rem;
         }
         
         .form-control:focus {
             border-color: var(--color-accent);
-            box-shadow: 0 0 0 0.2rem rgba(105, 129, 128, 0.4); /* Sombra de foco con el color de acento */
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Sombra de foco azul */
         }
         
         /* Botón Primario (Save/Guardar) */
         .btn-primary {
             background-color: var(--color-accent);
             border-color: var(--color-accent);
+            color: #fff;
             font-weight: 600;
             transition: all 0.2s;
         }
@@ -124,69 +138,88 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
             border-color: var(--color-accent-dark);
         }
 
-        /* Alertas */
+        /* Alertas - Adaptadas a la paleta de la referencia */
         .alert-success {
-            background-color: rgba(56, 161, 105, 0.2); 
-            color: var(--color-success);
-            border-color: var(--color-success);
-            border-radius: 0.5rem;
+            background-color: #c6f6d5; 
+            color: var(--color-text-dark); /* Color de texto oscuro para fondo claro */
+            border-color: #a7f3d0;
+            border-radius: 0.375rem;
         }
         .alert-danger {
-            background-color: rgba(229, 62, 62, 0.2); 
-            color: var(--color-danger);
-            border-color: var(--color-danger);
-            border-radius: 0.5rem;
+            background-color: #fed7d7; 
+            color: var(--color-text-dark);
+            border-color: #fbcbcb;
+            border-radius: 0.375rem;
+        }
+        .alert-warning {
+            background-color: #feebc8; /* Nuevo estilo para warning */
+            color: var(--color-text-dark);
+            border-color: #faf089;
+            border-radius: 0.375rem;
         }
 
         /* Listado de Órdenes */
         .order-item {
             border-bottom: 1px solid var(--color-border);
             padding: 1rem 0;
-            transition: background-color 0.3s;
+            transition: none; /* Eliminar transición y hover de fondo para simplificar */
+            margin-left: 0;
+            margin-right: 0;
         }
         
         .order-item:last-child {
-             border-bottom: none; /* Eliminar borde inferior del último elemento */
+            border-bottom: none;
         }
 
         .order-item:hover {
-            background-color: rgba(45, 74, 83, 0.3); /* Color de acento oscuro con transparencia */
-            border-radius: 0.5rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            margin-left: -0.5rem;
-            margin-right: -0.5rem;
+            background-color: transparent; /* Eliminar efecto de hover */
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
         }
 
         .text-info-custom {
-            color: #4dc0b5 !important; /* Un turquesa sutil para Payment/Order ID */
-            font-weight: 600;
+            color: var(--color-accent) !important; /* Usar azul de acento */
+            font-weight: 700;
         }
 
         .badge-status {
-            font-size: 0.8em;
-            padding: 0.4em 0.8em;
-            border-radius: 1rem;
-            font-weight: 600;
+            font-size: 0.75em; /* Ligeramente más pequeño */
+            padding: 0.3em 0.7em;
+            border-radius: 0.5rem; /* Ajustar radio */
+            font-weight: 700;
+            color: #fff; /* Asegurar texto blanco por defecto en badges */
         }
         
-        .badge.bg-success { background-color: var(--color-success) !important; }
-        .badge.bg-warning { background-color: var(--color-warning) !important; color: #1a202c !important; } /* Texto oscuro para el fondo amarillo */
-        .badge.bg-secondary { background-color: var(--color-border) !important; }
+        /* Override de Bootstrap y ajuste de colores de badge */
+        .badge.bg-success { background-color: var(--color-success) !important; color: var(--color-text-dark) !important; }
+        .badge.bg-warning { background-color: var(--color-warning) !important; color: var(--color-text-dark) !important; } 
+        .badge.bg-danger { background-color: var(--color-danger) !important; color: #fff !important; }
+        .badge.bg-secondary { background-color: var(--color-bg-tertiary) !important; color: #fff !important; }
 
         .address-box {
-            background-color: rgba(45, 74, 83, 0.6); /* Un poco más de transparencia en el fondo terciario */
+            background-color: var(--color-bg-tertiary); /* Usar el color de header de card como fondo de dirección */
             border: 1px solid var(--color-border);
             padding: 0.75rem;
             border-radius: 0.5rem;
-            color: var(--color-text-primary);
+            color: #fff; /* Texto blanco en el address box para buen contraste */
             font-size: 0.85rem;
             margin-top: 0.75rem;
         }
+        
+        .text-success { color: var(--color-success) !important; }
+        .text-secondary { color: var(--color-text-secondary) !important; }
 
         .placeholder-empty {
             color: var(--color-text-secondary) !important;
-            opacity: 0.8;
+            opacity: 1; /* Quitar opacidad para mantener el color */
+        }
+
+        /* Regla para que los divisores horizontales se vean bien */
+        hr {
+            border-color: var(--color-border) !important; 
+            opacity: 1 !important; /* Quitar opacidad para que el color sea claro */
         }
     </style>
 </head>
@@ -251,17 +284,17 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                 <label for="payment_id" class="form-label"><i class="fas fa-barcode me-1"></i> Payment ID (ID de Compra) *</label>
                                 <input type="text" class="form-control" id="payment_id" name="payment_id" required 
                                         placeholder="Ingrese el ID de pago de su compra">
-                                <div class="form-text text-muted small mt-2">Este ID vincula la dirección a tu compra.</div>
+                                <div class="form-text text-secondary small mt-2">Este ID vincula la dirección a tu compra.</div>
                             </div>
 
-                            <hr style="border-color: var(--color-border); opacity: 0.5;">
+                            <hr class="my-4">
                             <h6 class="mb-3 text-white"><i class="fas fa-user me-1"></i> Datos del Receptor</h6>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="nombre" class="form-label">Nombre *</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required 
-                                            value="<?= session()->get('nombre') ?>">
+                                                value="<?= session()->get('nombre') ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="apellido" class="form-label">Apellido *</label>
@@ -274,7 +307,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                 <input type="text" class="form-control" id="telefono" name="telefono" required>
                             </div>
 
-                            <hr style="border-color: var(--color-border); opacity: 0.5;">
+                            <hr class="my-4">
                             <h6 class="mb-3 text-white"><i class="fas fa-location-arrow me-1"></i> Detalles del Domicilio</h6>
 
                             <div class="row">
@@ -321,7 +354,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                             <div class="mb-4">
                                 <label for="referencias" class="form-label"><i class="fas fa-info-circle me-1"></i> Referencias</label>
                                 <textarea class="form-control" id="referencias" name="referencias" rows="3" 
-                                            placeholder="Referencias adicionales para la entrega (ej: 'Dejar con portería', 'Casa portón verde')"></textarea>
+                                                placeholder="Referencias adicionales para la entrega (ej: 'Dejar con portería', 'Casa portón verde')"></textarea>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100 py-2">
@@ -351,7 +384,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
                                                 <strong>Orden: <span class="text-info-custom">#<?= esc($compra['order_id']) ?></span></strong>
-                                                <div class="small text-muted">ID de Pago: <?= esc($compra['payment_id']) ?></div>
+                                                <div class="small text-secondary">ID de Pago: <?= esc($compra['payment_id']) ?></div>
                                             </div>
                                             <?php 
                                                 // Mapeo de estado para colores adaptados
@@ -360,7 +393,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                                 if ($status === 'aprobada' || $status === 'entregado' || $status === 'enviado') {
                                                     $statusClass = 'bg-success';
                                                 } else if ($status === 'pendiente' || $status === 'en proceso') {
-                                                    $statusClass = 'bg-warning text-dark';
+                                                    $statusClass = 'bg-warning';
                                                 } else if ($status === 'rechazado' || $status === 'cancelado') {
                                                     $statusClass = 'bg-danger';
                                                 }
@@ -377,7 +410,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                                 <strong><i class="fas fa-calendar-alt me-1"></i> Fecha:</strong> 
                                                 <?= date('d/m/Y H:i', strtotime($compra['fecha_compra'])) ?>
                                             </div>
-                                            <div class="col-12 text-muted">
+                                            <div class="col-12 text-secondary">
                                                 <i class="fas fa-envelope me-1"></i> Email: <?= esc($compra['email']) ?>
                                             </div>
                                         </div>
