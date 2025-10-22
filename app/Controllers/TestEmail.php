@@ -8,39 +8,57 @@ class TestEmail extends Controller
 {
     public function index()
     {
-        $email = \Config\Services::email();
+        // Forzar la configuración desde variables de entorno
+        $config = [
+            'protocol' => 'smtp',
+            'SMTPHost' => $_ENV['email.SMTPHost'] ?? 'smtp.gmail.com',
+            'SMTPUser' => $_ENV['email.SMTPUser'] ?? 'againsafegas.ascii@gmail.com',
+            'SMTPPass' => $_ENV['email.SMTPPass'] ?? 'ywbn dvza fiew hcir',
+            'SMTPPort' => $_ENV['email.SMTPPort'] ?? 587,
+            'SMTPCrypto' => $_ENV['email.SMTPCrypto'] ?? 'tls',
+            'mailType' => 'html',
+            'charset' => 'UTF-8'
+        ];
         
-        $email->setTo('againsafegas.ascii@gmail.com'); // Cambia por tu email de prueba
-        $email->setSubject('Prueba de email desde Render - ' . date('Y-m-d H:i:s'));
-        $email->setMessage('
-            <h1>¡Prueba exitosa! 🎉</h1>
-            <p>El email se envió correctamente desde Render.</p>
-            <p><strong>Fecha:</strong> ' . date('Y-m-d H:i:s') . '</p>
-            <p><strong>Servidor:</strong> ' . $_SERVER['HTTP_HOST'] . '</p>
-        ');
+        $email = \Config\Services::email($config);
         
-        if ($email->send()) {
-            echo '✅ Email enviado exitosamente a: againsafegas.ascii@gmail.com';
-            echo '<br>📧 Revisa la bandeja de entrada y spam.';
-        } else {
-            echo '❌ Error al enviar el email:';
-            echo '<pre>';
-            echo $email->printDebugger();
-            echo '</pre>';
+        try {
+            $email->setTo('againsafegas.ascii@gmail.com');
+            $email->setSubject('Prueba SMTP - ' . date('Y-m-d H:i:s'));
+            $email->setMessage('
+                <h2>Configuración usada:</h2>
+                <ul>
+                    <li>Host: ' . $config['SMTPHost'] . '</li>
+                    <li>Puerto: ' . $config['SMTPPort'] . '</li>
+                    <li>Crypto: ' . $config['SMTPCrypto'] . '</li>
+                    <li>Usuario: ' . $config['SMTPUser'] . '</li>
+                </ul>
+            ');
+            
+            if ($email->send()) {
+                echo '✅ Email enviado exitosamente!';
+                echo '<br>📧 Revisa tu bandeja de entrada y spam.';
+            } else {
+                echo '❌ Error al enviar:';
+                echo '<pre>';
+                echo $email->printDebugger(['headers']);
+                echo '</pre>';
+            }
+        } catch (\Exception $e) {
+            echo '❌ Excepción: ' . $e->getMessage();
         }
     }
     
-    public function simpleTest()
+    public function testConnection()
     {
-        $email = \Config\Services::email();
-        $email->setTo('againsafegas.ascii@gmail.com');
-        $email->setSubject('Prueba simple');
-        $email->setMessage('Este es un mensaje de prueba simple.');
+        // Prueba de conexión SMTP básica
+        $socket = @fsockopen('smtp.gmail.com', 587, $errno, $errstr, 10);
         
-        if ($email->send()) {
-            return '✅ Email simple enviado correctamente';
+        if ($socket) {
+            echo '✅ Conexión SMTP exitosa a smtp.gmail.com:587';
+            fclose($socket);
         } else {
-            return '❌ Error: ' . $email->printDebugger();
+            echo '❌ No se pudo conectar a SMTP: ' . $errstr . ' (' . $errno . ')';
         }
     }
 }

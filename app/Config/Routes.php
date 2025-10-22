@@ -97,4 +97,4 @@ $routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDirecc
 
 // Rutas para probar emails
 $routes->get('test-email', 'TestEmail::index');
-$routes->get('test-email-simple', 'TestEmail::simpleTest');
+$routes->get('test-smtp', 'TestEmail::testConnection');
