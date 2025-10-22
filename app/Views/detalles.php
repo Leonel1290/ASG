@@ -11,21 +11,20 @@
     <meta name="csrf-name" content="<?= csrf_token() ?>">
 
     <style>
+        /* Variables de color adaptadas al Dark Mode */
         :root {
-            --primary-color: #007bff; /* Azul vibrante */
-            --success-color: #28a745; /* Verde para abierta */
-            --danger-color: #dc3545; /* Rojo para cerrada */
-            --warning-color: #ffc107;
-            --info-color: #6c757d; /* Gris para info/neutro */
-            --text-color: #333;
-            --bg-color: #f0f2f5; /* Fondo más suave */
-            --card-bg: #ffffff;
-            --border-color: #e6e6e6;
+            --primary-color: #4CAF50; /* Verde brillante para 'Abierta' */
+            --danger-color: #F44336; /* Rojo brillante para 'Cerrada' */
+            --info-color: #616161; /* Gris oscuro para volver */
+            --text-color-light: #f4f7f6; /* Texto claro */
+            --text-color-dark: #b0b0b0; /* Texto secundario gris */
+            --bg-color: #121212; /* Fondo muy oscuro */
+            --card-bg: #1e1e1e; /* Fondo de panel ligeramente más claro */
         }
         body { 
-            font-family: 'Roboto', 'Arial', sans-serif; 
+            font-family: 'Roboto', sans-serif; 
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-color-light);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,148 +34,123 @@
         }
         .control-panel { 
             background-color: var(--card-bg);
-            border: none; /* Eliminamos el borde simple */
-            border-radius: 12px; /* Bordes más suaves */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
-            padding: 40px;
+            border-radius: 20px; /* Bordes más pronunciados */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); /* Sombra intensa */
+            padding: 30px;
             text-align: center;
             width: 100%;
-            max-width: 450px; /* Panel un poco más ancho */
-            transition: transform 0.3s ease-in-out;
+            max-width: 400px;
         }
         h2 {
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 25px;
+            color: var(--text-color-light);
             font-size: 1.8em;
-            font-weight: 500;
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
         }
         .info {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f7f9fc;
-            border-left: 5px solid var(--primary-color);
-            border-radius: 4px;
-            text-align: left;
-            font-size: 0.95em;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.1em;
+            color: var(--text-color-light);
         }
         .info p { margin: 5px 0; }
-
-        /* **NUEVO**: Estilo para el estado de la válvula */
-        .status-box {
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            transition: all 0.5s ease;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-        }
-        .status-box p {
-            margin: 5px 0;
-            font-weight: 700;
-            font-size: 1.4em;
-            text-transform: uppercase;
-        }
-
-        /* Indicadores visuales */
-        .status-display-text {
-            display: inline-block;
-            margin-left: 10px;
-        }
-        .status-icon {
-            font-size: 1.2em;
-            margin-right: 10px;
-        }
-        .status-loading {
-            color: var(--info-color);
-        }
-        .status-open {
-            background-color: #e6f6e9; /* Fondo verde claro */
-            color: var(--success-color);
-        }
-        .status-closed {
-            background-color: #fbe6e8; /* Fondo rojo claro */
+        .info .nombre { font-size: 1.2em; font-weight: 500; }
+        .info .mac { font-size: 0.85em; color: var(--text-color-dark); }
+        .alert-error {
+            padding: 15px;
+            background-color: #3f191a; /* Fondo oscuro de alerta */
+            border-left: 5px solid var(--danger-color);
             color: var(--danger-color);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: left;
+            font-weight: bold;
         }
-        .status-error {
-             background-color: #fff0f0;
-            color: red;
+
+        /* Indicador de Porcentaje/Estado */
+        .status-percentage-container {
+            margin: 40px 0;
         }
-        
-        /* **NUEVO**: Grupo de botones más dinámico */
+        .percentage {
+            font-size: 4em; /* Grande como en la imagen */
+            font-weight: 700;
+            color: var(--text-color-light);
+            transition: color 0.5s ease;
+        }
+        .status-label {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--text-color-dark);
+        }
+        #status-indicator-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+            transition: background-color 0.5s ease;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Botones */
         .button-group {
             display: flex;
-            justify-content: space-between;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
         }
         .button-group button {
-            padding: 12px 15px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px; /* Bordes redondeados */
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
+            transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            font-size: 1.1em;
         }
         .button-group button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         .button-group button:active:not(:disabled) {
             transform: translateY(0);
         }
         .button-group button:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* Colores de botones */
-        #btn-volver {
-            background-color: var(--info-color);
-            color: white;
-        }
         #btn-abrir {
-            background-color: var(--success-color);
+            background-color: #00A36A; /* Verde para Abrir */
             color: white;
         }
         #btn-cerrar {
-            background-color: var(--danger-color);
+            background-color: #CC0000; /* Rojo para Cerrar */
             color: white;
         }
-
-        .footer-text {
-            margin-top: 25px;
-            font-size: 0.85em;
-            color: var(--info-color);
+        #btn-volver {
+            background-color: var(--info-color);
+            color: var(--text-color-light);
+            font-size: 1em;
         }
-        .alert-error {
-            padding: 10px;
-            background-color: #fbe6e8;
-            border-left: 4px solid var(--danger-color);
-            color: var(--danger-color);
-            border-radius: 4px;
-            margin-bottom: 20px;
-            text-align: left;
-            font-weight: bold;
+
+        .icon {
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="control-panel">
-    <i class="fas fa-gas-pump" style="font-size: 2em; color: var(--primary-color); margin-bottom: 10px;"></i>
-    <h2>Control de Válvula de Gas</h2>
+    <h2>Control de Válvula</h2>
 
     <?php if (isset($dispositivo) && $dispositivo): ?>
 <div class="info">
-    <p><i class="fas fa-microchip"></i> Dispositivo: <strong><?= esc($dispositivo->nombre) ?></strong></p>
-    <p><i class="fas fa-network-wired"></i> MAC: <strong><?= esc($dispositivo->MAC) ?></strong></p>
-</div>
+    <p class="nombre"><?= esc($dispositivo->nombre) ?></p>
+    <p class="mac">MAC: <?= esc($dispositivo->MAC) ?></p>
+    </div>
 <?php elseif (isset($error_message)): ?>
 <div class="alert-error">
     <p><i class="fas fa-exclamation-triangle"></i> <?= esc($error_message) ?></p>
@@ -187,63 +161,69 @@
 </div>
 <?php endif; ?>
 
-    <div id="valve-status-box" class="status-box status-loading">
-        <p>Estado Actual:</p>
-        <p id="status-display">
-            <i class="fas fa-spinner fa-spin status-icon"></i>
-            <span class="status-display-text">Cargando...</span>
-        </p>
+    <div class="status-percentage-container">
+        <p id="percentage-display" class="percentage">Cargando...</p>
+        <p class="status-label">Estado actual: <span id="status-indicator-dot"></span></p>
     </div>
 
     <div class="button-group">
-        <button id="btn-volver"><i class="fas fa-arrow-left"></i> Volver</button>
-        <button id="btn-abrir"><i class="fas fa-door-open"></i> Abrir</button>
-        <button id="btn-cerrar"><i class="fas fa-door-closed"></i> Cerrar</button>
+        <button id="btn-abrir"><i class="fas fa-play icon"></i> Abrir Válvula</button>
+        <button id="btn-cerrar"><i class="fas fa-stop icon"></i> Cerrar Válvula</button>
+        <button id="btn-volver"><i class="fas fa-arrow-left icon"></i> Volver al Perfil</button>
     </div>
     
-    <p class="footer-text">El estado se actualiza automáticamente cada 5 segundos.</p>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        // **IMPORTANTE**: Asegúrate que esta MAC sea la que se pasa desde el controlador PHP
+        // **PARÁMETROS ESENCIALES MANTENIDOS**
         const MAC_ADDRESS = '<?= esc($dispositivo->MAC ?? '') ?>'; 
         const API_KEY = "SUPER_SECRET_API_MLUS"; // Clave del ESP32/API
         
-        const statusBox = document.getElementById('valve-status-box');
-        const statusDisplay = document.getElementById('status-display');
+        const percentageDisplay = document.getElementById('percentage-display');
+        const statusIndicatorDot = document.getElementById('status-indicator-dot');
         const btnAbrir = document.getElementById('btn-abrir');
         const btnCerrar = document.getElementById('btn-cerrar');
         const btnVolver = document.getElementById('btn-volver');
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const csrfName = document.querySelector('meta[name="csrf-name"]').content;
-        let isControlInProcess = false; // Bandera para evitar clics múltiples
+        let isControlInProcess = false;
 
-        // Función auxiliar para actualizar la UI (Mantiene la funcionalidad original)
+        // **FUNCIÓN ESENCIAL MANTENIDA con adaptación visual**
         function actualizarEstadoUI(estado) {
-            // Reinicia las clases de estado
-            statusBox.classList.remove('status-open', 'status-closed', 'status-error', 'status-loading');
-            statusDisplay.innerHTML = ''; // Limpia el contenido
+            // Limpiar clases de color
+            percentageDisplay.style.color = 'var(--text-color-light)';
 
             if (estado === 1) {
-                statusDisplay.innerHTML = '<i class="fas fa-check-circle status-icon"></i><span class="status-display-text">Válvula ABIERTA</span>';
-                statusBox.classList.add('status-open');
+                // Válvula ABIERTA (100% de flujo)
+                percentageDisplay.textContent = '100%';
+                percentageDisplay.style.color = 'var(--primary-color)';
+                statusIndicatorDot.style.backgroundColor = 'var(--primary-color)';
                 btnAbrir.disabled = true;
                 btnCerrar.disabled = false;
             } else if (estado === 0) {
-                statusDisplay.innerHTML = '<i class="fas fa-times-circle status-icon"></i><span class="status-display-text">Válvula CERRADA</span>';
-                statusBox.classList.add('status-closed');
+                // Válvula CERRADA (0% de flujo)
+                percentageDisplay.textContent = '0%';
+                percentageDisplay.style.color = 'var(--danger-color)';
+                statusIndicatorDot.style.backgroundColor = 'var(--danger-color)';
                 btnAbrir.disabled = false;
+                btnCerrar.disabled = true;
+            } else {
+                 // Estado de Error/Cargando (neutro)
+                percentageDisplay.textContent = '...';
+                percentageDisplay.style.color = 'var(--text-color-dark)';
+                statusIndicatorDot.style.backgroundColor = 'var(--info-color)';
+                btnAbrir.disabled = true;
                 btnCerrar.disabled = true;
             }
         }
 
         // Función para mostrar el estado de "Enviando Orden"
         function showSendingStatus() {
-            statusBox.classList.remove('status-open', 'status-closed', 'status-error');
-            statusBox.classList.add('status-loading');
-            statusDisplay.innerHTML = '<i class="fas fa-sync-alt fa-spin status-icon"></i><span class="status-display-text">Enviando orden...</span>';
+            percentageDisplay.textContent = 'Enviando...';
+            percentageDisplay.style.color = 'var(--text-color-dark)';
+            statusIndicatorDot.style.backgroundColor = 'var(--info-color)';
             btnAbrir.disabled = true;
             btnCerrar.disabled = true;
         }
@@ -257,12 +237,11 @@
 
             const formData = new FormData();
             formData.append('mac', MAC_ADDRESS);
-            // La DB tiene 1=Abierta, 0=Cerrada
             formData.append('estado', estado); 
             formData.append(csrfName, csrfToken);
 
             try {
-                // RUTA CORREGIDA: Apunta al ValveController::actualizarEstado
+                // RUTA ESENCIAL MANTENIDA
                 const response = await fetch('<?= base_url('valve/actualizarEstado') ?>', {
                     method: 'POST',
                     body: formData
@@ -271,19 +250,16 @@
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    // Actualizamos inmediatamente con el estado de la DB (aunque el ESP32 no haya confirmado)
                     actualizarEstadoUI(data.nuevo_estado);
                 } else {
                     throw new Error(data.message || 'Error desconocido al cambiar estado');
                 }
             } catch (error) {
                 console.error('Error al controlar la válvula:', error);
-                statusBox.classList.remove('status-loading');
-                statusBox.classList.add('status-error');
-                statusDisplay.innerHTML = '<i class="fas fa-exclamation-circle status-icon"></i><span class="status-display-text">Fallo: ' + (error.message || 'Error de red.') + '</span>';
-                
-                // En caso de fallo, re-consulta el estado real (esencial)
-                fetchDeviceState(); 
+                percentageDisplay.textContent = 'FALLO';
+                percentageDisplay.style.color = 'red';
+                statusIndicatorDot.style.backgroundColor = 'red';
+                fetchDeviceState(); // Re-consulta el estado real (esencial)
             } finally {
                 isControlInProcess = false;
             }
@@ -291,23 +267,13 @@
 
         // 2. Obtiene el estado actual de la válvula (Funcionalidad esencial mantenida)
         async function fetchDeviceState() {
-            if (isControlInProcess) return; // No consultar si se está enviando una orden
+            if (isControlInProcess) return;
 
-            if (!statusBox.classList.contains('status-error')) {
-                // Muestra un estado de "Consultando" si no hay error previo
-                statusBox.classList.remove('status-open', 'status-closed');
-                statusBox.classList.add('status-loading');
-                statusDisplay.innerHTML = '<i class="fas fa-sync-alt fa-spin status-icon"></i><span class="status-display-text">Consultando estado...</span>';
-            }
-            
-
-            // URL CRÍTICA: Ahora usa la ruta /api/valve_status, que apunta a ValveController::obtenerEstadoSimple()
+            // URL ESENCIAL MANTENIDA
             const url = '<?= base_url('api/valve_status?mac=') ?>' + MAC_ADDRESS + '&api_key=' + API_KEY; 
 
             try {
                 const response = await fetch(url);
-                
-                // response.text() es CLAVE: Espera un string simple ("1", "0", "-1", etc.)
                 const estadoTexto = await response.text(); 
                 
                 if (response.ok) {
@@ -321,15 +287,14 @@
                         throw new Error('Respuesta inválida.');
                     }
                 } else {
-                    // Error HTTP (404, 500)
                     throw new Error('Error de conexión HTTP: ' + response.status);
                 }
 
             } catch (error) {
                 console.error('Error en fetchDeviceState:', error);
-                statusBox.classList.remove('status-loading', 'status-open', 'status-closed');
-                statusBox.classList.add('status-error');
-                statusDisplay.innerHTML = '<i class="fas fa-exclamation-circle status-icon"></i><span class="status-display-text">Error: No se pudo obtener el estado.</span>';
+                percentageDisplay.textContent = 'ERROR';
+                percentageDisplay.style.color = 'red';
+                statusIndicatorDot.style.backgroundColor = 'red';
                 btnAbrir.disabled = true;
                 btnCerrar.disabled = true;
             }
