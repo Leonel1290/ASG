@@ -274,17 +274,27 @@
 
         /* Botones del Footer del Modal */
         .modal-footer .btn-back {
-            /* Usamos el color de info para el botón de "Mis Compras" */
-            background-color: var(--border-color-dark);
-            border-color: var(--border-color-dark);
-            color: var(--font-color-main);
-        }
-        
-        .modal-footer .btn-back:hover {
-            background-color: #21262d;
-            border-color: #21262d;
-            color: #fff;
-        }
+    background-color: var(--border-color-dark);
+    border-color: var(--border-color-dark);
+    color: var(--font-color-main);
+}
+
+.modal-footer .btn-back:hover {
+    background-color: #21262d;
+    border-color: #21262d;
+    color: #fff;
+}
+
+.modal-footer .btn-primary {
+    background-color: var(--accent-color-green);
+    border-color: var(--accent-color-green);
+    font-weight: 600;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #238636;
+    border-color: #238636;
+}
 
         .btn-primary {
             background-color: var(--accent-color-green);
@@ -454,7 +464,7 @@
                     </div>
                     
                     <small class="text-secondary d-block mt-2">
-                        <i class="fas fa-info-circle"></i> Guarda este ID. Lo necesitarás en **Mis Compras** para registrar tu **dirección de envío**.
+                        <i class="fas fa-info-circle"></i> Guarda este ID. Lo necesitarás para registrar tu **dirección de envío**.
                     </small>
                     
                     <div id="payment-id-warning" class="text-warning mt-3" style="display: none;">
@@ -463,7 +473,8 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center pt-0 pb-4">
-                <a href="/" class="btn btn-primary"><i class="fas fa-home me-1"></i> Continuar al Inicio</a>
+                <a href="/" class="btn btn-back me-2"><i class="fas fa-home me-1"></i> Continuar al Inicio</a>
+                <a href="/mis_compras" class="btn btn-primary"><i class="fas fa-receipt me-1"></i> Ir a Mis Compras</a>
             </div>
         </div>
     </div>

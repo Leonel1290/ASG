@@ -497,7 +497,9 @@ class PerfilController extends BaseController
 
     // Obtener compras del usuario autenticado
     $comprasModel = new \App\Models\ComprasModel();
-    $compras = $comprasModel->where('id_usuario', $usuarioId)->findAll();
+    $compras = $comprasModel->where('id_usuario', $usuarioId)
+                           ->orderBy('fecha_compra', 'DESC')
+                           ->findAll();
 
     // Obtener direcciones de envío existentes del usuario
     $direccionesModel = new \App\Models\DireccionesEnvioModel();
