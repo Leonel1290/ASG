@@ -100,10 +100,20 @@
 <div class="control-panel">
     <h2>Control Básico de Válvula</h2>
 
-    <div class="info">
-        <p>Dispositivo: **ASG-Sentinel**</p>
-        <p>MAC: **CC:7B:5C:A8:0F:50**</p>
-    </div>
+    <?php if (isset($dispositivo) && $dispositivo): ?>
+<div class="info">
+    <p>Dispositivo: <strong><?= esc($dispositivo->nombre) ?></strong></p>
+    <p>MAC: <strong><?= esc($dispositivo->MAC) ?></strong></p>
+</div>
+<?php elseif (isset($error_message)): ?>
+<div class="alert-error">
+    <p><?= esc($error_message) ?></p>
+</div>
+<?php else: ?>
+<div class="alert-error">
+    <p>Error: Datos del dispositivo no disponibles.</p>
+</div>
+<?php endif; ?>
 
     <div class="status-box">
         <p>Estado Actual:</p>
@@ -123,7 +133,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         
         // **IMPORTANTE**: Asegúrate que esta MAC sea la que se pasa desde el controlador PHP
-        const MAC_ADDRESS = 'CC:7B:5C:A8:0F:50'; 
+        const MAC_ADDRESS = '<?= esc($dispositivo->MAC ?? '') ?>'; 
         const API_KEY = "SUPER_SECRET_API_MLUS"; // Clave del ESP32/API
         
         const statusDisplay = document.getElementById('status-display');
