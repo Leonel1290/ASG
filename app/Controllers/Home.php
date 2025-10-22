@@ -319,11 +319,19 @@ class Home extends BaseController
     }
 
         public function comprar()
-    {
-        $session = session();
-        log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
-        return view('comprar');
+{
+    $session = session();
+    log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
+    
+    // Verificar si el usuario está logueado
+    if (!$session->get('logged_in')) {
+        log_message('debug', 'Home::comprar() - Usuario no logueado, redirigiendo a login.');
+        $session->setFlashdata('error', 'Debes iniciar sesión para realizar una compra.');
+        return redirect()->to('/loginobtener');
     }
+    
+    return view('comprar');
+}
 
     public function guardar_compra()
     {

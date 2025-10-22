@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ComprasModel;
+use App\Models\UserModel;
 use CodeIgniter\Controller;
 use Config\Services;
 
@@ -13,10 +14,42 @@ class CompraController extends Controller
     private $paypalApiUrl = "https://api-m.sandbox.paypal.com";
 
     protected $comprasModel;
+    protected $userModel;
 
     public function __construct()
     {
         $this->comprasModel = new ComprasModel();
+        $this->userModel = new UserModel();
+    }
+
+    /**
+     * Verificar si el usuario está autenticado
+     */
+    private function checkAuthentication()
+    {
+        $session = session();
+        if (!$session->get('logged_in')) {
+            log_message('debug', 'Usuario no autenticado intentando acceder a compra');
+            return $this->response->setStatusCode(401)->setJSON([
+                'error' => 'Debes iniciar sesión para realizar una compra'
+            ]);
+        }
+        return null;
+    }
+
+    /**
+     * Obtener datos del usuario autenticado
+     */
+    private function getAuthenticatedUser()
+    {
+        $session = session();
+        $userId = $session->get('id');
+        
+        if (!$userId) {
+            return null;
+        }
+        
+        return $this->userModel->find($userId);
     }
 
     /**
@@ -150,10 +183,16 @@ HTML;
     }
 
     /**
-     * ✅ Crear orden en PayPal
+     * ✅ Crear orden en PayPal - CON AUTENTICACIÓN
      */
     public function createOrder()
     {
+        // Verificar autenticación
+        $authError = $this->checkAuthentication();
+        if ($authError) {
+            return $authError;
+        }
+
         try {
             $token = $this->getAccessToken();
 
@@ -202,7 +241,7 @@ HTML;
             }
 
             $result = json_decode($response, true);
-            log_message('debug', 'Orden creada: ' . print_r($result, true));
+            log_message('debug', 'Orden creada para usuario autenticado: ' . print_r($result, true));
             
             return $this->response->setJSON($result);
             
@@ -213,10 +252,16 @@ HTML;
     }
 
     /**
-     * ✅ Capturar orden y guardar en BD (sin depender de usuario)
+     * ✅ Capturar orden y guardar en BD - CON USUARIO AUTENTICADO
      */
     public function captureOrder($orderId)
     {
+        // Verificar autenticación
+        $authError = $this->checkAuthentication();
+        if ($authError) {
+            return $authError;
+        }
+
         try {
             $token = $this->getAccessToken();
 
@@ -250,14 +295,18 @@ HTML;
             }
 
             $result = json_decode($response, true);
-            log_message('debug', 'Orden capturada: ' . print_r($result, true));
+            log_message('debug', 'Orden capturada para usuario autenticado: ' . print_r($result, true));
 
             // ✅ Guardar en base de datos solo si fue exitoso
             if (isset($result['status']) && $result['status'] === "COMPLETED") {
                 $purchaseUnit = $result['purchase_units'][0];
                 $capture = $purchaseUnit['payments']['captures'][0];
                 
-                // Extraer nombre del pagador si está disponible
+                // Obtener datos del usuario autenticado
+                $user = $this->getAuthenticatedUser();
+                $session = session();
+                
+                // Extraer nombre del pagador si está disponible, sino usar datos del usuario
                 $payerName = null;
                 if (isset($result['payer']['name'])) {
                     $given = $result['payer']['name']['given_name'] ?? '';
@@ -265,54 +314,62 @@ HTML;
                     $payerName = trim($given . ' ' . $surname) ?: null;
                 }
                 
-                // Extraer email del pagador (si PayPal lo envía)
+                if (!$payerName && $user) {
+                    $payerName = $user['nombre'] ?? null;
+                }
+                
+                // Extraer email del pagador (si PayPal lo envía), sino usar email del usuario
                 $payerEmail = $result['payer']['email_address'] ?? null;
+                if (!$payerEmail && $user) {
+                    $payerEmail = $user['email'] ?? null;
+                }
 
-    $data = [
-        'order_id'   => $result['id'],
-        'payer_id'   => $result['payer']['payer_id'] ?? null,
-        'payment_id' => $capture['id'] ?? null,
-        'status'     => $result['status'],
-        'monto'      => $capture['amount']['value'] ?? null,
-        'nombre'     => $payerName,
-        'email'      => $payerEmail,
-        'fecha_compra' => date('Y-m-d H:i:s')
-    ];
-    
-    log_message('debug', 'Datos a guardar: ' . print_r($data, true));
-    
-    try {
-        $this->comprasModel->insert($data);
-        log_message('debug', 'Compra guardada en BD con ID: ' . $this->comprasModel->getInsertID());
+                $data = [
+                    'order_id'   => $result['id'],
+                    'payer_id'   => $result['payer']['payer_id'] ?? null,
+                    'payment_id' => $capture['id'] ?? null,
+                    'status'     => $result['status'],
+                    'monto'      => $capture['amount']['value'] ?? null,
+                    'nombre'     => $payerName,
+                    'email'      => $payerEmail,
+                    'id_usuario' => $session->get('id'), // ← GUARDAR ID DEL USUARIO AUTENTICADO
+                    'fecha_compra' => date('Y-m-d H:i:s')
+                ];
+                
+                log_message('debug', 'Datos a guardar con usuario ID: ' . $data['id_usuario']);
+                
+                try {
+                    $this->comprasModel->insert($data);
+                    $compraId = $this->comprasModel->getInsertID();
+                    log_message('debug', 'Compra guardada en BD con ID: ' . $compraId);
 
-        $recipient = $payerEmail ?: (session()->get('email') ?? null);
-        if (!empty($recipient)) {
-            $this->sendPurchaseEmail($recipient, $data);
-        } else {
-            log_message('warning', 'No se envió email: email del pagador y email de sesión no disponibles.');
-        }
-    } catch (\Exception $e) {
-        log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
-        // No devolvemos error para no afectar la experiencia del usuario
-    }
+                    // Enviar email de confirmación
+                    if (!empty($payerEmail)) {
+                        $this->sendPurchaseEmail($payerEmail, $data);
+                    } else {
+                        log_message('warning', 'No se envió email: email no disponible.');
+                    }
+                } catch (\Exception $e) {
+                    log_message('error', 'Error al guardar compra en BD: ' . $e->getMessage());
+                    // No devolvemos error para no afectar la experiencia del usuario
+                }
 
-    // ✅ MODIFICACIÓN: Devolver respuesta personalizada con payment_id
-    $responseData = [
-        'status' => 'COMPLETED',
-        'payment_id' => $capture['id'] ?? null, // ← Esto es lo que necesita el frontend
-        'order_id' => $result['id'],
-        'payer_id' => $result['payer']['payer_id'] ?? null,
-        'message' => 'Compra procesada exitosamente'
-    ];
-    
-    log_message('debug', 'Enviando respuesta al frontend: ' . print_r($responseData, true));
-    
-    return $this->response->setJSON($responseData);
-}
+                // ✅ Devolver respuesta personalizada con payment_id
+                $responseData = [
+                    'status' => 'COMPLETED',
+                    'payment_id' => $capture['id'] ?? null, // ← Esto es lo que necesita el frontend
+                    'order_id' => $result['id'],
+                    'payer_id' => $result['payer']['payer_id'] ?? null,
+                    'message' => 'Compra procesada exitosamente'
+                ];
+                
+                log_message('debug', 'Enviando respuesta al frontend: ' . print_r($responseData, true));
+                
+                return $this->response->setJSON($responseData);
+            }
 
-// Si no fue COMPLETED, devolver la respuesta original de PayPal
-return $this->response->setJSON($result);
-
+            // Si no fue COMPLETED, devolver la respuesta original de PayPal
+            return $this->response->setJSON($result);
             
         } catch (\Exception $e) {
             log_message('error', 'Exception in captureOrder: ' . $e->getMessage());

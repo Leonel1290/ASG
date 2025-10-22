@@ -486,7 +486,7 @@ class PerfilController extends BaseController
             return redirect()->to('/perfil')->with('error', 'No se seleccionaron dispositivos para desenlazar.');
         }
     }
-    public function misCompras()
+   public function misCompras()
 {
     $session = session();
     $usuarioId = $session->get('id');
@@ -495,9 +495,9 @@ class PerfilController extends BaseController
         return redirect()->to('/login')->with('error', 'Debes iniciar sesión para acceder a esta página.');
     }
 
-    // Obtener compras directamente del usuario
+    // Obtener compras del usuario autenticado
     $comprasModel = new \App\Models\ComprasModel();
-    $compras = $comprasModel->getComprasByUsuario($usuarioId);
+    $compras = $comprasModel->where('id_usuario', $usuarioId)->findAll();
 
     // Obtener direcciones de envío existentes del usuario
     $direccionesModel = new \App\Models\DireccionesEnvioModel();
@@ -513,7 +513,6 @@ class PerfilController extends BaseController
         'compras' => $compras,
         'direccionesIndexadas' => $direccionesIndexadas
     ];
-
 
     return view('/mis_compras', $data);
 }
