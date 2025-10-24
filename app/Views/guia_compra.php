@@ -285,6 +285,11 @@
 </head>
 <body>
 
+    <a href="<?= base_url('/') ?>" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+
 <div class="guide-container">
     <div class="guide-header">
         <h1>🛒 Guía Completa de Compra ASG</h1>
