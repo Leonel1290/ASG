@@ -376,4 +376,9 @@ HTML;
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Error interno del servidor']);
         }
     }
+    public function guiaDeCompra()
+{
+    // Carga la vista guia_compra.php
+    return view('guia_compra'); 
+}
 }

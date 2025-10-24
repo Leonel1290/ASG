@@ -95,6 +95,5 @@ $routes->get('/mis_compras', 'PerfilController::misCompras');
 $routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDireccionEnvio');
 
 
-// Rutas para probar emails
-$routes->get('test-email', 'TestEmail::index');
-$routes->get('test-smtp', 'TestEmail::testConnection');
+// NUEVA RUTA: Guía de Compra
+$routes->get('/guia-de-compra', 'CompraController::guiaDeCompra');
