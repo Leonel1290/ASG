@@ -93,3 +93,7 @@ $routes->get('descarga', 'Home::descarga');
 //Comprasid
 $routes->get('/mis_compras', 'PerfilController::misCompras');
 $routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDireccionEnvio');
+
+
+// NUEVA RUTA: Guía de Compra
+$routes->get('/guia-de-compra', 'CompraController::guiaDeCompra');

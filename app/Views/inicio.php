@@ -374,6 +374,12 @@
                             <a href="<?= base_url('/comprar') ?>" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
                                 <i class="fas fa-shopping-cart me-1"></i> Comprar Ahora
                             </a>
+                            <a href="<?= base_url('/guia-de-compra') ?>" class="btn btn-outline-custom">
+                                <i class="fas fa-book me-1"></i> Guía de Compra
+                            </a>
+                            <a href="#company" class="btn btn-outline-custom">
+                                <i class="fas fa-info-circle me-1"></i> Más Información
+                            </a>
 
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
                                 <i class="fas fa-desktop me-1"></i> Simulación
