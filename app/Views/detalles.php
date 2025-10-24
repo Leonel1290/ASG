@@ -195,6 +195,7 @@ if (!function_exists('esc')) {
         .badge.bg-success { background-color: var(--success-color) !important; color: var(--bg-dark); }
         .badge.bg-warning { background-color: var(--warning-color) !important; color: var(--bg-dark); }
         .badge.bg-danger { background-color: var(--danger-color) !important; color: var(--text-darker); }
+        .badge.bg-info { background-color: var(--primary-color) !important; color: var(--text-darker); }
 
 
         .chart-container {
@@ -460,7 +461,7 @@ if (!function_exists('esc')) {
                 } else if (safeValue > 400 && safeValue < 550) {
                     width = 33 + ((safeValue - 400) / 150) * 33; // Escala 401-549 a 33-66%
                     levelText = 'Normal';
-                    barClass = 'bg-primary';
+                    barClass = 'bg-success'; // Cambiado de bg-primary a bg-success (VERDE)
                 }
             }
 
