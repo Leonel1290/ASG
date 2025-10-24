@@ -371,14 +371,8 @@
                     <li class="nav-item ms-lg-3">
                         <div class="d-flex flex-column flex-lg-row align-items-center btn-group-mobile">
                             <!-- BOTÓN COMPRAR (ahora primero) -->
-                            <a href="<?= base_url('/comprar') ?>" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
-                                <i class="fas fa-shopping-cart me-1"></i> Comprar Ahora
-                            </a>
                             <a href="<?= base_url('/guia-de-compra') ?>" class="btn btn-outline-custom">
                                 <i class="fas fa-book me-1"></i> Guía de Compra
-                            </a>
-                            <a href="#company" class="btn btn-outline-custom">
-                                <i class="fas fa-info-circle me-1"></i> Más Información
                             </a>
 
                             <a href="<?= base_url('/simulacion') ?>" class="btn btn-outline-custom mb-2 mb-lg-0 me-lg-2">
@@ -387,11 +381,6 @@
 
                             <a href="<?= base_url('/descarga') ?>" class="btn btn-custom mb-2 mb-lg-0 me-lg-2">
                                 <i class="fas fa-download me-1"></i> Descargar App
-                            </a>
-
-                            <!-- BOTÓN INICIAR SESIÓN (ahora después) -->
-                            <a href="<?= base_url('/loginobtener') ?>" class="btn btn-outline-custom">
-                                <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
                             </a>
                         </div>
                     </li>
@@ -414,11 +403,11 @@
                         Tu hogar seguro con ASG. Sistema de detección precisa de fugas de gas con monitoreo en tiempo real y control remoto.
                     </p>
                     <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
-                        <a href="<?= base_url('/comprar') ?>" class="btn btn-custom">
-                            <i class="fas fa-shopping-cart me-1"></i> Comprar Ahora
+                        <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom">
+                            <i class="fas fa-shopping-cart me-1"></i> Iniciar Sesión
                         </a>
-                        <a href="#company" class="btn btn-outline-custom">
-                            <i class="fas fa-info-circle me-1"></i> Más Información
+                        <a href="<?= base_url('/comprar') ?>" class="btn btn-outline-custom">
+                            <i class="fas fa-info-circle me-1"></i> Comprar Ahora
                         </a>
                     </div>
                 </div>
