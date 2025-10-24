@@ -368,15 +368,19 @@ if (!function_exists('esc')) {
                                                     $estado = 'Desconocido';
                                                     $class = '';
 
-                                                    if ($nivel >= 500) {
+                                                    // NUEVOS VALORES MODIFICADOS
+                                                    if ($nivel >= 600) {
                                                         $estado = 'Peligro';
                                                         $class = 'bg-danger';
-                                                    } elseif ($nivel >= 350) {
-                                                        $estado = 'Precaución';
+                                                    } elseif ($nivel >= 550) {
+                                                        $estado = 'Advertencia';
                                                         $class = 'bg-warning text-dark';
-                                                    } elseif ($nivel >= 0) {
+                                                    } elseif ($nivel >= 350) {
                                                         $estado = 'Seguro';
                                                         $class = 'bg-success';
+                                                    } else {
+                                                        $estado = 'Bajo';
+                                                        $class = 'bg-info';
                                                     }
                                                 ?>
                                                 <span class="badge <?= $class ?>"><?= $estado ?></span>
@@ -431,18 +435,33 @@ if (!function_exists('esc')) {
 
             const safeValue = Math.max(0, value); // Ensure value is not negative
 
-            if (safeValue < 200) {
-                width = (safeValue / 200) * 33; // Scale 0-199 PPM to 0-33%
+            // NUEVOS VALORES SEGÚN TUS ESPECIFICACIONES
+            if (safeValue >= 350 && safeValue <= 400) {
+                // Verde - Seguro (350-400 PPM)
+                width = ((safeValue - 350) / 50) * 33; // Escala 350-400 a 0-33%
                 levelText = 'Seguro';
                 barClass = 'bg-success';
-            } else if (safeValue < 350) {
-                width = 33 + ((safeValue - 200) / 300) * 33; // Scale 200-499 PPM to 33-66%
-                levelText = 'Precaución';
-                barClass = 'bg-warning text-dark'; // Added text-dark for visibility
-            } else { // 500 PPM and above
-                width = 66 + ((safeValue - 500) / 500) * 34; // Scale 500+ PPM to 66-100%
+            } else if (safeValue >= 550 && safeValue <= 600) {
+                // Amarillo - Advertencia (550-600 PPM)
+                width = 33 + ((safeValue - 550) / 50) * 33; // Escala 550-600 a 33-66%
+                levelText = 'Advertencia';
+                barClass = 'bg-warning text-dark';
+            } else if (safeValue > 600) {
+                // Rojo - Peligro (>600 PPM)
+                width = 66 + ((safeValue - 600) / 400) * 34; // Escala 600-1000 a 66-100%
                 levelText = 'Peligro';
                 barClass = 'bg-danger';
+            } else {
+                // Valores fuera de los rangos definidos
+                if (safeValue < 350) {
+                    width = (safeValue / 350) * 33; // Escala 0-349 a 0-33%
+                    levelText = 'Bajo';
+                    barClass = 'bg-info';
+                } else if (safeValue > 400 && safeValue < 550) {
+                    width = 33 + ((safeValue - 400) / 150) * 33; // Escala 401-549 a 33-66%
+                    levelText = 'Normal';
+                    barClass = 'bg-primary';
+                }
             }
 
             width = Math.min(100, Math.max(0, width)); // Cap width between 0 and 100
