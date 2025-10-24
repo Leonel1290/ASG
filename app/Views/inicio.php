@@ -404,7 +404,7 @@
                     </p>
                     <div class="d-flex gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="400">
                         <a href="<?= base_url('/loginobtener') ?>" class="btn btn-custom">
-                            <i class="fad fa-sign-in"></i> Iniciar Sesión
+                            <i class="fas fa-sign-in"></i> Iniciar Sesión
                         </a>
                         <a href="<?= base_url('/comprar') ?>" class="btn btn-outline-custom">
                             <i class="fas fa-shopping-cart me-1"></i> Comprar Ahora
