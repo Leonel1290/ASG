@@ -286,13 +286,11 @@
 <body>
 
 <div class="guide-container">
-    <!-- Header -->
     <div class="guide-header">
         <h1>🛒 Guía Completa de Compra ASG</h1>
         <p class="subtitle">Sigue estos pasos simples para adquirir tu ASG Sentinel y proteger tu hogar</p>
     </div>
 
-    <!-- Paso 1 -->
     <div class="step-card">
         <div class="step-number">1</div>
         <h3 class="step-title">Acceder a la Tienda</h3>
@@ -306,7 +304,6 @@
         </div>
     </div>
 
-    <!-- Paso 2 -->
     <div class="step-card">
         <div class="step-number">2</div>
         <h3 class="step-title">Verificación de Cuenta</h3>
@@ -330,7 +327,6 @@
         </div>
     </div>
 
-    <!-- Paso 3 -->
     <div class="step-card">
         <div class="step-number">3</div>
         <h3 class="step-title">Realizar el Pago</h3>
@@ -344,7 +340,6 @@
         </div>
     </div>
 
-    <!-- Paso 4 -->
     <div class="step-card">
         <div class="step-number">4</div>
         <h3 class="step-title">Confirmación de Compra <span class="status-badge status-important">CRÍTICO</span></h3>
@@ -372,7 +367,6 @@
         </div>
     </div>
 
-    <!-- Paso 5 -->
     <div class="step-card">
         <div class="step-number">5</div>
         <h3 class="step-title">Registrar Dirección de Envío</h3>
@@ -397,7 +391,6 @@
         </div>
     </div>
 
-    <!-- Paso 6 -->
     <div class="step-card">
         <div class="step-number">6</div>
         <h3 class="step-title">Completar Información de Envío</h3>
@@ -428,7 +421,6 @@
         </div>
     </div>
 
-    <!-- Paso 7 -->
     <div class="step-card">
         <div class="step-number">7</div>
         <h3 class="step-title">Confirmación Final</h3>
@@ -441,34 +433,6 @@
             </ul>
         </div>
     </div>
-
-    <!-- Diagrama de Flujo -->
-    <div class="flow-diagram">
-        <h4 class="text-primary mb-4">🔄 Resumen Visual del Flujo</h4>
-        <div class="flow-step">Inicio</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Comprar</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">[¿Sesión? NO → Login]</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Pago PayPal</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Modal Éxito</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Copiar Payment ID</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Mis Compras</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Ingresar Payment ID</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Completar Dirección</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">Guardar</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step text-success">✅ Compra Registrada</div>
-    </div>
-
-    <!-- Tiempos y Soporte -->
     <div class="row">
         <div class="col-md-6">
             <div class="step-card">
@@ -493,7 +457,6 @@
         </div>
     </div>
 
-    <!-- Checklist -->
     <div class="checklist">
         <h3>✅ Checklist del Usuario</h3>
         
@@ -532,7 +495,6 @@
         </div>
     </div>
 
-    <!-- Botones de Acción -->
     <div class="text-center mt-5">
         <a href="<?= base_url('/comprar') ?>" class="btn btn-guide">
             <i class="fas fa-shopping-cart me-2"></i> Comenzar Compra
@@ -545,9 +507,8 @@
         </a>
     </div>
 
-    <!-- Consejo Final -->
     <div class="text-center mt-4">
-        <p class="text-muted">
+        <p class="text-light">
             <i class="fas fa-lightbulb text-warning me-1"></i>
             <strong>Consejo Importante:</strong> Siempre guarda tu Payment ID, es tu referencia principal para cualquier consulta sobre tu compra y envío.
         </p>
