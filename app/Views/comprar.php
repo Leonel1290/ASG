@@ -14,8 +14,8 @@
             --bg-color-main: #0d1117;
             --bg-color-card: #161b22;
             --font-color-main: #e6edf3;
-            --accent-color-blue: #58a6ff;
-            --accent-color-green: #2ea043;
+            --accent-color-blue: #58a6ff; /* Usado para info/trust */
+            --accent-color-green: #2ea043; /* Usado para éxito/primario */
             --accent-color-red: #f87171;
             --border-color-dark: #2d333b;
             --shadow-light: rgba(0,0,0,0.2);
@@ -68,7 +68,7 @@
         }
 
         /* ------------------- CONTENEDOR PRINCIPAL ------------------- */
-        .checkout-wrapper { /* Nuevo contenedor para la imagen y los detalles */
+        .checkout-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
@@ -83,17 +83,17 @@
             padding: 3rem;
             max-width: 900px;
             width: 100%;
-            display: flex; /* Contenedor principal para flexbox */
-            flex-direction: row; /* Imagen a la izquierda, detalles a la derecha por defecto */
+            display: flex;
+            flex-direction: row;
             gap: 2rem;
             animation: fadeIn 1s ease-in-out;
-            flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+            flex-wrap: wrap;
         }
 
         /* ------------------- SECCIONES DEL PRODUCTO ------------------- */
-        .product-image-container { /* Nuevo contenedor para la imagen */
-            flex: 1; /* Permite que la imagen tome espacio */
-            min-width: 250px; /* Ancho mínimo para la imagen en columnas */
+        .product-image-container {
+            flex: 1;
+            min-width: 250px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -101,7 +101,7 @@
 
         .product-image-container img {
             width: 100%;
-            max-width: 350px; /* Ajusta el tamaño máximo de la imagen según el diseño deseado */
+            max-width: 350px;
             height: auto;
             border-radius: 0.5rem;
             box-shadow: 0 8px 25px var(--shadow-dark);
@@ -113,8 +113,8 @@
         }
         
         .product-details-section {
-            flex: 2; /* Permite que la sección de detalles ocupe más espacio */
-            min-width: 300px; /* Ancho mínimo para los detalles */
+            flex: 2;
+            min-width: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -189,6 +189,124 @@
             font-size: 0.9rem;
         }
 
+        /* ------------------- ESTILOS DEL MODAL DE ÉXITO MEJORADO ------------------- */
+        .modal-content {
+            background-color: var(--bg-color-card);
+            color: var(--font-color-main);
+            border: none;
+            border-radius: 1rem;
+        }
+        
+        /* Estilo específico para el modal de éxito */
+        .modal-content-success {
+            background-color: #1c2128; /* Fondo un poco más oscuro que la tarjeta principal */
+            border: 1px solid var(--accent-color-green);
+            border-radius: 1rem;
+            box-shadow: 0 0 40px rgba(46, 160, 67, 0.4); /* Sombra suave verde */
+        }
+        
+        .modal-header {
+            border-bottom: none;
+        }
+
+        .modal-header-success {
+            padding-bottom: 0;
+            justify-content: flex-end;
+        }
+
+        .modal-body-success {
+            text-align: center;
+            padding: 1rem 3rem 2rem 3rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--accent-color-green);
+            margin-bottom: 1rem;
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        .modal-title-custom {
+            color: var(--font-color-main);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%); /* Asegura que el ícono de cerrar se vea bien en fondo oscuro */
+        }
+        
+        /* Modificación de alert-info para que encaje mejor */
+        .alert-info-custom {
+            background-color: #1a273b; /* Fondo azul oscuro del tema */
+            border-color: var(--accent-color-blue);
+            color: var(--font-color-main);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem !important;
+            text-align: left;
+        }
+
+        .code-display-box {
+            background-color: var(--bg-color-main); /* Más oscuro que el fondo del modal */
+            color: var(--accent-color-blue);
+            border: 1px solid var(--border-color-dark);
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 1rem !important;
+            overflow: hidden;
+        }
+
+        /* Botón de Copiar */
+        .btn-copy {
+            color: var(--accent-color-blue);
+            border-color: var(--accent-color-blue);
+            background-color: transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--accent-color-blue);
+            color: var(--bg-color-card);
+        }
+
+        /* Botones del Footer del Modal */
+        .modal-footer .btn-back {
+    background-color: var(--border-color-dark);
+    border-color: var(--border-color-dark);
+    color: var(--font-color-main);
+}
+
+.modal-footer .btn-back:hover {
+    background-color: #21262d;
+    border-color: #21262d;
+    color: #fff;
+}
+
+.modal-footer .btn-primary {
+    background-color: var(--accent-color-green);
+    border-color: var(--accent-color-green);
+    font-weight: 600;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #238636;
+    border-color: #238636;
+}
+
+        .btn-primary {
+            background-color: var(--accent-color-green);
+            border-color: var(--accent-color-green);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #238636;
+            border-color: #238636;
+        }
+
         /* ------------------- OTROS ESTILOS ------------------- */
         .error-message {
             color: var(--accent-color-red);
@@ -210,25 +328,6 @@
             color: #fff;
         }
 
-        .modal-content {
-            background-color: #1c2128;
-            color: #c9d1d9;
-        }
-
-        .modal-title {
-            color: var(--accent-color-green);
-        }
-
-        .btn-primary {
-            background-color: #238636;
-            border-color: #238636;
-        }
-
-        .btn-primary:hover {
-            background-color: #2ea043;
-            border-color: #2ea043;
-        }
-        
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -238,18 +337,6 @@
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
             margin-right: 10px;
-        }
-
-        /* Estilos para el payment_id */
-        .alert-info {
-            background-color: #0c2d6b;
-            border-color: #58a6ff;
-            color: #c9d1d9;
-        }
-
-        .code-display {
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
         }
         
         /* ------------------- ANIMACIONES ------------------- */
@@ -267,11 +354,18 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
 
         /* ------------------- RESPONSIVIDAD ------------------- */
         @media (max-width: 768px) {
             .product-checkout-view {
-                flex-direction: column; /* Apila la imagen y los detalles en pantallas pequeñas */
+                flex-direction: column;
                 padding: 1.5rem;
             }
             .trust-badges {
@@ -279,11 +373,15 @@
             }
             
             .product-image-container {
-                margin-bottom: 1.5rem; /* Espacio debajo de la imagen cuando está arriba */
+                margin-bottom: 1.5rem;
             }
 
             .product-image-container img {
-                max-width: 250px; /* Ajuste para móviles, la imagen puede ser un poco más pequeña */
+                max-width: 250px;
+            }
+
+            .modal-body-success {
+                padding: 1rem 1.5rem 1.5rem 1.5rem;
             }
         }
     </style>
@@ -342,50 +440,59 @@
     </div>
 
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">¡Compra Exitosa!</h5>
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content modal-content-success">
+            <div class="modal-header modal-header-success">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                <p>Tu pago fue procesado correctamente. ¡Gracias por confiar en AgainSafeGas!</p>
-                <div class="alert alert-info mt-3">
-                    <strong>Tu ID de compra:</strong>
+            <div class="modal-body modal-body-success">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h5 class="modal-title-custom" id="successModalLabel">¡Compra Completada con Éxito!</h5>
+                <p class="text-muted mb-4">Tu pago ha sido **aprobado** y tu pedido está en camino a procesamiento.</p>
+
+                <div class="alert alert-info-custom">
+                    <strong>Tu ID de compra (Payment ID):</strong>
                     <div class="d-flex align-items-center mt-2">
-                        <code id="payment-id-display" class="bg-dark text-light p-2 rounded flex-grow-1 code-display" style="font-size: 0.9rem;">
-                            Cargando...
-                        </code>
-                        <button class="btn btn-sm btn-outline-light ms-2" id="copy-payment-id-btn">
-                            <i class="fas fa-copy"></i>
+                        <div id="payment-id-display-container" class="code-display-box flex-grow-1 d-flex align-items-center me-2">
+                            <code id="payment-id-display" class="code-display text-truncate" style="font-size: 0.95rem;">
+                                Cargando...
+                            </code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary btn-copy" id="copy-payment-id-btn" title="Copiar ID">
+                            <i class="fas fa-copy"></i> Copiar
                         </button>
                     </div>
-                    <small class="text-muted d-block mt-2">Guarda este ID para vincular tu dispositivo luego</small>
-                    <div id="payment-id-warning" class="text-warning mt-2" style="display: none;">
-                        <small><i class="fas fa-exclamation-triangle"></i> Si no ves el ID, revisa tu email o contacta con soporte</small>
+                    
+                    <small class="text-secondary d-block mt-2">
+                        <i class="fas fa-info-circle"></i> Guarda este ID. Lo necesitarás para registrar tu **dirección de envío**.
+                    </small>
+                    
+                    <div id="payment-id-warning" class="text-warning mt-3" style="display: none;">
+                        <small><i class="fas fa-exclamation-triangle"></i> Si no ves el ID, revisa tu email de confirmación de PayPal o contacta con soporte.</small>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <a href="/" class="btn btn-primary">Continuar al Inicio</a>
+            <div class="modal-footer justify-content-center pt-0 pb-4">
+                <a href="/" class="btn btn-back me-2"><i class="fas fa-home me-1"></i> Continuar al Inicio</a>
+                <a href="/mis_compras" class="btn btn-primary"><i class="fas fa-receipt me-1"></i> Ir a Mis Compras</a>
             </div>
         </div>
     </div>
 </div>
 
-    <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="processingModalLabel">Procesando compra</h5>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="loading-spinner"></div> 
-                    <span>Estamos guardando los detalles de tu compra...</span>
-                </div>
+<div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="processingModalLabel">Procesando compra</h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="loading-spinner"></div> 
+                <span>Estamos guardando los detalles de tu compra...</span>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://www.paypal.com/sdk/js?client-id=AcPUPMO4o6DTBBdmCmosS-e1fFHHyY3umWiNLu0T0b0RCQsdKW7mEJt3c3WaZ2VBZdSZHIgIVQCXf54_&currency=USD"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -406,27 +513,34 @@
             errorDiv.innerText = message;
         }
 
-        // Función corregida para copiar el payment_id
+        // Función corregida para copiar el payment_id, ahora usando la clase btn-copy
         function copyPaymentId() {
-            const paymentId = document.getElementById('payment-id-display').textContent;
-            if (!paymentId) return;
+            const paymentId = document.getElementById('payment-id-display').textContent.trim();
+            if (!paymentId || paymentId === 'Cargando...') return;
             
             navigator.clipboard.writeText(paymentId).then(() => {
                 // Mostrar feedback visual
                 const copyBtn = document.getElementById('copy-payment-id-btn');
                 const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-                copyBtn.classList.remove('btn-outline-light');
+                const originalClasses = Array.from(copyBtn.classList);
+
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                copyBtn.classList.remove('btn-copy', 'btn-outline-secondary');
                 copyBtn.classList.add('btn-success');
+                copyBtn.style.borderColor = 'var(--accent-color-green)';
+                copyBtn.style.color = '#fff'; // Asegura el color del texto
+
                 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.classList.remove('btn-success');
-                    copyBtn.classList.add('btn-outline-light');
+                    copyBtn.classList.add('btn-copy', 'btn-outline-secondary');
+                    copyBtn.style.borderColor = ''; // Limpiar estilos en línea si se añadieron
+                    copyBtn.style.color = '';
                 }, 2000);
             }).catch(err => {
                 console.error('Error al copiar: ', err);
-                // Fallback para navegadores más antiguos
+                // Fallback para navegadores más antiguos (mantiene la lógica de feedback)
                 const tempInput = document.createElement('input');
                 tempInput.value = paymentId;
                 document.body.appendChild(tempInput);
@@ -434,24 +548,32 @@
                 document.execCommand('copy');
                 document.body.removeChild(tempInput);
                 
-                // Mostrar feedback visual incluso con fallback
                 const copyBtn = document.getElementById('copy-payment-id-btn');
                 const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-                copyBtn.classList.remove('btn-outline-light');
+                
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                copyBtn.classList.remove('btn-copy', 'btn-outline-secondary');
                 copyBtn.classList.add('btn-success');
+                copyBtn.style.borderColor = 'var(--accent-color-green)';
+                copyBtn.style.color = '#fff'; 
                 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.classList.remove('btn-success');
-                    copyBtn.classList.add('btn-outline-light');
+                    copyBtn.classList.add('btn-copy', 'btn-outline-secondary');
+                    copyBtn.style.borderColor = '';
+                    copyBtn.style.color = '';
                 }, 2000);
             });
         }
 
         // Agregar event listener después de que el DOM esté cargado
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('copy-payment-id-btn').addEventListener('click', copyPaymentId);
+            // Se usa el ID para la copia, no el btn-outline-light global
+            const copyButton = document.getElementById('copy-payment-id-btn');
+            if (copyButton) {
+                copyButton.addEventListener('click', copyPaymentId);
+            }
         });
 
         if (typeof paypal === 'undefined') {

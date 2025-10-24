@@ -9,165 +9,225 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Compras - ASG</title>
     <link rel="shortcut icon" href="<?= base_url('/imagenes/Logo.png'); ?>">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Paleta de colores mejorada para el tema oscuro */
+        /* Paleta de la vista de referencia (Tailwind CSS Dark-Gray/Blue) */
         :root {
-            --color-bg-primary: #121212; /* Fondo muy oscuro */
-            --color-bg-secondary: #1e1e1e; /* Fondo de tarjetas */
-            --color-bg-tertiary: #2a2a2a; /* Encabezado de tarjetas/elementos de lista */
-            --color-text-primary: #e0e0e0; /* Texto claro principal */
-            --color-text-secondary: #a0a0a0; /* Texto secundario/muted */
-            --color-accent-blue: #007bff; /* Azul primario (mejor contraste) */
-            --color-accent-blue-hover: #0056b3;
-            --color-border: #333333;
-            --color-success: #28a745;
-            --color-warning: #ffc107;
-            --color-danger: #dc3545;
+            --color-bg-primary: #1a202c; /* Fondo principal (body) */
+            --color-bg-secondary: #2d3748; /* Fondo de tarjetas/Contenedores */
+            --color-bg-tertiary: #4a5568; /* Header de tarjetas/Acentos */
+            --color-text-primary: #cbd5e0; /* Texto claro principal */
+            --color-text-secondary: #a0aec0; /* Texto de acento/Secundario */
+            --color-accent: #4299e1; /* Color de acento (Azul) */
+            --color-accent-dark: #2b6cb0; /* Azul oscuro para hover */
+            --color-border: #4a5568; /* Borde sutil */
+            --color-success: #48bb78; /* Verde para éxito */
+            --color-danger: #e53e3e; /* Rojo para peligro */
+            --color-warning: #ecc94b; /* Amarillo para advertencia */
+            --color-text-dark: #1a202c; /* Color de texto oscuro para advertencias */
         }
 
         body {
-            background-color: var(--color-bg-primary);
+            background-color: var(--color-bg-primary); /* Fondo principal simple */
             color: var(--color-text-primary);
-            font-family: 'Inter', sans-serif; /* Fuente más moderna */
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
+            padding-top: 70px;
         }
         
-        /* Navbar */
+        /* Navbar - Simplificado */
         .navbar {
-            background-color: var(--color-bg-secondary) !important;
-            border-bottom: 1px solid var(--color-border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            background-color: var(--color-bg-secondary) !important; /* Usar el fondo de tarjetas */
+            /* Eliminar el blur y el borde inferior para igualar la referencia */
+            backdrop-filter: none;
+            border-bottom: none; 
+            transition: none;
         }
 
-        .navbar-brand, .nav-link {
+        .navbar-brand {
+            color: #fff !important; /* Blanco para el brand */
+            font-size: 1.4rem;
+        }
+        .nav-link {
             color: var(--color-text-primary) !important;
+            font-size: 1.1rem;
+            padding-top: .75rem;
+            padding-bottom: .75rem;
         }
 
         .nav-link.active {
-            color: var(--color-accent-blue) !important;
-            border-bottom: 2px solid var(--color-accent-blue);
-            padding-bottom: 0.25rem;
+            color: var(--color-accent) !important;
+            border-bottom: none; /* Eliminar el borde azul inferior */
+            font-weight: bold;
+        }
+        
+        .nav-link:hover {
+            color: #fff !important; /* Blanco en hover */
         }
 
-        /* Cards y Formularios */
+        /* Botón Outline */
+        .btn-outline-secondary {
+            color: var(--color-text-primary);
+            border-color: var(--color-text-primary);
+            transition: all 0.2s;
+        }
+
+        .btn-outline-secondary:hover {
+            color: var(--color-bg-primary);
+            background-color: var(--color-text-primary);
+            border-color: var(--color-text-primary);
+        }
+
+        /* Cards */
         .card {
             background-color: var(--color-bg-secondary);
             color: var(--color-text-primary);
-            border: 1px solid var(--color-border);
-            border-radius: 0.75rem; /* Bordes más redondeados */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sutil sombra */
+            border: none; /* Sin borde explícito */
+            border-radius: 0.5rem; /* Ajustar radio al de referencia */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -5px rgba(0, 0, 0, 0.1); /* Sombra más sutil de referencia */
         }
         
         .card-header {
             background-color: var(--color-bg-tertiary);
-            color: var(--color-text-primary);
-            border-bottom: 1px solid var(--color-border);
-            border-radius: 0.75rem 0.75rem 0 0;
-            padding: 1rem 1.5rem;
-        }
-
-        .form-label {
-            color: var(--color-text-primary);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
+            color: #fff; /* Título en blanco para mejor contraste */
+            border-bottom: 1px solid var(--color-bg-secondary); /* Borde más suave */
+            border-radius: 0.5rem 0.5rem 0 0; /* Ajustar radio */
+            padding: 1rem 1.5rem; /* Ajustar padding */
         }
         
+        /* Formularios */
+        .form-label {
+            color: var(--color-text-primary);
+            font-weight: bold; /* Hacer la etiqueta más destacada como en la referencia */
+            margin-bottom: 0.5rem; /* Aumentar espacio */
+        }
+
         .form-control, .form-control:focus {
-            background-color: var(--color-bg-primary); /* Fondo más oscuro para los inputs */
+            background-color: var(--color-bg-secondary); /* Usar el color de tarjeta para los inputs */
             border: 1px solid var(--color-border);
             color: var(--color-text-primary);
-            border-radius: 0.5rem;
+            border-radius: 0.375rem; /* Ligeramente más pequeño que antes */
             padding: 0.75rem 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
         
         .form-control:focus {
-            border-color: var(--color-accent-blue);
-            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25); /* Sombra de foco azul */
         }
         
-        /* Botones */
+        /* Botón Primario (Save/Guardar) */
         .btn-primary {
-            background-color: var(--color-accent-blue);
-            border-color: var(--color-accent-blue);
-            transition: background-color 0.2s, border-color 0.2s;
+            background-color: var(--color-accent);
+            border-color: var(--color-accent);
+            color: #fff;
+            font-weight: 600;
+            transition: all 0.2s;
         }
         
         .btn-primary:hover {
-            background-color: var(--color-accent-blue-hover);
-            border-color: var(--color-accent-blue-hover);
+            background-color: var(--color-accent-dark);
+            border-color: var(--color-accent-dark);
         }
 
-        .btn-outline-secondary {
-            color: var(--color-text-secondary);
-            border-color: var(--color-text-secondary);
-        }
-
-        .btn-outline-secondary:hover {
-            color: var(--color-bg-secondary);
-            background-color: var(--color-text-secondary);
-        }
-
-        /* Alertas y Feedback */
+        /* Alertas - Adaptadas a la paleta de la referencia */
         .alert-success {
-            background-color: rgba(40, 167, 69, 0.15); /* Fondo sutil de éxito */
-            color: var(--color-success);
-            border-color: var(--color-success);
-            border-radius: 0.5rem;
+            background-color: #c6f6d5; 
+            color: var(--color-text-dark); /* Color de texto oscuro para fondo claro */
+            border-color: #a7f3d0;
+            border-radius: 0.375rem;
         }
         .alert-danger {
-            background-color: rgba(220, 53, 69, 0.15); /* Fondo sutil de error */
-            color: var(--color-danger);
-            border-color: var(--color-danger);
-            border-radius: 0.5rem;
+            background-color: #fed7d7; 
+            color: var(--color-text-dark);
+            border-color: #fbcbcb;
+            border-radius: 0.375rem;
+        }
+        .alert-warning {
+            background-color: #feebc8; /* Nuevo estilo para warning */
+            color: var(--color-text-dark);
+            border-color: #faf089;
+            border-radius: 0.375rem;
         }
 
-        /* Estilo de la lista de órdenes */
+        /* Listado de Órdenes */
         .order-item {
             border-bottom: 1px solid var(--color-border);
             padding: 1rem 0;
-            transition: background-color 0.3s;
+            transition: none; /* Eliminar transición y hover de fondo para simplificar */
+            margin-left: 0;
+            margin-right: 0;
         }
         
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
         .order-item:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-            border-radius: 0.5rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            margin-left: -0.5rem;
-            margin-right: -0.5rem;
+            background-color: transparent; /* Eliminar efecto de hover */
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
         }
 
-        .order-details strong {
-            color: var(--color-text-primary);
+        .text-info-custom {
+            color: var(--color-accent) !important; /* Usar azul de acento */
+            font-weight: 700;
         }
 
-        .small-address {
-            background-color: var(--color-bg-tertiary);
+        .badge-status {
+            font-size: 0.75em; /* Ligeramente más pequeño */
+            padding: 0.3em 0.7em;
+            border-radius: 0.5rem; /* Ajustar radio */
+            font-weight: 700;
+            color: #fff; /* Asegurar texto blanco por defecto en badges */
+        }
+        
+        /* Override de Bootstrap y ajuste de colores de badge */
+        .badge.bg-success { background-color: var(--color-success) !important; color: var(--color-text-dark) !important; }
+        .badge.bg-warning { background-color: var(--color-warning) !important; color: var(--color-text-dark) !important; } 
+        .badge.bg-danger { background-color: var(--color-danger) !important; color: #fff !important; }
+        .badge.bg-secondary { background-color: var(--color-bg-tertiary) !important; color: #fff !important; }
+
+        .address-box {
+            background-color: var(--color-bg-tertiary); /* Usar el color de header de card como fondo de dirección */
             border: 1px solid var(--color-border);
             padding: 0.75rem;
             border-radius: 0.5rem;
-            color: var(--color-text-secondary);
+            color: #fff; /* Texto blanco en el address box para buen contraste */
             font-size: 0.85rem;
             margin-top: 0.75rem;
         }
         
-        .text-muted {
+        .text-success { color: var(--color-success) !important; }
+        .text-secondary { color: var(--color-text-secondary) !important; }
+
+        .placeholder-empty {
             color: var(--color-text-secondary) !important;
+            opacity: 1; /* Quitar opacidad para mantener el color */
         }
 
-        /* Placeholder personalizado */
-        .form-control::placeholder {
-            color: var(--color-text-secondary);
-            opacity: 0.6;
+        /* Regla para que los divisores horizontales se vean bien */
+        hr {
+            border-color: var(--color-border) !important; 
+            opacity: 1 !important; /* Quitar opacidad para que el color sea claro */
         }
     </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid container-xl"> <a class="navbar-brand fw-bold" href="<?= base_url('/perfil') ?>">ASG <span class="badge bg-secondary">BETA</span></a>
+            <div class="container-fluid container-xl">
+                <a class="navbar-brand fw-bold" href="<?= base_url('/perfil') ?>">ASG</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -195,7 +255,7 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
     </header>
 
     <div class="container container-xl my-5">
-        <h2 class="mb-4 text-center">Gestión de Compras y Envíos 📦</h2>
+        <h2 class="mb-4 text-center text-white">Gestión de Compras y Envíos <i class="fas fa-shipping-fast text-secondary"></i></h2>
 
         <?php if (session('success')): ?>
             <div class="alert alert-success d-flex align-items-center" role="alert">
@@ -209,31 +269,32 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                 <div><?= session('error') ?></div>
             </div>
         <?php endif; ?>
-        <div class="row g-4"> <div class="col-lg-6">
+
+        <div class="row g-4">
+            <div class="col-lg-6">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-map-marker-alt me-2"></i> Dirección de Envío</h5>
-                        <p class="mb-0 text-muted small">Registra la dirección para recibir tu compra.</p>
+                        <h5 class="card-title mb-0"><i class="fas fa-map-marker-alt me-2"></i> Agregar Dirección de Envío</h5>
                     </div>
                     <div class="card-body p-4">
                         <form action="<?= base_url('/perfil/guardar-direccion-envio') ?>" method="post">
                             <?= csrf_field() ?>
                             
-                            <div class="mb-3">
-                                <label for="payment_id" class="form-label">Payment ID (ID de Transacción) *</label>
+                            <div class="mb-4">
+                                <label for="payment_id" class="form-label"><i class="fas fa-barcode me-1"></i> Payment ID (ID de Compra) *</label>
                                 <input type="text" class="form-control" id="payment_id" name="payment_id" required 
                                         placeholder="Ingrese el ID de pago de su compra">
-                                <div class="form-text text-muted">Asegúrate de que este ID sea el correcto para vincular la dirección.</div>
+                                <div class="form-text text-secondary small mt-2">Este ID vincula la dirección a tu compra.</div>
                             </div>
 
-                            <hr class="my-4" style="border-color: var(--color-border);">
-                            <h6 class="mb-3 text-white"><i class="fas fa-user me-1"></i> Datos Personales</h6>
+                            <hr class="my-4">
+                            <h6 class="mb-3 text-white"><i class="fas fa-user me-1"></i> Datos del Receptor</h6>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="nombre" class="form-label">Nombre *</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required 
-                                            value="<?= session()->get('nombre') ?>">
+                                                value="<?= session()->get('nombre') ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="apellido" class="form-label">Apellido *</label>
@@ -241,14 +302,13 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label">Teléfono *</label>
-                                <input type="text" class="form-control" id="telefono" name="telefono" required 
-                                        placeholder="Ej: 3584123456">
+                            <div class="mb-4">
+                                <label for="telefono" class="form-label"><i class="fas fa-phone me-1"></i> Teléfono *</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono" required>
                             </div>
 
-                            <hr class="my-4" style="border-color: var(--color-border);">
-                            <h6 class="mb-3 text-white"><i class="fas fa-map-marked-alt me-1"></i> Ubicación</h6>
+                            <hr class="my-4">
+                            <h6 class="mb-3 text-white"><i class="fas fa-location-arrow me-1"></i> Detalles del Domicilio</h6>
 
                             <div class="row">
                                 <div class="col-md-4 mb-3">
@@ -279,26 +339,26 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="piso" class="form-label">Piso</label>
-                                    <input type="text" class="form-control" id="piso" name="piso" placeholder="Ej: 5">
+                                    <input type="text" class="form-control" id="piso" name="piso">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="depto" class="form-label">Departamento</label>
-                                    <input type="text" class="form-control" id="depto" name="depto" placeholder="Ej: A / B">
+                                    <input type="text" class="form-control" id="depto" name="depto">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="codigo_postal" class="form-label">Código Postal *</label>
-                                    <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" required placeholder="C.P.">
+                                    <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" required>
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="referencias" class="form-label">Referencias Adicionales</label>
+                                <label for="referencias" class="form-label"><i class="fas fa-info-circle me-1"></i> Referencias</label>
                                 <textarea class="form-control" id="referencias" name="referencias" rows="3" 
-                                            placeholder="Detalles sobre el domicilio, ej: 'Casa con rejas azules', 'Timbrar en el 3er piso'"></textarea>
+                                                placeholder="Referencias adicionales para la entrega (ej: 'Dejar con portería', 'Casa portón verde')"></textarea>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="fas fa-shipping-fast me-2"></i> Guardar Dirección
+                                <i class="fas fa-save me-2"></i> Guardar Dirección de Envío
                             </button>
                         </form>
                     </div>
@@ -308,73 +368,73 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
             <div class="col-lg-6">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-list-alt me-2"></i> Historial de Órdenes</h5>
-                        <p class="mb-0 text-muted small">Listado de las compras vinculadas a tu cuenta.</p>
+                        <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i> Mis Órdenes de Compra</h5>
                     </div>
                     <div class="card-body p-4">
                         <?php if (empty($compras)): ?>
-                            <div class="text-center p-5">
-                                <i class="fas fa-box-open fa-3x mb-3 text-muted"></i><br>
-                                <p class="lead text-muted">¡Aún no tienes órdenes de compra!</p>
-                                <p class="text-muted small">Usa el formulario de la izquierda para ingresar un **Payment ID** y ver tu orden aquí.</p>
+                            <div class="text-center p-5 placeholder-empty">
+                                <i class="fas fa-box-open fa-3x mb-3"></i><br>
+                                <p class="lead">No tienes órdenes de compra registradas.</p>
+                                <p class="small">Ingresa un Payment ID válido a la izquierda para ver tu orden aquí.</p>
                             </div>
                         <?php else: ?>
                             <div class="list-group list-group-flush">
                                 <?php foreach ($compras as $compra): ?>
                                     <div class="order-item">
-                                        <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
-                                                <h6 class="mb-0 text-white">Orden ID: <span class="fw-bold text-info">#<?= esc($compra['order_id']) ?></span></h6>
-                                                <div class="small text-muted">
-                                                    Transacción: **<?= esc($compra['payment_id']) ?>**
-                                                </div>
+                                                <strong>Orden: <span class="text-info-custom">#<?= esc($compra['order_id']) ?></span></strong>
+                                                <div class="small text-secondary">ID de Pago: <?= esc($compra['payment_id']) ?></div>
                                             </div>
                                             <?php 
+                                                // Mapeo de estado para colores adaptados
+                                                $status = strtolower(esc($compra['status']));
                                                 $statusClass = 'bg-secondary';
-                                                if (strtolower(esc($compra['status'])) === 'aprobada') {
+                                                if ($status === 'aprobada' || $status === 'entregado' || $status === 'enviado') {
                                                     $statusClass = 'bg-success';
-                                                } else if (strtolower(esc($compra['status'])) === 'pendiente') {
-                                                    $statusClass = 'bg-warning text-dark';
+                                                } else if ($status === 'pendiente' || $status === 'en proceso') {
+                                                    $statusClass = 'bg-warning';
+                                                } else if ($status === 'rechazado' || $status === 'cancelado') {
+                                                    $statusClass = 'bg-danger';
                                                 }
                                             ?>
-                                            <span class="badge <?= $statusClass ?> rounded-pill px-3 py-2"><?= esc($compra['status']) ?></span>
+                                            <span class="badge badge-status <?= $statusClass ?>"><?= esc($compra['status']) ?></span>
                                         </div>
                                         
-                                        <div class="order-details mt-3 row g-0 small">
+                                        <div class="row g-0 small">
                                             <div class="col-6 mb-1">
-                                                <strong><i class="fas fa-dollar-sign me-1"></i> Monto:</strong> 
+                                                <strong><i class="fas fa-money-bill-wave me-1"></i> Monto:</strong> 
                                                 <span class="text-success">$<?= number_format($compra['monto'], 2) ?></span>
                                             </div>
-                                            <div class="col-6 mb-1">
+                                            <div class="col-6 mb-1 text-end">
                                                 <strong><i class="fas fa-calendar-alt me-1"></i> Fecha:</strong> 
                                                 <?= date('d/m/Y H:i', strtotime($compra['fecha_compra'])) ?>
                                             </div>
-                                            <div class="col-12">
-                                                <strong><i class="fas fa-at me-1"></i> Email de compra:</strong> 
-                                                <span class="text-secondary"><?= esc($compra['email']) ?></span>
+                                            <div class="col-12 text-secondary">
+                                                <i class="fas fa-envelope me-1"></i> Email: <?= esc($compra['email']) ?>
                                             </div>
                                         </div>
                                         
                                         <?php if (isset($direccionesIndexadas[$compra['id']])): 
-                                            $direccionEnvio = $direccionesIndexadas[$compra['id']];
+                                                $direccionEnvio = $direccionesIndexadas[$compra['id']];
                                         ?>
-                                            <div class="small-address">
-                                                <strong><i class="fas fa-map-pin me-1"></i> Dirección de Envío Registrada:</strong><br>
-                                                <div class="mt-1">
-                                                    **<?= esc($direccionEnvio['nombre']) ?> <?= esc($direccionEnvio['apellido']) ?>** (<?= esc($direccionEnvio['telefono']) ?>)<br>
+                                            <div class="address-box">
+                                                <strong><i class="fas fa-truck me-1"></i> Dirección de Envío:</strong><br>
+                                                <small>
+                                                    <?= esc($direccionEnvio['nombre']) ?> <?= esc($direccionEnvio['apellido']) ?> (Tel: <?= esc($direccionEnvio['telefono']) ?>)<br>
                                                     <?= esc($direccionEnvio['calle']) ?> <?= esc($direccionEnvio['numero']) ?>
-                                                    <?= $direccionEnvio['piso'] ? ' / Piso ' . esc($direccionEnvio['piso']) : '' ?>
-                                                    <?= $direccionEnvio['depto'] ? ' / Depto ' . esc($direccionEnvio['depto']) : '' ?><br>
-                                                    <?= esc($direccionEnvio['ciudad']) ?> (<?= esc($direccionEnvio['provincia']) ?>) - C.P. <?= esc($direccionEnvio['codigo_postal']) ?><br>
+                                                    <?= $direccionEnvio['piso'] ? ', Piso ' . esc($direccionEnvio['piso']) : '' ?>
+                                                    <?= $direccionEnvio['depto'] ? ', Depto ' . esc($direccionEnvio['depto']) : '' ?><br>
+                                                    <?= esc($direccionEnvio['ciudad']) ?>, <?= esc($direccionEnvio['provincia']) ?> (C.P. <?= esc($direccionEnvio['codigo_postal']) ?>)<br>
                                                     <?php if ($direccionEnvio['referencias']): ?>
-                                                        <span class="text-info mt-1 d-block">Referencias: *<?= esc($direccionEnvio['referencias']) ?>*</span>
+                                                        <span class="text-secondary d-block mt-1">Ref.: *<?= esc($direccionEnvio['referencias']) ?>*</span>
                                                     <?php endif; ?>
-                                                </div>
+                                                </small>
                                             </div>
                                         <?php else: ?>
-                                            <div class="mt-3 alert alert-warning p-2 small m-0">
-                                                <i class="fas fa-exclamation-circle me-1"></i> 
-                                                **Falta Dirección de Envío:** Registra los datos en el formulario para esta orden.
+                                            <div class="mt-3 alert alert-warning p-2 small m-0 border-0">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                **Atención:** Falta registrar la dirección de envío para esta orden.
                                             </div>
                                         <?php endif; ?>
                                     </div>
@@ -387,6 +447,22 @@ $perfilLang = require APPPATH . "Language/{$idioma}/Perfil.php";
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Asegúrate de que base_url('service-worker.js') apunte a la ruta correcta en Render
+                navigator.serviceWorker.register('<?= base_url('service-worker.js') ?>')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Fallo el registro de ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

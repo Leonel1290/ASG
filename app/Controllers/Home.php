@@ -52,53 +52,61 @@ class Home extends BaseController
     }
     // Método de Login (POST /login) - Maneja el envío del formulario de login
     public function login()
-    {
-        $session = session();
+{
+    $session = session();
 
-        // --- LOGGING PARA DEBUGGING ---
-        log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
-        // --- FIN LOGGING ---
+    // --- LOGGING PARA DEBUGGING ---
+    log_message('debug', 'Home::login() - Iniciando proceso de login. Datos de sesión al inicio: ' . json_encode($session->get()));
+    // --- FIN LOGGING ---
 
-        $userModel = new UserModel();
+    $userModel = new UserModel();
 
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+    $email = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
 
-        $user = $userModel->where('email', $email)->first();
+    $user = $userModel->where('email', $email)->first();
 
-        if ($user) {
-            if (!$user['is_active']) {
-                $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
-                log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
-                return redirect()->back()->withInput();
-            }
-
-            if (password_verify($password, $user['password'])) {
-                // Contraseña correcta, iniciar sesión
-                $sessionData = [
-                    'id'        => $user['id'],
-                    'nombre'    => $user['nombre'],
-                    'email'     => $user['email'],
-                    'logged_in' => true,
-                ];
-                $session->set($sessionData);
-
-                // --- LOGGING PARA DEBUGGING ---
-                log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
-                // --- FIN LOGGING ---
-
-                return redirect()->to('/perfil');
-            } else {
-                $session->setFlashdata('error', 'Contraseña incorrecta.');
-                log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
-                return redirect()->back()->withInput();
-            }
-        } else {
-            $session->setFlashdata('error', 'Email no encontrado.');
-            log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
+    if ($user) {
+        if (!$user['is_active']) {
+            $session->setFlashdata('error', 'Tu cuenta aún no ha sido verificada. Por favor, revisa tu email para activarla.');
+            log_message('debug', 'Home::login() - Intento de login con cuenta inactiva: ' . $email);
             return redirect()->back()->withInput();
         }
+
+        if (password_verify($password, $user['password'])) {
+            // Contraseña correcta, iniciar sesión
+            $sessionData = [
+                'id'        => $user['id'],
+                'nombre'    => $user['nombre'],
+                'email'     => $user['email'],
+                'logged_in' => true,
+            ];
+            $session->set($sessionData);
+
+            // --- LOGGING PARA DEBUGGING ---
+            log_message('debug', 'Home::login() - Login exitoso para usuario ID: ' . $user['id'] . '. Datos de sesión establecidos: ' . json_encode($sessionData));
+            // --- FIN LOGGING ---
+
+            // Verificar si hay una URL de redirección guardada (como la página de compra)
+            $redirectUrl = $session->get('redirect_url');
+            if ($redirectUrl) {
+                $session->remove('redirect_url'); // Limpiar después de usar
+                log_message('debug', 'Home::login() - Redirigiendo a URL guardada: ' . $redirectUrl);
+                return redirect()->to($redirectUrl);
+            }
+
+            return redirect()->to('/perfil');
+        } else {
+            $session->setFlashdata('error', 'Contraseña incorrecta.');
+            log_message('debug', 'Home::login() - Intento de login con contraseña incorrecta para email: ' . $email);
+            return redirect()->back()->withInput();
+        }
+    } else {
+        $session->setFlashdata('error', 'Email no encontrado.');
+        log_message('debug', 'Home::login() - Intento de login con email no encontrado: ' . $email);
+        return redirect()->back()->withInput();
     }
+}
 
     public function register()
     {
@@ -319,11 +327,21 @@ class Home extends BaseController
     }
 
         public function comprar()
-    {
-        $session = session();
-        log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
-        return view('comprar');
+{
+    $session = session();
+    log_message('debug', 'Home::comprar() - Mostrando vista de comprar. Estado de la sesión: ' . json_encode($session->get()));
+    
+    // Verificar si el usuario está logueado
+    if (!$session->get('logged_in')) {
+        log_message('debug', 'Home::comprar() - Usuario no logueado, guardando URL de retorno y redirigiendo a login.');
+        $session->setFlashdata('error', 'Debes iniciar sesión para realizar una compra.');
+        // Guardar la URL actual para redirigir después del login
+        $session->set('redirect_url', current_url());
+        return redirect()->to('/loginobtener');
     }
+    
+    return view('comprar');
+}
 
     public function guardar_compra()
     {

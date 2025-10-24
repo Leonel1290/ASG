@@ -25,126 +25,135 @@ class registerController extends Controller
     }
 
     // Método para procesar el formulario de registro (POST /register/store)
-    public function store()
-    {
-        // Validación del formulario
-        $validation = \Config\Services::validation();
+public function store()
+{
+    // Validación del formulario
+    $validation = \Config\Services::validation();
 
-        $validation->setRules([
-            'nombre'  => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El campo nombre debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
-                ]
-            ],
-            'apellido' => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El campo apellido debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
-                ]
-            ],
-            'email'    => [
-                'rules' => 'required|valid_email|is_unique[usuarios.email]|max_length[100]',
-                'errors' => [
-                    'required' => 'El campo email es obligatorio.',
-                    'valid_email' => 'El campo email debe contener una dirección válida.',
-                    'is_unique' => 'El email ya está registrado.',
-                    'max_length' => 'El campo email no puede exceder los 100 caracteres.'
-                ]
-            ],
-            'password' => [
-                'rules' => [
-                    'required',
-                    'min_length[6]',
-                    'max_length[255]',
-                    'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
-                    function ($password) {
-                        return !$this->userModel->isCommonPassword($password);
-                    }
+    $validation->setRules([
+        'nombre'  => [
+            'rules' => 'required|min_length[3]|max_length[50]',
+            'errors' => [
+                'required' => 'El campo nombre es obligatorio.',
+                'min_length' => 'El campo nombre debe tener al menos 3 caracteres.',
+                'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
+            ]
+        ],
+        'apellido' => [
+            'rules' => 'required|min_length[3]|max_length[50]',
+            'errors' => [
+                'required' => 'El campo apellido es obligatorio.',
+                'min_length' => 'El campo apellido debe tener al menos 3 caracteres.',
+                'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
+            ]
+        ],
+        'email'    => [
+            'rules' => 'required|valid_email|is_unique[usuarios.email]|max_length[100]',
+            'errors' => [
+                'required' => 'El campo email es obligatorio.',
+                'valid_email' => 'Debe ser un email válido.',
+                'is_unique' => 'El email ya está registrado.',
+                'max_length' => 'El campo email no puede exceder los 100 caracteres.'
+            ]
+        ],
+        'password' => [
+            'rules' => [
+                'required',
+                'min_length[6]',
+                'max_length[255]',
+                'regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/]',
+                function ($password) {
+                    return !$this->userModel->isCommonPassword($password);
+                }
             ],
             'errors' => [
                 'required' => 'El campo contraseña es obligatorio.',
-                'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
-                'max_length' => 'La contraseña no puede exceder los 255 caracteres.',
-        'regex_match' => 'La contraseña debe incluir: mayúscula, minúscula, número y carácter especial.',
-        'La contraseña es demasiado común. Elige una más segura.'
-    ]
+                'min_length' => 'Debe tener al menos 6 caracteres.',
+                'regex_match' => 'Debe incluir mayúscula, minúscula, número y símbolo.',
+                'La contraseña es demasiado común. Elige una más segura.'
             ]
-        ]);
+        ]
+    ]);
 
-        if (!$validation->withRequest($this->request)->run()) {
-            // Si la validación falla, redirigir de vuelta al formulario con errores y datos antiguos
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
-        }
-
-        // Procesar los datos del formulario si la validación es exitosa
-        $nombre = $this->request->getPost('nombre');
-        $apellido = $this->request->getPost('apellido');
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
-
-        // Generar token de verificación y definir expiración
-        $token = random_string('alnum', 32); // Genera un token alfanumérico de 32 caracteres
-        $expires = Time::now()->addHours(24); // Token válido por 24 horas
-
-        // Preparar datos para guardar el usuario (inicialmente inactivo)
-        $userData = [
-            'nombre'   => $nombre,
-            'apellido' => $apellido,
-            'email'    => $email,
-            'password' => password_hash($password, PASSWORD_BCRYPT), // Encriptar la contraseña
-            'is_active' => 0, // <-- Marcar como inactivo por defecto
-            'reset_token' => $token, // Usamos reset_token para el token de verificación
-            'reset_expires' => $expires->toDateTimeString(), // Guardar expiración
-        ];
-
-        // Guardar el usuario en la base de datos
-        // Usamos insert() en lugar de save() para obtener el ID del nuevo registro
-        $userId = $this->userModel->insert($userData);
-
-        if ($userId) {
-            // --- Enviar el correo electrónico de verificación ---
-            $emailService = \Config\Services::email();
-
-            // Configura el remitente. Es mejor configurar esto en app/Config/Email.php o .env
-            // Si no está configurado globalmente, descomenta y ajusta las siguientes líneas:
-            // $emailService->setFrom('tu_correo@ejemplo.com', 'ASG'); // <-- CONFIGURA ESTO
-
-            $emailService->setTo($email);
-            $emailService->setSubject('Verifica tu cuenta de ASG');
-
-            // Crear el enlace de verificación
-            $verificationLink = base_url("register/verify-email/{$token}"); // <-- NUEVA RUTA
-
-            $message = "Hola {$nombre},\n\nGracias por registrarte en ASG.\n\nPor favor, haz clic en el siguiente enlace para verificar tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nSi no te registraste en ASG, puedes ignorar este correo.\n\nAtentamente,\nEl equipo de ASG";
-
-            $emailService->setMessage($message);
-
-            // Intentar enviar el correo
-            if ($emailService->send()) {
-                // Éxito al enviar el correo
-                log_message('debug', 'Correo de verificación de registro enviado a: ' . $email);
-                // Redirigir a una página que le dice al usuario que revise su email
-                return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un correo de verificación a tu email. Por favor, revisa tu bandeja de entrada para activar tu cuenta.');
-            } else {
-                // Error al enviar el correo
-                // Puedes loguear el error para depuración
-                log_message('error', 'Error al enviar correo de verificación de registro a ' . $email . ': ' . $emailService->printDebugger(['headers', 'subject', 'body']));
-                // Opcional: Eliminar el usuario recién creado si el email no se pudo enviar
-                // $this->userModel->delete($userId);
-                return redirect()->back()->withInput()->with('error', 'Hubo un error al enviar el correo de verificación. Por favor, inténtalo de nuevo.');
-            }
-            // --- Fin Enviar el correo electrónico ---
-
-        } else {
-            // Error al guardar el usuario en la base de datos
-            return redirect()->back()->withInput()->with('error', 'Hubo un error al registrar el usuario. Por favor, inténtalo de nuevo.');
-        }
+    if (!$validation->withRequest($this->request)->run()) {
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
     }
+
+    // 🚨 Verificación del reCAPTCHA antes de guardar
+    $recaptchaResponse = $this->request->getPost('g-recaptcha-response');
+    $secretKey = getenv('RECAPTCHA_SECRET');
+    $userIp = $this->request->getIPAddress();
+
+    if (empty($recaptchaResponse)) {
+        return redirect()->back()->withInput()->with('error', 'Por favor, completa el reCAPTCHA.');
+    }
+
+    // Enviar la solicitud a Google para verificar
+    $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    $data = [
+        'secret' => $secretKey,
+        'response' => $recaptchaResponse,
+        'remoteip' => $userIp
+    ];
+
+    $options = [
+        'http' => [
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+
+    $context  = stream_context_create($options);
+    $result = file_get_contents($verifyUrl, false, $context);
+    $responseKeys = json_decode($result, true);
+
+    if (!$responseKeys['success']) {
+        return redirect()->back()->withInput()->with('error', 'Verificación reCAPTCHA fallida. Por favor, inténtalo de nuevo.');
+    }
+
+    // ✅ Si el CAPTCHA es válido, continúa con el registro normal
+    $nombre = $this->request->getPost('nombre');
+    $apellido = $this->request->getPost('apellido');
+    $email = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
+
+    $token = random_string('alnum', 32);
+    $expires = Time::now()->addHours(24);
+
+    $userData = [
+        'nombre'   => $nombre,
+        'apellido' => $apellido,
+        'email'    => $email,
+        'password' => password_hash($password, PASSWORD_BCRYPT),
+        'is_active' => 0,
+        'reset_token' => $token,
+        'reset_expires' => $expires->toDateTimeString(),
+    ];
+
+    $userId = $this->userModel->insert($userData);
+
+    if ($userId) {
+        $emailService = \Config\Services::email();
+        $emailService->setTo($email);
+        $emailService->setSubject('Verifica tu cuenta de ASG');
+
+        $verificationLink = base_url("register/verify-email/{$token}");
+        $message = "Hola {$nombre},\n\nGracias por registrarte en ASG.\nPor favor, verifica tu cuenta:\n{$verificationLink}\n\nEste enlace expirará en 24 horas.\n\nEquipo ASG";
+
+        $emailService->setMessage($message);
+
+        if ($emailService->send()) {
+            return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se envió un correo de verificación a tu email.');
+        } else {
+            log_message('error', 'Error al enviar correo de verificación: ' . $emailService->printDebugger(['headers', 'subject', 'body']));
+            return redirect()->back()->withInput()->with('error', 'Hubo un error al enviar el correo de verificación. Inténtalo de nuevo.');
+        }
+    } else {
+        return redirect()->back()->withInput()->with('error', 'Hubo un error al registrar el usuario. Inténtalo de nuevo.');
+    }
+}
+
 
     // Método para mostrar la página que le dice al usuario que revise su email (GET /register/check-email)
     public function checkEmail()

@@ -153,6 +153,9 @@ $userEmail = $userEmail ?? 'No disponible'; // Asegurarse de que la variable exi
                         <li class="nav-item">
                              <a class="nav-link active" aria-current="page" href="<?= base_url('/perfil/configuracion') ?>">Mi Perfil</a>
                         </li>
+                        <a class="nav-link" href="<?= base_url('/mis_compras') ?>">
+                             <i class="fas fa-shopping-cart me-1"></i> Mis Compras
+                      </a>
                     </ul>
                     <form action="<?= base_url('/logout') ?>" method="post" class="d-flex">
                          <?= csrf_field() ?>
