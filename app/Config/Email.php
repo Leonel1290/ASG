@@ -1,66 +1,67 @@
 <?php
 
-namespace App\Services;
+namespace Config; // NOTA: Si tu clase está en App\Services, cambia este namespace
 
-// Importar la clase SendGrid Mail
+use CodeIgniter\Config\BaseConfig;
 use SendGrid\Mail\Mail;
+use Exception; // Importar la clase Exception
 
-class Email
+class Email extends BaseConfig
 {
     /**
-     * Envía un correo electrónico utilizando la API de SendGrid.
-     *
-     * @param string $to Correo del destinatario.
-     * @param string $subject Asunto del correo.
-     * @param string $body Contenido HTML del correo.
-     * @return array Resultado del envío.
+     * Función personalizada para enviar emails a través de la API de SendGrid.
+     * Retorna un array: ['success' => bool, 'message' => string]
      */
-    public function sendMail($to, $subject, $body)
+    public function enviarEmail($datos)
     {
-        // Obtiene la API Key directamente de la variable de entorno SENDGRID_API_KEY
-        $apiKey = getenv('SENDGRID_API_KEY'); 
-
-        // Si no hay API Key, retorna un error
-        if (empty($apiKey)) {
-            return [
-                'status' => 'error',
-                'message' => 'API Key de SendGrid no encontrada en el entorno.'
-            ];
+        // 1. Obtener la API Key de la variable de entorno
+        $apiKey = getenv('SENDGRID_API_KEY');
+        if (!$apiKey) {
+            return ['success' => false, 'message' => 'ERROR DE CONFIGURACIÓN: La variable de entorno SENDGRID_API_KEY no está definida.'];
         }
-
-        $email = new \SendGrid\Mail\Mail();
-
-        // Obtener remitente y nombre desde el archivo .env
+        
+        $email = new Mail();
+        
+        // 🎯 CORRECCIÓN FINAL DEL REMITENTE: Usar las variables de entorno para el nombre y email.
         $fromEmail = getenv('SENDGRID_FROM_EMAIL') ?: "againsafegas.ascii@gmail.com";
         $fromName = getenv('SENDGRID_FROM_NAME') ?: "App Name";
-
-        $email->setFrom($fromEmail, $fromName);
-        $email->setSubject($subject);
-        $email->addTo($to);
-        $email->addContent("text/html", $body);
+        
+        $email->setFrom($fromEmail, $fromName); 
+        
+        $email->setSubject($datos['asunto']);
+        $email->addTo($datos['email']);
+        $email->addContent("text/html", $datos['mensaje']);
 
         $sendgrid = new \SendGrid($apiKey);
+
         try {
             $response = $sendgrid->send($email);
 
+            // 2. Revisar el código de estado de la respuesta de SendGrid
             if ($response->statusCode() >= 200 && $response->statusCode() < 300) {
-                return [
-                    'status' => 'success',
-                    'message' => 'Correo enviado exitosamente.',
-                    'statusCode' => $response->statusCode()
-                ];
+                return ['success' => true]; // Éxito
             } else {
-                return [
-                    'status' => 'error',
-                    'message' => 'Fallo al enviar el correo. Código: ' . $response->statusCode(),
-                    'details' => $response->body()
-                ];
+                // 3. Devolver el error específico de SendGrid
+                $status = $response->statusCode();
+                $body = $response->body();
+                
+                $error_details = 'Respuesta de SendGrid. Código: ' . $status;
+                
+                // Intenta decodificar el cuerpo JSON para obtener el mensaje de error de SendGrid
+                if (!empty($body)) {
+                    $json_body = json_decode($body, true);
+                    if (isset($json_body['errors'][0]['message'])) {
+                         $error_details .= ' - Mensaje: ' . $json_body['errors'][0]['message'];
+                    } else {
+                        $error_details .= ' - Cuerpo: ' . $body;
+                    }
+                }
+                
+                return ['success' => false, 'message' => 'FALLO DE ENVÍO: ' . $error_details];
             }
-        } catch (\Exception $e) {
-            return [
-                'status' => 'exception',
-                'message' => 'Excepción de SendGrid: ' . $e->getMessage()
-            ];
+        } catch (Exception $e) {
+            // 4. Capturar errores de conexión o librería
+            return ['success' => false, 'message' => 'Excepción en el envío: ' . $e->getMessage()];
         }
     }
 }
