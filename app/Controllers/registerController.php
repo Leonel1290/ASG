@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time; // Para manejar expiración de tokens
+use Config\Email; // <--- AGREGADO: Importar la clase Email personalizada
 
 class registerController extends Controller
 {
@@ -91,20 +92,11 @@ class registerController extends Controller
 
         if ($this->userModel->insert($data)) {
 
-            // --- INICIO: Lógica de Envío de Email con SendGrid (CodeIgniter) ---
-            $emailService = \Config\Services::email();
-
-            // 1. Configurar Remitente con variables de entorno (SENDGRID_FROM_EMAIL/NAME en Render)
-            $emailService->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME')); // <--- USO DE VARIABLES DE ENTORNO
-
-            // 2. Configurar Destinatario y Asunto
-            $emailService->setTo($data['email']);
-            $emailService->setSubject('Verifica tu Cuenta en ASG');
-
-            // 3. Crear Enlace de Verificación
+            // --- INICIO: Lógica de Envío de Email con SendGrid (USANDO CLASE PERSONALIZADA Email.php) ---
+            
+            // 1. Crear el Mensaje y Datos para el Email
             $verificationLink = base_url('/register/verify-email/' . $token); // Usa tu ruta de Routes.php
 
-            // 4. Crear el Mensaje (Usando HTML simple)
             $message = "<h2>¡Bienvenido a ASG, " . esc($data['nombre']) . "!</h2>"
                 . "<p>Gracias por registrarte. Por favor, haz clic en el siguiente enlace para activar tu cuenta:</p>"
                 . "<p><a href=\"{$verificationLink}\">Activar mi cuenta ahora</a></p>"
@@ -113,25 +105,40 @@ class registerController extends Controller
                 . "<p>Si no te registraste en ASG, puedes ignorar este correo.</p>"
                 . "<p>Saludos,<br>El equipo de ASG</p>";
 
-            $emailService->setMessage($message);
+            $emailData = [
+                'email' => $data['email'],
+                'asunto' => 'Verifica tu Cuenta en ASG',
+                'mensaje' => $message
+            ];
 
-            // 5. Enviar el correo
-            if ($emailService->send()) {
+            // 2. Enviar el correo usando la clase Email personalizada
+            $emailService = new Email();
+            $resultadoEnvio = $emailService->enviarEmail($emailData);
+
+            if ($resultadoEnvio['success']) {
                 log_message('info', 'Correo de verificación enviado a: ' . $data['email']);
                 // Éxito: Redirige a la página de "revisa tu email"
                 return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un enlace de verificación a tu email. Por favor, revisa tu bandeja de entrada (y la carpeta de spam).');
             } else {
-                // Fallo: Loggea el error (visible en los logs de Render) y muestra un mensaje al usuario
-                $error = $emailService->printDebugger(['headers']);
-                log_message('error', 'Error al enviar correo de verificación (SendGrid): ' . $error);
+                // Fallo: Loggea el error y muestra un mensaje al usuario con el detalle del error
+                $errorMensaje = $resultadoEnvio['message'];
+                log_message('error', 'Error al enviar correo de verificación (SendGrid): ' . $errorMensaje);
                 
-                return redirect()->back()->withInput()->with('error', 'Error al enviar el correo de verificación. Por favor, intenta de nuevo o contacta soporte.');
+                // Mensaje amigable para el usuario final (usando el detalle del error para el diagnóstico)
+                $displayMessage = 'Error al enviar el correo de verificación. Razón: ' . $errorMensaje;
+
+                // Puedes suavizar el mensaje si detectas errores de configuración internos:
+                if (strpos($errorMensaje, 'SENDGRID_API_KEY no está definida') !== false) {
+                    $displayMessage = 'Error interno en el servicio de correo. Contacta al soporte.';
+                }
+                
+                return redirect()->back()->withInput()->with('error', $displayMessage);
             }
             // --- FIN: Lógica de Envío de Email ---
         } else {
             return redirect()->back()->withInput()->with('error', 'No se pudo registrar el usuario. Inténtalo de nuevo.');
         }
     }
-
+    
     // ... (Mantén los métodos checkEmail() y verifyEmailToken($token) sin cambios) ...
 }
