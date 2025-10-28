@@ -85,5 +85,3 @@ $routes->get('prueba', function() {
 
 $routes->get('detalles/(:segment)', 'DetalleController::detalles/$1');
 
-// Nota: Puedes eliminar las rutas 'servo' que has unificado en ValveController
-// $routes->group('servo', function($routes) { ... });
