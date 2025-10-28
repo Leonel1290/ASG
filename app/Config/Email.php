@@ -1,6 +1,8 @@
 <?php
 
-namespace Config; // NOTA: Si tu clase está en App\Services, cambia este namespace
+// El namespace 'Config' es típico de CodeIgniter para archivos de configuración,
+// asumiendo que este archivo está en app/Config/Email.php
+namespace Config; 
 
 use CodeIgniter\Config\BaseConfig;
 use SendGrid\Mail\Mail;
@@ -11,6 +13,9 @@ class Email extends BaseConfig
     /**
      * Función personalizada para enviar emails a través de la API de SendGrid.
      * Retorna un array: ['success' => bool, 'message' => string]
+     *
+     * @param array $datos ['email' => '...', 'asunto' => '...', 'mensaje' => '...']
+     * @return array
      */
     public function enviarEmail($datos)
     {
@@ -22,9 +27,10 @@ class Email extends BaseConfig
         
         $email = new Mail();
         
-        // 🎯 CORRECCIÓN FINAL DEL REMITENTE: Usar las variables de entorno para el nombre y email.
+        // 🎯 Implementación Final del Remitente: Usa las variables de entorno
+        // Fallback a los valores codificados si las variables de entorno no existen (aunque deberían)
         $fromEmail = getenv('SENDGRID_FROM_EMAIL') ?: "againsafegas.ascii@gmail.com";
-        $fromName = getenv('SENDGRID_FROM_NAME') ?: "App Name";
+        $fromName = getenv('SENDGRID_FROM_NAME') ?: "ASG - (Again Safe Gas)"; 
         
         $email->setFrom($fromEmail, $fromName); 
         
@@ -32,6 +38,7 @@ class Email extends BaseConfig
         $email->addTo($datos['email']);
         $email->addContent("text/html", $datos['mensaje']);
 
+        // Instanciar SendGrid
         $sendgrid = new \SendGrid($apiKey);
 
         try {
@@ -41,13 +48,13 @@ class Email extends BaseConfig
             if ($response->statusCode() >= 200 && $response->statusCode() < 300) {
                 return ['success' => true]; // Éxito
             } else {
-                // 3. Devolver el error específico de SendGrid
+                // 3. Devolver el error específico de SendGrid (como el persistente 403)
                 $status = $response->statusCode();
                 $body = $response->body();
                 
                 $error_details = 'Respuesta de SendGrid. Código: ' . $status;
                 
-                // Intenta decodificar el cuerpo JSON para obtener el mensaje de error de SendGrid
+                // Intenta decodificar el cuerpo JSON para obtener el mensaje de error detallado de SendGrid
                 if (!empty($body)) {
                     $json_body = json_decode($body, true);
                     if (isset($json_body['errors'][0]['message'])) {
