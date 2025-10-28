@@ -3,74 +3,38 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;
-use CodeIgniter\I18n\Time; // Para manejar expiración de tokens
+use CodeIgniter\I18n\Time; 
 use Config\Email; // <--- CRUCIAL: Importar la clase Email personalizada
 
 class registerController extends Controller
 {
-    protected $userModel; // Propiedad para el modelo de usuario
+    protected $userModel; 
 
     public function __construct()
     {
-        // Instancia el modelo de usuario
         $this->userModel = new UserModel();
-
-        // Cargar helpers necesarios
         helper(['form', 'url', 'text', 'email']); 
     }
 
-    // Método para mostrar la vista del formulario de registro (GET /register)
     public function index()
     {
-        return view('register'); // Tu vista del formulario de registro
+        return view('register'); 
     }
 
-    // Método para procesar el formulario de registro (POST /register/store)
     public function store()
     {
-        // Validación del formulario
+        // ... (Validación del formulario: Código omitido por brevedad, asumiendo que es correcto) ...
+
         $validation = \Config\Services::validation();
 
         $validation->setRules([
-            'nombre'  => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El campo nombre debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo nombre no puede exceder los 50 caracteres.'
-                ]
-            ],
-            'apellido' => [
-                'rules' => 'required|min_length[3]|max_length[50]',
-                'errors' => [
-                    'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El campo apellido debe tener al menos 3 caracteres.',
-                    'max_length' => 'El campo apellido no puede exceder los 50 caracteres.'
-                ]
-            ],
-            'email' => [
-                'rules' => 'required|valid_email|is_unique[usuarios.email]',
-                'errors' => [
-                    'required' => 'El campo email es obligatorio.',
-                    'valid_email' => 'Por favor, introduce una dirección de email válida.',
-                    'is_unique' => 'Este email ya está registrado.'
-                ]
-            ],
-            'password' => [
-                'rules' => 'required|min_length[6]',
-                'errors' => [
-                    'required' => 'El campo contraseña es obligatorio.',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres.'
-                ]
-            ],
-            'confirm_password' => [
-                'rules' => 'required|matches[password]',
-                'errors' => [
-                    'required' => 'Debes confirmar la contraseña.',
-                    'matches' => 'Las contraseñas no coinciden.'
-                ]
-            ]
+            'nombre'  => ['rules' => 'required|min_length[3]|max_length[50]', 'errors' => ['required' => 'El campo nombre es obligatorio.', 'min_length' => 'El campo nombre debe tener al menos 3 caracteres.', 'max_length' => 'El campo nombre no puede exceder los 50 caracteres.']],
+            'apellido' => ['rules' => 'required|min_length[3]|max_length[50]', 'errors' => ['required' => 'El campo apellido es obligatorio.', 'min_length' => 'El campo apellido debe tener al menos 3 caracteres.', 'max_length' => 'El campo apellido no puede exceder los 50 caracteres.']],
+            'email' => ['rules' => 'required|valid_email|is_unique[usuarios.email]', 'errors' => ['required' => 'El campo email es obligatorio.', 'valid_email' => 'Por favor, introduce una dirección de email válida.', 'is_unique' => 'Este email ya está registrado.']],
+            'password' => ['rules' => 'required|min_length[6]', 'errors' => ['required' => 'El campo contraseña es obligatorio.', 'min_length' => 'La contraseña debe tener al menos 6 caracteres.']],
+            'confirm_password' => ['rules' => 'required|matches[password]', 'errors' => ['required' => 'Debes confirmar la contraseña.', 'matches' => 'Las contraseñas no coinciden.']]
         ]);
+
 
         if (!$validation->withRequest($this->request)->run()) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
@@ -85,17 +49,16 @@ class registerController extends Controller
             'apellido' => $this->request->getPost('apellido'),
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'is_active' => 0, // Inactivo hasta verificar
-            'reset_token' => $token, // Reutilizado para verificación de email
-            'reset_expires' => $expires, // Expiración del token
+            'is_active' => 0, 
+            'reset_token' => $token, 
+            'reset_expires' => $expires,
         ];
 
         if ($this->userModel->insert($data)) {
 
-            // --- INICIO: Lógica de Envío de Email con SendGrid (USANDO CLASE PERSONALIZADA Email.php) ---
+            // --- INICIO: Lógica de Envío de Email con SendGrid ---
             
-            // 1. Crear el Mensaje y Datos para el Email
-            $verificationLink = base_url('/register/verify-email/' . $token); // Usa tu ruta de Routes.php
+            $verificationLink = base_url('/register/verify-email/' . $token); 
 
             $message = "<h2>¡Bienvenido a ASG, " . esc($data['nombre']) . "!</h2>"
                 . "<p>Gracias por registrarte. Por favor, haz clic en el siguiente enlace para activar tu cuenta:</p>"
@@ -117,7 +80,6 @@ class registerController extends Controller
 
             if ($resultadoEnvio['success']) {
                 log_message('info', 'Correo de verificación enviado a: ' . $data['email']);
-                // Éxito: Redirige a la página de "revisa tu email"
                 return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un enlace de verificación a tu email. Por favor, revisa tu bandeja de entrada (y la carpeta de spam).');
             } else {
                 // Fallo: Loggea el error y muestra un mensaje al usuario con el detalle del error
@@ -127,7 +89,7 @@ class registerController extends Controller
                 // Mensaje para mostrar al usuario final, incluyendo el detalle del error
                 $displayMessage = 'Error al enviar el correo de verificación. Razón: ' . $errorMensaje;
 
-                // Opcional: Suavizar el mensaje si detectamos errores de configuración internos:
+                // Suavizar el mensaje si detectamos errores internos:
                 if (strpos($errorMensaje, 'SENDGRID_API_KEY no está definida') !== false) {
                     $displayMessage = 'Error interno en el servicio de correo. Contacta al soporte.';
                 }
