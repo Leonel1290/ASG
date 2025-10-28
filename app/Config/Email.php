@@ -1,5 +1,3 @@
-// app/Services/Email.php (o donde esté tu clase Email)
-
 <?php
 
 namespace App\Services;
@@ -32,12 +30,11 @@ class Email
 
         $email = new \SendGrid\Mail\Mail();
 
-        // 🎯 MODIFICACIÓN: Obtener remitente y nombre desde el archivo .env
-        // Si las variables de entorno no existen, usa los valores predeterminados anteriores.
+        // Obtener remitente y nombre desde el archivo .env
         $fromEmail = getenv('SENDGRID_FROM_EMAIL') ?: "againsafegas.ascii@gmail.com";
         $fromName = getenv('SENDGRID_FROM_NAME') ?: "App Name";
 
-        $email->setFrom($fromEmail, $fromName); // Usa las variables del .env
+        $email->setFrom($fromEmail, $fromName);
         $email->setSubject($subject);
         $email->addTo($to);
         $email->addContent("text/html", $body);
