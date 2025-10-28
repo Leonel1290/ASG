@@ -4,7 +4,7 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time; // Para manejar expiración de tokens
-use Config\Email; // <--- AGREGADO: Importar la clase Email personalizada
+use Config\Email; // <--- CRUCIAL: Importar la clase Email personalizada
 
 class registerController extends Controller
 {
@@ -124,10 +124,10 @@ class registerController extends Controller
                 $errorMensaje = $resultadoEnvio['message'];
                 log_message('error', 'Error al enviar correo de verificación (SendGrid): ' . $errorMensaje);
                 
-                // Mensaje amigable para el usuario final (usando el detalle del error para el diagnóstico)
+                // Mensaje para mostrar al usuario final, incluyendo el detalle del error
                 $displayMessage = 'Error al enviar el correo de verificación. Razón: ' . $errorMensaje;
 
-                // Puedes suavizar el mensaje si detectas errores de configuración internos:
+                // Opcional: Suavizar el mensaje si detectamos errores de configuración internos:
                 if (strpos($errorMensaje, 'SENDGRID_API_KEY no está definida') !== false) {
                     $displayMessage = 'Error interno en el servicio de correo. Contacta al soporte.';
                 }
