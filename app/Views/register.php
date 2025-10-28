@@ -102,7 +102,6 @@
         }
     </style>
 
-    <!-- Script oficial de Google reCAPTCHA -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
@@ -110,7 +109,6 @@
     <section class="form-register">
         <h1>Formulario de Registro</h1>
 
-        <!-- Mensajes -->
         <?php if (session()->getFlashdata('success')): ?>
             <p class="success-message"><?= session()->getFlashdata('success') ?></p>
         <?php endif; ?>
@@ -133,7 +131,6 @@
             </div>
         <?php endif; ?>
 
-        <!-- Formulario -->
         <form action="<?= base_url('register/store') ?>" method="post">
             <?= csrf_field() ?>
 
@@ -148,7 +145,8 @@
                 <img src="https://static.thenounproject.com/png/1035969-200.png" id="eyeicon" alt="Mostrar/Ocultar contraseña">
             </div>
 
-            <!-- Google reCAPTCHA -->
+            <input class="controls" type="password" name="confirm_password" id="confirm_password" placeholder="Confirme su contraseña" required>
+
             <div class="g-recaptcha" data-sitekey="6LekJPIrAAAAABMwovEjr7lZj6lNoUlqBXr_iCzu"></div>
 
             <p>Estoy de acuerdo con los <a href="<?= base_url('terminos') ?>" target="_blank">Términos y Condiciones</a></p>
@@ -163,6 +161,9 @@
         // Mostrar / ocultar contraseña
         let eyeicon = document.getElementById("eyeicon");
         let password = document.getElementById("password");
+        // Asegúrate de que el script solo controle el primer campo de contraseña si usas el mismo ícono/lógica
+        // Si quieres que el ícono funcione para ambos campos, necesitarías dos íconos y lógica separada
+        // Por ahora, mantendremos la lógica original solo para el campo 'password'
         eyeicon.onclick = function() {
             if (password.type == "password") {
                 password.type = "text";
