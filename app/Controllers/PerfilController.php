@@ -8,6 +8,7 @@ use App\Models\LecturasGasModel;
 use App\Models\UserModel;
 use App\Models\DispositivoModel;
 use CodeIgniter\I18n\Time;
+use Config\Email;
 
 class PerfilController extends BaseController
 {
@@ -26,7 +27,68 @@ class PerfilController extends BaseController
 
         helper(['form', 'url', 'text', 'email']);
     }
+public function enviarVerificacion()
+    {
+        $session = session();
+        $usuarioId = $session->get('id');
 
+        if (!$usuarioId) {
+            return redirect()->to('/login')->with('error', 'Debes iniciar sesión para verificar tu perfil.');
+        }
+
+        $user = $this->userModel->find($usuarioId);
+
+        if (!$user) {
+            return redirect()->to('/login')->with('error', 'Usuario no encontrado.');
+        }
+
+        // 1. Generar Token y actualizar en la DB
+        $verificationToken = bin2hex(random_bytes(32));
+        $expirationTime = Time::now()->addMinutes(60)->toDateTimeString(); // 1 hora de validez
+
+        // Asumiendo que tu modelo tiene una columna 'reset_token' y 'reset_expires'
+        $this->userModel->update($usuarioId, [
+            'reset_token' => $verificationToken,
+            'reset_expires' => $expirationTime,
+        ]);
+
+        // 2. Preparar el correo
+        $verificationLink = base_url('perfil/confirmar-acceso/' . $verificationToken);
+        // NOTA: Asume que tienes una vista 'emails/email_verificacion_perfil.php'
+        $mensaje = view('emails/email_verificacion_perfil', ['link' => $verificationLink, 'nombre' => $user['nombre']]);
+
+        $datosEmail = [
+            'email' => $user['email'],
+            'asunto' => 'Verificación de Acceso a Configuración de Perfil',
+            'mensaje' => $mensaje,
+        ];
+        
+        // 🛑 LÍNEA DE PRUEBA CRÍTICA (TEMPORAL): BORRAR INMEDIATAMENTE DESPUÉS DE LA PRUEBA 🛑
+        // Esto registrará la clave real que Render está usando.
+        log_message('error', 'API_KEY_LEIDA_RENDER: ' . getenv('SENDGRID_API_KEY'));
+        // 🛑 FIN DE LÍNEA DE PRUEBA 🛑
+
+        // 3. Enviar el correo usando el servicio SendGrid
+        $emailService = new \Config\Email();
+        $resultadoEnvio = $emailService->enviarEmail($datosEmail);
+
+        if ($resultadoEnvio['success']) {
+            log_message('info', 'Correo de verificación de perfil enviado a: ' . $user['email']);
+            return redirect()->back()->with('success', 'Se ha enviado un enlace de verificación a tu email para acceder a la configuración. Revisa tu bandeja de entrada.');
+        } else {
+            // Fallo: Loggea el error y muestra un mensaje al usuario con el detalle del error
+            $errorMensaje = $resultadoEnvio['message'];
+            log_message('error', 'Error al enviar correo de verificación de perfil (SendGrid): ' . $errorMensaje);
+
+            // Suavizar el mensaje para el usuario final (si es un 403, es un problema de clave)
+            $displayMessage = 'Error al enviar el correo de verificación. Razón: ' . $errorMensaje;
+            if (strpos($errorMensaje, 'Código: 403') !== false) {
+                 $displayMessage = 'Error crítico: Problema de autorización de la API de SendGrid. Por favor, verifica la clave en Render y sus permisos en SendGrid.';
+            }
+
+            return redirect()->back()->with('error', $displayMessage);
+        }
+    }
     public function index()
     {
         $session = session();

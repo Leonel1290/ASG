@@ -1,12 +1,10 @@
 <?php
 
-// El namespace 'Config' es típico de CodeIgniter para archivos de configuración,
-// asumiendo que este archivo está en app/Config/Email.php
 namespace Config; 
 
 use CodeIgniter\Config\BaseConfig;
 use SendGrid\Mail\Mail;
-use Exception; // Importar la clase Exception
+use Exception; 
 
 class Email extends BaseConfig
 {
@@ -27,8 +25,7 @@ class Email extends BaseConfig
         
         $email = new Mail();
         
-        // 🎯 Implementación Final del Remitente: Usa las variables de entorno
-        // Fallback a los valores codificados si las variables de entorno no existen (aunque deberían)
+        // 🎯 Uso de Variables de Entorno para Remitente
         $fromEmail = getenv('SENDGRID_FROM_EMAIL') ?: "againsafegas.ascii@gmail.com";
         $fromName = getenv('SENDGRID_FROM_NAME') ?: "ASG - (Again Safe Gas)"; 
         
