@@ -6,8 +6,10 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'againsafegas.ascii@gmail.com';
-    public string $fromName   = 'ASG';
+    // LECTURA DE VARIABLES DE ENTORNO PARA REMITENTE
+    // Asegura que se usen las variables SENDGRID_FROM_EMAIL/NAME de Render
+    public string $fromEmail  = getenv('SENDGRID_FROM_EMAIL');
+    public string $fromName   = getenv('SENDGRID_FROM_NAME');
     public string $recipients = '';
 
     /**
@@ -18,7 +20,8 @@ class Email extends BaseConfig
     /**
      * The mail sending protocol: mail, sendmail, smtp
      */
-    public string $protocol = 'smtp';
+    // LECTURA DE VARIABLES DE ENTORNO PARA PROTOCOLO
+    public string $protocol = getenv('email.protocol') ?: 'smtp';
 
     /**
      * The server path to Sendmail.
@@ -28,27 +31,31 @@ class Email extends BaseConfig
     /**
      * SMTP Server Hostname
      */
-    public string $SMTPHost = 'smtp.gmail.com';
+    // LECTURA DE VARIABLES DE ENTORNO PARA HOST
+    public string $SMTPHost = getenv('email.SMTPHost') ?: 'localhost';
 
     /**
-     * SMTP Username
+     * SMTP Username (Debe ser 'apikey' para SendGrid)
      */
-    public string $SMTPUser = 'againsafegas.ascii@gmail.com';
+    // LECTURA DE VARIABLES DE ENTORNO PARA USUARIO
+    public string $SMTPUser = getenv('email.SMTPUser') ?: '';
 
     /**
-     * SMTP Password
+     * SMTP Password (Tu API Key de SendGrid)
      */
-    public string $SMTPPass = 'ywbn dvza fiew hcir'; // 🔑 Contraseña actualizada
+    // LECTURA DE VARIABLES DE ENTORNO PARA CONTRASEÑA
+    public string $SMTPPass = getenv('email.SMTPPass') ?: '';
 
     /**
      * SMTP Port
      */
-    public int $SMTPPort = 465;
+    // LECTURA DE VARIABLES DE ENTORNO PARA PUERTO (587 para SendGrid)
+    public int $SMTPPort = (int)getenv('email.SMTPPort') ?: 25;
 
     /**
      * SMTP Timeout (in seconds)
      */
-    public int $SMTPTimeout = 60;
+    public int $SMTPTimeout = (int)getenv('email.SMTPTimeout') ?: 60;
 
     /**
      * Enable persistent SMTP connections
@@ -56,13 +63,10 @@ class Email extends BaseConfig
     public bool $SMTPKeepAlive = false;
 
     /**
-     * SMTP Encryption.
-     *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
+     * SMTP Encryption. (Debe ser 'tls' para el puerto 587 de SendGrid)
      */
-    public string $SMTPCrypto = 'ssl';
+    // LECTURA DE VARIABLES DE ENTORNO PARA ENCRIPTACIÓN
+    public string $SMTPCrypto = getenv('email.SMTPCrypto') ?: 'tls';
 
     /**
      * Enable word-wrap
@@ -100,14 +104,14 @@ class Email extends BaseConfig
     public string $CRLF = "\r\n";
 
     /**
-     * Newline character. (Use “\r\n” to comply with RFC 822)
+     * The mail MIME version number. Recommended: 1.0
      */
-    public string $newline = "\r\n";
+    public string $newline = "\n";
 
     /**
-     * Enable BCC Batch Mode.
+     * Type of mail, either 'text' or 'html'
      */
-    public bool $BCCBatchMode = false;
+    public string $BCCBatchMode = false;
 
     /**
      * Number of emails in each BCC batch
@@ -115,7 +119,7 @@ class Email extends BaseConfig
     public int $BCCBatchSize = 200;
 
     /**
-     * Enable notify message from server
+     * Sets the most preferred way to send email
      */
-    public bool $DSN = false;
+    public string $DSN = '';
 }

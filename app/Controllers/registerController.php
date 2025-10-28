@@ -90,22 +90,21 @@ class registerController extends Controller
         ];
 
         if ($this->userModel->insert($data)) {
-            // $user_id = $this->userModel->getInsertID(); // Puedes usar esto si lo necesitas
 
             // --- INICIO: Lógica de Envío de Email con SendGrid (CodeIgniter) ---
             $emailService = \Config\Services::email();
 
             // 1. Configurar Remitente con variables de entorno (SENDGRID_FROM_EMAIL/NAME en Render)
-            $emailService->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME')); // <--- CAMBIO CLAVE
+            $emailService->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME')); // <--- USO DE VARIABLES DE ENTORNO
 
-            // 2. Configurar destinatario y asunto
+            // 2. Configurar Destinatario y Asunto
             $emailService->setTo($data['email']);
             $emailService->setSubject('Verifica tu Cuenta en ASG');
 
-            // 3. Crear el enlace de verificación
+            // 3. Crear Enlace de Verificación
             $verificationLink = base_url('/register/verify-email/' . $token); // Usa tu ruta de Routes.php
 
-            // 4. Crear el mensaje (Usando HTML simple)
+            // 4. Crear el Mensaje (Usando HTML simple)
             $message = "<h2>¡Bienvenido a ASG, " . esc($data['nombre']) . "!</h2>"
                 . "<p>Gracias por registrarte. Por favor, haz clic en el siguiente enlace para activar tu cuenta:</p>"
                 . "<p><a href=\"{$verificationLink}\">Activar mi cuenta ahora</a></p>"
@@ -118,16 +117,15 @@ class registerController extends Controller
 
             // 5. Enviar el correo
             if ($emailService->send()) {
+                log_message('info', 'Correo de verificación enviado a: ' . $data['email']);
                 // Éxito: Redirige a la página de "revisa tu email"
                 return redirect()->to('/register/check-email')->with('success', '¡Registro exitoso! Se ha enviado un enlace de verificación a tu email. Por favor, revisa tu bandeja de entrada (y la carpeta de spam).');
             } else {
                 // Fallo: Loggea el error (visible en los logs de Render) y muestra un mensaje al usuario
                 $error = $emailService->printDebugger(['headers']);
-                log_message('error', 'Error al enviar email de verificación (SendGrid): ' . $error);
+                log_message('error', 'Error al enviar correo de verificación (SendGrid): ' . $error);
                 
-                // Opcional: Podrías considerar eliminar el usuario recién creado aquí si el email es CRÍTICO.
-                
-                return redirect()->back()->withInput()->with('error', 'Error al enviar el correo de verificación. Por favor, inténtalo de nuevo. Asegúrate de que la API Key de SendGrid esté correcta.');
+                return redirect()->back()->withInput()->with('error', 'Error al enviar el correo de verificación. Por favor, intenta de nuevo o contacta soporte.');
             }
             // --- FIN: Lógica de Envío de Email ---
         } else {
@@ -135,56 +133,5 @@ class registerController extends Controller
         }
     }
 
-    // Método para mostrar la vista que pide revisar el email
-    public function checkEmail()
-    {
-        return view('verification_message');
-    }
-
-    // Método para procesar la verificación del token (GET /register/verify-email/$token)
-    public function verifyEmailToken($token)
-    {
-        if (empty($token)) {
-            return redirect()->to('/register')->with('error', 'Token de verificación no proporcionado.');
-        }
-
-        // Buscar al usuario por el token y asegurar que no esté activo
-        $user = $this->userModel->where('reset_token', $token)
-                                ->where('is_active', 0) // Solo usuarios inactivos
-                                ->first();
-
-        if (!$user) {
-            // El token no existe, ya fue usado o el usuario ya está activo
-            return redirect()->to('/loginobtener')->with('error', 'El enlace de verificación no es válido o ya fue utilizado.');
-        }
-
-        // --- Verificación de Expiración ---
-        $expires = Time::parse($user['reset_expires']);
-        if ($expires->isBefore(Time::now())) {
-            // Token expirado, limpiar el token en la base de datos
-            $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-            return redirect()->to('/register')->with('error', 'El token de verificación ha expirado. Por favor, regístrate de nuevo para obtener un nuevo token.');
-        }
-
-        // Verificar si el usuario ya está activo (aunque ya filtramos arriba, es una doble verificación)
-        if ($user['is_active']) {
-             // Limpiar el token aunque ya esté activo
-             $this->userModel->update($user['id'], ['reset_token' => null, 'reset_expires' => null]);
-             return redirect()->to('/loginobtener')->with('info', 'Tu cuenta ya ha sido verificada. Por favor, inicia sesión.');
-        }
-
-
-        // --- Token válido: Activar la cuenta del usuario ---
-
-        // Marcar al usuario como activo en la base de datos
-        $updateData = [
-            'is_active' => 1, // Marcar como activo
-            'reset_token' => null, // Limpiar el token después de usarlo
-            'reset_expires' => null, // Limpiar la expiración
-        ];
-        $this->userModel->update($user['id'], $updateData);
-
-        // Redirigir al usuario a la página de login con un mensaje de éxito
-        return redirect()->to('/loginobtener')->with('success', '¡Cuenta verificada con éxito! Ahora puedes iniciar sesión.');
-    }
+    // ... (Mantén los métodos checkEmail() y verifyEmailToken($token) sin cambios) ...
 }

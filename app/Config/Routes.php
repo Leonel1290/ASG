@@ -36,26 +36,31 @@ $routes->post('/logout', 'Home::logout');
 
 // PASSWORD RECOVERY
 $routes->get('/forgotpassword', 'Home::forgotpassword');
-$routes->post('/forgotpassword1', 'Home::forgotPPassword'); // Assume this is the route that processes the forgot password form
-$routes->get('/reset-password/(:any)', 'Home::showResetPasswordForm/$1');
-$routes->post('/reset-password', 'Home::resetPassword'); // Assume this is the route that processes the reset password form
-$routes->get('detalles/(:any)', 'DetalleController::detalles/$1');
+$routes->post('/forgotpassword1', 'Home::forgotpassword1');
+$routes->get('/resetpassword/(:segment)', 'Home::resetpassword/$1');
+$routes->post('/resetpassword1', 'Home::resetpassword1');
 
 
-// Rutas para el perfil y dispositivos (PerfilController)
-$routes->group('perfil', function($routes) {
+// --- PERFIL ROUTES ---
+$routes->group('perfil', function ($routes) {
     $routes->get('/', 'PerfilController::index');
-    $routes->get('configuracion', 'PerfilController::configuracion');
-    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
-    $routes->get('verificar-email/(:segment)', 'PerfilController::verificarEmailToken/$1');
-    $routes->post('cambiar-contrasena', 'PerfilController::cambiarContrasena');
-    $routes->post('eliminar-cuenta', 'PerfilController::eliminarCuenta');
-    $routes->get('config_form', 'PerfilController::configForm');
-    $routes->post('actualizar', 'PerfilController::actualizar');
+    $routes->get('configuracion', 'PerfilController::configuracion'); // La vista que pide el email
+
+    // Rutas para Dispositivos
+    $routes->get('registrar-dispositivo', 'PerfilController::registerLink');
+    $routes->post('registrar-dispositivo/store', 'PerfilController::storeLink');
+    $routes->get('mis-compras', 'PerfilController::misCompras');
+    $routes->get('direccion-envio/(:segment)', 'PerfilController::direccionEnvio/$1');
+    $routes->post('direccion-envio/guardar', 'PerfilController::guardarDireccion');
     $routes->get('cambio-exitoso', 'PerfilController::cambioExitoso');
     $routes->get('dispositivo/editar/(:segment)', 'PerfilController::editDevice/$1');
     $routes->post('dispositivo/actualizar', 'PerfilController::updateDevice');
     $routes->post('eliminar-dispositivos', 'PerfilController::eliminarDispositivos');
+
+    // === NUEVAS RUTAS DE VERIFICACIÓN DE PERFIL ===
+    $routes->post('enviar-verificacion', 'PerfilController::enviarVerificacion');
+    $routes->get('confirmar-acceso/(:segment)', 'PerfilController::confirmarAcceso/$1');
+    // =============================================
 });
 
 $routes->post('/cambiar-idioma', 'LanguageController::changeLanguage');
@@ -86,14 +91,3 @@ $routes->get('prueba', function() {
 
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
-
-// En routes.php (CodeIgniter 4)
-$routes->get('descarga', 'Home::descarga');
-
-//Comprasid
-$routes->get('/mis_compras', 'PerfilController::misCompras');
-$routes->post('perfil/guardar-direccion-envio', 'PerfilController::guardarDireccionEnvio');
-
-
-// NUEVA RUTA: Guía de Compra
-$routes->get('/guia-de-compra', 'CompraController::guiaDeCompra');
