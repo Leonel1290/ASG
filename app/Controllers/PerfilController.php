@@ -50,7 +50,7 @@ class PerfilController extends BaseController
 
         // Obtener dispositivos enlazados por el usuario
         $data['dispositivosEnlazados'] = $this->dispositivoModel
-                                            ->where('usuario_id', $usuarioId) // <--- CORRECCIÓN CLAVE
+                                            ->where('id_usuario', $usuarioId) E
                                             ->findAll();
 
         log_message('debug', 'PerfilController::index() - Dispositivos encontrados: ' . count($data['dispositivosEnlazados']));
