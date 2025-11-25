@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost/Pruebainicio/views/';
+    public string $baseURL = 'https://asg-rxnu.onrender.com/';
      //http://localhost/SanchezLeonel2024/login2/ASG-3/public/
     
     /**

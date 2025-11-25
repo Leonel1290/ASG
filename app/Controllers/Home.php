@@ -421,4 +421,8 @@ class Home extends BaseController
     {
         return view('descarga');
     }
+    public function juego()
+    {
+        return view('juego');
+    }
 }

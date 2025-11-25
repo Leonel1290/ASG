@@ -91,3 +91,5 @@ $routes->get('prueba', function() {
 
 $routes->post('paypal/create-order', 'CompraController::createOrder');
 $routes->post('paypal/capture-order/(:any)', 'CompraController::captureOrder/$1');
+
+$routes->get('/juego', 'Home::juego');
